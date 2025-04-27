@@ -30,6 +30,22 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
 import { 
   Users, 
   FileText, 
@@ -42,7 +58,12 @@ import {
   FileCheck, 
   Download, 
   Pencil, 
-  UserCheck
+  UserCheck,
+  DollarSign,
+  CreditCard,
+  Activity,
+  TrendingUp,
+  Calendar
 } from "lucide-react";
 import { User, Document, Course } from "@shared/schema";
 
@@ -51,6 +72,13 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [searchTerm, setSearchTerm] = useState("");
+  const [dateRange, setDateRange] = useState<{
+    from: Date;
+    to: Date;
+  }>({
+    from: new Date(new Date().setDate(new Date().getDate() - 30)),
+    to: new Date()
+  });
   
   // Mutation for updating course price
   const updateCoursePriceMutation = useMutation({
@@ -111,16 +139,44 @@ export default function AdminDashboard() {
     u.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Fetch analytics data
+  const { data: userActivityStats, isLoading: isUserActivityLoading } = useQuery({
+    queryKey: ["/api/analytics/user-activity"],
+  });
+
+  const { data: documentStats, isLoading: isDocumentStatsLoading } = useQuery({
+    queryKey: ["/api/analytics/document-stats"],
+  });
+
+  const { data: revenueStats, isLoading: isRevenueStatsLoading } = useQuery({
+    queryKey: ["/api/analytics/revenue-stats"],
+  });
+
+  const { data: dailyEventCounts, isLoading: isDailyEventsLoading } = useQuery({
+    queryKey: ["/api/analytics/daily-events", {
+      startDate: dateRange.from.toISOString(),
+      endDate: dateRange.to.toISOString()
+    }],
+  });
+
   // Dashboard statistics
   const stats = {
-    totalUsers: users?.length || 0,
+    totalUsers: userActivityStats?.totalUsers || users?.length || 0,
     totalCertifiers: certifiers?.length || 0,
-    totalDocuments: documents?.length || 0,
+    totalDocuments: documentStats?.totalDocuments || documents?.length || 0,
     totalCourses: courses?.length || 0,
-    pendingDocuments: documents?.filter(d => d.status === "pending").length || 0,
-    signedDocuments: documents?.filter(d => d.status === "signed").length || 0,
-    registeredToday: 5, // Placeholder value
-    conversionRate: "23%", // Placeholder value
+    pendingDocuments: documentStats?.documentsByStatus?.pending || documents?.filter(d => d.status === "pending").length || 0,
+    signedDocuments: documentStats?.documentsByStatus?.signed || documents?.filter(d => d.status === "signed").length || 0,
+    newUsersToday: userActivityStats?.newUsersToday || 0,
+    newUsersThisWeek: userActivityStats?.newUsersThisWeek || 0,
+    newUsersThisMonth: userActivityStats?.newUsersThisMonth || 0,
+    revenueToday: revenueStats?.revenueToday || 0,
+    revenueThisWeek: revenueStats?.revenueThisWeek || 0,
+    revenueThisMonth: revenueStats?.revenueThisMonth || 0,
+    totalRevenue: revenueStats?.totalRevenue || 0,
+    documentRevenue: revenueStats?.documentRevenue || 0,
+    courseRevenue: revenueStats?.courseRevenue || 0,
+    videoCallRevenue: revenueStats?.videoCallRevenue || 0,
   };
 
   return (
@@ -142,10 +198,14 @@ export default function AdminDashboard() {
             onValueChange={setActiveTab}
             className="space-y-6"
           >
-            <TabsList className="grid grid-cols-3 w-full max-w-md">
+            <TabsList className="grid grid-cols-4 w-full max-w-xl">
               <TabsTrigger value="dashboard" className="gap-2">
                 <BarChart3 className="h-4 w-4" />
                 <span>Dashboard</span>
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="gap-2">
+                <Activity className="h-4 w-4" />
+                <span>Analítica</span>
               </TabsTrigger>
               <TabsTrigger value="users" className="gap-2">
                 <Users className="h-4 w-4" />
