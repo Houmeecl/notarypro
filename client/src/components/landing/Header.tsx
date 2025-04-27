@@ -47,7 +47,7 @@ export default function Header() {
             <a href="#contacto" className="text-secondary hover:text-primary font-medium text-sm transition duration-150">
               Contacto
             </a>
-            <Link href="/partners/public-page" className="text-secondary hover:text-primary font-medium text-sm transition duration-150">
+            <Link href="/vecinos-express" className="text-secondary hover:text-primary font-medium text-sm transition duration-150">
               Vecinos Express
             </Link>
             
@@ -114,7 +114,7 @@ export default function Header() {
                 Contacto
               </a>
               <Link 
-                href="/partners/public-page"
+                href="/vecinos-express"
                 className="block px-3 py-2 text-base font-medium text-secondary hover:text-primary hover:bg-light rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >

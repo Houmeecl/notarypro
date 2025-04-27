@@ -27,6 +27,7 @@ import TemplateAdminPage from "@/pages/template-admin";
 import VerificarDocumento from "@/pages/verificar-documento";
 import VideocallInterfaceDemo from "@/pages/videocall-interface-demo";
 import CursoCertificador from "@/pages/curso-certificador";
+import VecinosExpress from "@/pages/vecinos-express";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -113,6 +114,7 @@ function Router() {
       <Route path="/verificar-documento" component={VerificarDocumento} />
       <Route path="/verificar-documento/:code" component={VerificarDocumento} />
       <Route path="/curso-certificador" component={CursoCertificador} />
+      <Route path="/vecinos-express" component={VecinosExpress} />
       
       {/* Partner pages */}
       <Route path="/partners/public-page" component={PartnersPublicPage} />
