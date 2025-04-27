@@ -9,6 +9,7 @@
 import { db } from '../db';
 import * as schema from '@shared/schema';
 import { eq } from 'drizzle-orm';
+import { videoXService } from './videox-service';
 
 // Interfaces
 export interface ApiCredentials {
@@ -59,6 +60,15 @@ let integrations: Record<string, ApiIntegration> = {
       isEnabled: false
     }
   },
+  videox: {
+    id: 'videox',
+    name: 'VideoX Conference',
+    credentials: {},
+    status: {
+      isConfigured: false,
+      isEnabled: false
+    }
+  },
   stripe: {
     id: 'stripe',
     name: 'Stripe Payments',
@@ -96,6 +106,7 @@ export async function getIntegrationsStatus(): Promise<Record<string, ApiStatus>
   result.crm.isConfigured = !!process.env.CRM_API_KEY && !!process.env.CRM_API_URL;
   result.whatsapp.isConfigured = !!process.env.WHATSAPP_API_KEY && !!process.env.WHATSAPP_API_URL;
   result.dialogflow.isConfigured = !!process.env.DIALOGFLOW_API_KEY;
+  result.videox.isConfigured = !!process.env.VIDEOX_API_KEY && !!process.env.VIDEOX_API_SECRET && !!process.env.VIDEOX_ACCOUNT_ID;
   result.stripe.isConfigured = !!process.env.STRIPE_SECRET_KEY && !!process.env.VITE_STRIPE_PUBLIC_KEY;
   result.sendgrid.isConfigured = !!process.env.SENDGRID_API_KEY;
   
@@ -172,6 +183,18 @@ export async function testIntegrationConnection(apiId: string): Promise<ApiStatu
         // Simulación de prueba de conexión a Dialogflow
         if (!process.env.DIALOGFLOW_API_KEY) {
           throw new Error('Credenciales de Dialogflow incompletas');
+        }
+        isConnected = true;
+        break;
+        
+      case 'videox':
+        // Usar el servicio real de VideoX para probar la conexión
+        if (!process.env.VIDEOX_API_KEY || !process.env.VIDEOX_API_SECRET || !process.env.VIDEOX_ACCOUNT_ID) {
+          throw new Error('Credenciales de VideoX incompletas');
+        }
+        const videoXResult = await videoXService.testConnection();
+        if (!videoXResult.success) {
+          throw new Error(videoXResult.message);
         }
         isConnected = true;
         break;

@@ -19,6 +19,7 @@ import {
   Bot,
   CreditCard,
   Mail,
+  Video,
   RefreshCw,
   CheckCircle2,
   XCircle
@@ -89,6 +90,19 @@ const ApiIntegrationsPage = () => {
       fields: [
         { name: 'DIALOGFLOW_API_KEY', label: 'API Key', type: 'text', placeholder: 'Ingrese su API Key de Dialogflow', required: true, secret: true },
         { name: 'DIALOGFLOW_PROJECT_ID', label: 'Project ID', type: 'text', placeholder: 'ID del proyecto de Dialogflow', required: true, secret: false }
+      ]
+    },
+    {
+      id: 'videox',
+      name: 'VideoX Conference',
+      description: 'Integra sistemas de videoconferencia para certificaciones remotas y reuniones',
+      icon: <Video className="h-6 w-6 text-red-500" />,
+      isEnabled: false,
+      isConfigured: false,
+      fields: [
+        { name: 'VIDEOX_API_KEY', label: 'API Key', type: 'text', placeholder: 'Ingrese su API Key de VideoX', required: true, secret: true },
+        { name: 'VIDEOX_API_SECRET', label: 'API Secret', type: 'text', placeholder: 'Ingrese su API Secret de VideoX', required: true, secret: true },
+        { name: 'VIDEOX_ACCOUNT_ID', label: 'Account ID', type: 'text', placeholder: 'ID de la cuenta de VideoX', required: true, secret: false }
       ]
     },
     {
@@ -315,6 +329,7 @@ const ApiIntegrationsPage = () => {
           <TabsTrigger value="crm">CRM</TabsTrigger>
           <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
           <TabsTrigger value="dialogflow">Dialogflow</TabsTrigger>
+          <TabsTrigger value="videox">VideoX</TabsTrigger>
           <TabsTrigger value="payments">Pagos</TabsTrigger>
           <TabsTrigger value="email">Email</TabsTrigger>
         </TabsList>
