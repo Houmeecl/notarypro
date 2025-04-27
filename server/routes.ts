@@ -33,9 +33,12 @@ import {
 import { generateVerificationCode, generateQRCodeSVG, generateSignatureData } from "@shared/utils/verification-code";
 import adminRouter from "./admin/admin-routes";
 import integrationRouter from "./admin/integration-routes";
+import { adminPosRouter } from "./admin/admin-pos-routes";
+import { partnerPosRouter } from "./partners/partner-pos-routes";
 import { automationService } from "./services/automation-service";
 import { whatsappService } from "./services/whatsapp-service";
 import { dialogflowService } from "./services/dialogflow-service";
+import { posService } from "./services/pos-service";
 import { WebSocketServer } from "ws";
 import { createSuperAdmin } from "./admin/seed-admin";
 
@@ -105,6 +108,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Registrar rutas de integración
   app.use('/api/integration', integrationRouter);
+  
+  // Registrar rutas de POS
+  app.use('/api/admin/pos', adminPosRouter);
+  app.use('/api/partners/pos', partnerPosRouter);
   
   // Inicializar el super administrador
   // Esta función comprueba si ya existe y solo actualiza la contraseña si es necesario
