@@ -35,6 +35,7 @@ import adminRouter from "./admin/admin-routes";
 import integrationRouter from "./admin/integration-routes";
 import { adminPosRouter } from "./admin/admin-pos-routes";
 import { partnerPosRouter } from "./partners/partner-pos-routes";
+import { registerAdminApiRoutes } from "./admin/admin-api-routes";
 import { automationService } from "./services/automation-service";
 import { whatsappService } from "./services/whatsapp-service";
 import { dialogflowService } from "./services/dialogflow-service";
@@ -112,6 +113,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registrar rutas de POS
   app.use('/api/admin/pos', adminPosRouter);
   app.use('/api/partners/pos', partnerPosRouter);
+
+  // Registrar rutas de APIs de integraciones
+  registerAdminApiRoutes(app);
   
   // Inicializar el super administrador
   // Esta función comprueba si ya existe y solo actualiza la contraseña si es necesario
