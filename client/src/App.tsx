@@ -23,6 +23,7 @@ import CertificacionPorVideo from "@/pages/certificacion-por-video";
 import UneteAlEquipo from "@/pages/unete-al-equipo";
 import ConversorPresencialRemoto from "@/pages/conversor-presencial-remoto";
 import TemplateAdminPage from "@/pages/template-admin";
+import VerificarDocumento from "@/pages/verificar-documento";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -101,6 +102,8 @@ function Router() {
       <Route path="/certificacion-por-video" component={CertificacionPorVideo} />
       <Route path="/unete-al-equipo" component={UneteAlEquipo} />
       <Route path="/conversor-presencial-remoto" component={ConversorPresencialRemoto} />
+      <Route path="/verificar-documento" component={VerificarDocumento} />
+      <Route path="/verificar-documento/:code" component={VerificarDocumento} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
