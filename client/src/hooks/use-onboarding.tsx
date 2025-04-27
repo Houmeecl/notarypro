@@ -20,15 +20,8 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     const onboardingStatus = localStorage.getItem('onboardingCompleted');
     setIsOnboardingCompleted(onboardingStatus === 'true');
     
-    // Auto-show onboarding for new users
-    if (onboardingStatus === null) {
-      // Wait a bit to allow the app to load first
-      const timer = setTimeout(() => {
-        setShowOnboardingWizard(true);
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
+    // No mostrar automáticamente el onboarding al iniciar
+    // Ahora el usuario deberá activarlo explícitamente desde la interfaz
   }, []);
   
   const showOnboarding = (stepId?: string) => {
