@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Play, ArrowRight, Video } from "lucide-react";
 import { ExplanatoryVideo } from "@/components/ui/explanatory-video";
-import { Logo, PartnerLogo } from "@/components/ui/logo";
+import logoImg from "@/assets/logo12582620.png";
 
 export default function Hero() {
   return (
@@ -11,7 +11,7 @@ export default function Hero() {
         {/* Logo principal - Sin texto adicional */}
         <div className="flex justify-center items-center mb-16">
           <img 
-            src="/assets/notarypro-logo.png" 
+            src={logoImg} 
             alt="NotaryPro Logo" 
             className="h-20 w-auto" 
           />

@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import Logo from "@/components/common/Logo";
+import logoImg from "@/assets/logo12582620.png";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,7 +21,7 @@ export default function Header() {
           <div className="flex items-center">
             <Link href="/">
               <img 
-                src="/assets/notarypro-logo.png" 
+                src={logoImg} 
                 alt="NotaryPro Logo" 
                 className="h-10 w-auto" 
               />
