@@ -17,9 +17,15 @@ export default function Header() {
     <header className="relative bg-white shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
-          {/* Logo */}
+          {/* Logo - Solo imagen sin texto */}
           <div className="flex items-center">
-            <Logo size="md" variant="full" />
+            <Link href="/">
+              <img 
+                src="/assets/notarypro-logo.png" 
+                alt="NotaryPro Logo" 
+                className="h-10 w-auto" 
+              />
+            </Link>
           </div>
 
           {/* Desktop Navigation */}

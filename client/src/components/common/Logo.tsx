@@ -34,11 +34,7 @@ const Logo: React.FC<LogoProps> = ({
         className="h-auto max-h-full"
         style={{ height: variant === 'icon' ? `${height}px` : `${height}px` }}
       />
-      {variant === 'full' && (
-        <span className="ml-2 font-bold text-gray-800 hidden sm:block">
-          NotaryPro Chile
-        </span>
-      )}
+      {/* Eliminamos el texto NotaryPro Chile */}
     </div>
   );
 

@@ -8,9 +8,13 @@ export default function Hero() {
   return (
     <section className="relative bg-light pt-16 pb-32 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Solo logo principal - centrado y más grande */}
+        {/* Logo principal - Sin texto adicional */}
         <div className="flex justify-center items-center mb-16">
-          <Logo size="lg" showText={true} className="scale-110" />
+          <img 
+            src="/assets/notarypro-logo.png" 
+            alt="NotaryPro Logo" 
+            className="h-20 w-auto" 
+          />
         </div>
         
         <div className="flex flex-col md:flex-row items-center">
