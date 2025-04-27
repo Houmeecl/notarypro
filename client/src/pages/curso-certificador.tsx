@@ -108,7 +108,7 @@ export default function CursoCertificador() {
               <CorporateLogo size="lg" />
             </div>
             
-            <div className="mb-6">
+            <div className="flex justify-center mb-6">
               <CertifierBadge size="lg" className="mb-2" />
             </div>
             
