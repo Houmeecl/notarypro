@@ -39,7 +39,7 @@ export default function ServiciosEmpresariales() {
             En el entorno empresarial actual de Chile, la gestión eficiente de documentos es crucial para mantener la competitividad. NotaryPro Chile ofrece soluciones avanzadas de firma electrónica que permiten a las empresas chilenas reducir costos, mejorar la eficiencia y cumplir con todas las normativas legales establecidas en la Ley 19.799 sobre Documentos Electrónicos y Firma Electrónica.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <Card className="border border-gray-200 hover:border-primary transition-colors duration-200">
               <CardContent className="p-6">
                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
@@ -60,6 +60,23 @@ export default function ServiciosEmpresariales() {
                 <h3 className="text-xl font-bold text-secondary mb-2">Portal Empresarial</h3>
                 <p className="text-gray-600">
                   Plataforma personalizada con su marca, que permite a sus colaboradores y clientes firmar documentos de forma segura con validez legal en Chile.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border border-gray-200 hover:border-primary transition-colors duration-200">
+              <CardContent className="p-6">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="text-primary h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="4" y="2" width="16" height="20" rx="2" />
+                    <line x1="8" y1="2" x2="8" y2="22" />
+                    <line x1="16" y1="2" x2="16" y2="22" />
+                    <circle cx="12" cy="18" r="1" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-secondary mb-2">Estaciones de Firma Digital</h3>
+                <p className="text-gray-600">
+                  Tablets y kioscos con nuestra aplicación instalada para firmas presenciales en sus oficinas, minas, o cualquier ubicación en territorio chileno.
                 </p>
               </CardContent>
             </Card>
@@ -164,6 +181,91 @@ export default function ServiciosEmpresariales() {
               <p className="text-gray-600 text-sm">
                 Certificados, matrículas, contratos educacionales, documentación académica
               </p>
+            </div>
+          </div>
+
+          {/* Kioscos y Tablets Section */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-12">
+            <div className="flex flex-col md:flex-row gap-8">
+              <div className="md:w-1/2">
+                <h3 className="text-2xl font-bold text-secondary mb-4">
+                  Estaciones de Firma en Kioscos y Tablets
+                </h3>
+                <p className="text-gray-700 mb-4">
+                  Nuestro servicio de kioscos y tablets ofrece una solución completa para empresas que necesitan capturar firmas electrónicas en sitio, ideal para:
+                </p>
+                <ul className="list-disc pl-5 text-gray-700 space-y-3 mb-6">
+                  <li><span className="font-medium">Sitios mineros y operaciones remotas</span>: Instalamos estaciones de firma en faenas mineras y operaciones industriales en cualquier parte de Chile.</li>
+                  <li><span className="font-medium">Oficinas corporativas</span>: Implemente kioscos de firma en sus instalaciones para visitantes y colaboradores.</li>
+                  <li><span className="font-medium">Eventos y ferias comerciales</span>: Dispositivos portátiles para capturar firmas durante eventos especiales.</li>
+                  <li><span className="font-medium">Operaciones multiubicación</span>: Mantenga consistencia en la firma de documentos a través de múltiples ubicaciones.</li>
+                </ul>
+                <h4 className="font-bold text-lg mb-2">Planes flexibles de suscripción mensual:</h4>
+                <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                  <div className="flex justify-between mb-2">
+                    <span className="font-medium">1-5 dispositivos</span>
+                    <span className="font-medium">Desde $29.990 por dispositivo/mes</span>
+                  </div>
+                  <div className="flex justify-between mb-2">
+                    <span className="font-medium">6-20 dispositivos</span>
+                    <span className="font-medium">Desde $24.990 por dispositivo/mes</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium">21+ dispositivos</span>
+                    <span className="font-medium">Consultar por precios corporativos</span>
+                  </div>
+                </div>
+                <Button className="w-full md:w-auto">Consultar por este servicio</Button>
+              </div>
+              <div className="md:w-1/2">
+                <div className="rounded-lg bg-gray-100 p-6 h-full flex flex-col justify-center">
+                  <h4 className="font-bold text-xl mb-4">Todo incluido en el servicio:</h4>
+                  <ul className="space-y-3">
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Hardware: Tablet o kiosco según sus necesidades</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Software: Aplicación NotaryPro con su marca personalizada</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Conexión: Configuración de conectividad 4G o WiFi</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Instalación: Configuración y puesta en marcha</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Soporte: Mantenimiento y atención técnica 24/7</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Almacenamiento: Acceso a todos los documentos en la nube</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Capacitación: Formación para su personal</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -278,6 +380,15 @@ export default function ServiciosEmpresariales() {
               </h3>
               <p className="text-gray-600">
                 Sí, disponemos de planes empresariales personalizados según el volumen de documentos, número de usuarios y necesidades específicas de integración, con tarifas especiales para empresas chilenas de diferentes tamaños.
+              </p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <h3 className="font-bold text-secondary mb-2">
+                ¿Cómo funciona el servicio de tablets y kioscos para firmas?
+              </h3>
+              <p className="text-gray-600">
+                Nuestro servicio incluye todo lo necesario: dispositivos, software personalizado, instalación y mantenimiento. Instalamos tablets o kioscos en sus instalaciones con nuestra aplicación preconfigurada, proporcionamos capacitación a su personal y ofrecemos soporte continuo. El servicio se contrata mediante suscripción mensual, sin inversión inicial en equipos, y los documentos firmados se almacenan automáticamente en nuestra plataforma segura.
               </p>
             </div>
           </div>
