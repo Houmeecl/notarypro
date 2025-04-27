@@ -11,10 +11,12 @@ import {
   LogOut,
   ChevronRight,
   Menu,
-  X
+  X,
+  Store
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import Logo from "@/components/common/Logo";
 
 interface NavItemProps {
   icon: React.ReactNode;

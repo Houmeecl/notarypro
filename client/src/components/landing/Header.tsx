@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import Logo from "@/components/common/Logo";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,16 +19,7 @@ export default function Header() {
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center">
-              <div className="flex items-center">
-                <img 
-                  src="/assets/nuevo-logo.png" 
-                  alt="NotaryPro" 
-                  className="h-10 w-auto"
-                />
-                <span className="ml-2 font-bold text-xl text-gray-900">NotaryPro</span>
-              </div>
-            </Link>
+            <Logo size="md" variant="full" />
           </div>
 
           {/* Desktop Navigation */}
