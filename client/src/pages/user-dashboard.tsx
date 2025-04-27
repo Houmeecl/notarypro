@@ -129,12 +129,20 @@ export default function UserDashboard() {
                 </TabsTrigger>
               </TabsList>
               
-              <Link href="/document-sign/new">
-                <Button className="bg-primary hover:bg-primary/90">
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Nuevo Documento
-                </Button>
-              </Link>
+              <div className="flex gap-2">
+                <Link href="/documents">
+                  <Button variant="outline">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Todos mis documentos
+                  </Button>
+                </Link>
+                <Link href="/document-categories">
+                  <Button className="bg-primary hover:bg-primary/90">
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Nuevo Documento
+                  </Button>
+                </Link>
+              </div>
             </div>
             
             <TabsContent value="documents" className="space-y-6">

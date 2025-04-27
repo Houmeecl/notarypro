@@ -17,6 +17,13 @@ import AdminDashboard from "@/pages/admin-dashboard";
 import CoursePage from "@/pages/course-page";
 import DocumentSign from "@/pages/document-sign";
 
+// Document pages
+import DocumentCategoriesPage from "@/pages/document-categories";
+import DocumentTemplatesPage from "@/pages/document-templates";
+import DocumentFormPage from "@/pages/document-form";
+import DocumentViewPage from "@/pages/document-view";
+import DocumentsPage from "@/pages/documents";
+
 function Router() {
   return (
     <Switch>
@@ -32,6 +39,25 @@ function Router() {
       <ProtectedRoute 
         path="/document-sign/:id" 
         component={DocumentSign} 
+        allowedRoles={["user", "certifier", "admin"]} 
+      />
+      
+      {/* Document routes */}
+      <Route path="/document-categories" component={DocumentCategoriesPage} />
+      <Route path="/document-templates/:categoryId" component={DocumentTemplatesPage} />
+      <ProtectedRoute 
+        path="/document-form/:templateId" 
+        component={DocumentFormPage} 
+        allowedRoles={["user", "certifier", "admin"]} 
+      />
+      <ProtectedRoute 
+        path="/documents" 
+        component={DocumentsPage} 
+        allowedRoles={["user", "certifier", "admin"]} 
+      />
+      <ProtectedRoute 
+        path="/documents/:documentId" 
+        component={DocumentViewPage} 
         allowedRoles={["user", "certifier", "admin"]} 
       />
       
