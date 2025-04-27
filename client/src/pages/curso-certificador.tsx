@@ -17,7 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { AlertCircle, ArrowLeft, ArrowRight, BookOpen, CheckCircle, Clock, FileCheck, GraduationCap, ShieldCheck, Star, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ExplanatoryVideo } from "@/components/ui/explanatory-video";
-// import logoPath from "../assets/logo.png";
+import { CorporateLogo, CertifierBadge } from "@/components/ui/logo/CorporateLogo";
 
 export default function CursoCertificador() {
   const [activeTab, setActiveTab] = useState("info");
@@ -105,16 +105,11 @@ export default function CursoCertificador() {
         <div className="max-w-5xl mx-auto">
           <header className="text-center mb-12">
             <div className="flex justify-center mb-6">
-              {/* Logo will be added later */}
+              <CorporateLogo size="lg" />
             </div>
             
             <div className="mb-6">
-              <h1 className="text-2xl md:text-3xl font-bold text-red-600 uppercase">
-                CERTIFICADORES OFICIAL LEY 19.799
-              </h1>
-              <p className="text-lg text-gray-700 mt-1">
-                por Certificadora Pública Digital de Chile
-              </p>
+              <CertifierBadge size="lg" className="mb-2" />
             </div>
             
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
