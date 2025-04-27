@@ -11,10 +11,10 @@ import { ArrowRight, Check, AlertCircle, FileText, FileCode, RotateCw } from "lu
 // pero se implementan directamente aquí para evitar problemas de importación en el cliente
 
 // Mapeo de términos presenciales a sus equivalentes online
-const PRESENTIAL_TO_REMOTE_TERMS: Record<string, string> = {
+const PRESENTIAL_TO_ONLINE_TERMS: Record<string, string> = {
   // Términos generales
-  'presencial': 'remoto',
-  'presencialmente': 'remotamente',
+  'presencial': 'online',
+  'presencialmente': 'online',
   'en persona': 'por videoconferencia',
   'físicamente': 'virtualmente',
   'comparecer físicamente': 'comparecer virtualmente',
@@ -25,21 +25,21 @@ const PRESENTIAL_TO_REMOTE_TERMS: Record<string, string> = {
   'acudir a la oficina': 'conectarse a la sesión virtual',
   'en las oficinas': 'a través de la plataforma digital',
   'presencia física': 'presencia virtual',
-  'de forma presencial': 'de forma telemática',
+  'de forma presencial': 'de forma online',
   
   // Términos notariales específicos
   'ante notario': 'ante certificador en línea',
   'notario público': 'certificador digital',
   'oficina notarial': 'plataforma de certificación digital',
   'despacho notarial': 'servicio de certificación en línea',
-  'sede notarial': 'sesión de certificación remota',
+  'sede notarial': 'sesión de certificación online',
   'notaría': 'certificación en línea',
-  'acto notarial presencial': 'acto notarial remoto',
+  'acto notarial presencial': 'acto notarial online',
   'escritura pública presencial': 'escritura pública electrónica',
   'firma manuscrita': 'firma electrónica avanzada',
   'acta notarial física': 'acta notarial digital',
   'testimonio físico': 'testimonio digital',
-  'diligencia presencial': 'diligencia remota',
+  'diligencia presencial': 'diligencia online',
   'documento físico': 'documento electrónico',
   'original físico': 'original digital',
   'copia física': 'copia digital',
@@ -50,11 +50,11 @@ const PRESENTIAL_TO_REMOTE_TERMS: Record<string, string> = {
   'rúbrica manuscrita': 'firma digital certificada',
 };
 
-const convertPresentialToRemote = (text: string): string => {
+const convertPresentialToOnline = (text: string): string => {
   let convertedText = text;
   
   // Reemplazar todos los términos presenciales por sus equivalentes online
-  for (const [presential, remote] of Object.entries(PRESENTIAL_TO_REMOTE_TERMS)) {
+  for (const [presential, online] of Object.entries(PRESENTIAL_TO_ONLINE_TERMS)) {
     // Usa una expresión regular para hacer coincidir el término completo y con distinción entre mayúsculas/minúsculas
     const regex = new RegExp(`\\b${presential}\\b`, 'gi');
     convertedText = convertedText.replace(regex, (match) => {
@@ -195,7 +195,7 @@ export default function PresentialToRemoteConverter() {
                     <AlertCircle className="h-4 w-4 text-amber-600" />
                     <AlertTitle className="text-amber-800">Se requiere conversión</AlertTitle>
                     <AlertDescription className="text-amber-600">
-                      Se encontraron términos presenciales que pueden ser convertidos a formato remoto.
+                      Se encontraron términos presenciales que pueden ser convertidos a formato online.
                     </AlertDescription>
                   </Alert>
                 )}
