@@ -7,12 +7,14 @@ import FAQ from "@/components/landing/FAQ";
 import Contact from "@/components/landing/Contact";
 import CTA from "@/components/landing/CTA";
 import Footer from "@/components/landing/Footer";
+import RonService from "@/components/landing/RonService";
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
       <Hero />
+      <RonService />
       <Services />
       <HowItWorks />
       <Pricing />
