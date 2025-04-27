@@ -150,6 +150,40 @@ export interface IStorage {
   getVideoCallSessionsByStatus(status: string): Promise<VideoCallSession[]>;
   updateVideoCallSession(id: number, session: Partial<VideoCallSession>): Promise<VideoCallSession | undefined>;
   
+  // Analytics operations
+  createAnalyticsEvent(insertEvent: InsertAnalyticsEvent): Promise<AnalyticsEvent>;
+  getAnalyticsEvents(options?: { 
+    startDate?: Date;
+    endDate?: Date;
+    eventType?: string;
+    userId?: number;
+  }): Promise<AnalyticsEvent[]>;
+  getDailyEventCounts(options?: {
+    startDate?: Date;
+    endDate?: Date;
+    eventType?: string;
+  }): Promise<{ date: string; count: number }[]>;
+  getUserActivityStats(): Promise<{
+    totalUsers: number;
+    newUsersToday: number;
+    newUsersThisWeek: number;
+    newUsersThisMonth: number;
+  }>;
+  getDocumentStats(): Promise<{
+    totalDocuments: number;
+    documentsCreatedToday: number;
+    documentsByStatus: Record<string, number>;
+  }>;
+  getRevenueStats(): Promise<{
+    totalRevenue: number;
+    revenueToday: number;
+    revenueThisWeek: number;
+    revenueThisMonth: number;
+    documentRevenue: number;
+    courseRevenue: number;
+    videoCallRevenue: number;
+  }>;
+  
   sessionStore: session.Store;
 }
 
@@ -875,6 +909,57 @@ export class DatabaseStorage implements IStorage {
       pool, 
       createTableIfMissing: true 
     });
+  }
+  
+  // Analytics operations
+  async createAnalyticsEvent(insertEvent: InsertAnalyticsEvent): Promise<AnalyticsEvent> {
+    return await createAnalyticsEvent(insertEvent);
+  }
+  
+  async getAnalyticsEvents(options?: { 
+    startDate?: Date; 
+    endDate?: Date; 
+    eventType?: string; 
+    userId?: number;
+  }): Promise<AnalyticsEvent[]> {
+    return await getAnalyticsEvents(options);
+  }
+  
+  async getDailyEventCounts(options?: { 
+    startDate?: Date; 
+    endDate?: Date; 
+    eventType?: string;
+  }): Promise<{ date: string; count: number }[]> {
+    return await getDailyEventCounts(options);
+  }
+  
+  async getUserActivityStats(): Promise<{ 
+    totalUsers: number; 
+    newUsersToday: number; 
+    newUsersThisWeek: number; 
+    newUsersThisMonth: number;
+  }> {
+    return await getUserActivityStats();
+  }
+  
+  async getDocumentStats(): Promise<{ 
+    totalDocuments: number; 
+    documentsCreatedToday: number; 
+    documentsByStatus: Record<string, number>;
+  }> {
+    return await getDocumentStats();
+  }
+  
+  async getRevenueStats(): Promise<{
+    totalRevenue: number;
+    revenueToday: number;
+    revenueThisWeek: number;
+    revenueThisMonth: number;
+    documentRevenue: number;
+    courseRevenue: number;
+    videoCallRevenue: number;
+  }> {
+    return await getRevenueStats();
   }
 
   // User operations

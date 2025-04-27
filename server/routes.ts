@@ -780,6 +780,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error.message });
     }
   });
+  
+  // Analytics routes
+  app.post("/api/analytics/events", isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = insertAnalyticsEventSchema.parse({
+        ...req.body,
+        userId: req.user.id
+      });
+      const event = await storage.createAnalyticsEvent(validatedData);
+      res.status(201).json(event);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+  
+  app.get("/api/analytics/events", isAdmin, async (req, res) => {
+    try {
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+      const eventType = req.query.eventType as string;
+      const userId = req.query.userId ? parseInt(req.query.userId as string) : undefined;
+      
+      const events = await storage.getAnalyticsEvents({
+        startDate,
+        endDate,
+        eventType,
+        userId
+      });
+      
+      res.status(200).json(events);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  app.get("/api/analytics/daily-counts", isAdmin, async (req, res) => {
+    try {
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+      const eventType = req.query.eventType as string;
+      
+      const counts = await storage.getDailyEventCounts({
+        startDate,
+        endDate,
+        eventType
+      });
+      
+      res.status(200).json(counts);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  app.get("/api/analytics/user-stats", isAdmin, async (req, res) => {
+    try {
+      const stats = await storage.getUserActivityStats();
+      res.status(200).json(stats);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  app.get("/api/analytics/document-stats", isAdmin, async (req, res) => {
+    try {
+      const stats = await storage.getDocumentStats();
+      res.status(200).json(stats);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  app.get("/api/analytics/revenue-stats", isAdmin, async (req, res) => {
+    try {
+      const stats = await storage.getRevenueStats();
+      res.status(200).json(stats);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
