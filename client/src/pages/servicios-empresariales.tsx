@@ -200,19 +200,37 @@ export default function ServiciosEmpresariales() {
                   <li><span className="font-medium">Eventos y ferias comerciales</span>: Dispositivos portátiles para capturar firmas durante eventos especiales.</li>
                   <li><span className="font-medium">Operaciones multiubicación</span>: Mantenga consistencia en la firma de documentos a través de múltiples ubicaciones.</li>
                 </ul>
-                <h4 className="font-bold text-lg mb-2">Planes flexibles de suscripción mensual:</h4>
+                <h4 className="font-bold text-lg mb-2">Tarifas y planes:</h4>
                 <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                  <div className="flex justify-between mb-2">
-                    <span className="font-medium">1-5 dispositivos</span>
-                    <span className="font-medium">Desde $29.990 por dispositivo/mes</span>
+                  <p className="font-medium text-primary mb-2">Cuota de implementación inicial:</p>
+                  <p className="mb-3">Incluye configuración personalizada de sus documentos, integración con su sistema de gestión documental para auditoría, y capacitación del personal.</p>
+                  <div className="mb-4 border-b pb-3">
+                    <div className="flex justify-between mb-1">
+                      <span>1-5 dispositivos</span>
+                      <span>$350.000 + IVA</span>
+                    </div>
+                    <div className="flex justify-between mb-1">
+                      <span>6-20 dispositivos</span>
+                      <span>$650.000 + IVA</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>21+ dispositivos</span>
+                      <span>Consultar</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between mb-2">
-                    <span className="font-medium">6-20 dispositivos</span>
-                    <span className="font-medium">Desde $24.990 por dispositivo/mes</span>
+                  
+                  <p className="font-medium text-primary mb-2">Suscripción mensual por dispositivo:</p>
+                  <div className="flex justify-between mb-1">
+                    <span>1-5 dispositivos</span>
+                    <span>$29.990 + IVA / mes</span>
+                  </div>
+                  <div className="flex justify-between mb-1">
+                    <span>6-20 dispositivos</span>
+                    <span>$24.990 + IVA / mes</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-medium">21+ dispositivos</span>
-                    <span className="font-medium">Consultar por precios corporativos</span>
+                    <span>21+ dispositivos</span>
+                    <span>Consultar por precios corporativos</span>
                   </div>
                 </div>
                 <Button className="w-full md:w-auto">Consultar por este servicio</Button>
@@ -249,19 +267,109 @@ export default function ServiciosEmpresariales() {
                       <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
+                      <span>Registro único: Cada documento recibe un número único para verificación posterior</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Gestor documental: Sistema integrado para auditoría y almacenamiento seguro</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
                       <span>Soporte: Mantenimiento y atención técnica 24/7</span>
                     </li>
                     <li className="flex items-start">
                       <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span>Almacenamiento: Acceso a todos los documentos en la nube</span>
+                      <span>Capacitación: Formación para su personal</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* NotaryPro Vecino Section */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-12">
+            <div className="flex flex-col md:flex-row gap-8">
+              <div className="md:w-1/2">
+                <h3 className="text-2xl font-bold text-secondary mb-4">
+                  Programa NotaryPro Vecino
+                </h3>
+                <p className="text-gray-700 mb-4">
+                  Convierta su negocio local en un punto autorizado para servicios de certificación documental. Nuestro programa NotaryPro Vecino permite a almacenes, locutorios, centros de internet y otros comercios de barrio ofrecer servicios de firma digital y legalización de documentos.
+                </p>
+                <h4 className="font-bold text-lg mb-2">Beneficios para su negocio:</h4>
+                <ul className="list-disc pl-5 text-gray-700 space-y-2 mb-6">
+                  <li>Ingresos adicionales por cada documento procesado</li>
+                  <li>Aumento del flujo de clientes a su local</li>
+                  <li>Sin inversión inicial - solo una pequeña cuota mensual</li>
+                  <li>Formación completa y soporte continuo</li>
+                  <li>Diferenciación frente a la competencia</li>
+                </ul>
+                <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                  <h4 className="font-bold text-lg mb-2">Modalidad de servicio:</h4>
+                  <div className="flex justify-between mb-2">
+                    <span className="font-medium">Cuota mensual</span>
+                    <span className="font-medium">$19.990 + IVA</span>
+                  </div>
+                  <div className="flex justify-between mb-2">
+                    <span className="font-medium">Comisión por documento</span>
+                    <span className="font-medium">20% del valor</span>
+                  </div>
+                  <p className="text-sm mt-2">*El cliente paga directamente en su terminal POS. NotaryPro retiene su comisión y liquida el pago semanalmente.</p>
+                </div>
+                <Button className="w-full md:w-auto">Unirse al programa NotaryPro Vecino</Button>
+              </div>
+              <div className="md:w-1/2">
+                <div className="rounded-lg bg-gray-100 p-6 h-full flex flex-col justify-center">
+                  <h4 className="font-bold text-xl mb-4">Incluye en su local:</h4>
+                  <ul className="space-y-3">
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Tablet con aplicación NotaryPro preinstalada</span>
                     </li>
                     <li className="flex items-start">
                       <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span>Capacitación: Formación para su personal</span>
+                      <span>Terminal POS para pagos con tarjeta</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Señalética y materiales promocionales</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Capacitación para uso del sistema</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Sistema de registro único para cada documento</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Liquidación semanal de comisiones</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Soporte técnico telefónico prioritario</span>
                     </li>
                   </ul>
                 </div>
@@ -388,7 +496,25 @@ export default function ServiciosEmpresariales() {
                 ¿Cómo funciona el servicio de tablets y kioscos para firmas?
               </h3>
               <p className="text-gray-600">
-                Nuestro servicio incluye todo lo necesario: dispositivos, software personalizado, instalación y mantenimiento. Instalamos tablets o kioscos en sus instalaciones con nuestra aplicación preconfigurada, proporcionamos capacitación a su personal y ofrecemos soporte continuo. El servicio se contrata mediante suscripción mensual, sin inversión inicial en equipos, y los documentos firmados se almacenan automáticamente en nuestra plataforma segura.
+                Nuestro servicio incluye todo lo necesario: dispositivos, software personalizado, instalación y mantenimiento. Instalamos tablets o kioscos en sus instalaciones con nuestra aplicación preconfigurada, proporcionamos capacitación a su personal y ofrecemos soporte continuo. El servicio se contrata mediante suscripción mensual con una cuota inicial de implementación para la configuración de sus documentos, y los documentos firmados se almacenan automáticamente en nuestro gestor documental para auditoría.
+              </p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <h3 className="font-bold text-secondary mb-2">
+                ¿Cómo verifico la autenticidad de un documento firmado con NotaryPro?
+              </h3>
+              <p className="text-gray-600">
+                Cada documento procesado a través de nuestra plataforma recibe un número de registro único que se incorpora al documento firmado. Este identificador puede utilizarse en nuestro portal de verificación para comprobar la autenticidad del documento, fecha y hora de firma, identidad de los firmantes y cualquier otra información relevante. Este sistema de verificación cumple con los requisitos de trazabilidad y no repudio establecidos en la Ley 19.799.
+              </p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <h3 className="font-bold text-secondary mb-2">
+                ¿Qué es el programa NotaryPro Vecino?
+              </h3>
+              <p className="text-gray-600">
+                Es nuestro programa para comercios y negocios locales que desean ofrecer servicios de certificación de documentos. Proporcionamos una tablet con nuestra aplicación y un terminal POS para pagos. Los clientes pueden acudir a estos locales para firmar y legalizar documentos, pagando directamente en el comercio. El propietario del negocio recibe una comisión por cada documento procesado, generando un ingreso adicional mientras ofrece un servicio valioso a su comunidad.
               </p>
             </div>
           </div>
