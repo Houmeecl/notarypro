@@ -17,8 +17,8 @@ export function Logo({
   className,
   linkTo = '/',
 }: LogoProps) {
-  // Importar las imágenes de los logos
-  const logoImage = '/assets/nuevo-logo.png';
+  // Importar la imagen del logo original
+  const logoImage = '/assets/notarypro-logo.png';
   
   // Definir tamaños de logo según el parámetro size
   const logoSizes = {
