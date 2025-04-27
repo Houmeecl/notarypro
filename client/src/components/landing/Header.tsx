@@ -47,6 +47,9 @@ export default function Header() {
             <a href="#contacto" className="text-secondary hover:text-primary font-medium text-sm transition duration-150">
               Contacto
             </a>
+            <Link href="/partners/public-page" className="text-secondary hover:text-primary font-medium text-sm transition duration-150">
+              Vecinos Express
+            </Link>
             
             {user ? (
               <Link href={user.role === "certifier" ? "/certifier-dashboard" : (user.role === "admin" ? "/admin-dashboard" : "/user-dashboard")}>
@@ -110,6 +113,13 @@ export default function Header() {
               >
                 Contacto
               </a>
+              <Link 
+                href="/partners/public-page"
+                className="block px-3 py-2 text-base font-medium text-secondary hover:text-primary hover:bg-light rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Vecinos Express
+              </Link>
               
               {user ? (
                 <Link href={user.role === "certifier" ? "/certifier-dashboard" : (user.role === "admin" ? "/admin-dashboard" : "/user-dashboard")}>
