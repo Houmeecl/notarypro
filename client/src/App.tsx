@@ -21,6 +21,7 @@ import ServiciosEmpresariales from "@/pages/servicios-empresariales";
 import NotarizeOnline from "@/pages/notarize-online";
 import CertificacionPorVideo from "@/pages/certificacion-por-video";
 import UneteAlEquipo from "@/pages/unete-al-equipo";
+import ConversorPresencialRemoto from "@/pages/conversor-presencial-remoto";
 import TemplateAdminPage from "@/pages/template-admin";
 
 // Document pages
@@ -99,6 +100,7 @@ function Router() {
       <Route path="/notarize-online" component={NotarizeOnline} />
       <Route path="/certificacion-por-video" component={CertificacionPorVideo} />
       <Route path="/unete-al-equipo" component={UneteAlEquipo} />
+      <Route path="/conversor-presencial-remoto" component={ConversorPresencialRemoto} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />

@@ -55,6 +55,7 @@ export interface IStorage {
   getPendingDocuments(): Promise<Document[]>;
   getCertifierDocuments(certifierId: number): Promise<Document[]>;
   getDocumentsByStatus(status: string): Promise<Document[]>;
+  getDocumentByVerificationCode(code: string): Promise<Document | undefined>;
   
   // Identity verification operations
   createIdentityVerification(verification: InsertIdentityVerification): Promise<IdentityVerification>;
@@ -358,6 +359,12 @@ export class MemStorage implements IStorage {
   async getCertifierDocuments(certifierId: number): Promise<Document[]> {
     return Array.from(this.documents.values()).filter(
       (document) => document.certifierId === certifierId,
+    );
+  }
+  
+  async getDocumentByVerificationCode(code: string): Promise<Document | undefined> {
+    return Array.from(this.documents.values()).find(
+      (document) => document.qrCode === code,
     );
   }
 
@@ -820,6 +827,11 @@ export class DatabaseStorage implements IStorage {
   
   async getDocumentsByStatus(status: string): Promise<Document[]> {
     return await db.select().from(documents).where(eq(documents.status, status));
+  }
+  
+  async getDocumentByVerificationCode(code: string): Promise<Document | undefined> {
+    const [document] = await db.select().from(documents).where(eq(documents.qrCode, code));
+    return document || undefined;
   }
 
   // Identity verification operations

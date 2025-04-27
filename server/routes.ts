@@ -20,6 +20,7 @@ import {
   insertQuizAttemptSchema,
   insertCertificateSchema
 } from "@shared/schema";
+import { generateVerificationCode, generateQRCodeSVG, generateSignatureData } from "@shared/utils/verification-code";
 
 // Ensure these directories exist
 const uploadsDir = path.join(process.cwd(), "uploads");
@@ -430,14 +431,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Document must be validated for advanced signatures" });
       }
       
+      // Generar código de verificación único
+      const verificationCode = generateVerificationCode(documentId, document.title);
+      
+      // Generar SVG del código QR para la verificación
+      const qrCodeSvg = generateQRCodeSVG(verificationCode);
+      
+      // Generar datos de firma con el código de verificación
+      const signatureData = generateSignatureData(req.user.id, documentId, verificationCode);
+      
+      // Actualizar el documento con el código de verificación y datos de firma
       const updatedDocument = await storage.updateDocument(documentId, {
-        signatureData: req.body.signatureData,
-        status: "signed"
+        signatureData,
+        status: "signed",
+        qrCode: verificationCode,
+        signatureTimestamp: new Date()
       });
       
       res.status(200).json(updatedDocument);
     } catch (error) {
       res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Verificación de documentos por código
+  app.get("/api/verificar-documento/:code", async (req, res) => {
+    try {
+      const code = req.params.code;
+      
+      // Buscar documento por código de verificación
+      const document = await storage.getDocumentByVerificationCode(code);
+      
+      if (!document) {
+        return res.status(404).json({ 
+          verified: false,
+          message: "Documento no encontrado. El código de verificación puede ser inválido o el documento ya no existe."
+        });
+      }
+      
+      // Obtener datos del firmante
+      const user = await storage.getUser(document.userId);
+      
+      // Responder con los datos de verificación
+      res.status(200).json({
+        verified: true,
+        documentInfo: {
+          title: document.title,
+          signatureTimestamp: document.signatureTimestamp,
+          signerName: user?.fullName || "Usuario desconocido"
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        verified: false,
+        message: "Error en la verificación. Por favor, intente nuevamente."
+      });
     }
   });
 
