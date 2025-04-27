@@ -398,7 +398,7 @@ export default function PartnersPublicPage() {
             Únase a nuestra red de puntos de servicio y expanda su negocio hoy mismo
           </p>
           <Button 
-            onClick={() => navigate("/partners/registration-form")}
+            onClick={() => setLocation("/partners/registration-form")}
             className="bg-white text-[#EC1C24] hover:bg-white/90 px-8 py-3 text-lg"
           >
             Registrar mi negocio
