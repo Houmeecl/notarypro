@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { SearchIcon, CheckCircle, XCircle, ArrowRight, FileSearch } from "lucide-react";
+import { SearchIcon, CheckCircle, XCircle, ArrowRight, FileSearch, Video, AlertTriangle, HelpCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useParams } from "wouter";
+import { ExplanatoryVideo } from "@/components/ui/explanatory-video";
 
 interface VerificationResult {
   verified: boolean;
@@ -101,13 +102,42 @@ export default function VerificarDocumento() {
 
         <Card className="shadow-md">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <FileSearch className="h-5 w-5 text-primary mr-2" />
-              Verificar Autenticidad
-            </CardTitle>
-            <CardDescription>
-              Introduzca el código de verificación que aparece en el documento o que obtuvo al escanear el código QR.
-            </CardDescription>
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle className="flex items-center">
+                  <FileSearch className="h-5 w-5 text-primary mr-2" />
+                  Verificar Autenticidad
+                </CardTitle>
+                <CardDescription>
+                  Introduzca el código de verificación que aparece en el documento o que obtuvo al escanear el código QR.
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <ExplanatoryVideo
+                  title="¿Cómo verificar un documento?"
+                  description="Aprenda a comprobar la autenticidad de documentos firmados en nuestra plataforma siguiendo estos sencillos pasos."
+                  videoType="verification"
+                  triggerLabel="Ver tutorial"
+                >
+                  <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                    <Video className="h-4 w-4" />
+                    Ver tutorial
+                  </Button>
+                </ExplanatoryVideo>
+                
+                <ExplanatoryVideo
+                  title="¿Qué significa el resultado?"
+                  description="Aprenda a interpretar los resultados de la verificación y qué hacer si un documento no se verifica correctamente."
+                  videoType="explanation"
+                  triggerLabel="Interpretar resultados"
+                >
+                  <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                    <HelpCircle className="h-4 w-4" />
+                    Ayuda
+                  </Button>
+                </ExplanatoryVideo>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="flex gap-2">
@@ -169,13 +199,35 @@ export default function VerificarDocumento() {
                     </div>
                   </div>
                 ) : (
-                  <Alert variant="destructive">
-                    <XCircle className="h-4 w-4" />
-                    <AlertTitle>Documento No Verificado</AlertTitle>
-                    <AlertDescription>
-                      {result.message || "No se pudo verificar la autenticidad del documento."}
-                    </AlertDescription>
-                  </Alert>
+                  <div className="space-y-4">
+                    <Alert variant="destructive">
+                      <XCircle className="h-4 w-4" />
+                      <AlertTitle>Documento No Verificado</AlertTitle>
+                      <AlertDescription>
+                        {result.message || "No se pudo verificar la autenticidad del documento."}
+                      </AlertDescription>
+                    </Alert>
+                    
+                    <div className="bg-gray-50 p-4 rounded-md border flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium text-sm mb-1">¿Necesita ayuda con la verificación?</h3>
+                        <p className="text-xs text-gray-600">
+                          Si tiene problemas para verificar un documento, vea nuestro video tutorial 
+                          o póngase en contacto con soporte técnico.
+                        </p>
+                      </div>
+                      <ExplanatoryVideo
+                        title="¿Problemas con la verificación?"
+                        description="Aprenda qué hacer cuando un documento no se verifica correctamente y cómo resolver los problemas más comunes."
+                        videoType="tutorial"
+                      >
+                        <Button variant="outline" size="sm" className="flex items-center gap-1">
+                          <AlertTriangle className="h-4 w-4 text-amber-500" />
+                          Ver soluciones
+                        </Button>
+                      </ExplanatoryVideo>
+                    </div>
+                  </div>
                 )}
               </div>
             )}
