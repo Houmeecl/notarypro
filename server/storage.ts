@@ -1,5 +1,7 @@
 import {
   users, type User, type InsertUser,
+  documentCategories, type DocumentCategory, type InsertDocumentCategory,
+  documentTemplates, type DocumentTemplate, type InsertDocumentTemplate,
   documents, type Document, type InsertDocument,
   identityVerifications, type IdentityVerification, type InsertIdentityVerification,
   courses, type Course, type InsertCourse,
@@ -291,8 +293,8 @@ export class MemStorage implements IStorage {
       createdAt, 
       updatedAt, 
       status: "pending", 
-      certifierId: undefined,
-      signatureData: undefined
+      certifierId: null,
+      signatureData: null
     };
     this.documents.set(id, document);
     return document;
@@ -342,8 +344,8 @@ export class MemStorage implements IStorage {
       id, 
       createdAt, 
       status: "pending", 
-      certifierId: undefined,
-      notes: undefined
+      certifierId: null,
+      notes: null
     };
     this.identityVerifications.set(id, verification);
     return verification;
@@ -425,7 +427,7 @@ export class MemStorage implements IStorage {
       id, 
       enrolledAt, 
       completed: false,
-      completedAt: undefined
+      completedAt: null
     };
     this.courseEnrollments.set(id, enrollment);
     return enrollment;
