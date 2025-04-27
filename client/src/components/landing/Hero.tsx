@@ -114,7 +114,7 @@ export default function Hero() {
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                   <ExplanatoryVideo
                     title="Cómo funciona NotaryPro"
-                    description="Descubre cómo NotaryPro te permite firmar y certificar documentos con validez legal bajo la Ley 19.799."
+                    description="Conoce todos los pasos para utilizar NotaryPro: desde la creación de tu cuenta hasta la firma y verificación de documentos."
                     videoType="explanation"
                     triggerLabel="Ver explicación"
                   >
@@ -140,10 +140,10 @@ export default function Hero() {
                 />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                   <ExplanatoryVideo
-                    title="Tutorial: Firma de documentos"
-                    description="Aprende paso a paso cómo subir, preparar y firmar documentos digitales en nuestra plataforma."
+                    title="NotaryPro para Empresas"
+                    description="Dos ejecutivos discuten cómo implementar NotaryPro en su empresa y los beneficios para el negocio."
                     videoType="tutorial"
-                    triggerLabel="Ver tutorial"
+                    triggerLabel="Ver discusión"
                   >
                     <div className="w-16 h-16 rounded-full bg-primary/80 text-white flex items-center justify-center hover:bg-primary cursor-pointer transition-all">
                       <Play className="h-8 w-8 ml-1" />
@@ -152,7 +152,7 @@ export default function Hero() {
                 </div>
               </div>
               <div className="p-5">
-                <h3 className="font-bold text-lg text-secondary mb-2">Tutorial: Firma de documentos</h3>
+                <h3 className="font-bold text-lg text-secondary mb-2">NotaryPro para Empresas</h3>
                 <p className="text-gray-600 text-sm">Aprende cómo implementar NotaryPro en tu empresa. Dos oficinistas discuten los beneficios y el proceso de adopción.</p>
               </div>
             </div>
@@ -167,10 +167,10 @@ export default function Hero() {
                 />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                   <ExplanatoryVideo
-                    title="Proceso de verificación de identidad"
-                    description="La verificación de identidad es fundamental para la validez legal de tus documentos. Conoce nuestros tres métodos de verificación seguros."
+                    title="Programa Vecinos NotaryPro Express"
+                    description="Conoce cómo funciona nuestro programa Vecinos NotaryPro Express que permite a tiendas locales, minimarkets y almacenes de barrio convertirse en puntos de certificación."
                     videoType="verification"
-                    triggerLabel="Ver proceso"
+                    triggerLabel="Ver programa"
                   >
                     <div className="w-16 h-16 rounded-full bg-primary/80 text-white flex items-center justify-center hover:bg-primary cursor-pointer transition-all">
                       <Play className="h-8 w-8 ml-1" />
