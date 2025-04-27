@@ -388,7 +388,154 @@ export const insertPartnerPaymentSchema = createInsertSchema(partnerPayments).pi
   notes: true,
 });
 
-// Export types
+// CRM Leads
+export const crmLeads = pgTable("crm_leads", {
+  id: serial("id").primaryKey(),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  rut: text("rut"),
+  documentType: text("document_type"),
+  status: text("status").notNull().default("initiated"), // initiated, data_completed, payment_completed, certified, incomplete
+  source: text("source").notNull().default("webapp"), // webapp, android, website, whatsapp
+  pipelineStage: text("pipeline_stage").notNull().default("initiated"), // initiated, data_completed, payment_completed, certified, incomplete
+  lastContactDate: timestamp("last_contact_date").defaultNow(),
+  assignedToUserId: integer("assigned_to_user_id"),
+  notes: text("notes"),
+  metadata: jsonb("metadata"), // Additional data
+  crmExternalId: text("crm_external_id"), // ID in external CRM system
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertCrmLeadSchema = createInsertSchema(crmLeads).pick({
+  fullName: true,
+  email: true,
+  phone: true,
+  rut: true,
+  documentType: true,
+  status: true,
+  source: true,
+  pipelineStage: true,
+  assignedToUserId: true,
+  notes: true,
+  metadata: true,
+  crmExternalId: true,
+});
+
+// WhatsApp Messages
+export const whatsappMessages = pgTable("whatsapp_messages", {
+  id: serial("id").primaryKey(),
+  leadId: integer("lead_id"),
+  userId: integer("user_id"),
+  direction: text("direction").notNull(), // incoming, outgoing
+  phoneNumber: text("phone_number").notNull(),
+  messageType: text("message_type").notNull().default("text"), // text, image, document, template
+  content: text("content").notNull(),
+  templateName: text("template_name"), // For template messages
+  status: text("status").notNull().default("pending"), // pending, sent, delivered, read, failed
+  externalMessageId: text("external_message_id"), // ID from WhatsApp API
+  metadata: jsonb("metadata"), // Additional data
+  sentAt: timestamp("sent_at").defaultNow(),
+  deliveredAt: timestamp("delivered_at"),
+  readAt: timestamp("read_at"),
+});
+
+export const insertWhatsappMessageSchema = createInsertSchema(whatsappMessages).pick({
+  leadId: true,
+  userId: true,
+  direction: true,
+  phoneNumber: true,
+  messageType: true,
+  content: true,
+  templateName: true,
+  status: true,
+  externalMessageId: true,
+  metadata: true,
+});
+
+// Dialogflow Sessions
+export const dialogflowSessions = pgTable("dialogflow_sessions", {
+  id: serial("id").primaryKey(),
+  leadId: integer("lead_id"),
+  userId: integer("user_id"),
+  sessionId: text("session_id").notNull().unique(), // Dialogflow session ID
+  intent: text("intent"), // Current/last detected intent
+  parameters: jsonb("parameters"), // Session parameters
+  status: text("status").notNull().default("active"), // active, transferred, closed
+  transferredToUserId: integer("transferred_to_user_id"), // If conversation was transferred to human
+  metadata: jsonb("metadata"), // Additional data
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  lastInteractionAt: timestamp("last_interaction_at").defaultNow(),
+});
+
+export const insertDialogflowSessionSchema = createInsertSchema(dialogflowSessions).pick({
+  leadId: true,
+  userId: true,
+  sessionId: true,
+  intent: true,
+  parameters: true,
+  status: true,
+  transferredToUserId: true,
+  metadata: true,
+});
+
+// Message Templates
+export const messageTemplates = pgTable("message_templates", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  category: text("category").notNull(), // onboarding, payment, certification, follow_up, etc.
+  content: text("content").notNull(),
+  variables: jsonb("variables"), // Available variables for this template
+  isWhatsappTemplate: boolean("is_whatsapp_template").default(false).notNull(), // If approved by WhatsApp
+  whatsappTemplateNamespace: text("whatsapp_template_namespace"), // WhatsApp template namespace
+  whatsappTemplateElementName: text("whatsapp_template_element_name"), // Element name in WhatsApp
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertMessageTemplateSchema = createInsertSchema(messageTemplates).pick({
+  name: true,
+  category: true,
+  content: true,
+  variables: true,
+  isWhatsappTemplate: true,
+  whatsappTemplateNamespace: true,
+  whatsappTemplateElementName: true,
+  isActive: true,
+});
+
+// Automation Rules
+export const automationRules = pgTable("automation_rules", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  triggerType: text("trigger_type").notNull(), // event_based, schedule_based, condition_based
+  triggerEvent: text("trigger_event"), // For event_based: document_created, payment_completed, etc.
+  triggerSchedule: text("trigger_schedule"), // For schedule_based: cron expression
+  triggerCondition: jsonb("trigger_condition"), // For condition_based: JSON condition
+  actionType: text("action_type").notNull(), // send_whatsapp, create_lead, update_lead, transfer_to_human
+  actionConfig: jsonb("action_config").notNull(), // Action configuration
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAutomationRuleSchema = createInsertSchema(automationRules).pick({
+  name: true,
+  description: true,
+  triggerType: true,
+  triggerEvent: true,
+  triggerSchedule: true,
+  triggerCondition: true,
+  actionType: true,
+  actionConfig: true,
+  isActive: true,
+});
+
+// Export original types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 
@@ -443,3 +590,15 @@ export type PartnerSale = typeof partnerSales.$inferSelect;
 export type InsertPartnerSale = z.infer<typeof insertPartnerSaleSchema>;
 export type PartnerPayment = typeof partnerPayments.$inferSelect;
 export type InsertPartnerPayment = z.infer<typeof insertPartnerPaymentSchema>;
+
+// CRM & Automation Types
+export type CrmLead = typeof crmLeads.$inferSelect;
+export type InsertCrmLead = z.infer<typeof insertCrmLeadSchema>;
+export type WhatsappMessage = typeof whatsappMessages.$inferSelect;
+export type InsertWhatsappMessage = z.infer<typeof insertWhatsappMessageSchema>;
+export type DialogflowSession = typeof dialogflowSessions.$inferSelect;
+export type InsertDialogflowSession = z.infer<typeof insertDialogflowSessionSchema>;
+export type MessageTemplate = typeof messageTemplates.$inferSelect;
+export type InsertMessageTemplate = z.infer<typeof insertMessageTemplateSchema>;
+export type AutomationRule = typeof automationRules.$inferSelect;
+export type InsertAutomationRule = z.infer<typeof insertAutomationRuleSchema>;

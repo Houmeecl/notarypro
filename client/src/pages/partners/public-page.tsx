@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'wouter';
+import { useLocation } from 'wouter';
 import { 
   Building, 
   Users, 
@@ -33,13 +33,13 @@ import {
 } from "@/components/ui/accordion";
 
 export default function PartnersPublicPage() {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [email, setEmail] = useState('');
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
-      navigate('/partners/registration-form?email=' + encodeURIComponent(email));
+      setLocation('/partners/registration-form?email=' + encodeURIComponent(email));
     }
   };
 
@@ -62,7 +62,7 @@ export default function PartnersPublicPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
-                  onClick={() => navigate("/partners/registration-form")}
+                  onClick={() => setLocation("/partners/registration-form")}
                   className="bg-white text-[#EC1C24] hover:bg-white/90 px-6 py-3 text-lg"
                 >
                   Unirse al programa
@@ -70,7 +70,7 @@ export default function PartnersPublicPage() {
                 <Button 
                   variant="outline" 
                   className="border-white text-white hover:bg-white/10 px-6 py-3 text-lg"
-                  onClick={() => navigate("/partners/partner-login")}
+                  onClick={() => setLocation("/partners/partner-login")}
                 >
                   Iniciar sesión
                 </Button>

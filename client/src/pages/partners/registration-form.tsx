@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -134,7 +134,6 @@ const communesByRegion: Record<string, string[]> = {
 const defaultCommunes = ["Comuna 1", "Comuna 2", "Comuna 3", "Comuna 4", "Comuna 5"];
 
 export default function PartnerRegistrationForm() {
-  const navigate = useNavigate();
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const [registrationCompleted, setRegistrationCompleted] = useState(false);
@@ -200,7 +199,7 @@ export default function PartnerRegistrationForm() {
           <div className="mb-8">
             <Button 
               variant="ghost" 
-              onClick={() => navigate("/partners/public-page")}
+              onClick={() => setLocation("/partners/public-page")}
               className="mb-4"
             >
               <ChevronLeft className="w-4 h-4 mr-2" />
@@ -220,7 +219,7 @@ export default function PartnerRegistrationForm() {
           </div>
           
           {registrationCompleted ? (
-            <RegistrationSuccess onBackToHome={() => navigate("/partners/public-page")} />
+            <RegistrationSuccess onBackToHome={() => setLocation("/partners/public-page")} />
           ) : (
             <Card>
               <CardHeader>

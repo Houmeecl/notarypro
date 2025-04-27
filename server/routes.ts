@@ -23,9 +23,21 @@ import {
   insertPartnerSchema,
   insertPartnerBankDetailsSchema,
   insertPartnerSaleSchema,
-  insertPartnerPaymentSchema
+  insertPartnerPaymentSchema,
+  insertWhatsappMessageSchema,
+  insertDialogflowSessionSchema,
+  insertCrmLeadSchema,
+  insertMessageTemplateSchema,
+  insertAutomationRuleSchema
 } from "@shared/schema";
 import { generateVerificationCode, generateQRCodeSVG, generateSignatureData } from "@shared/utils/verification-code";
+import adminRouter from "./admin/admin-routes";
+import integrationRouter from "./admin/integration-routes";
+import { automationService } from "./services/automation-service";
+import { whatsappService } from "./services/whatsapp-service";
+import { dialogflowService } from "./services/dialogflow-service";
+import { WebSocketServer } from "ws";
+import { createSuperAdmin } from "./admin/seed-admin";
 
 // Ensure these directories exist
 const uploadsDir = path.join(process.cwd(), "uploads");
@@ -87,6 +99,21 @@ function isAdmin(req: Request, res: Response, next: any) {
 export async function registerRoutes(app: Express): Promise<Server> {
   // setup authentication routes
   setupAuth(app);
+  
+  // Registrar rutas de administración
+  app.use('/api/admin', adminRouter);
+  
+  // Registrar rutas de integración
+  app.use('/api/integration', integrationRouter);
+  
+  // Inicializar el super administrador
+  // Esta función comprueba si ya existe y solo actualiza la contraseña si es necesario
+  try {
+    await createSuperAdmin();
+    console.log('Super admin inicializado correctamente');
+  } catch (error) {
+    console.error('Error al inicializar super admin:', error);
+  }
 
   // Document routes
   app.post("/api/documents", isAuthenticated, upload.single("document"), async (req, res) => {
@@ -1267,6 +1294,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Webhooks para WhatsApp
+  app.post("/api/webhooks/whatsapp", async (req, res) => {
+    try {
+      // Procesar el webhook entrante
+      const message = await whatsappService.processWebhook(req.body);
+      
+      if (message) {
+        // Buscar o crear una sesión de Dialogflow
+        let session = await storage.getDialogflowSessionByPhone(message.phoneNumber);
+        
+        if (!session) {
+          // Buscar si el usuario existe por número de teléfono
+          const user = await storage.getUserByPhone(message.phoneNumber);
+          
+          // Crear nueva sesión
+          const sessionId = await dialogflowService.createSession(null, user?.id);
+          
+          // Guardar en base de datos
+          session = await storage.createDialogflowSession({
+            phoneNumber: message.phoneNumber,
+            sessionId,
+            userId: user?.id || null,
+            status: 'active'
+          });
+        }
+        
+        // Procesar el mensaje con Dialogflow
+        const { responseText } = await dialogflowService.processMessage(message, session);
+        
+        // Enviar respuesta automática
+        await dialogflowService.sendResponse(message.phoneNumber, responseText, session.sessionId);
+      }
+      
+      res.status(200).send('OK');
+    } catch (error) {
+      console.error('Error processing WhatsApp webhook:', error);
+      res.status(500).json({ error: 'Error processing webhook' });
+    }
+  });
+  
+  // Configurar WebSocket para comunicación en tiempo real
   const httpServer = createServer(app);
+  
+  // Configurar WebSocket en ruta específica para no interferir con HMR de Vite
+  const wss = new WebSocketServer({ 
+    server: httpServer,
+    path: '/ws'
+  });
+  
+  // Gestionar conexiones WebSocket
+  wss.on('connection', (ws) => {
+    console.log('Nueva conexión WebSocket establecida');
+    
+    // Enviar mensaje de bienvenida
+    ws.send(JSON.stringify({ 
+      type: 'connection',
+      message: 'Conexión establecida con el servidor' 
+    }));
+    
+    // Manejar mensajes entrantes
+    ws.on('message', async (message) => {
+      try {
+        const data = JSON.parse(message.toString());
+        
+        // Verificar el tipo de mensaje
+        if (data.type === 'document_update') {
+          // Notificar a todos los clientes sobre la actualización
+          wss.clients.forEach((client) => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify({
+                type: 'document_update',
+                data: data.data
+              }));
+            }
+          });
+        } else if (data.type === 'chat_message') {
+          // Procesar mensaje de chat
+          if (data.dialogflowSessionId) {
+            // Obtener la sesión
+            const session = await storage.getDialogflowSession(data.dialogflowSessionId);
+            
+            if (session) {
+              // Procesar mensaje con Dialogflow
+              const { responseText } = await dialogflowService.processMessage(
+                { content: data.message, direction: 'incoming' } as any, 
+                session
+              );
+              
+              // Enviar respuesta al cliente
+              ws.send(JSON.stringify({
+                type: 'chat_response',
+                message: responseText,
+                sessionId: data.dialogflowSessionId
+              }));
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error procesando mensaje WebSocket:', error);
+        ws.send(JSON.stringify({ 
+          type: 'error',
+          message: 'Error procesando mensaje' 
+        }));
+      }
+    });
+    
+    // Manejar desconexiones
+    ws.on('close', () => {
+      console.log('Conexión WebSocket cerrada');
+    });
+  });
+  
   return httpServer;
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'wouter';
+import { useLocation } from 'wouter';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -39,7 +39,7 @@ const loginSchema = z.object({
 });
 
 export default function PartnerLogin() {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [loginError, setLoginError] = useState<string | null>(null);
   
@@ -68,7 +68,7 @@ export default function PartnerLogin() {
       localStorage.setItem('partnerName', data.partner.storeName);
       
       // Redirect to partner dashboard
-      navigate("/partners/partner-dashboard");
+      setLocation("/partners/partner-dashboard");
       
       toast({
         title: "Inicio de sesión exitoso",
@@ -92,7 +92,7 @@ export default function PartnerLogin() {
   }
 
   function handleResetCredentials() {
-    navigate("/partners/reset-credentials");
+    setLocation("/partners/reset-credentials");
   }
 
   return (
@@ -102,7 +102,7 @@ export default function PartnerLogin() {
           <div className="mb-8">
             <Button 
               variant="ghost" 
-              onClick={() => navigate("/partners/public-page")}
+              onClick={() => setLocation("/partners/public-page")}
               className="mb-4"
             >
               <ChevronLeft className="w-4 h-4 mr-2" />
@@ -206,7 +206,7 @@ export default function PartnerLogin() {
               </Button>
               <Button 
                 variant="outline"
-                onClick={() => navigate("/partners/registration-form")}
+                onClick={() => setLocation("/partners/registration-form")}
               >
                 Registrarse
               </Button>

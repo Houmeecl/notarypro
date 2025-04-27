@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'wouter';
+import { useLocation } from 'wouter';
 import { 
   Check, 
   ChevronRight, 
@@ -37,7 +37,7 @@ interface OnboardingWizardProps {
 
 export function OnboardingWizard({ onComplete, initialStep }: OnboardingWizardProps) {
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
@@ -118,7 +118,7 @@ export function OnboardingWizard({ onComplete, initialStep }: OnboardingWizardPr
           <Button 
             variant="outline" 
             className="w-full"
-            onClick={() => navigate("/documents")}
+            onClick={() => setLocation("/documents")}
           >
             Ver mis documentos
             <ChevronRight className="ml-2 h-4 w-4" />
@@ -223,7 +223,7 @@ export function OnboardingWizard({ onComplete, initialStep }: OnboardingWizardPr
           <div className="flex justify-center">
             <Button 
               variant="outline" 
-              onClick={() => navigate("/certificacion-por-video")}
+              onClick={() => setLocation("/certificacion-por-video")}
             >
               Solicitar certificación por video
               <Video className="ml-2 h-4 w-4" />
@@ -298,7 +298,7 @@ export function OnboardingWizard({ onComplete, initialStep }: OnboardingWizardPr
           <div className="flex flex-col sm:flex-row justify-center gap-3 pt-4">
             <Button 
               variant="outline"
-              onClick={() => navigate("/help-center")}
+              onClick={() => setLocation("/help-center")}
             >
               Centro de ayuda
               <HelpCircle className="ml-2 h-4 w-4" />
@@ -372,7 +372,7 @@ export function OnboardingWizard({ onComplete, initialStep }: OnboardingWizardPr
     }
     
     // Navigate to dashboard or home
-    navigate("/");
+    setLocation("/");
   }
   
   function handleSkip() {
