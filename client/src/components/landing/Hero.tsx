@@ -73,8 +73,8 @@ export default function Hero() {
           <div className="md:w-1/2 mt-10 md:mt-0">
             <div className="relative h-auto w-full rounded-xl overflow-hidden shadow-xl">
               <img
-                src="https://images.unsplash.com/photo-1554224155-8d04cb21ed6c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
-                alt="Firma digital de documentos"
+                src="https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                alt="Persona utilizando NotaryPro"
                 className="w-full h-auto object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
@@ -107,8 +107,8 @@ export default function Hero() {
             <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300">
               <div className="relative h-48 bg-gradient-to-r from-gray-100 to-gray-50">
                 <img 
-                  src="https://images.unsplash.com/photo-1554224155-8d04cb21ed6c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
-                  alt="Explicación general" 
+                  src="https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                  alt="Pasos para usar NotaryPro" 
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
@@ -126,7 +126,7 @@ export default function Hero() {
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-lg text-secondary mb-2">Cómo funciona NotaryPro</h3>
-                <p className="text-gray-600 text-sm">Descubre cómo nuestra plataforma te permite firmar documentos con validez legal siguiendo la Ley 19.799.</p>
+                <p className="text-gray-600 text-sm">Conoce todos los pasos para utilizar la plataforma, desde el registro hasta la firma y verificación de documentos.</p>
               </div>
             </div>
             
@@ -134,8 +134,8 @@ export default function Hero() {
             <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300">
               <div className="relative h-48 bg-gradient-to-r from-gray-100 to-gray-50">
                 <img 
-                  src="https://images.unsplash.com/photo-1557200134-90327ee9fafa?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
-                  alt="Tutorial" 
+                  src="https://images.unsplash.com/photo-1577412647305-991150c7d163?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                  alt="Oficinistas discutiendo implementación" 
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
@@ -153,7 +153,7 @@ export default function Hero() {
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-lg text-secondary mb-2">Tutorial: Firma de documentos</h3>
-                <p className="text-gray-600 text-sm">Guía paso a paso para firmar documentos en nuestra plataforma. Aprende a subir documentos y posicionar tu firma.</p>
+                <p className="text-gray-600 text-sm">Aprende cómo implementar NotaryPro en tu empresa. Dos oficinistas discuten los beneficios y el proceso de adopción.</p>
               </div>
             </div>
             
@@ -161,8 +161,8 @@ export default function Hero() {
             <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300">
               <div className="relative h-48 bg-gradient-to-r from-gray-100 to-gray-50">
                 <img 
-                  src="https://images.unsplash.com/photo-1588702547923-7093a6c3ba33?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
-                  alt="Verificación" 
+                  src="https://images.unsplash.com/photo-1581955957646-b8c6b58d91f7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                  alt="Vecinos en tienda local" 
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
@@ -179,8 +179,8 @@ export default function Hero() {
                 </div>
               </div>
               <div className="p-5">
-                <h3 className="font-bold text-lg text-secondary mb-2">Proceso de verificación de identidad</h3>
-                <p className="text-gray-600 text-sm">Conoce cómo funciona nuestro proceso de verificación para garantizar la validez legal de tus documentos.</p>
+                <h3 className="font-bold text-lg text-secondary mb-2">Vecinos NotaryPro Express</h3>
+                <p className="text-gray-600 text-sm">Descubre cómo los locales comerciales de tu barrio pueden ofrecer servicios de certificación como puntos Vecinos Express.</p>
               </div>
             </div>
           </div>

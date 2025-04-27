@@ -26,14 +26,14 @@ const defaultVideos = {
 // Títulos y descripciones predeterminados para cada tipo de video
 const videoTitles = {
   explanation: "Cómo funciona NotaryPro",
-  tutorial: "Tutorial: Firma de documentos",
-  verification: "Proceso de verificación de identidad"
+  tutorial: "NotaryPro para Empresas",
+  verification: "Programa Vecinos NotaryPro Express"
 };
 
 const videoDescriptions = {
-  explanation: "Descubre cómo NotaryPro te permite firmar y certificar documentos con validez legal bajo la Ley 19.799. Conoce nuestra plataforma, beneficios y red de Vecinos Express para una gestión documental simple, segura y legal en todo Chile.",
-  tutorial: "Aprende paso a paso cómo subir, preparar y firmar documentos digitales en nuestra plataforma. Este tutorial te muestra el proceso completo desde la carga del documento hasta la firma con validez legal y cómo compartirlo con otras personas.",
-  verification: "La verificación de identidad es fundamental para la validez legal de tus documentos. Conoce nuestros tres métodos de verificación: por videollamada con certificador profesional, mediante Clave Única del Estado o con verificación biométrica automatizada."
+  explanation: "Conoce todos los pasos para utilizar NotaryPro: desde la creación de tu cuenta hasta la firma y verificación de documentos. Un recorrido completo por las funcionalidades de la plataforma.",
+  tutorial: "Dos ejecutivos discuten cómo implementar NotaryPro en su empresa y los beneficios para el negocio. Descubre por qué empresas de todos los tamaños eligen nuestra plataforma para sus documentos legales.",
+  verification: "Conoce cómo funciona nuestro programa Vecinos NotaryPro Express que permite a tiendas locales, minimarkets y almacenes de barrio convertirse en puntos de certificación y obtener comisiones por cada servicio."
 };
 
 // Mensajes que se muestran al finalizar el video
