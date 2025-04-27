@@ -24,9 +24,9 @@ export default function FAQ() {
                 ¿Qué validez legal tienen los documentos firmados?
               </AccordionTrigger>
               <AccordionContent className="p-4 border-t border-gray-200 text-gray-600">
-                Los documentos firmados con nuestra plataforma tienen plena validez legal conforme a la ley de firma electrónica vigente. 
-                La firma electrónica avanzada tiene el mismo valor jurídico que una firma manuscrita, mientras que la firma simple tiene 
-                validez en determinados tipos de documentos según la legislación aplicable.
+                Los documentos firmados con nuestra plataforma tienen plena validez legal conforme a la Ley 19.799 sobre Documentos Electrónicos y Firma Electrónica en Chile. 
+                La firma electrónica avanzada tiene el mismo valor jurídico que una firma manuscrita según el Artículo 3° de dicha ley, mientras que la firma electrónica simple 
+                tiene validez en determinados tipos de documentos según lo establecido en el Artículo 5° de la misma legislación.
               </AccordionContent>
             </AccordionItem>
 
@@ -57,20 +57,33 @@ export default function FAQ() {
                 ¿Qué es un certificador y cómo puedo convertirme en uno?
               </AccordionTrigger>
               <AccordionContent className="p-4 border-t border-gray-200 text-gray-600">
-                Un certificador es un profesional autorizado para validar la identidad de los firmantes y certificar documentos con firma electrónica avanzada. 
-                Para convertirte en certificador, debes completar nuestro curso de certificación, aprobar el examen final y cumplir con los requisitos legales establecidos. 
-                Una vez certificado, tendrás acceso al dashboard de certificadores.
+                Un certificador es un profesional autorizado para validar la identidad de los firmantes y certificar documentos con firma electrónica avanzada, conforme a lo establecido en la Ley 19.799 y su reglamento. 
+                Para convertirte en certificador, debes completar nuestro curso de certificación acreditado, aprobar el examen final y cumplir con los requisitos establecidos por el Ministerio de Economía, Fomento y Turismo de Chile. 
+                Una vez certificado, tendrás acceso al dashboard de certificadores y podrás validar documentos en conformidad con la normativa chilena.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-5" className="border border-gray-200 rounded-lg overflow-hidden mb-4 bg-white">
+              <AccordionTrigger className="p-4 text-left font-medium text-secondary hover:no-underline">
+                ¿Cómo cumple la plataforma con la Ley 19.799 de Chile?
+              </AccordionTrigger>
+              <AccordionContent className="p-4 border-t border-gray-200 text-gray-600">
+                Nuestra plataforma cumple con todos los requisitos establecidos en la Ley 19.799 sobre Documentos Electrónicos y Firma Electrónica en Chile, así como con su Reglamento.
+                Esto incluye: 1) Proporcionar mecanismos confiables de firma electrónica simple y avanzada, 2) Mantener un sistema seguro de identificación y validación de los firmantes,
+                3) Garantizar la integridad y no repudio de los documentos mediante certificación por terceros confiables, 4) Generar sellos de tiempo que aseguran la fecha y hora exacta 
+                de la firma, y 5) Mantener un registro inmutable y auditable de todas las transacciones realizadas en la plataforma.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-6" className="border border-gray-200 rounded-lg overflow-hidden mb-4 bg-white">
               <AccordionTrigger className="p-4 text-left font-medium text-secondary hover:no-underline">
                 ¿Cuánto tiempo se almacenan los documentos firmados?
               </AccordionTrigger>
               <AccordionContent className="p-4 border-t border-gray-200 text-gray-600">
                 El tiempo de almacenamiento depende del plan contratado. En el plan básico, los documentos se guardan durante 30 días. 
                 El plan profesional incluye almacenamiento por 1 año, y el plan empresarial ofrece almacenamiento ilimitado. 
-                En cualquier caso, siempre recibirás el documento firmado por correo electrónico y podrás descargarlo durante el periodo de almacenamiento.
+                En cualquier caso, siempre recibirás el documento firmado por correo electrónico y podrás descargarlo durante el periodo de almacenamiento, 
+                cumpliendo con los plazos mínimos establecidos en la normativa chilena.
               </AccordionContent>
             </AccordionItem>
           </Accordion>

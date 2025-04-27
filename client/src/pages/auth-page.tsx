@@ -112,7 +112,7 @@ export default function AuthPage() {
             <CardHeader>
               <CardTitle className="text-center text-2xl font-bold">Bienvenido a NotaryPro</CardTitle>
               <CardDescription className="text-center">
-                Plataforma líder en firma y certificación notarial digital en Canadá
+                Plataforma líder en firma y certificación notarial digital en Chile, en cumplimiento con la Ley 19.799
               </CardDescription>
             </CardHeader>
             <CardContent>

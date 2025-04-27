@@ -16,7 +16,7 @@ export default function DocumentNavbar() {
             <Link href="/">
               <a className="flex items-center mr-8">
                 <FileText className="h-6 w-6 text-primary mr-2" />
-                <span className="text-xl font-semibold">NotaryPro</span>
+                <span className="text-xl font-semibold">NotaryPro Chile</span>
               </a>
             </Link>
             

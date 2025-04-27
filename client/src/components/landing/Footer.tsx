@@ -15,7 +15,7 @@ export default function Footer() {
               />
             </Link>
             <p className="text-gray-600 mb-4">
-              Plataforma líder en firma y certificación digital notarial para profesionales jurídicos y empresas en Canadá.
+              Plataforma líder en firma y certificación digital notarial para profesionales jurídicos y empresas en Chile, en cumplimiento con la Ley 19.799.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-primary transition-colors duration-150">
@@ -114,8 +114,8 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">
-                  Cumplimiento Legal
+                <a href="https://www.bcn.cl/leychile/navegar?idNorma=196640" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                  Ley 19.799 - Documentos Electrónicos
                 </a>
               </li>
               <li>
