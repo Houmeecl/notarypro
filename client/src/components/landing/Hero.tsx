@@ -2,11 +2,18 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Play, ArrowRight, Video } from "lucide-react";
 import { ExplanatoryVideo } from "@/components/ui/explanatory-video";
+import { Logo, PartnerLogo } from "@/components/ui/logo";
 
 export default function Hero() {
   return (
     <section className="relative bg-light pt-16 pb-32 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Logo section at the top */}
+        <div className="flex justify-between items-center mb-12">
+          <Logo size="lg" showText={true} />
+          <PartnerLogo size="md" />
+        </div>
+        
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 md:pr-12">
             <h1 className="text-4xl md:text-5xl font-bold text-secondary leading-tight font-heading mb-6">

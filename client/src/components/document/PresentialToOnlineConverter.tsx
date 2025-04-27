@@ -60,13 +60,13 @@ const convertPresentialToOnline = (text: string): string => {
     convertedText = convertedText.replace(regex, (match) => {
       // Preservar el caso (mayúscula/minúscula)
       if (match === match.toLowerCase()) {
-        return remote;
+        return online;
       } else if (match === match.toUpperCase()) {
-        return remote.toUpperCase();
+        return online.toUpperCase();
       } else if (match[0] === match[0].toUpperCase()) {
-        return remote.charAt(0).toUpperCase() + remote.slice(1);
+        return online.charAt(0).toUpperCase() + online.slice(1);
       }
-      return remote;
+      return online;
     });
   }
   
@@ -76,7 +76,7 @@ const convertPresentialToOnline = (text: string): string => {
 const identifyPresentialTerms = (text: string): string[] => {
   const foundTerms: string[] = [];
   
-  for (const presential of Object.keys(PRESENTIAL_TO_REMOTE_TERMS)) {
+  for (const presential of Object.keys(PRESENTIAL_TO_ONLINE_TERMS)) {
     const regex = new RegExp(`\\b${presential}\\b`, 'gi');
     if (regex.test(text)) {
       foundTerms.push(presential);
@@ -98,7 +98,7 @@ const generateConversionReport = (text: string): {
   const termCounts: Record<string, number> = {};
   
   // Contar ocurrencias de cada término
-  for (const presential of Object.keys(PRESENTIAL_TO_REMOTE_TERMS)) {
+  for (const presential of Object.keys(PRESENTIAL_TO_ONLINE_TERMS)) {
     const regex = new RegExp(`\\b${presential}\\b`, 'gi');
     const matches = text.match(regex);
     if (matches && matches.length > 0) {
@@ -109,7 +109,7 @@ const generateConversionReport = (text: string): {
   // Generar detalles de términos
   const termDetails = Object.entries(termCounts).map(([term, count]) => ({
     original: term,
-    replacement: PRESENTIAL_TO_REMOTE_TERMS[term],
+    replacement: PRESENTIAL_TO_ONLINE_TERMS[term],
     count
   }));
   
@@ -124,7 +124,7 @@ const generateConversionReport = (text: string): {
   };
 };
 
-export default function PresentialToRemoteConverter() {
+export default function PresentialToOnlineConverter() {
   const [originalText, setOriginalText] = useState("");
   const [convertedText, setConvertedText] = useState("");
   const [report, setReport] = useState<any>(null);
@@ -134,7 +134,7 @@ export default function PresentialToRemoteConverter() {
   const handleConvert = () => {
     if (!originalText.trim()) return;
     
-    const converted = convertPresentialToRemote(originalText);
+    const converted = convertPresentialToOnline(originalText);
     const conversionReport = generateConversionReport(originalText);
     
     setConvertedText(converted);

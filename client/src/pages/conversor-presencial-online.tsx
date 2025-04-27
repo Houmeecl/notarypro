@@ -1,9 +1,9 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, FileText, Edit, Replace, MessageSquareDiff } from "lucide-react";
-import PresentialToRemoteConverter from "@/components/document/PresentialToRemoteConverter";
+import PresentialToOnlineConverter from "@/components/document/PresentialToOnlineConverter";
 
-export default function ConversorPresencialRemoto() {
+export default function ConversorPresencialOnline() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-12">
@@ -31,7 +31,7 @@ export default function ConversorPresencialRemoto() {
               </div>
             </div>
 
-            <PresentialToRemoteConverter />
+            <PresentialToOnlineConverter />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
