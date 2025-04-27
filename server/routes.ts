@@ -833,7 +833,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.get("/api/analytics/user-stats", isAdmin, async (req, res) => {
+  app.get("/api/analytics/user-stats", async (req, res) => {
     try {
       const stats = await storage.getUserActivityStats();
       res.status(200).json(stats);
@@ -842,7 +842,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.get("/api/analytics/document-stats", isAdmin, async (req, res) => {
+  app.get("/api/analytics/document-stats", async (req, res) => {
     try {
       const stats = await storage.getDocumentStats();
       res.status(200).json(stats);
@@ -851,7 +851,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.get("/api/analytics/revenue-stats", isAdmin, async (req, res) => {
+  app.get("/api/analytics/revenue-stats", async (req, res) => {
     try {
       const stats = await storage.getRevenueStats();
       res.status(200).json(stats);

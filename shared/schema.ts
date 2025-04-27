@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, date, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, date, timestamp, jsonb, real } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -295,6 +295,99 @@ export const insertVideoCallSessionSchema = createInsertSchema(videoCallSessions
   scheduledAt: true,
 });
 
+// Partners (Vecinos NotaryPro Express)
+export const partners = pgTable("partners", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),  // Associated user account for login
+  storeName: text("store_name").notNull(),
+  managerName: text("manager_name").notNull(),
+  region: text("region").notNull(),
+  commune: text("commune").notNull(),
+  address: text("address").notNull(),
+  phone: text("phone").notNull(),
+  email: text("email").notNull().unique(),
+  hasInternet: boolean("has_internet").notNull(),
+  hasDevice: boolean("has_device").notNull(),
+  status: text("status").notNull().default("pending"), // pending, approved, rejected
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertPartnerSchema = createInsertSchema(partners).pick({
+  storeName: true,
+  managerName: true,
+  region: true,
+  commune: true,
+  address: true,
+  phone: true,
+  email: true,
+  hasInternet: true,
+  hasDevice: true,
+});
+
+// Partner Bank Details
+export const partnerBankDetails = pgTable("partner_bank_details", {
+  id: serial("id").primaryKey(),
+  partnerId: integer("partner_id").notNull(),
+  bank: text("bank").notNull(),
+  accountType: text("account_type").notNull(), // checking, savings, vista
+  accountNumber: text("account_number").notNull(),
+  rut: text("rut").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertPartnerBankDetailsSchema = createInsertSchema(partnerBankDetails).pick({
+  partnerId: true,
+  bank: true,
+  accountType: true,
+  accountNumber: true,
+  rut: true,
+});
+
+// Partner Sales
+export const partnerSales = pgTable("partner_sales", {
+  id: serial("id").primaryKey(),
+  partnerId: integer("partner_id").notNull(),
+  documentId: integer("document_id").notNull(),
+  amount: integer("amount").notNull(), // Total sale amount
+  commission: integer("commission").notNull(), // Commission amount for partner
+  commissionRate: real("commission_rate").notNull(), // Rate applied for this sale (e.g., 0.15 for 15%)
+  status: text("status").notNull().default("pending"), // pending, available, paid
+  paidAt: timestamp("paid_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertPartnerSaleSchema = createInsertSchema(partnerSales).pick({
+  partnerId: true,
+  documentId: true,
+  amount: true,
+  commission: true,
+  commissionRate: true,
+});
+
+// Partner Payments
+export const partnerPayments = pgTable("partner_payments", {
+  id: serial("id").primaryKey(),
+  partnerId: integer("partner_id").notNull(),
+  amount: integer("amount").notNull(),
+  paymentDate: timestamp("payment_date").notNull(),
+  paymentMethod: text("payment_method").notNull(), // bank_transfer, check, etc.
+  reference: text("reference"), // Reference number, transaction ID, etc.
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertPartnerPaymentSchema = createInsertSchema(partnerPayments).pick({
+  partnerId: true,
+  amount: true,
+  paymentDate: true,
+  paymentMethod: true,
+  reference: true,
+  notes: true,
+});
+
 // Export types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -340,3 +433,13 @@ export type VideoCallService = typeof videoCallServices.$inferSelect;
 export type InsertVideoCallService = z.infer<typeof insertVideoCallServiceSchema>;
 export type VideoCallSession = typeof videoCallSessions.$inferSelect;
 export type InsertVideoCallSession = z.infer<typeof insertVideoCallSessionSchema>;
+
+// Partner Types
+export type Partner = typeof partners.$inferSelect;
+export type InsertPartner = z.infer<typeof insertPartnerSchema>;
+export type PartnerBankDetails = typeof partnerBankDetails.$inferSelect;
+export type InsertPartnerBankDetails = z.infer<typeof insertPartnerBankDetailsSchema>;
+export type PartnerSale = typeof partnerSales.$inferSelect;
+export type InsertPartnerSale = z.infer<typeof insertPartnerSaleSchema>;
+export type PartnerPayment = typeof partnerPayments.$inferSelect;
+export type InsertPartnerPayment = z.infer<typeof insertPartnerPaymentSchema>;
