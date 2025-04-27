@@ -22,7 +22,7 @@ export default function Header() {
               <img 
                 src="/assets/notarypro-logo.png" 
                 alt="Certificadora" 
-                className="h-10 w-auto"
+                className="h-14 w-auto"
               />
             </Link>
           </div>
