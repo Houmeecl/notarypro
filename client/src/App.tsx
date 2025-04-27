@@ -47,6 +47,10 @@ import PosIntegrationPage from "@/pages/partners/pos-integration";
 // Admin pages
 import PosManagementPage from "@/pages/admin/pos-management";
 import ApiIntegrationsPage from "@/pages/admin/api-integrations";
+import AdminDashboardPage from "@/pages/admin/dashboard";
+import AdminDocumentsPage from "@/pages/admin/documents";
+import AdminCertifiersPage from "@/pages/admin/certifiers";
+import AdminAIStrategyPage from "@/pages/admin/ai-strategy";
 
 function Router() {
   return (
@@ -150,6 +154,34 @@ function Router() {
       <ProtectedRoute 
         path="/admin/api-integrations" 
         component={ApiIntegrationsPage} 
+        allowedRoles={["admin"]} 
+      />
+      
+      {/* Admin Master Dashboard */}
+      <ProtectedRoute 
+        path="/admin/dashboard" 
+        component={AdminDashboardPage} 
+        allowedRoles={["admin"]} 
+      />
+      
+      {/* Admin Documents Management */}
+      <ProtectedRoute 
+        path="/admin/documents" 
+        component={AdminDocumentsPage} 
+        allowedRoles={["admin"]} 
+      />
+      
+      {/* Admin Certifiers Management */}
+      <ProtectedRoute 
+        path="/admin/certifiers" 
+        component={AdminCertifiersPage} 
+        allowedRoles={["admin"]} 
+      />
+      
+      {/* Admin AI Strategy */}
+      <ProtectedRoute 
+        path="/admin/ai-strategy" 
+        component={AdminAIStrategyPage} 
         allowedRoles={["admin"]} 
       />
       
