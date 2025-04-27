@@ -25,6 +25,7 @@ import ConversorPresencialOnline from "@/pages/conversor-presencial-online";
 import TemplateAdminPage from "@/pages/template-admin";
 import VerificarDocumento from "@/pages/verificar-documento";
 import VideocallInterfaceDemo from "@/pages/videocall-interface-demo";
+import CursoCertificador from "@/pages/curso-certificador";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -105,6 +106,7 @@ function Router() {
       <Route path="/conversor-presencial-online" component={ConversorPresencialOnline} />
       <Route path="/verificar-documento" component={VerificarDocumento} />
       <Route path="/verificar-documento/:code" component={VerificarDocumento} />
+      <Route path="/curso-certificador" component={CursoCertificador} />
       
       {/* Videocall demo */}
       <ProtectedRoute 
