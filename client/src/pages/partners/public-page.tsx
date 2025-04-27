@@ -14,8 +14,10 @@ import {
   Mail, 
   FileCheck,
   Clock,
-  CheckCircle
+  CheckCircle,
+  Store
 } from 'lucide-react';
+import notaryProLogo from '../../assets/notary-pro-logo.png';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -45,6 +47,41 @@ export default function PartnersPublicPage() {
 
   return (
     <div className="bg-white min-h-screen">
+      {/* Header/Navigation */}
+      <header className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <img 
+              src={notaryProLogo} 
+              alt="NotaryPro Logo" 
+              className="h-10" 
+            />
+            <span className="font-bold text-xl text-[#EC1C24]">Vecinos Express</span>
+          </div>
+          <nav className="hidden md:flex items-center space-x-8">
+            <a href="#beneficios" className="text-gray-700 hover:text-[#EC1C24] transition-colors">Beneficios</a>
+            <a href="#como-funciona" className="text-gray-700 hover:text-[#EC1C24] transition-colors">Cómo funciona</a>
+            <a href="#testimonios" className="text-gray-700 hover:text-[#EC1C24] transition-colors">Testimonios</a>
+            <a href="#preguntas" className="text-gray-700 hover:text-[#EC1C24] transition-colors">FAQ</a>
+          </nav>
+          <div className="flex items-center space-x-4">
+            <Button 
+              variant="ghost"
+              className="text-gray-700 hover:text-[#EC1C24]"
+              onClick={() => setLocation("/partners/partner-login")}
+            >
+              Iniciar sesión
+            </Button>
+            <Button 
+              className="bg-[#EC1C24] hover:bg-[#d91920] text-white"
+              onClick={() => setLocation("/partners/registration-form")}
+            >
+              Registrarse
+            </Button>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-[#EC1C24] to-[#e43d42] text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-pattern-grid"></div>
@@ -107,61 +144,72 @@ export default function PartnersPublicPage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-16 bg-gray-50">
+      <section id="beneficios" className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
+            <div className="flex justify-center">
+              <img src={notaryProLogo} alt="NotaryPro Logo" className="h-12 mb-4" />
+            </div>
             <h2 className="text-3xl font-bold mb-4">Beneficios del programa</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Convierta su negocio en un punto de servicio oficial y aproveche estas ventajas
+              Convierta su negocio en un punto de servicio oficial y obtenga ventajas exclusivas
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card>
+            <Card className="border-t-4 border-t-[#EC1C24] shadow-lg hover:shadow-xl transition-shadow">
               <CardHeader>
-                <DollarSign className="h-10 w-10 text-[#EC1C24] mb-2" />
-                <CardTitle>Ingresos adicionales</CardTitle>
+                <DollarSign className="h-12 w-12 text-[#EC1C24] mb-2" />
+                <CardTitle className="text-xl">Ingresos adicionales</CardTitle>
                 <CardDescription>
                   Reciba comisiones por cada documento procesado en su establecimiento
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">
-                  Ganancia del 15% del valor de cada documento procesado. 
-                  Pagos mensuales automáticos a su cuenta bancaria.
-                </p>
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                  <p className="text-gray-700">
+                    <span className="font-bold text-[#EC1C24]">15%</span> de comisión sobre cada trámite.
+                    <br />
+                    Pagos mensuales automáticos a su cuenta bancaria.
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-t-4 border-t-[#EC1C24] shadow-lg hover:shadow-xl transition-shadow">
               <CardHeader>
-                <Users className="h-10 w-10 text-[#EC1C24] mb-2" />
-                <CardTitle>Más clientes</CardTitle>
+                <Store className="h-12 w-12 text-[#EC1C24] mb-2" />
+                <CardTitle className="text-xl">Aumente su negocio</CardTitle>
                 <CardDescription>
-                  Atraiga nuevos clientes a su negocio ofreciendo servicios adicionales
+                  Atraiga nuevos clientes a su tienda ofreciendo servicios adicionales
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">
-                  Las personas que buscan servicios documentales también consumirán 
-                  sus productos habituales, aumentando sus ventas.
-                </p>
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                  <p className="text-gray-700">
+                    Los clientes que buscan servicios documentales también consumirán 
+                    sus productos habituales, aumentando sus ventas diarias.
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-t-4 border-t-[#EC1C24] shadow-lg hover:shadow-xl transition-shadow">
               <CardHeader>
-                <HandHelping className="h-10 w-10 text-[#EC1C24] mb-2" />
-                <CardTitle>Sin inversión inicial</CardTitle>
+                <HandHelping className="h-12 w-12 text-[#EC1C24] mb-2" />
+                <CardTitle className="text-xl">Todo incluido</CardTitle>
                 <CardDescription>
-                  Comience sin costos. Le proporcionamos todo lo necesario
+                  Sin costos iniciales. Le proporcionamos todo lo necesario
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">
-                  Reciba capacitación gratuita, soporte técnico y el material 
-                  necesario para operar como punto de servicio.
-                </p>
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                  <p className="text-gray-700">
+                    Capacitación gratuita, soporte técnico y equipamiento incluido.
+                    <br />
+                    Tablet con la aplicación NotaryPro Express preinstalada.
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -169,32 +217,36 @@ export default function PartnersPublicPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16">
+      <section id="como-funciona" className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
+            <div className="flex justify-center">
+              <img src={notaryProLogo} alt="NotaryPro Logo" className="h-12 mb-4" />
+            </div>
             <h2 className="text-3xl font-bold mb-4">¿Cómo funciona?</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              El proceso es simple y está diseñado para integrarse fácilmente con su negocio actual
+              Un proceso simple diseñado para integrarse fácilmente con su negocio local
             </p>
           </div>
 
           <div className="relative">
             {/* Connector Line */}
-            <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gray-200 -translate-x-1/2 hidden md:block"></div>
+            <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-red-100 -translate-x-1/2 hidden md:block"></div>
             
-            <div className="space-y-12 relative">
+            <div className="space-y-16 relative">
               {/* Step 1 */}
               <div className="flex flex-col md:flex-row items-center gap-8">
-                <div className="md:w-1/2 order-1 md:order-1 md:text-right">
-                  <h3 className="text-xl font-bold mb-2">Regístrese en el programa</h3>
-                  <p className="text-gray-600">
-                    Complete el formulario de registro con los datos de su negocio.
-                    Nuestro equipo revisará su solicitud y se pondrá en contacto con usted.
+                <div className="md:w-1/2 order-1 md:order-1 md:text-right bg-white p-6 rounded-lg shadow-sm md:shadow-md hover:shadow-lg transition-shadow">
+                  <h3 className="text-xl font-bold mb-3 text-[#333333]">1. Regístrese en el programa</h3>
+                  <p className="text-gray-700">
+                    Complete el formulario online con los datos de su negocio.
+                    Nuestro equipo revisará su solicitud y se pondrá en contacto 
+                    con usted en un plazo de 24-48 horas.
                   </p>
                 </div>
                 <div className="md:w-24 relative z-10 order-0 md:order-2">
-                  <div className="w-12 h-12 rounded-full bg-[#EC1C24] text-white flex items-center justify-center mx-auto">
-                    <span className="font-bold">1</span>
+                  <div className="w-16 h-16 rounded-full bg-[#EC1C24] text-white flex items-center justify-center mx-auto shadow-lg">
+                    <FileCheck className="h-8 w-8" />
                   </div>
                 </div>
                 <div className="md:w-1/2 order-2 md:order-3 md:hidden">
@@ -208,31 +260,33 @@ export default function PartnersPublicPage() {
                   {/* Empty div for mobile layout */}
                 </div>
                 <div className="md:w-24 relative z-10 order-0 md:order-2">
-                  <div className="w-12 h-12 rounded-full bg-[#EC1C24] text-white flex items-center justify-center mx-auto">
-                    <span className="font-bold">2</span>
+                  <div className="w-16 h-16 rounded-full bg-[#EC1C24] text-white flex items-center justify-center mx-auto shadow-lg">
+                    <BookOpen className="h-8 w-8" />
                   </div>
                 </div>
-                <div className="md:w-1/2 order-2 md:order-3">
-                  <h3 className="text-xl font-bold mb-2">Reciba capacitación y equipamiento</h3>
-                  <p className="text-gray-600">
-                    Le proporcionamos toda la capacitación necesaria y una tablet 
-                    con nuestra aplicación para procesar documentos.
+                <div className="md:w-1/2 order-2 md:order-3 bg-white p-6 rounded-lg shadow-sm md:shadow-md hover:shadow-lg transition-shadow">
+                  <h3 className="text-xl font-bold mb-3 text-[#333333]">2. Reciba capacitación completa</h3>
+                  <p className="text-gray-700">
+                    Le proporcionamos capacitación personalizada y una tablet 
+                    con nuestra aplicación NotaryPro Express preinstalada para
+                    procesar documentos de forma rápida y sencilla.
                   </p>
                 </div>
               </div>
 
               {/* Step 3 */}
               <div className="flex flex-col md:flex-row items-center gap-8">
-                <div className="md:w-1/2 order-1 md:order-1 md:text-right">
-                  <h3 className="text-xl font-bold mb-2">Comience a procesar documentos</h3>
-                  <p className="text-gray-600">
+                <div className="md:w-1/2 order-1 md:order-1 md:text-right bg-white p-6 rounded-lg shadow-sm md:shadow-md hover:shadow-lg transition-shadow">
+                  <h3 className="text-xl font-bold mb-3 text-[#333333]">3. Comience a procesar documentos</h3>
+                  <p className="text-gray-700">
                     Atienda a clientes que necesiten servicios documentales, 
-                    registre sus datos y documentos en la aplicación.
+                    registre sus datos y documentos en la aplicación. El proceso
+                    toma solo minutos y no requiere conocimientos técnicos.
                   </p>
                 </div>
                 <div className="md:w-24 relative z-10 order-0 md:order-2">
-                  <div className="w-12 h-12 rounded-full bg-[#EC1C24] text-white flex items-center justify-center mx-auto">
-                    <span className="font-bold">3</span>
+                  <div className="w-16 h-16 rounded-full bg-[#EC1C24] text-white flex items-center justify-center mx-auto shadow-lg">
+                    <Store className="h-8 w-8" />
                   </div>
                 </div>
                 <div className="md:w-1/2 order-2 md:order-3 md:hidden">
@@ -246,19 +300,29 @@ export default function PartnersPublicPage() {
                   {/* Empty div for mobile layout */}
                 </div>
                 <div className="md:w-24 relative z-10 order-0 md:order-2">
-                  <div className="w-12 h-12 rounded-full bg-[#EC1C24] text-white flex items-center justify-center mx-auto">
-                    <span className="font-bold">4</span>
+                  <div className="w-16 h-16 rounded-full bg-[#EC1C24] text-white flex items-center justify-center mx-auto shadow-lg">
+                    <DollarSign className="h-8 w-8" />
                   </div>
                 </div>
-                <div className="md:w-1/2 order-2 md:order-3">
-                  <h3 className="text-xl font-bold mb-2">Reciba sus comisiones</h3>
-                  <p className="text-gray-600">
-                    Las comisiones se calculan automáticamente y se transfieren 
-                    a su cuenta bancaria cada mes.
+                <div className="md:w-1/2 order-2 md:order-3 bg-white p-6 rounded-lg shadow-sm md:shadow-md hover:shadow-lg transition-shadow">
+                  <h3 className="text-xl font-bold mb-3 text-[#333333]">4. Reciba sus comisiones</h3>
+                  <p className="text-gray-700">
+                    Las comisiones se calculan automáticamente (15% del valor de cada documento) 
+                    y se transfieren a su cuenta bancaria cada mes. Acceda a su 
+                    panel de control para ver sus estadísticas y ganancias en tiempo real.
                   </p>
                 </div>
               </div>
             </div>
+          </div>
+          
+          <div className="mt-16 text-center">
+            <Button 
+              onClick={() => setLocation("/partners/registration-form")}
+              className="bg-[#EC1C24] hover:bg-[#d91920] text-white px-8 py-3 text-lg"
+            >
+              Comenzar el proceso de registro
+            </Button>
           </div>
         </div>
       </section>
