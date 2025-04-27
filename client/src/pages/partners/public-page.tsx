@@ -328,9 +328,12 @@ export default function PartnersPublicPage() {
       </section>
 
       {/* Partner Testimonials */}
-      <section className="py-16 bg-gray-50">
+      <section id="testimonios" className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
+            <div className="flex justify-center">
+              <img src={notaryProLogo} alt="NotaryPro Logo" className="h-12 mb-4" />
+            </div>
             <h2 className="text-3xl font-bold mb-4">Lo que dicen nuestros socios</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Comercios que ya son parte del programa Vecinos NotaryPro Express
@@ -338,49 +341,88 @@ export default function PartnersPublicPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card>
+            <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              <div className="h-2 bg-[#EC1C24]"></div>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-16 h-16 bg-gray-200 rounded-full mb-4"></div>
-                  <p className="text-gray-700 mb-4 italic">
-                    "Ha sido un excelente complemento para mi minimarket. No solo genera 
-                    ingresos adicionales, sino que atrae más clientes."
-                  </p>
+                  <div className="w-16 h-16 bg-gray-100 rounded-full mb-4 flex items-center justify-center">
+                    <Store className="h-8 w-8 text-[#EC1C24]" />
+                  </div>
+                  <div className="bg-gray-50 p-5 rounded-lg mb-4 relative">
+                    <div className="absolute top-0 left-5 transform -translate-y-1/2 rotate-45 w-4 h-4 bg-gray-50"></div>
+                    <p className="text-gray-700 italic">
+                      "Ha sido un excelente complemento para mi minimarket. No solo genera 
+                      ingresos adicionales, sino que atrae más clientes a mi negocio."
+                    </p>
+                  </div>
                   <div>
-                    <h4 className="font-semibold">Pedro Ramírez</h4>
+                    <h4 className="font-semibold text-[#333333]">Pedro Ramírez</h4>
                     <p className="text-sm text-gray-500">Minimarket Don Pedro, Santiago</p>
+                    <div className="flex justify-center mt-2">
+                      <div className="flex">
+                        {[...Array(5)].map((_, i) => (
+                          <CheckCircle key={i} className="h-4 w-4 text-[#EC1C24] mr-1" />
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              <div className="h-2 bg-[#EC1C24]"></div>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-16 h-16 bg-gray-200 rounded-full mb-4"></div>
-                  <p className="text-gray-700 mb-4 italic">
-                    "La aplicación es muy fácil de usar y el soporte del equipo 
-                    técnico es excelente. Mis clientes valoran el servicio."
-                  </p>
+                  <div className="w-16 h-16 bg-gray-100 rounded-full mb-4 flex items-center justify-center">
+                    <BookOpen className="h-8 w-8 text-[#EC1C24]" />
+                  </div>
+                  <div className="bg-gray-50 p-5 rounded-lg mb-4 relative">
+                    <div className="absolute top-0 left-5 transform -translate-y-1/2 rotate-45 w-4 h-4 bg-gray-50"></div>
+                    <p className="text-gray-700 italic">
+                      "La aplicación es muy fácil de usar y el soporte del equipo 
+                      técnico es excelente. Mis clientes valoran el nuevo servicio."
+                    </p>
+                  </div>
                   <div>
-                    <h4 className="font-semibold">María González</h4>
+                    <h4 className="font-semibold text-[#333333]">María González</h4>
                     <p className="text-sm text-gray-500">Librería Educativa, Valparaíso</p>
+                    <div className="flex justify-center mt-2">
+                      <div className="flex">
+                        {[...Array(5)].map((_, i) => (
+                          <CheckCircle key={i} className="h-4 w-4 text-[#EC1C24] mr-1" />
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              <div className="h-2 bg-[#EC1C24]"></div>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-16 h-16 bg-gray-200 rounded-full mb-4"></div>
-                  <p className="text-gray-700 mb-4 italic">
-                    "Estaba buscando formas de diversificar mi negocio. Este programa 
-                    fue la solución perfecta. Recomiendo 100%."
-                  </p>
+                  <div className="w-16 h-16 bg-gray-100 rounded-full mb-4 flex items-center justify-center">
+                    <Briefcase className="h-8 w-8 text-[#EC1C24]" />
+                  </div>
+                  <div className="bg-gray-50 p-5 rounded-lg mb-4 relative">
+                    <div className="absolute top-0 left-5 transform -translate-y-1/2 rotate-45 w-4 h-4 bg-gray-50"></div>
+                    <p className="text-gray-700 italic">
+                      "Estaba buscando formas de diversificar mi negocio. Este programa 
+                      fue la solución perfecta. Recomiendo 100% participar."
+                    </p>
+                  </div>
                   <div>
-                    <h4 className="font-semibold">Juan Morales</h4>
+                    <h4 className="font-semibold text-[#333333]">Juan Morales</h4>
                     <p className="text-sm text-gray-500">Bazar Central, Concepción</p>
+                    <div className="flex justify-center mt-2">
+                      <div className="flex">
+                        {[...Array(5)].map((_, i) => (
+                          <CheckCircle key={i} className="h-4 w-4 text-[#EC1C24] mr-1" />
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -390,63 +432,86 @@ export default function PartnersPublicPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16">
+      <section id="preguntas" className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
+            <div className="flex justify-center">
+              <img src={notaryProLogo} alt="NotaryPro Logo" className="h-12 mb-4" />
+            </div>
             <h2 className="text-3xl font-bold mb-4">Preguntas frecuentes</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Respondemos las dudas más comunes sobre el programa Vecinos NotaryPro Express
             </p>
           </div>
 
-          <div className="max-w-3xl mx-auto">
-            <Accordion type="single" collapsible>
-              <AccordionItem value="item-1">
-                <AccordionTrigger>¿Qué tipos de negocios pueden participar?</AccordionTrigger>
-                <AccordionContent>
-                  Cualquier negocio con atención al público puede participar: minimarkets, 
-                  librerías, bazares, farmacias, centros de fotocopiado, y similares. 
-                  El requisito principal es contar con un espacio adecuado para atender 
-                  a los clientes y conexión a internet.
+          <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-6 md:p-8">
+            <Accordion type="single" collapsible className="border-none">
+              <AccordionItem value="item-1" className="border-b border-gray-200 py-4">
+                <AccordionTrigger className="hover:text-[#EC1C24] font-medium text-lg">
+                  ¿Qué tipos de negocios pueden participar?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-700 pt-2">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    Cualquier negocio con atención al público puede participar: minimarkets, 
+                    librerías, bazares, farmacias, centros de fotocopiado, y similares. 
+                    El requisito principal es contar con un espacio adecuado para atender 
+                    a los clientes y conexión a internet.
+                  </div>
                 </AccordionContent>
               </AccordionItem>
               
-              <AccordionItem value="item-2">
-                <AccordionTrigger>¿Qué documentos puedo procesar como punto de servicio?</AccordionTrigger>
-                <AccordionContent>
-                  Podrá procesar diversos tipos de documentos: declaraciones juradas, 
-                  poderes simples, certificados, contratos, finiquitos, entre otros. 
-                  Todos estos documentos serán verificados y certificados por nuestro 
-                  equipo de profesionales.
+              <AccordionItem value="item-2" className="border-b border-gray-200 py-4">
+                <AccordionTrigger className="hover:text-[#EC1C24] font-medium text-lg">
+                  ¿Qué documentos puedo procesar como punto de servicio?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-700 pt-2">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    Podrá procesar diversos tipos de documentos: declaraciones juradas, 
+                    poderes simples, certificados, contratos, finiquitos, entre otros. 
+                    Todos estos documentos serán verificados y certificados por nuestro 
+                    equipo de profesionales.
+                  </div>
                 </AccordionContent>
               </AccordionItem>
               
-              <AccordionItem value="item-3">
-                <AccordionTrigger>¿Cómo se calculan y pagan las comisiones?</AccordionTrigger>
-                <AccordionContent>
-                  Usted recibe una comisión del 15% del valor de cada documento procesado 
-                  en su establecimiento. Las comisiones se acumulan automáticamente en su 
-                  cuenta de partner y se transfieren a su cuenta bancaria mensualmente.
+              <AccordionItem value="item-3" className="border-b border-gray-200 py-4">
+                <AccordionTrigger className="hover:text-[#EC1C24] font-medium text-lg">
+                  ¿Cómo se calculan y pagan las comisiones?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-700 pt-2">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    Usted recibe una comisión del 15% del valor de cada documento procesado 
+                    en su establecimiento. Las comisiones se acumulan automáticamente en su 
+                    cuenta de partner y se transfieren a su cuenta bancaria mensualmente.
+                  </div>
                 </AccordionContent>
               </AccordionItem>
               
-              <AccordionItem value="item-4">
-                <AccordionTrigger>¿Necesito conocimientos legales para participar?</AccordionTrigger>
-                <AccordionContent>
-                  No, no necesita conocimientos legales previos. Nosotros le proporcionamos 
-                  toda la capacitación necesaria y nuestra aplicación está diseñada para ser 
-                  muy intuitiva y fácil de usar. Además, nuestro equipo de certificadores se 
-                  encarga de la validación legal de los documentos.
+              <AccordionItem value="item-4" className="border-b border-gray-200 py-4">
+                <AccordionTrigger className="hover:text-[#EC1C24] font-medium text-lg">
+                  ¿Necesito conocimientos legales para participar?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-700 pt-2">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    No, no necesita conocimientos legales previos. Nosotros le proporcionamos 
+                    toda la capacitación necesaria y nuestra aplicación está diseñada para ser 
+                    muy intuitiva y fácil de usar. Además, nuestro equipo de certificadores se 
+                    encarga de la validación legal de los documentos.
+                  </div>
                 </AccordionContent>
               </AccordionItem>
               
-              <AccordionItem value="item-5">
-                <AccordionTrigger>¿Qué equipamiento necesito?</AccordionTrigger>
-                <AccordionContent>
-                  Lo ideal es contar con una tablet con sistema Android, pero si no tiene, 
-                  podemos proporcionarle una en comodato mientras sea parte del programa. 
-                  También es recomendable tener una impresora para los recibos, aunque no 
-                  es estrictamente necesario.
+              <AccordionItem value="item-5" className="py-4">
+                <AccordionTrigger className="hover:text-[#EC1C24] font-medium text-lg">
+                  ¿Qué equipamiento necesito?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-700 pt-2">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    Lo ideal es contar con una tablet con sistema Android, pero si no tiene, 
+                    podemos proporcionarle una en comodato mientras sea parte del programa. 
+                    También es recomendable tener una impresora para los recibos, aunque no 
+                    es estrictamente necesario.
+                  </div>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -455,29 +520,61 @@ export default function PartnersPublicPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-[#EC1C24] text-white">
+      <section className="py-20 bg-gradient-to-br from-[#EC1C24] to-[#d91920] text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">¿Listo para comenzar?</h2>
-          <p className="text-xl mb-8">
-            Únase a nuestra red de puntos de servicio y expanda su negocio hoy mismo
+          <img src={notaryProLogo} alt="NotaryPro Logo" className="h-16 mx-auto mb-6 filter brightness-0 invert" />
+          <h2 className="text-4xl font-bold mb-6">¿Listo para comenzar?</h2>
+          <p className="text-xl mb-10 max-w-2xl mx-auto">
+            Únase a nuestra red de puntos de servicio y transforme su negocio en un centro de trámites documentales certificados
           </p>
-          <Button 
-            onClick={() => setLocation("/partners/registration-form")}
-            className="bg-white text-[#EC1C24] hover:bg-white/90 px-8 py-3 text-lg"
-          >
-            Registrar mi negocio
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              onClick={() => setLocation("/partners/registration-form")}
+              className="bg-white text-[#EC1C24] hover:bg-white/90 px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-shadow"
+            >
+              Registrar mi negocio
+            </Button>
+            <Button 
+              onClick={() => setLocation("/partners/partner-login")}
+              variant="outline"
+              className="border-white text-white hover:bg-white/10 px-8 py-3 text-lg"
+            >
+              Iniciar sesión
+            </Button>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-16">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-10">
+            <div className="flex items-center mb-6 md:mb-0">
+              <img src={notaryProLogo} alt="NotaryPro Logo" className="h-10 mr-3 filter brightness-0 invert" />
+              <div>
+                <h3 className="text-xl font-bold">Vecinos NotaryPro Express</h3>
+                <p className="text-gray-400 text-sm">Transformando negocios locales</p>
+              </div>
+            </div>
+            <div className="flex space-x-6">
+              <a href="#" className="h-10 w-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-[#EC1C24] transition-colors">
+                <Mail className="h-5 w-5" />
+              </a>
+              <a href="#" className="h-10 w-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-[#EC1C24] transition-colors">
+                <Phone className="h-5 w-5" />
+              </a>
+              <a href="#" className="h-10 w-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-[#EC1C24] transition-colors">
+                <MapPin className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-8 border-t border-gray-800">
             <div>
-              <h3 className="text-lg font-bold mb-4">Vecinos NotaryPro Express</h3>
+              <h3 className="text-lg font-bold mb-4">Sobre NotaryPro</h3>
               <p className="text-gray-400">
-                Programa de puntos de servicio para trámites documentales certificados
+                Programa de puntos de servicio para trámites documentales certificados. 
+                Expandiendo el acceso a servicios legales en todo Chile.
               </p>
             </div>
             
@@ -485,15 +582,15 @@ export default function PartnersPublicPage() {
               <h3 className="text-lg font-bold mb-4">Contacto</h3>
               <ul className="space-y-2 text-gray-400">
                 <li className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-2" />
+                  <MapPin className="h-4 w-4 mr-2 text-[#EC1C24]" />
                   <span>Av. Principal 123, Santiago</span>
                 </li>
                 <li className="flex items-center">
-                  <Phone className="h-4 w-4 mr-2" />
+                  <Phone className="h-4 w-4 mr-2 text-[#EC1C24]" />
                   <span>+56 2 2123 4567</span>
                 </li>
                 <li className="flex items-center">
-                  <Mail className="h-4 w-4 mr-2" />
+                  <Mail className="h-4 w-4 mr-2 text-[#EC1C24]" />
                   <span>partners@cerfidoc.cl</span>
                 </li>
               </ul>
@@ -503,21 +600,32 @@ export default function PartnersPublicPage() {
               <h3 className="text-lg font-bold mb-4">Enlaces</h3>
               <ul className="space-y-2 text-gray-400">
                 <li>
-                  <a href="#" className="hover:text-white">Sobre nosotros</a>
+                  <a href="#beneficios" className="hover:text-white hover:ml-1 transition-all flex items-center">
+                    <span className="text-[#EC1C24] mr-2">→</span> Beneficios
+                  </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white">Términos y condiciones</a>
+                  <a href="#como-funciona" className="hover:text-white hover:ml-1 transition-all flex items-center">
+                    <span className="text-[#EC1C24] mr-2">→</span> Cómo funciona
+                  </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white">Política de privacidad</a>
+                  <a href="#testimonios" className="hover:text-white hover:ml-1 transition-all flex items-center">
+                    <span className="text-[#EC1C24] mr-2">→</span> Testimonios
+                  </a>
+                </li>
+                <li>
+                  <a href="#preguntas" className="hover:text-white hover:ml-1 transition-all flex items-center">
+                    <span className="text-[#EC1C24] mr-2">→</span> Preguntas frecuentes
+                  </a>
                 </li>
               </ul>
             </div>
             
             <div>
-              <h3 className="text-lg font-bold mb-4">Suscríbase</h3>
+              <h3 className="text-lg font-bold mb-4">Reciba actualizaciones</h3>
               <p className="text-gray-400 mb-4">
-                Reciba información sobre nuestro programa de partners
+                Suscríbase para recibir las últimas novedades sobre nuestro programa
               </p>
               <form className="flex">
                 <Input 
@@ -533,7 +641,13 @@ export default function PartnersPublicPage() {
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
-            <p>&copy; {new Date().getFullYear()} CerfiDoc. Todos los derechos reservados.</p>
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <p>&copy; {new Date().getFullYear()} CerfiDoc NotaryPro. Todos los derechos reservados.</p>
+              <div className="flex space-x-6 mt-4 md:mt-0">
+                <a href="#" className="text-gray-400 hover:text-white">Términos y condiciones</a>
+                <a href="#" className="text-gray-400 hover:text-white">Política de privacidad</a>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
