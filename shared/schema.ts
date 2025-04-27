@@ -310,6 +310,13 @@ export const partners = pgTable("partners", {
   hasDevice: boolean("has_device").notNull(),
   status: text("status").notNull().default("pending"), // pending, approved, rejected
   notes: text("notes"),
+  // POS integration fields
+  posIntegrated: boolean("pos_integrated").default(false),
+  posProvider: text("pos_provider"),
+  posApiKey: text("pos_api_key"),
+  posStoreId: text("pos_store_id"),
+  posSalesEndpoint: text("pos_sales_endpoint"),
+  lastSyncedAt: timestamp("last_synced_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -324,6 +331,58 @@ export const insertPartnerSchema = createInsertSchema(partners).pick({
   email: true,
   hasInternet: true,
   hasDevice: true,
+});
+
+// POS Transactions
+export const posTransactions = pgTable("pos_transactions", {
+  id: serial("id").primaryKey(),
+  partnerId: integer("partner_id").notNull().references(() => partners.id),
+  transactionDate: timestamp("transaction_date", { mode: 'date' }).notNull(),
+  transactionId: text("transaction_id"),
+  posReference: text("pos_reference"),
+  amount: integer("amount").notNull(), // Amount in cents
+  items: jsonb("items"), // Items sold in this transaction
+  commissionAmount: integer("commission_amount"), // Commission in cents
+  commissionRate: real("commission_rate"),
+  synchronized: boolean("synchronized").default(true).notNull(),
+  metadata: jsonb("metadata"), // Additional POS data
+  createdAt: timestamp("created_at", { mode: 'date' }).defaultNow().notNull(),
+});
+
+export const insertPosTransactionSchema = createInsertSchema(posTransactions).pick({
+  partnerId: true,
+  transactionDate: true,
+  transactionId: true,
+  posReference: true,
+  amount: true,
+  items: true,
+  commissionAmount: true,
+  commissionRate: true,
+  synchronized: true,
+  metadata: true,
+});
+
+// POS Providers
+export const posProviders = pgTable("pos_providers", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  displayName: text("display_name").notNull(),
+  apiBaseUrl: text("api_base_url").notNull(),
+  apiDocumentationUrl: text("api_documentation_url"),
+  logoUrl: text("logo_url"),
+  isActive: boolean("is_active").default(true).notNull(),
+  requiredFields: jsonb("required_fields").notNull(),
+  createdAt: timestamp("created_at", { mode: 'date' }).defaultNow().notNull(),
+});
+
+export const insertPosProviderSchema = createInsertSchema(posProviders).pick({
+  name: true,
+  displayName: true,
+  apiBaseUrl: true,
+  apiDocumentationUrl: true,
+  logoUrl: true,
+  isActive: true,
+  requiredFields: true,
 });
 
 // Partner Bank Details
@@ -590,6 +649,12 @@ export type PartnerSale = typeof partnerSales.$inferSelect;
 export type InsertPartnerSale = z.infer<typeof insertPartnerSaleSchema>;
 export type PartnerPayment = typeof partnerPayments.$inferSelect;
 export type InsertPartnerPayment = z.infer<typeof insertPartnerPaymentSchema>;
+
+// POS Types
+export type PosTransaction = typeof posTransactions.$inferSelect;
+export type InsertPosTransaction = z.infer<typeof insertPosTransactionSchema>;
+export type PosProvider = typeof posProviders.$inferSelect;
+export type InsertPosProvider = z.infer<typeof insertPosProviderSchema>;
 
 // CRM & Automation Types
 export type CrmLead = typeof crmLeads.$inferSelect;
