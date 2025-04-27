@@ -142,12 +142,18 @@ export default function VerificarDocumento() {
           <CardContent>
             <div className="flex gap-2">
               <Input
-                placeholder="Ej. DOC-ABC123XYZ"
+                placeholder="Ej. XX-XXXX-XX"
                 value={verificationCode}
                 onChange={(e) => setVerificationCode(e.target.value)}
                 className="flex-1"
+                maxLength={9}
+                pattern="[A-Z0-9]{2}-[A-Z0-9]{4}-[A-Z0-9]{2}"
               />
-              <Button onClick={handleVerify} disabled={isVerifying}>
+              <Button 
+                onClick={handleVerify} 
+                disabled={isVerifying} 
+                className="bg-primary hover:bg-primary/90"
+              >
                 {isVerifying ? (
                   <>
                     <span className="animate-spin mr-2">
@@ -165,31 +171,31 @@ export default function VerificarDocumento() {
             </div>
 
             {result && (
-              <div className="mt-6">
+              <div className="mt-6 animate-in fade-in slide-in-from-top-3 duration-300">
                 {result.verified ? (
                   <div className="space-y-4">
                     <Alert variant="default" className="bg-green-50 border-green-200">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      <AlertTitle className="text-green-800">Documento Verificado</AlertTitle>
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                      <AlertTitle className="text-green-800 text-lg">Documento Verificado</AlertTitle>
                       <AlertDescription className="text-green-700">
-                        El documento es auténtico y ha sido validado correctamente.
+                        El documento es auténtico y ha sido validado correctamente en nuestra plataforma.
                       </AlertDescription>
                     </Alert>
 
-                    <div className="bg-gray-50 p-4 rounded-md border">
-                      <h3 className="font-medium mb-3">Información del Documento</h3>
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-start">
-                          <span className="font-medium w-28">Título:</span>
-                          <span className="flex-1">{result.documentInfo?.title}</span>
+                    <div className="bg-gray-50 p-5 rounded-md border">
+                      <h3 className="font-medium mb-4 text-gray-800 text-base">Información del Documento</h3>
+                      <ul className="space-y-3">
+                        <li className="flex items-start border-b border-gray-100 pb-2">
+                          <span className="font-medium w-32 text-gray-700">Título:</span>
+                          <span className="flex-1 text-gray-900 font-medium">{result.documentInfo?.title}</span>
+                        </li>
+                        <li className="flex items-start border-b border-gray-100 pb-2">
+                          <span className="font-medium w-32 text-gray-700">Firmado por:</span>
+                          <span className="flex-1 text-gray-900">{result.documentInfo?.signerName}</span>
                         </li>
                         <li className="flex items-start">
-                          <span className="font-medium w-28">Firmado por:</span>
-                          <span className="flex-1">{result.documentInfo?.signerName}</span>
-                        </li>
-                        <li className="flex items-start">
-                          <span className="font-medium w-28">Fecha de firma:</span>
-                          <span className="flex-1">
+                          <span className="font-medium w-32 text-gray-700">Fecha de firma:</span>
+                          <span className="flex-1 text-gray-900">
                             {result.documentInfo?.signatureTimestamp 
                               ? formatDate(result.documentInfo.signatureTimestamp)
                               : "No disponible"}
@@ -197,12 +203,24 @@ export default function VerificarDocumento() {
                         </li>
                       </ul>
                     </div>
+                    
+                    <div className="p-4 rounded-md bg-blue-50 border border-blue-200 flex justify-between items-center">
+                      <p className="text-sm text-blue-800">
+                        Este documento ha sido verificado con éxito. Puede descargarlo y conservarlo como un registro oficial.
+                      </p>
+                      <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-100">
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Descargar Certificado
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <Alert variant="destructive">
-                      <XCircle className="h-4 w-4" />
-                      <AlertTitle>Documento No Verificado</AlertTitle>
+                      <XCircle className="h-5 w-5" />
+                      <AlertTitle className="text-lg">Documento No Verificado</AlertTitle>
                       <AlertDescription>
                         {result.message || "No se pudo verificar la autenticidad del documento."}
                       </AlertDescription>
@@ -210,25 +228,53 @@ export default function VerificarDocumento() {
                     
                     <div className="bg-gray-50 p-4 rounded-md border flex items-center justify-between">
                       <div>
-                        <h3 className="font-medium text-sm mb-1">¿Necesita ayuda con la verificación?</h3>
-                        <p className="text-xs text-gray-600">
-                          Si tiene problemas para verificar un documento, vea nuestro video tutorial 
+                        <h3 className="font-medium text-base mb-1 text-gray-800">¿Necesita ayuda con la verificación?</h3>
+                        <p className="text-sm text-gray-600">
+                          Si tiene problemas para verificar un documento, vea nuestro tutorial 
                           o póngase en contacto con soporte técnico.
                         </p>
                       </div>
-                      <ExplanatoryVideo
-                        title="¿Problemas con la verificación?"
-                        description="Aprenda qué hacer cuando un documento no se verifica correctamente y cómo resolver los problemas más comunes."
-                        videoType="tutorial"
-                      >
-                        <Button variant="outline" size="sm" className="flex items-center gap-1">
-                          <AlertTriangle className="h-4 w-4 text-amber-500" />
-                          Ver soluciones
+                      <div className="flex gap-2">
+                        <ExplanatoryVideo
+                          title="¿Problemas con la verificación?"
+                          description="Aprenda qué hacer cuando un documento no se verifica correctamente y cómo resolver los problemas más comunes."
+                          videoType="tutorial"
+                        >
+                          <Button variant="outline" size="sm" className="flex items-center gap-1">
+                            <AlertTriangle className="h-4 w-4 text-amber-500" />
+                            Ver soluciones
+                          </Button>
+                        </ExplanatoryVideo>
+                        
+                        <Button variant="secondary" size="sm" className="flex items-center gap-1">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                          </svg>
+                          Contactar Soporte
                         </Button>
-                      </ExplanatoryVideo>
+                      </div>
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+            
+            {!result && !isVerifying && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-md border border-gray-200">
+                <div className="flex items-center">
+                  <div className="mr-4 flex-shrink-0 rounded-full bg-blue-100 p-2">
+                    <svg className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-800">¿Dónde encuentro el código?</h3>
+                    <p className="mt-1 text-xs text-gray-600">
+                      El código de verificación se encuentra al final del documento, junto al código QR.
+                      El formato es XX-XXXX-XX (por ejemplo: AB-1234-CD).
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </CardContent>
