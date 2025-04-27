@@ -43,6 +43,7 @@ import { posService } from "./services/pos-service";
 import { WebSocketServer } from "ws";
 import { createSuperAdmin } from "./admin/seed-admin";
 import { gamificationRouter } from "./gamification-routes";
+import { verifyDocument } from "./services/gamification-service";
 
 // Ensure these directories exist
 const uploadsDir = path.join(process.cwd(), "uploads");

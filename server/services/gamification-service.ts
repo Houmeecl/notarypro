@@ -172,11 +172,14 @@ export async function verifyDocument(userId: number, code: string) {
   }
   
   // Registrar la verificación del documento
-  const verification = await db.execute(sql`
+  const result = await db.execute(sql`
     INSERT INTO document_verifications (document_id, user_id, verified, verified_at)
     VALUES (${doc.id}, ${userId}, true, NOW())
     RETURNING id, document_id as "documentId", verified, verified_at as "verifiedAt"
   `);
+  
+  // Extraer el registro de verificación del resultado
+  const verification = result.rows[0] as { id: number, documentId: number, verified: boolean, verifiedAt: Date };
   
   // Actualizar estadísticas de verificación del usuario
   await updateUserVerificationStats(userId);
@@ -205,7 +208,7 @@ export async function verifyDocument(userId: number, code: string) {
     documentId: doc.id,
     documentTitle: doc.title,
     verified: true,
-    verifiedAt: verification.verified_at,
+    verifiedAt: verification.verifiedAt,
   };
 }
 
