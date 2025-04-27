@@ -113,6 +113,26 @@ gamificationRouter.get("/my-rank/:period", isAuthenticated, async (req, res) => 
 });
 
 // Obtener historial de actividades del usuario
+// Obtener estadísticas de verificación
+gamificationRouter.get("/verification-stats", isAuthenticated, async (req, res) => {
+  try {
+    // Si es admin, puede obtener estadísticas globales
+    if (req.user.role === 'admin' && req.query.global === 'true') {
+      const stats = await gamificationService.getVerificationStats();
+      return res.status(200).json(stats);
+    }
+    
+    // Para usuarios normales, solo sus propias estadísticas
+    const stats = await gamificationService.getVerificationStats(req.user.id);
+    res.status(200).json(stats);
+  } catch (error: any) {
+    res.status(500).json({ 
+      error: "Error al obtener estadísticas de verificación",
+      message: error.message 
+    });
+  }
+});
+
 gamificationRouter.get("/activities", isAuthenticated, async (req, res) => {
   try {
     const userId = req.user!.id;

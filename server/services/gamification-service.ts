@@ -871,6 +871,110 @@ export async function getUserLeaderboardPosition(userId: number, period: string 
 /**
  * Obtiene el historial de actividades de un usuario
  */
+/**
+ * Obtiene estadísticas de verificación para un usuario específico o globales
+ */
+export async function getVerificationStats(userId?: number) {
+  // Variables para almacenar resultados
+  let totalVerifications = 0;
+  let verificationsByDay: { date: string; count: number }[] = [];
+  let mostVerifiedDocuments: { documentId: number; title: string; count: number }[] = [];
+
+  // Consulta para obtener total de verificaciones (con filtro opcional por usuario)
+  const totalQuery = userId 
+    ? db.select({ count: sql`count(*)` })
+        .from(gamificationActivities)
+        .where(and(
+          eq(gamificationActivities.userId, userId),
+          eq(gamificationActivities.activityType, 'document_verification')
+        ))
+    : db.select({ count: sql`count(*)` })
+        .from(gamificationActivities)
+        .where(eq(gamificationActivities.activityType, 'document_verification'));
+
+  // Ejecutar consulta de total
+  const [totalResult] = await totalQuery;
+  totalVerifications = Number(totalResult?.count || 0);
+
+  // Consulta para obtener verificaciones por día (últimos 30 días)
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  
+  const byDayQuery = userId
+    ? db.select({
+        date: sql`DATE(created_at)`,
+        count: sql`count(*)`
+      })
+      .from(gamificationActivities)
+      .where(and(
+        eq(gamificationActivities.userId, userId),
+        eq(gamificationActivities.activityType, 'document_verification'),
+        gt(gamificationActivities.createdAt, thirtyDaysAgo)
+      ))
+      .groupBy(sql`DATE(created_at)`)
+      .orderBy(sql`DATE(created_at)`)
+    : db.select({
+        date: sql`DATE(created_at)`,
+        count: sql`count(*)`
+      })
+      .from(gamificationActivities)
+      .where(and(
+        eq(gamificationActivities.activityType, 'document_verification'),
+        gt(gamificationActivities.createdAt, thirtyDaysAgo)
+      ))
+      .groupBy(sql`DATE(created_at)`)
+      .orderBy(sql`DATE(created_at)`);
+
+  // Ejecutar consulta por día
+  const byDayResults = await byDayQuery;
+  verificationsByDay = byDayResults.map(r => ({ 
+    date: r.date.toString(), 
+    count: Number(r.count) 
+  }));
+
+  // Consulta para obtener los documentos más verificados
+  const mostVerifiedQuery = userId
+    ? db.select({
+        documentId: gamificationActivities.metadata.documentId,
+        title: documents.title,
+        count: sql`count(*)`
+      })
+      .from(gamificationActivities)
+      .leftJoin(documents, eq(documents.id, gamificationActivities.metadata.documentId))
+      .where(and(
+        eq(gamificationActivities.userId, userId),
+        eq(gamificationActivities.activityType, 'document_verification')
+      ))
+      .groupBy(gamificationActivities.metadata.documentId, documents.title)
+      .orderBy(desc(sql`count(*)`))
+      .limit(5)
+    : db.select({
+        documentId: gamificationActivities.metadata.documentId,
+        title: documents.title,
+        count: sql`count(*)`
+      })
+      .from(gamificationActivities)
+      .leftJoin(documents, eq(documents.id, gamificationActivities.metadata.documentId))
+      .where(eq(gamificationActivities.activityType, 'document_verification'))
+      .groupBy(gamificationActivities.metadata.documentId, documents.title)
+      .orderBy(desc(sql`count(*)`))
+      .limit(5);
+
+  // Ejecutar consulta de documentos más verificados
+  const mostVerifiedResults = await mostVerifiedQuery;
+  mostVerifiedDocuments = mostVerifiedResults.map(r => ({
+    documentId: Number(r.documentId || 0),
+    title: r.title || 'Documento desconocido',
+    count: Number(r.count || 0)
+  }));
+
+  return {
+    totalVerifications,
+    verificationsByDay,
+    mostVerifiedDocuments
+  };
+}
+
 export async function getUserActivities(userId: number, limit: number = 20) {
   const activities = await db
     .select()
