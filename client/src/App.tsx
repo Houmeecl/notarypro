@@ -18,6 +18,7 @@ import CoursePage from "@/pages/course-page";
 import DocumentSign from "@/pages/document-sign";
 import AvisoLegal from "@/pages/aviso-legal";
 import ServiciosEmpresariales from "@/pages/servicios-empresariales";
+import TemplateAdminPage from "@/pages/template-admin";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -74,6 +75,11 @@ function Router() {
       <ProtectedRoute 
         path="/admin-dashboard" 
         component={AdminDashboard} 
+        allowedRoles={["admin"]} 
+      />
+      <ProtectedRoute 
+        path="/template-admin" 
+        component={TemplateAdminPage} 
         allowedRoles={["admin"]} 
       />
       
