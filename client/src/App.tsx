@@ -24,6 +24,7 @@ import UneteAlEquipo from "@/pages/unete-al-equipo";
 import ConversorPresencialOnline from "@/pages/conversor-presencial-online";
 import TemplateAdminPage from "@/pages/template-admin";
 import VerificarDocumento from "@/pages/verificar-documento";
+import VideocallInterfaceDemo from "@/pages/videocall-interface-demo";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -104,6 +105,13 @@ function Router() {
       <Route path="/conversor-presencial-online" component={ConversorPresencialOnline} />
       <Route path="/verificar-documento" component={VerificarDocumento} />
       <Route path="/verificar-documento/:code" component={VerificarDocumento} />
+      
+      {/* Videocall demo */}
+      <ProtectedRoute 
+        path="/videocall-interface-demo" 
+        component={VideocallInterfaceDemo} 
+        allowedRoles={["certifier", "admin"]} 
+      />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />

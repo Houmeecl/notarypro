@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Sidebar from "@/components/dashboard/Sidebar";
 import PendingDocuments from "@/components/certifier/PendingDocuments";
+import VideoCallSystemExplanation from "@/components/certifier/VideoCallSystemExplanation";
 import { Button } from "@/components/ui/button";
 import { 
   Card, 
@@ -27,7 +28,8 @@ import {
   Shield, 
   Users, 
   TrendingUp,
-  Calendar
+  Calendar,
+  Video
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Document } from "@shared/schema";
@@ -146,8 +148,23 @@ export default function CertifierDashboard() {
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 space-y-6">
               <PendingDocuments />
+              
+              <div>
+                <h2 className="text-xl font-bold mb-4">Sistema de Certificación por Video</h2>
+                <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-4">
+                  <div className="flex gap-3 items-center">
+                    <Video className="h-5 w-5 text-blue-500" />
+                    <p className="text-blue-700 font-medium">
+                      Sistema pionero en Chile para certificación online de documentos mediante videollamada
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Importar el componente de explicación del sistema */}
+                <VideoCallSystemExplanation />
+              </div>
             </div>
             
             <div className="space-y-6">
