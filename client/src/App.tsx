@@ -18,6 +18,9 @@ import CoursePage from "@/pages/course-page";
 import DocumentSign from "@/pages/document-sign";
 import AvisoLegal from "@/pages/aviso-legal";
 import ServiciosEmpresariales from "@/pages/servicios-empresariales";
+import NotarizeOnline from "@/pages/notarize-online";
+import CertificacionPorVideo from "@/pages/certificacion-por-video";
+import UneteAlEquipo from "@/pages/unete-al-equipo";
 import TemplateAdminPage from "@/pages/template-admin";
 
 // Document pages
@@ -93,6 +96,9 @@ function Router() {
       {/* Public pages */}
       <Route path="/aviso-legal" component={AvisoLegal} />
       <Route path="/servicios-empresariales" component={ServiciosEmpresariales} />
+      <Route path="/notarize-online" component={NotarizeOnline} />
+      <Route path="/certificacion-por-video" component={CertificacionPorVideo} />
+      <Route path="/unete-al-equipo" component={UneteAlEquipo} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
