@@ -57,7 +57,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                <a href="/servicios-empresariales" className="text-gray-600 hover:text-primary transition-colors duration-150">
                   Soluciones Empresariales
                 </a>
               </li>
@@ -99,11 +99,9 @@ export default function Footer() {
             <h3 className="text-lg font-semibold text-secondary mb-4">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/aviso-legal">
-                  <a className="text-gray-600 hover:text-primary transition-colors duration-150">
-                    Aviso Legal
-                  </a>
-                </Link>
+                <a href="/aviso-legal" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                  Aviso Legal
+                </a>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">
@@ -131,7 +129,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-200 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm">
-            &copy; {new Date().getFullYear()} NotaryPro. Todos los derechos reservados.
+            &copy; {new Date().getFullYear()} NotaryPro Chile. Todos los derechos reservados.
           </p>
           <div className="mt-4 md:mt-0">
             <img

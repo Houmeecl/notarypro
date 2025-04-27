@@ -17,6 +17,7 @@ import AdminDashboard from "@/pages/admin-dashboard";
 import CoursePage from "@/pages/course-page";
 import DocumentSign from "@/pages/document-sign";
 import AvisoLegal from "@/pages/aviso-legal";
+import ServiciosEmpresariales from "@/pages/servicios-empresariales";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -85,6 +86,7 @@ function Router() {
       
       {/* Public pages */}
       <Route path="/aviso-legal" component={AvisoLegal} />
+      <Route path="/servicios-empresariales" component={ServiciosEmpresariales} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
