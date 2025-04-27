@@ -1,1131 +1,1267 @@
-import { useState, useEffect, useRef } from 'react';
-import { useAuth } from '@/hooks/use-auth';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
-import { Download, Smartphone, QrCode, Copy, Check, ArrowRight, FileText, ExternalLink } from 'lucide-react';
-import { Link } from 'wouter';
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { Separator } from "@/components/ui/separator";
+import { Laptop, Smartphone, Download, FileCode, Info, ExternalLink, Copy, Check } from "lucide-react";
 
-export default function AndroidSdkTest() {
-  const { user } = useAuth();
+interface SDKForm {
+  nombreTienda: string;
+  direccion: string;
+  region: string;
+  comuna: string;
+  id: string;
+  apiKey: string;
+}
+
+interface ClienteForm {
+  nombre: string;
+  rut: string;
+  email: string;
+  telefono: string;
+}
+
+interface DocumentoForm {
+  tipo: string;
+  titulo: string;
+  detalle: string;
+  monto: string;
+  metodoPago: string;
+}
+
+const AndroidSdkTest: React.FC = () => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState('installation');
   const [copied, setCopied] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [activeTab, setActiveTab] = useState("simulador");
+  const [formData, setFormData] = useState<SDKForm>({
+    nombreTienda: "Mi Tienda Vecinos",
+    direccion: "Avenida Providencia 1234",
+    region: "Región Metropolitana",
+    comuna: "Providencia",
+    id: "12345",
+    apiKey: "vns_test_key_123456789",
+  });
 
-  // Función para descargar el SDK
-  const downloadSdk = async () => {
-    try {
-      const response = await fetch('/assets/vecinos-notarypro-sdk-dist.js');
-      const text = await response.text();
-      
-      // Crear un blob con el contenido
-      const blob = new Blob([text], { type: 'text/javascript' });
-      const url = URL.createObjectURL(blob);
-      
-      // Crear un elemento <a> para descargar
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'vecinos-notarypro-sdk.js';
-      document.body.appendChild(a);
-      a.click();
-      
-      // Limpiar
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 0);
-      
-      toast({
-        title: 'SDK descargado',
-        description: 'El archivo del SDK ha sido descargado correctamente.',
-      });
-    } catch (error) {
-      console.error('Error al descargar SDK:', error);
-      toast({
-        title: 'Error al descargar',
-        description: 'No se pudo descargar el SDK. Intente nuevamente más tarde.',
-        variant: 'destructive'
-      });
-    }
+  const [clienteForm, setClienteForm] = useState<ClienteForm>({
+    nombre: "Juan Pérez González",
+    rut: "12.345.678-9",
+    email: "juan.perez@ejemplo.cl",
+    telefono: "+56912345678",
+  });
+
+  const [documentoForm, setDocumentoForm] = useState<DocumentoForm>({
+    tipo: "poder",
+    titulo: "Poder Simple para Trámite",
+    detalle: "Autorización para realizar trámite en registro civil",
+    monto: "15000",
+    metodoPago: "efectivo",
+  });
+
+  const [clienteRegistrado, setClienteRegistrado] = useState(false);
+  const [documentoProcesado, setDocumentoProcesado] = useState(false);
+  const [reciboGenerado, setReciboGenerado] = useState(false);
+  const [codigoVerificacion, setCodigoVerificacion] = useState("");
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  // Copiar SDK al portapapeles
-  const copySdk = async () => {
-    try {
-      // Obtener el SDK desde el archivo dist
-      const response = await fetch('/assets/vecinos-notarypro-sdk-dist.js');
-      const text = await response.text();
-      
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      
-      toast({
-        title: 'SDK copiado',
-        description: 'El código del SDK ha sido copiado al portapapeles.',
-      });
-      
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      console.error('Error al copiar SDK:', error);
-      toast({
-        title: 'Error al copiar',
-        description: 'No se pudo copiar el SDK. Intente descargarlo en su lugar.',
-        variant: 'destructive'
-      });
-    }
+  const handleClienteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setClienteForm({ ...clienteForm, [name]: value });
   };
 
-  // Simular la instalación en el iframe
-  const loadSdkInSandbox = () => {
-    if (!iframeRef.current) return;
+  const handleDocumentoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setDocumentoForm({ ...documentoForm, [name]: value });
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setDocumentoForm({ ...documentoForm, [name]: value });
+  };
+
+  const handleRegistrarCliente = () => {
+    // Validaciones básicas
+    if (!clienteForm.nombre || !clienteForm.rut || !clienteForm.email) {
+      toast({
+        title: "Error en el formulario",
+        description: "Nombre, RUT y email son campos obligatorios",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setClienteRegistrado(true);
+    toast({
+      title: "Cliente registrado correctamente",
+      description: `${clienteForm.nombre} ha sido registrado en el sistema`,
+    });
+  };
+
+  const handleProcesarDocumento = () => {
+    // Validar cliente registrado
+    if (!clienteRegistrado) {
+      toast({
+        title: "Paso incompleto",
+        description: "Primero debe registrar al cliente (Paso 1)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validar campos documento
+    if (!documentoForm.titulo || !documentoForm.monto) {
+      toast({
+        title: "Error en el formulario",
+        description: "Título y monto son campos obligatorios",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setDocumentoProcesado(true);
+    toast({
+      title: "Documento procesado correctamente",
+      description: `${documentoForm.titulo} ha sido registrado para ${clienteForm.nombre}`,
+    });
+  };
+
+  const handleGenerarRecibo = () => {
+    // Validar documento procesado
+    if (!documentoProcesado) {
+      toast({
+        title: "Paso incompleto",
+        description: "Primero debe procesar el documento (Paso 2)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Generar código aleatorio para verificación
+    const codigo = `VEC-${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`;
+    setCodigoVerificacion(codigo);
+    setReciboGenerado(true);
     
-    try {
-      const iframeDocument = iframeRef.current.contentDocument || iframeRef.current.contentWindow?.document;
-      
-      if (!iframeDocument) {
-        throw new Error('No se pudo acceder al documento del iframe');
-      }
-      
-      // Limpiar iframe
-      iframeDocument.open();
-      iframeDocument.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>SDK Vecinos NotaryPro</title>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              margin: 0;
-              padding: 16px;
-              background-color: #f9f9f9;
-            }
-            .container {
-              max-width: 800px;
-              margin: 0 auto;
-              background: white;
-              padding: 20px;
-              border-radius: 8px;
-              box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            }
-            h1 { 
-              font-size: 24px; 
-              margin-top: 0;
-              color: #111827;
-            }
-            h2 { 
-              font-size: 18px; 
-              margin-top: 24px;
-              color: #111827;
-            }
-            .form-group {
-              margin-bottom: 16px;
-            }
-            label {
-              display: block;
-              margin-bottom: 4px;
-              font-weight: 500;
-            }
-            input, select, textarea {
-              width: 100%;
-              padding: 8px;
-              border: 1px solid #ccc;
-              border-radius: 4px;
-              font-size: 16px;
-            }
-            button {
-              background-color: #EC1C24;
-              color: white;
-              border: none;
-              padding: 10px 16px;
-              border-radius: 4px;
-              cursor: pointer;
-              font-size: 16px;
-            }
-            button:hover {
-              background-color: #d31920;
-            }
-            .status {
-              padding: 16px;
-              background-color: #f0f0f0;
-              border-radius: 4px;
-              margin-top: 24px;
-            }
-            .log-window {
-              background-color: #2d2d2d;
-              color: #f0f0f0;
-              padding: 16px;
-              border-radius: 4px;
-              max-height: 200px;
-              overflow-y: auto;
-              font-family: monospace;
-              margin-top: 24px;
-            }
-            .log-item {
-              margin-bottom: 8px;
-              line-height: 1.4;
-            }
-            .success { color: #10b981; }
-            .error { color: #ef4444; }
-            .info { color: #60a5fa; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <h1>Tablet Android SDK Test</h1>
-            <p>Esta simulación muestra cómo funciona el SDK de Vecinos NotaryPro Express en una tablet Android.</p>
-            
-            <div class="status">
-              <h2>Estado del SDK</h2>
-              <div id="sdk-status">Esperando inicialización...</div>
-            </div>
-            
-            <h2>Paso 1: Configurar punto de servicio</h2>
-            <div class="form-group">
-              <label for="store-id">ID de tienda:</label>
-              <input type="text" id="store-id" value="12345" />
-            </div>
-            <div class="form-group">
-              <label for="store-name">Nombre de tienda:</label>
-              <input type="text" id="store-name" value="Almacén Don Pedro" />
-            </div>
-            <div class="form-group">
-              <label for="store-address">Dirección:</label>
-              <input type="text" id="store-address" value="Av. Principal 123, Santiago" />
-            </div>
-            <div class="form-group">
-              <label for="store-api-key">API Key:</label>
-              <input type="text" id="store-api-key" value="demo-api-key-123456" />
-            </div>
-            
-            <button id="init-sdk">Inicializar SDK</button>
-            
-            <h2>Consola de log</h2>
-            <div class="log-window" id="log-window">
-              <div class="log-item">// Los mensajes del SDK aparecerán aquí</div>
-            </div>
-            
-            <div id="sdk-form" style="display: none; margin-top: 24px;">
-              <h2>Paso 2: Registrar cliente</h2>
-              <div class="form-group">
-                <label for="client-name">Nombre completo:</label>
-                <input type="text" id="client-name" placeholder="Ej: Juan Pérez" />
-              </div>
-              <div class="form-group">
-                <label for="client-rut">RUT:</label>
-                <input type="text" id="client-rut" placeholder="Ej: 12.345.678-9" />
-              </div>
-              <div class="form-group">
-                <label for="client-email">Email:</label>
-                <input type="text" id="client-email" placeholder="Ej: juan@ejemplo.cl" />
-              </div>
-              <div class="form-group">
-                <label for="client-phone">Teléfono:</label>
-                <input type="text" id="client-phone" placeholder="Ej: +56912345678" />
-              </div>
-              
-              <button id="register-client">Registrar cliente</button>
-              
-              <div id="document-form" style="display: none; margin-top: 24px;">
-                <h2>Paso 3: Procesar documento</h2>
-                <div class="form-group">
-                  <label for="doc-type">Tipo de documento:</label>
-                  <select id="doc-type">
-                    <option value="declaracion_jurada">Declaración jurada</option>
-                    <option value="poder">Poder simple</option>
-                    <option value="contrato">Contrato</option>
-                    <option value="certificado">Certificado</option>
-                    <option value="finiquito">Finiquito</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="doc-title">Título:</label>
-                  <input type="text" id="doc-title" placeholder="Ej: Declaración jurada de residencia" />
-                </div>
-                <div class="form-group">
-                  <label for="doc-details">Detalles:</label>
-                  <textarea id="doc-details" placeholder="Información adicional sobre el documento..."></textarea>
-                </div>
-                <div class="form-group">
-                  <label for="doc-amount">Monto a cobrar (CLP):</label>
-                  <input type="number" id="doc-amount" value="5000" />
-                </div>
-                <div class="form-group">
-                  <label for="doc-payment">Método de pago:</label>
-                  <select id="doc-payment">
-                    <option value="efectivo">Efectivo</option>
-                    <option value="tarjeta">Tarjeta</option>
-                    <option value="transferencia">Transferencia</option>
-                  </select>
-                </div>
-                
-                <button id="process-document">Procesar documento</button>
-                
-                <div id="receipt-form" style="display: none; margin-top: 24px;">
-                  <h2>Paso 4: Generar recibo</h2>
-                  <p>El documento ha sido procesado correctamente. Ahora puede generar un recibo para el cliente.</p>
-                  <button id="generate-receipt">Generar recibo</button>
-                  
-                  <div id="receipt-view" style="display: none; margin-top: 24px;">
-                    <h2>Recibo generado</h2>
-                    <div style="border: 1px solid #ccc; padding: 16px; border-radius: 4px;">
-                      <div style="text-align: center; margin-bottom: 16px;">
-                        <h3 style="margin: 0;">Vecinos NotaryPro Express</h3>
-                        <p style="margin: 4px 0;">Almacén Don Pedro</p>
-                        <p style="margin: 4px 0;">Av. Principal 123, Santiago</p>
-                      </div>
-                      
-                      <h3 style="margin-top: 0;">RECIBO DE DOCUMENTO</h3>
-                      <p><strong>Cliente:</strong> <span id="receipt-client-name"></span></p>
-                      <p><strong>RUT:</strong> <span id="receipt-client-rut"></span></p>
-                      <p><strong>Documento:</strong> <span id="receipt-doc-title"></span></p>
-                      <p><strong>Tipo:</strong> <span id="receipt-doc-type"></span></p>
-                      <p><strong>Fecha:</strong> <span id="receipt-date"></span></p>
-                      <p><strong>Monto:</strong> $<span id="receipt-amount"></span></p>
-                      <p><strong>Método de pago:</strong> <span id="receipt-payment"></span></p>
-                      
-                      <div style="text-align: center; margin-top: 24px; padding: 16px; border: 1px dashed #ccc;">
-                        <p style="margin: 0;">Para verificar este documento, visite:</p>
-                        <p style="font-weight: bold; margin: 8px 0;">cerfidoc.cl/verificar</p>
-                        <p style="margin: 0;">Código: <span id="receipt-code">DOC-12345</span></p>
-                      </div>
-                      
-                      <div style="text-align: center; margin-top: 24px;">
-                        <p>¡Gracias por usar Vecinos NotaryPro Express!</p>
-                      </div>
-                    </div>
-                    
-                    <div style="margin-top: 16px; display: flex; gap: 8px;">
-                      <button id="print-receipt">Imprimir recibo</button>
-                      <button id="restart-process">Nuevo documento</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <script>
-            // Simulación del SDK (no es el SDK real, solo para la demo)
-            console.originalLog = console.log;
-            console.log = function() {
-              // Imprimir en la consola normal
-              console.originalLog.apply(console, arguments);
-              
-              // También imprimir en nuestra consola simulada
-              const logWindow = document.getElementById('log-window');
-              const logItem = document.createElement('div');
-              logItem.className = 'log-item';
-              
-              // Convertir argumentos a texto
-              let message = Array.from(arguments).map(arg => {
-                if (typeof arg === 'object') {
-                  return JSON.stringify(arg);
-                }
-                return arg;
-              }).join(' ');
-              
-              // Colorear basado en el contenido
-              if (message.includes('✅') || message.includes('✓')) {
-                logItem.classList.add('success');
-              } else if (message.includes('⚠️') || message.includes('Error')) {
-                logItem.classList.add('error');
-              } else if (message.includes('🔄') || message.includes('ℹ️')) {
-                logItem.classList.add('info');
-              }
-              
-              logItem.textContent = message;
-              logWindow.appendChild(logItem);
-              logWindow.scrollTop = logWindow.scrollHeight;
-            };
-            
-            // Simulación básica de la clase VecinosPOS
-            class VecinosPOS {
-              constructor(config) {
-                // Verificar configuración mínima
-                if (!config.id || !config.nombre || !config.apiKey) {
-                  console.log('⚠️ Error: Configuración incompleta. Verifique que tenga id, nombre y apiKey.');
-                  document.getElementById('sdk-status').textContent = 'Error: Configuración incompleta';
-                  document.getElementById('sdk-status').style.color = '#ef4444';
-                  return;
-                }
-                
-                this.config = config;
-                this.apiUrl = "https://api.cerfidoc.cl";
-                this.modoOffline = false;
-                
-                console.log('✅ Punto de servicio configurado: ' + config.nombre);
-                document.getElementById('sdk-status').textContent = 'SDK inicializado correctamente';
-                document.getElementById('sdk-status').style.color = '#10b981';
-                
-                // Mostrar el formulario de cliente
-                document.getElementById('sdk-form').style.display = 'block';
-                
-                // Para propósitos de la demo
-                this.clienteRegistrado = null;
-                this.documentoProcesado = null;
-                
-                // Simular verificación de conexión
-                setTimeout(() => {
-                  console.log('🌐 Conexión a internet disponible');
-                }, 500);
-              }
-              
-              async registrarCliente(cliente) {
-                console.log('👤 Registrando cliente:', cliente.nombre);
-                
-                // Validar datos
-                if (!cliente.nombre || !cliente.rut || !cliente.email) {
-                  console.log('⚠️ Error: Datos de cliente incompletos. Nombre, RUT y email son obligatorios.');
-                  throw new Error('Datos de cliente incompletos');
-                }
-                
-                return new Promise((resolve) => {
-                  // Simular tiempo de procesamiento
-                  setTimeout(() => {
-                    const resultado = {
-                      id: 12345,
-                      cliente: cliente
-                    };
-                    this.clienteRegistrado = resultado;
-                    console.log('✓ Cliente registrado correctamente');
-                    resolve(resultado);
-                    
-                    // Mostrar el formulario de documento
-                    document.getElementById('document-form').style.display = 'block';
-                  }, 1000);
-                });
-              }
-              
-              async procesarDocumento(clienteId, documento) {
-                console.log('📄 Procesando documento:', documento.titulo);
-                
-                // Validar datos
-                if (!clienteId || !documento.tipo || !documento.titulo || !documento.monto || !documento.metodoPago) {
-                  console.log('⚠️ Error: Datos de documento incompletos.');
-                  throw new Error('Datos de documento incompletos');
-                }
-                
-                return new Promise((resolve) => {
-                  // Simular tiempo de procesamiento
-                  setTimeout(() => {
-                    const resultado = {
-                      documentoId: 98765,
-                      estado: 'recibido'
-                    };
-                    this.documentoProcesado = {
-                      ...resultado,
-                      documento: documento
-                    };
-                    console.log('✓ Documento procesado correctamente');
-                    resolve(resultado);
-                    
-                    // Mostrar el formulario de recibo
-                    document.getElementById('receipt-form').style.display = 'block';
-                  }, 1500);
-                });
-              }
-              
-              async imprimirRecibo(documentoId, cliente, documento) {
-                console.log('🖨️ Generando recibo para documento:', documentoId);
-                
-                return new Promise((resolve) => {
-                  // Simular tiempo de procesamiento
-                  setTimeout(() => {
-                    console.log('✓ Recibo generado correctamente');
-                    
-                    // Rellenar datos del recibo
-                    document.getElementById('receipt-client-name').textContent = cliente.nombre;
-                    document.getElementById('receipt-client-rut').textContent = cliente.rut;
-                    document.getElementById('receipt-doc-title').textContent = documento.titulo;
-                    document.getElementById('receipt-doc-type').textContent = this.getTipoDocumentoTexto(documento.tipo);
-                    document.getElementById('receipt-date').textContent = new Date().toLocaleDateString('es-CL');
-                    document.getElementById('receipt-amount').textContent = documento.monto;
-                    document.getElementById('receipt-payment').textContent = this.getMetodoPagoTexto(documento.metodoPago);
-                    document.getElementById('receipt-code').textContent = 'DOC-' + documentoId;
-                    
-                    // Mostrar el recibo
-                    document.getElementById('receipt-view').style.display = 'block';
-                    
-                    resolve({
-                      reciboUrl: 'https://cerfidoc.cl/recibos/' + documentoId,
-                      codigoQR: 'https://cerfidoc.cl/qr/' + documentoId
-                    });
-                  }, 1000);
-                });
-              }
-              
-              getTipoDocumentoTexto(tipo) {
-                const tipos = {
-                  'declaracion_jurada': 'Declaración jurada',
-                  'poder': 'Poder simple',
-                  'contrato': 'Contrato',
-                  'certificado': 'Certificado',
-                  'finiquito': 'Finiquito'
-                };
-                return tipos[tipo] || tipo;
-              }
-              
-              getMetodoPagoTexto(metodo) {
-                const metodos = {
-                  'efectivo': 'Efectivo',
-                  'tarjeta': 'Tarjeta',
-                  'transferencia': 'Transferencia bancaria'
-                };
-                return metodos[metodo] || metodo;
-              }
-            }
-            
-            // Constantes requeridas por el SDK
-            const TIPO_DOCUMENTO = {
-              PODER: 'poder',
-              DECLARACION_JURADA: 'declaracion_jurada',
-              CONTRATO: 'contrato', 
-              CERTIFICADO: 'certificado',
-              FINIQUITO: 'finiquito',
-              OTRO: 'otro'
-            };
-            
-            const METODO_PAGO = {
-              EFECTIVO: 'efectivo',
-              TARJETA: 'tarjeta',
-              TRANSFERENCIA: 'transferencia'
-            };
-            
-            // Variables globales
-            let pos = null;
-            
-            // Evento: Inicializar SDK
-            document.getElementById('init-sdk').addEventListener('click', function() {
-              const id = parseInt(document.getElementById('store-id').value);
-              const nombre = document.getElementById('store-name').value;
-              const direccion = document.getElementById('store-address').value;
-              const apiKey = document.getElementById('store-api-key').value;
-              
-              // Inicializar SDK
-              pos = new VecinosPOS({
-                id: id,
-                nombre: nombre,
-                direccion: direccion,
-                region: 'Metropolitana',
-                comuna: 'Santiago',
-                apiKey: apiKey
-              });
-            });
-            
-            // Evento: Registrar cliente
-            document.getElementById('register-client').addEventListener('click', async function() {
-              if (!pos) {
-                console.log('⚠️ Error: SDK no inicializado');
-                return;
-              }
-              
-              const nombre = document.getElementById('client-name').value;
-              const rut = document.getElementById('client-rut').value;
-              const email = document.getElementById('client-email').value;
-              const telefono = document.getElementById('client-phone').value;
-              
-              try {
-                await pos.registrarCliente({
-                  nombre: nombre,
-                  rut: rut,
-                  email: email,
-                  telefono: telefono
-                });
-              } catch (error) {
-                console.log('⚠️ Error: ' + error.message);
-              }
-            });
-            
-            // Evento: Procesar documento
-            document.getElementById('process-document').addEventListener('click', async function() {
-              if (!pos || !pos.clienteRegistrado) {
-                console.log('⚠️ Error: Cliente no registrado');
-                return;
-              }
-              
-              const tipo = document.getElementById('doc-type').value;
-              const titulo = document.getElementById('doc-title').value;
-              const detalle = document.getElementById('doc-details').value;
-              const monto = parseInt(document.getElementById('doc-amount').value);
-              const metodoPago = document.getElementById('doc-payment').value;
-              
-              try {
-                await pos.procesarDocumento(pos.clienteRegistrado.id, {
-                  tipo: tipo,
-                  titulo: titulo,
-                  detalle: detalle,
-                  monto: monto,
-                  metodoPago: metodoPago
-                });
-              } catch (error) {
-                console.log('⚠️ Error: ' + error.message);
-              }
-            });
-            
-            // Evento: Generar recibo
-            document.getElementById('generate-receipt').addEventListener('click', async function() {
-              if (!pos || !pos.clienteRegistrado || !pos.documentoProcesado) {
-                console.log('⚠️ Error: No hay documento procesado');
-                return;
-              }
-              
-              try {
-                await pos.imprimirRecibo(
-                  pos.documentoProcesado.documentoId,
-                  pos.clienteRegistrado.cliente,
-                  pos.documentoProcesado.documento
-                );
-              } catch (error) {
-                console.log('⚠️ Error: ' + error.message);
-              }
-            });
-            
-            // Evento: Imprimir recibo (solo simula la acción)
-            document.getElementById('print-receipt').addEventListener('click', function() {
-              console.log('🖨️ Enviando recibo a la impresora...');
-              setTimeout(() => {
-                console.log('✓ Recibo impreso correctamente');
-              }, 1000);
-            });
-            
-            // Evento: Reiniciar proceso
-            document.getElementById('restart-process').addEventListener('click', function() {
-              // Reiniciar formularios
-              document.getElementById('client-name').value = '';
-              document.getElementById('client-rut').value = '';
-              document.getElementById('client-email').value = '';
-              document.getElementById('client-phone').value = '';
-              document.getElementById('doc-title').value = '';
-              document.getElementById('doc-details').value = '';
-              document.getElementById('doc-amount').value = '5000';
-              
-              // Ocultar secciones
-              document.getElementById('document-form').style.display = 'none';
-              document.getElementById('receipt-form').style.display = 'none';
-              document.getElementById('receipt-view').style.display = 'none';
-              
-              // Reiniciar estado
-              if (pos) {
-                pos.clienteRegistrado = null;
-                pos.documentoProcesado = null;
-                console.log('🔄 Proceso reiniciado');
-              }
-            });
-            
-            // Mensaje inicial
-            console.log('📱 Simulador de tablet Android iniciado');
-            console.log('ℹ️ Configure el punto de servicio y haga clic en "Inicializar SDK"');
-          </script>
-        </body>
-        </html>
-      `);
-      iframeDocument.close();
-      
-      toast({
-        title: 'Simulador iniciado',
-        description: 'El simulador de tablet Android está listo para usar.'
-      });
-    } catch (error) {
-      console.error('Error al cargar simulador:', error);
-      toast({
-        title: 'Error al cargar simulador',
-        description: 'No se pudo iniciar el simulador de tablet. Intente nuevamente.',
-        variant: 'destructive'
-      });
-    }
+    toast({
+      title: "Recibo generado correctamente",
+      description: `Código de verificación: ${codigo}`,
+    });
   };
 
-  useEffect(() => {
-    if (activeTab === 'simulator') {
-      loadSdkInSandbox();
-    }
-  }, [activeTab]);
+  const handleReiniciar = () => {
+    setClienteRegistrado(false);
+    setDocumentoProcesado(false);
+    setReciboGenerado(false);
+    setCodigoVerificacion("");
+    toast({
+      title: "Simulador reiniciado",
+      description: "Todos los estados han sido restablecidos",
+    });
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    
+    toast({
+      title: "Código copiado",
+      description: "El código ha sido copiado al portapapeles",
+    });
+  };
+
+  const downloadSdk = () => {
+    const downloadUrl = "/assets/vecinos-notarypro-sdk-dist.js";
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = "vecinos-notarypro-sdk.js";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Descarga iniciada",
+      description: "El SDK se está descargando a su dispositivo",
+    });
+  };
 
   return (
-    <div className="container py-8">
-      <h1 className="text-3xl font-bold mb-2">SDK para Tablets Android</h1>
-      <p className="text-gray-600 mb-8">Pruebe y descargue el SDK para integrar en su tablet Android del programa Vecinos NotaryPro Express</p>
-      
-      <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="w-full mb-6">
-          <TabsTrigger value="installation">Instalación</TabsTrigger>
-          <TabsTrigger value="simulator">Simulador</TabsTrigger>
-          <TabsTrigger value="download">Descargar</TabsTrigger>
-          <TabsTrigger value="documentation">Documentación</TabsTrigger>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:space-x-8 mb-8">
+        <div className="flex-1">
+          <h1 className="text-3xl font-bold text-primary">Vecinos SDK para Android</h1>
+          <p className="text-muted-foreground mt-2">
+            Herramienta completa para tablets Android de puntos de servicio Vecinos NotaryPro Express
+          </p>
+        </div>
+        <div className="flex space-x-4">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={downloadSdk}
+          >
+            <Download size={16} />
+            Descargar SDK
+          </Button>
+          <Button 
+            variant="default" 
+            className="flex items-center gap-2"
+            onClick={() => setActiveTab("documentacion")}
+          >
+            <FileCode size={16} />
+            Documentación
+          </Button>
+        </div>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-4 w-full">
+          <TabsTrigger value="simulador" className="flex items-center gap-2">
+            <Smartphone size={16} />
+            Simulador
+          </TabsTrigger>
+          <TabsTrigger value="documentacion" className="flex items-center gap-2">
+            <FileCode size={16} />
+            Documentación
+          </TabsTrigger>
+          <TabsTrigger value="instalacion" className="flex items-center gap-2">
+            <Laptop size={16} />
+            Guía de Instalación
+          </TabsTrigger>
+          <TabsTrigger value="avanzado" className="flex items-center gap-2">
+            <Info size={16} />
+            Funciones Avanzadas
+          </TabsTrigger>
         </TabsList>
-        
-        {/* TAB: INSTALACIÓN */}
-        <TabsContent value="installation">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+
+        {/* TAB: Simulador */}
+        <TabsContent value="simulador" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-4 space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Guía de instalación</CardTitle>
+                  <CardTitle>Configuración de la Tienda</CardTitle>
                   <CardDescription>
-                    Siga estos pasos para instalar el SDK en su tablet Android
+                    Datos del punto de servicio Vecinos
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="rounded-lg border p-4">
-                    <h3 className="text-lg font-medium mb-4">Requisitos mínimos</h3>
-                    <ul className="space-y-2">
-                      <li className="flex items-start">
-                        <Smartphone className="h-5 w-5 mr-3 text-primary" />
-                        <div>
-                          <p className="font-medium">Tablet Android 5.0 o superior</p>
-                          <p className="text-sm text-gray-600">
-                            Recomendamos tablets con al menos 2GB de RAM para un rendimiento óptimo.
-                          </p>
-                        </div>
-                      </li>
-                      <li className="flex items-start">
-                        <Check className="h-5 w-5 mr-3 text-primary" />
-                        <div>
-                          <p className="font-medium">Navegador web compatible con JavaScript</p>
-                          <p className="text-sm text-gray-600">
-                            Chrome, Firefox o el navegador nativo de la tablet.
-                          </p>
-                        </div>
-                      </li>
-                      <li className="flex items-start">
-                        <Check className="h-5 w-5 mr-3 text-primary" />
-                        <div>
-                          <p className="font-medium">Cuenta activa en el programa Vecinos NotaryPro</p>
-                          <p className="text-sm text-gray-600">
-                            Necesitará su ID de socio y clave API para la configuración.
-                          </p>
-                        </div>
-                      </li>
-                    </ul>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="nombreTienda">Nombre de la Tienda</Label>
+                    <Input 
+                      id="nombreTienda" 
+                      name="nombreTienda" 
+                      value={formData.nombreTienda} 
+                      onChange={handleInputChange}
+                    />
                   </div>
-                  
-                  <div>
-                    <h3 className="text-lg font-medium mb-3">Instalación para desarrolladores</h3>
-                    <ol className="space-y-6 list-decimal pl-6">
-                      <li>
-                        <div>
-                          <p className="font-medium">Descargue el archivo SDK</p>
-                          <p className="text-sm text-gray-600 mb-2">
-                            Obtenga el archivo <code className="px-1 py-0.5 bg-gray-100 rounded">vecinos-notarypro-sdk.js</code> desde la pestaña "Descargar".
-                          </p>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => setActiveTab('download')}
-                            className="text-sm"
-                          >
-                            <Download className="h-3.5 w-3.5 mr-1" />
-                            Ir a descargas
-                          </Button>
-                        </div>
-                      </li>
-                      <li>
-                        <div>
-                          <p className="font-medium">Incluya el archivo en su proyecto Android</p>
-                          <p className="text-sm text-gray-600">
-                            Añada el SDK a la carpeta <code className="px-1 py-0.5 bg-gray-100 rounded">assets/js/</code> de su proyecto Android.
-                          </p>
-                          <div className="mt-2 bg-gray-50 p-3 rounded-md text-sm border">
-                            <p className="font-mono text-xs">
-                              // Ejemplo de cómo cargar el SDK en un WebView (Java)<br />
-                              WebView webView = findViewById(R.id.webView);<br />
-                              webView.getSettings().setJavaScriptEnabled(true);<br />
-                              webView.loadUrl("file:///android_asset/js/vecinos-notarypro-sdk.js");
-                            </p>
-                          </div>
-                        </div>
-                      </li>
-                      <li>
-                        <div>
-                          <p className="font-medium">Inicialice el SDK</p>
-                          <p className="text-sm text-gray-600">
-                            Configure el SDK con los datos de su punto de servicio.
-                          </p>
-                          <div className="mt-2 bg-gray-50 p-3 rounded-md text-sm border">
-                            <p className="font-mono text-xs">
-                              // Ejemplo de inicialización del SDK (JavaScript)<br />
-                              const pos = new VecinosPOS({'{'}<br />
-                              &nbsp;&nbsp;id: 123, // ID asignado a su tienda<br />
-                              &nbsp;&nbsp;nombre: "Minimarket Don Pedro",<br />
-                              &nbsp;&nbsp;direccion: "Calle Principal 123",<br />
-                              &nbsp;&nbsp;region: "Metropolitana",<br />
-                              &nbsp;&nbsp;comuna: "Santiago",<br />
-                              &nbsp;&nbsp;apiKey: "su-clave-secreta-aqui"<br />
-                              {'}'});
-                            </p>
-                          </div>
-                        </div>
-                      </li>
-                    </ol>
+                  <div className="space-y-2">
+                    <Label htmlFor="direccion">Dirección</Label>
+                    <Input 
+                      id="direccion" 
+                      name="direccion" 
+                      value={formData.direccion} 
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="region">Región</Label>
+                      <Input 
+                        id="region" 
+                        name="region" 
+                        value={formData.region} 
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="comuna">Comuna</Label>
+                      <Input 
+                        id="comuna" 
+                        name="comuna" 
+                        value={formData.comuna} 
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="id">ID de Tienda</Label>
+                      <Input 
+                        id="id" 
+                        name="id" 
+                        value={formData.id} 
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="apiKey">API Key</Label>
+                      <Input 
+                        id="apiKey" 
+                        name="apiKey" 
+                        value={formData.apiKey} 
+                        onChange={handleInputChange}
+                      />
+                    </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex flex-col items-start space-y-4">
-                  <div className="bg-primary/10 p-4 rounded-md w-full">
-                    <h3 className="font-medium mb-2">Opción para usuarios no técnicos</h3>
-                    <p className="text-sm mb-3">
-                      Si prefiere no hacer la instalación técnica, puede usar nuestra aplicación oficial:
-                    </p>
-                    <Button variant="default">
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      Descargar app "Vecinos POS" de Google Play
-                    </Button>
-                  </div>
-                </CardFooter>
               </Card>
             </div>
             
-            <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Equipo e instalación</CardTitle>
-                  <CardDescription>Contenido del kit para socios</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="aspect-video rounded-md bg-gray-100 flex items-center justify-center">
-                    <img 
-                      src="/assets/tablet-example.jpg" 
-                      alt="Tablet con SDK instalado" 
-                      className="max-h-full max-w-full object-contain"
-                      onError={(e) => {
-                        e.currentTarget.src = "https://via.placeholder.com/400x250?text=Tablet+SDK";
-                      }}
-                    />
+            <div className="lg:col-span-8">
+              <div className="relative mx-auto bg-gray-900 rounded-t-xl p-4 max-w-3xl">
+                <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-1 h-16 bg-gray-700 rounded-r-md"></div>
+                <div className="absolute top-1/2 right-0 transform -translate-y-1/2 w-1 h-16 bg-gray-700 rounded-l-md"></div>
+                <div className="bg-white rounded-lg p-4 h-[600px] overflow-y-auto">
+                  <div className="bg-primary text-white py-2 px-4 rounded-md mb-4 flex justify-between items-center">
+                    <span className="font-semibold">NotaryPro Express - Simulador</span>
+                    <span>{new Date().toLocaleTimeString()}</span>
                   </div>
                   
-                  <h3 className="font-medium">El kit incluye:</h3>
-                  <ul className="space-y-2">
-                    <li className="flex items-start">
-                      <Check className="h-4 w-4 mr-2 mt-0.5 text-green-600" />
-                      <span>Tablet Android preconfigurada</span>
-                    </li>
-                    <li className="flex items-start">
-                      <Check className="h-4 w-4 mr-2 mt-0.5 text-green-600" />
-                      <span>App Vecinos POS con SDK instalado</span>
-                    </li>
-                    <li className="flex items-start">
-                      <Check className="h-4 w-4 mr-2 mt-0.5 text-green-600" />
-                      <span>Impresora térmica Bluetooth</span>
-                    </li>
-                    <li className="flex items-start">
-                      <Check className="h-4 w-4 mr-2 mt-0.5 text-green-600" />
-                      <span>Material publicitario para el punto</span>
-                    </li>
-                    <li className="flex items-start">
-                      <Check className="h-4 w-4 mr-2 mt-0.5 text-green-600" />
-                      <span>Capacitación para uso del sistema</span>
-                    </li>
-                  </ul>
-                  
-                  <div className="bg-yellow-50 p-3 rounded-md text-sm border border-yellow-200 mt-4">
-                    <p className="text-yellow-800">
-                      <strong>Nota:</strong> La descarga del SDK es sólo para partners que desean desarrollar su propia aplicación. Si usted es un punto de servicio normal, recibirá el equipo ya configurado.
-                    </p>
+                  <div className="space-y-6">
+                    <Card>
+                      <CardHeader className="bg-gray-50 pb-2">
+                        <CardTitle className="text-lg">PASO 1: Registrar Cliente</CardTitle>
+                        <CardDescription>
+                          {clienteRegistrado ? (
+                            <span className="text-green-600 font-medium">✓ Cliente registrado</span>
+                          ) : (
+                            "Ingrese los datos del cliente para el trámite"
+                          )}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="pt-4 space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="nombre">Nombre Completo</Label>
+                            <Input 
+                              id="nombre" 
+                              name="nombre" 
+                              value={clienteForm.nombre} 
+                              onChange={handleClienteChange}
+                              disabled={clienteRegistrado}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="rut">RUT</Label>
+                            <Input 
+                              id="rut" 
+                              name="rut" 
+                              value={clienteForm.rut} 
+                              onChange={handleClienteChange}
+                              disabled={clienteRegistrado}
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input 
+                              id="email" 
+                              name="email" 
+                              value={clienteForm.email} 
+                              onChange={handleClienteChange}
+                              disabled={clienteRegistrado}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="telefono">Teléfono</Label>
+                            <Input 
+                              id="telefono" 
+                              name="telefono" 
+                              value={clienteForm.telefono} 
+                              onChange={handleClienteChange}
+                              disabled={clienteRegistrado}
+                            />
+                          </div>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="border-t pt-4">
+                        <Button 
+                          onClick={handleRegistrarCliente} 
+                          disabled={clienteRegistrado}
+                          variant={clienteRegistrado ? "secondary" : "default"}
+                        >
+                          {clienteRegistrado ? "Cliente Registrado" : "Registrar Cliente"}
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader className="bg-gray-50 pb-2">
+                        <CardTitle className="text-lg">PASO 2: Procesar Documento</CardTitle>
+                        <CardDescription>
+                          {documentoProcesado ? (
+                            <span className="text-green-600 font-medium">✓ Documento procesado</span>
+                          ) : (
+                            "Complete la información del documento a tramitar"
+                          )}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="pt-4 space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="tipo">Tipo de Documento</Label>
+                            <Select 
+                              disabled={documentoProcesado}
+                              defaultValue={documentoForm.tipo}
+                              onValueChange={(value) => handleSelectChange("tipo", value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Seleccionar tipo" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Tipos de Documento</SelectLabel>
+                                  <SelectItem value="poder">Poder Simple</SelectItem>
+                                  <SelectItem value="declaracion_jurada">Declaración Jurada</SelectItem>
+                                  <SelectItem value="contrato">Contrato</SelectItem>
+                                  <SelectItem value="certificado">Certificado</SelectItem>
+                                  <SelectItem value="finiquito">Finiquito</SelectItem>
+                                  <SelectItem value="otro">Otro Documento</SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="titulo">Título del Documento</Label>
+                            <Input 
+                              id="titulo" 
+                              name="titulo" 
+                              value={documentoForm.titulo} 
+                              onChange={handleDocumentoChange}
+                              disabled={documentoProcesado}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="detalle">Detalle (opcional)</Label>
+                          <Input 
+                            id="detalle" 
+                            name="detalle" 
+                            value={documentoForm.detalle} 
+                            onChange={handleDocumentoChange}
+                            disabled={documentoProcesado}
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="monto">Monto (CLP)</Label>
+                            <Input 
+                              id="monto" 
+                              name="monto" 
+                              value={documentoForm.monto} 
+                              onChange={handleDocumentoChange}
+                              disabled={documentoProcesado}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="metodoPago">Método de Pago</Label>
+                            <Select 
+                              disabled={documentoProcesado}
+                              defaultValue={documentoForm.metodoPago}
+                              onValueChange={(value) => handleSelectChange("metodoPago", value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Seleccionar método" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Métodos de Pago</SelectLabel>
+                                  <SelectItem value="efectivo">Efectivo</SelectItem>
+                                  <SelectItem value="tarjeta">Tarjeta</SelectItem>
+                                  <SelectItem value="transferencia">Transferencia</SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="border-t pt-4">
+                        <Button 
+                          onClick={handleProcesarDocumento} 
+                          disabled={documentoProcesado || !clienteRegistrado}
+                          variant={documentoProcesado ? "secondary" : "default"}
+                        >
+                          {documentoProcesado ? "Documento Procesado" : "Procesar Documento"}
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader className="bg-gray-50 pb-2">
+                        <CardTitle className="text-lg">PASO 3: Generar Recibo</CardTitle>
+                        <CardDescription>
+                          {reciboGenerado ? (
+                            <span className="text-green-600 font-medium">✓ Recibo generado</span>
+                          ) : (
+                            "Genere un recibo y código de verificación para el cliente"
+                          )}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        {reciboGenerado ? (
+                          <div className="border rounded-md p-4 bg-gray-50">
+                            <div className="text-center mb-4">
+                              <h3 className="text-lg font-bold text-primary">NotaryPro Express</h3>
+                              <p className="text-sm text-muted-foreground">{formData.nombreTienda}</p>
+                              <p className="text-xs text-muted-foreground">{formData.direccion}, {formData.comuna}</p>
+                            </div>
+                            <div className="space-y-3 text-sm">
+                              <div className="flex justify-between">
+                                <span className="font-medium">Cliente:</span>
+                                <span>{clienteForm.nombre}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">RUT:</span>
+                                <span>{clienteForm.rut}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Documento:</span>
+                                <span>{documentoForm.titulo}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Monto:</span>
+                                <span>${parseInt(documentoForm.monto).toLocaleString('es-CL')}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Fecha:</span>
+                                <span>{new Date().toLocaleDateString('es-CL')}</span>
+                              </div>
+                            </div>
+                            <div className="mt-4 border-t border-dashed pt-4">
+                              <div className="text-center">
+                                <p className="text-xs text-muted-foreground mb-1">Código de verificación:</p>
+                                <p className="font-bold text-lg">{codigoVerificacion}</p>
+                                <p className="text-xs text-muted-foreground mt-2">Verifique su documento en:</p>
+                                <p className="text-xs text-primary">cerfidoc.cl/verificar</p>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-center py-4">
+                            <p className="text-muted-foreground mb-4">
+                              Complete los pasos anteriores para generar un recibo para el cliente
+                            </p>
+                          </div>
+                        )}
+                      </CardContent>
+                      <CardFooter className="border-t pt-4 flex justify-between">
+                        <Button 
+                          onClick={handleGenerarRecibo} 
+                          disabled={reciboGenerado || !documentoProcesado}
+                          variant={reciboGenerado ? "secondary" : "default"}
+                        >
+                          {reciboGenerado ? "Recibo Generado" : "Generar Recibo"}
+                        </Button>
+                        
+                        {reciboGenerado && (
+                          <Button 
+                            variant="outline"
+                            onClick={() => copyToClipboard(codigoVerificacion)}
+                            className="flex items-center gap-2"
+                          >
+                            {copied ? (
+                              <>
+                                <Check size={16} />
+                                Copiado
+                              </>
+                            ) : (
+                              <>
+                                <Copy size={16} />
+                                Copiar Código
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </CardFooter>
+                    </Card>
+                    
+                    <div className="flex justify-center mt-6">
+                      <Button 
+                        variant="destructive" 
+                        onClick={handleReiniciar}
+                        disabled={!clienteRegistrado && !documentoProcesado && !reciboGenerado}
+                      >
+                        Reiniciar Simulador
+                      </Button>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
+              <div className="bg-black h-6 max-w-3xl mx-auto rounded-b-xl"></div>
             </div>
           </div>
         </TabsContent>
-        
-        {/* TAB: SIMULADOR */}
-        <TabsContent value="simulator">
+
+        {/* TAB: Documentación */}
+        <TabsContent value="documentacion" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Simulador de Tablet Android</CardTitle>
+              <CardTitle>Documentación - SDK Vecinos NotaryPro Express</CardTitle>
               <CardDescription>
-                Pruebe cómo funciona el SDK en una tablet Android sin necesidad de instalar nada
+                API de referencia y ejemplos de uso para el SDK de integración para tablets Android
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="bg-gray-50 p-4 rounded-md mb-6">
-                <p className="text-sm">
-                  Este simulador muestra el funcionamiento básico del SDK para procesamiento de documentos.
-                  Siga los pasos que se muestran en la interfaz: inicializar el SDK, registrar un cliente,
-                  procesar un documento y generar un recibo.
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Introducción</h3>
+                <p className="text-muted-foreground">
+                  El SDK de Vecinos NotaryPro Express está diseñado para facilitar la integración de los puntos de servicio con la plataforma central. Este SDK simplifica el proceso de registro de clientes, procesamiento de documentos y generación de recibos, incluso cuando no hay conexión a internet.
                 </p>
               </div>
               
-              <div className="border rounded-md overflow-hidden" style={{ height: '600px' }}>
-                <iframe 
-                  ref={iframeRef}
-                  title="Simulador de Tablet Android"
-                  className="w-full h-full"
-                  sandbox="allow-scripts allow-same-origin"
-                />
+              <Separator />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Referencia de la API</h3>
+                
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger>Inicialización del SDK</AccordionTrigger>
+                    <AccordionContent className="space-y-4">
+                      <div className="bg-gray-50 p-4 rounded-md">
+                        <pre className="text-sm overflow-auto">
+{`// Inicializar el SDK con la configuración de la tienda
+const miPuntoDeServicio = new VecinosPOS({
+  id: "12345",              // ID único del punto de servicio
+  nombre: "Mi Tienda",      // Nombre comercial
+  direccion: "Av Principal 123", // Dirección física
+  region: "Metropolitana",  // Región de Chile
+  comuna: "Santiago",       // Comuna
+  apiKey: "vns_xxxxx"       // Clave proporcionada por NotaryPro
+});`}
+                        </pre>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Esta inicialización establece la conexión con los servidores de NotaryPro y configura el almacenamiento local para funcionamiento sin conexión.
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="item-2">
+                    <AccordionTrigger>Paso 1: Registrar Cliente</AccordionTrigger>
+                    <AccordionContent className="space-y-4">
+                      <div className="bg-gray-50 p-4 rounded-md">
+                        <pre className="text-sm overflow-auto">
+{`// Registrar un nuevo cliente o buscar uno existente
+const resultado = await miPuntoDeServicio.registrarCliente({
+  nombre: "Juan Pérez",
+  rut: "12.345.678-9",
+  email: "juan@ejemplo.cl",
+  telefono: "+56912345678"  // Opcional
+});
+
+console.log("Cliente registrado con ID:", resultado.id);
+
+// Alternativamente, buscar cliente existente por RUT
+const clienteExistente = await miPuntoDeServicio.buscarClientePorRut("12.345.678-9");
+if (clienteExistente) {
+  console.log("Cliente encontrado:", clienteExistente);
+}`}
+                        </pre>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        La función registrarCliente devuelve un objeto con el ID del cliente y sus datos. Si el cliente ya existe, buscarClientePorRut permite recuperar su información.
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="item-3">
+                    <AccordionTrigger>Paso 2: Procesar Documento</AccordionTrigger>
+                    <AccordionContent className="space-y-4">
+                      <div className="bg-gray-50 p-4 rounded-md">
+                        <pre className="text-sm overflow-auto">
+{`// Constantes disponibles para tipos de documento
+// TIPO_DOCUMENTO.PODER
+// TIPO_DOCUMENTO.DECLARACION_JURADA
+// TIPO_DOCUMENTO.CONTRATO
+// TIPO_DOCUMENTO.CERTIFICADO
+// TIPO_DOCUMENTO.FINIQUITO
+// TIPO_DOCUMENTO.OTRO
+
+// Constantes para métodos de pago
+// METODO_PAGO.EFECTIVO
+// METODO_PAGO.TARJETA
+// METODO_PAGO.TRANSFERENCIA
+
+// Procesar un documento para el cliente registrado
+const resultadoDoc = await miPuntoDeServicio.procesarDocumento(
+  resultado.id,  // ID del cliente obtenido en el paso 1
+  {
+    tipo: TIPO_DOCUMENTO.PODER,
+    titulo: "Poder Simple para Trámite",
+    detalle: "Autorización para realizar trámite administrativo", // Opcional
+    monto: 15000,  // Monto en pesos chilenos
+    metodoPago: METODO_PAGO.EFECTIVO
+  }
+);
+
+console.log("Documento procesado:", resultadoDoc);
+// { documentoId: 12345, estado: "recibido" }`}
+                        </pre>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        El documento se enviará automáticamente al servidor cuando haya conexión a internet. Mientras tanto, se almacena localmente y se puede seguir operando.
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="item-4">
+                    <AccordionTrigger>Paso 3: Generar Recibo</AccordionTrigger>
+                    <AccordionContent className="space-y-4">
+                      <div className="bg-gray-50 p-4 rounded-md">
+                        <pre className="text-sm overflow-auto">
+{`// Generar un recibo para entregar al cliente
+const recibo = await miPuntoDeServicio.imprimirRecibo(
+  resultadoDoc.documentoId,
+  clienteForm,  // Datos del cliente
+  documentoForm // Datos del documento
+);
+
+console.log("Recibo generado:", recibo);
+// {
+//   reciboUrl: "data:text/html...",  // HTML del recibo para imprimir
+//   codigoQR: "https://cerfidoc.cl/verificar/ABC123", // URL para código QR
+//   verificacionCodigo: "ABC123" // Código para verificar documento
+// }
+
+// Para imprimir en impresora térmica conectada por Bluetooth:
+// imprimirEnDispositivoBluetooth(recibo.reciboUrl);
+`}
+                        </pre>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        El recibo incluye un código de verificación único que permite al cliente comprobar la autenticidad del documento en el sitio web de CerfiDoc.
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="item-5">
+                    <AccordionTrigger>Manejo del Modo Offline</AccordionTrigger>
+                    <AccordionContent className="space-y-4">
+                      <div className="bg-gray-50 p-4 rounded-md">
+                        <pre className="text-sm overflow-auto">
+{`// El SDK maneja automáticamente el modo offline
+// No es necesario código adicional
+
+// Para verificar el estado de la conexión:
+console.log("¿Modo offline activo?", miPuntoDeServicio.modoOffline);
+
+// Ver documentos pendientes de sincronización:
+console.log("Docs pendientes:", miPuntoDeServicio.documentosPendientes);
+
+// Forzar intento de sincronización (normalmente no es necesario)
+miPuntoDeServicio._sincronizar();`}
+                        </pre>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        El SDK detecta automáticamente cuando no hay conexión a internet y almacena los datos localmente. Cuando se recupera la conexión, sincroniza de forma automática con el servidor central.
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
-        
-        {/* TAB: DESCARGAR */}
-        <TabsContent value="download">
+
+        {/* TAB: Guía de Instalación */}
+        <TabsContent value="instalacion" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Descargar SDK</CardTitle>
+              <CardTitle>Guía de Instalación</CardTitle>
               <CardDescription>
-                Obtenga el SDK para implementarlo en su punto de servicio
+                Instrucciones paso a paso para integrar el SDK en su aplicación Android
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="bg-gray-50 p-6 rounded-md border">
-                <div className="flex flex-col md:flex-row gap-6 items-center">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold mb-2">SDK Vecinos NotaryPro Express v1.0</h3>
-                    <p className="text-gray-600 mb-4">
-                      Archivo JavaScript con todas las funciones necesarias para operar
-                      un punto de servicio NotaryPro. Compatible con Android 5.0+.
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Requisitos Previos</h3>
+                <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+                  <li>Tablet Android con Android 8.0 o superior</li>
+                  <li>Android Studio (para desarrollo) o la aplicación NotaryPro Express (para usuario final)</li>
+                  <li>Conexión a internet para la sincronización inicial</li>
+                  <li>Impresora térmica Bluetooth (opcional, para impresión de recibos)</li>
+                </ul>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Instalación para Desarrolladores</h3>
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Paso 1: Descarga el SDK</h4>
+                    <p className="text-muted-foreground">
+                      Descargue el archivo <code>vecinos-notarypro-sdk.js</code> haciendo clic en el botón "Descargar SDK" en la parte superior de esta página.
                     </p>
-                    <ul className="text-sm space-y-2 mb-4">
-                      <li className="flex items-start">
-                        <Check className="h-4 w-4 mr-2 mt-0.5 text-green-600" />
-                        <span>Tamaño: 27KB - Optimizado para carga rápida</span>
-                      </li>
-                      <li className="flex items-start">
-                        <Check className="h-4 w-4 mr-2 mt-0.5 text-green-600" />
-                        <span>Sin dependencias externas - Funciona independientemente</span>
-                      </li>
-                      <li className="flex items-start">
-                        <Check className="h-4 w-4 mr-2 mt-0.5 text-green-600" />
-                        <span>Modo offline incluido - Funciona incluso sin conexión</span>
-                      </li>
-                      <li className="flex items-start">
-                        <Check className="h-4 w-4 mr-2 mt-0.5 text-green-600" />
-                        <span>Documentación en español incluida en el archivo</span>
-                      </li>
-                    </ul>
-                    <div className="flex flex-wrap gap-3">
-                      <Button onClick={downloadSdk}>
-                        <Download className="mr-2 h-4 w-4" />
+                    <div className="flex justify-start mt-2">
+                      <Button 
+                        variant="outline" 
+                        className="flex items-center gap-2"
+                        onClick={downloadSdk}
+                      >
+                        <Download size={16} />
                         Descargar SDK
-                      </Button>
-                      <Button variant="outline" onClick={copySdk}>
-                        {copied ? (
-                          <>
-                            <Check className="mr-2 h-4 w-4" />
-                            Copiado
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="mr-2 h-4 w-4" />
-                            Copiar código
-                          </>
-                        )}
                       </Button>
                     </div>
                   </div>
-                  <div className="md:w-1/4 flex justify-center">
-                    <FileText className="h-32 w-32 text-primary/20" />
+                  
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Paso 2: Incluir en su Proyecto Android</h4>
+                    <p className="text-muted-foreground">
+                      Coloque el archivo descargado en la carpeta <code>assets/js/</code> de su proyecto Android.
+                    </p>
+                    <div className="bg-gray-50 p-4 rounded-md">
+                      <pre className="text-sm overflow-auto">
+{`📁 proyecto-android/
+  ├── 📁 app/
+  │   ├── 📁 src/
+  │   │   ├── 📁 main/
+  │   │   │   ├── 📁 assets/
+  │   │   │   │   ├── 📁 js/
+  │   │   │   │   │   └── 📄 vecinos-notarypro-sdk.js   // Ubicar aquí`}
+                      </pre>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Paso 3: Configurar WebView en su Aplicación</h4>
+                    <p className="text-muted-foreground">
+                      Agregue un WebView a su layout XML:
+                    </p>
+                    <div className="bg-gray-50 p-4 rounded-md">
+                      <pre className="text-sm overflow-auto">
+{`<!-- activity_main.xml -->
+<WebView
+    android:id="@+id/webView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />`}
+                      </pre>
+                    </div>
+                    
+                    <p className="text-muted-foreground mt-4">
+                      Configure el WebView en su actividad Java:
+                    </p>
+                    <div className="bg-gray-50 p-4 rounded-md">
+                      <pre className="text-sm overflow-auto">
+{`// MainActivity.java
+WebView webView = findViewById(R.id.webView);
+WebSettings webSettings = webView.getSettings();
+webSettings.setJavaScriptEnabled(true);
+webSettings.setDomStorageEnabled(true);
+
+// Cargar el SDK
+webView.loadUrl("file:///android_asset/js/vecinos-notarypro-sdk.js");
+
+// También puede cargar una interfaz HTML personalizada que use el SDK
+// webView.loadUrl("file:///android_asset/html/index.html");
+
+// Para comunicación entre Java y JavaScript
+webView.addJavascriptInterface(new WebAppInterface(this), "Android");`}
+                      </pre>
+                    </div>
+                    
+                    <p className="text-muted-foreground mt-4">
+                      Interfaz para comunicación con JavaScript:
+                    </p>
+                    <div className="bg-gray-50 p-4 rounded-md">
+                      <pre className="text-sm overflow-auto">
+{`// WebAppInterface.java
+public class WebAppInterface {
+    Context mContext;
+
+    WebAppInterface(Context c) {
+        mContext = c;
+    }
+
+    @JavascriptInterface
+    public void imprimirRecibo(String reciboHtml) {
+        // Código para enviar a impresora Bluetooth
+    }
+    
+    @JavascriptInterface
+    public void mostrarMensaje(String mensaje) {
+        Toast.makeText(mContext, mensaje, Toast.LENGTH_SHORT).show();
+    }
+}`}
+                      </pre>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Paso 4: Inicializar el SDK desde su HTML</h4>
+                    <p className="text-muted-foreground">
+                      Cree un archivo HTML para la interfaz de usuario:
+                    </p>
+                    <div className="bg-gray-50 p-4 rounded-md">
+                      <pre className="text-sm overflow-auto">
+{`<!-- assets/html/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vecinos NotaryPro Express</title>
+    <script src="../js/vecinos-notarypro-sdk.js"></script>
+    <script>
+        // Inicializar cuando la página esté cargada
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar el punto de servicio
+            window.puntoServicio = new VecinosPOS({
+                id: "12345",
+                nombre: "Mi Tienda",
+                direccion: "Av Principal 123",
+                region: "Metropolitana",
+                comuna: "Santiago",
+                apiKey: "vns_xxxxx"
+            });
+            
+            console.log("SDK inicializado correctamente");
+        });
+        
+        // Funciones para manejar los formularios de la interfaz
+        async function registrarCliente() {
+            // Obtener datos del formulario
+            const nombre = document.getElementById('nombre').value;
+            const rut = document.getElementById('rut').value;
+            const email = document.getElementById('email').value;
+            const telefono = document.getElementById('telefono').value;
+            
+            try {
+                const resultado = await window.puntoServicio.registrarCliente({
+                    nombre, rut, email, telefono
+                });
+                
+                // Mostrar mensaje en Android
+                Android.mostrarMensaje("Cliente registrado: " + nombre);
+                
+                return resultado;
+            } catch (error) {
+                console.error(error);
+                Android.mostrarMensaje("Error: " + error.message);
+            }
+        }
+        
+        // Más funciones para los otros pasos...
+    </script>
+</head>
+<body>
+    <!-- Interfaz de usuario con formularios -->
+</body>
+</html>`}
+                      </pre>
+                    </div>
                   </div>
                 </div>
               </div>
               
+              <Separator />
+              
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Guía de instalación rápida</h3>
+                <h3 className="text-lg font-semibold">Instalación para Usuarios Finales</h3>
+                <p className="text-muted-foreground">
+                  Si es un punto de servicio Vecinos y desea instalar la aplicación en su tablet Android, siga estos pasos:
+                </p>
                 
-                <ol className="space-y-4 list-decimal pl-6">
-                  <li>
-                    <p className="font-medium">Descargar SDK</p>
-                    <p className="text-sm text-gray-600">
-                      Descargue el archivo <code>vecinos-notarypro-sdk.js</code> usando el botón de arriba.
+                <ol className="list-decimal pl-6 space-y-4">
+                  <li className="text-muted-foreground">
+                    <span className="font-medium text-black dark:text-white">Descargue la aplicación NotaryPro Express</span>
+                    <p className="mt-1">
+                      La aplicación oficial está disponible en la Play Store o a través del enlace proporcionado por su supervisor de Vecinos.
+                    </p>
+                    <div className="mt-2">
+                      <Button 
+                        variant="outline" 
+                        className="flex items-center gap-2"
+                        onClick={() => window.open('https://play.google.com/store', '_blank')}
+                      >
+                        <ExternalLink size={16} />
+                        Descargar Aplicación
+                      </Button>
+                    </div>
+                  </li>
+                  
+                  <li className="text-muted-foreground">
+                    <span className="font-medium text-black dark:text-white">Ingrese las credenciales de su punto de servicio</span>
+                    <p className="mt-1">
+                      Al iniciar la aplicación por primera vez, se le solicitará ingresar el ID de su tienda y la clave API proporcionada por su supervisor.
                     </p>
                   </li>
-                  <li>
-                    <p className="font-medium">Crear proyecto Android (para desarrolladores)</p>
-                    <p className="text-sm text-gray-600">
-                      Si está creando una aplicación personalizada, añada el archivo a su proyecto
-                      Android en la carpeta <code>assets/js/</code>.
+                  
+                  <li className="text-muted-foreground">
+                    <span className="font-medium text-black dark:text-white">Configure la impresora (opcional)</span>
+                    <p className="mt-1">
+                      Si dispone de una impresora térmica Bluetooth, vincúlela con su tablet Android y configúrela en la sección "Configuración" de la aplicación.
                     </p>
                   </li>
-                  <li>
-                    <p className="font-medium">Para usuarios no técnicos</p>
-                    <p className="text-sm text-gray-600">
-                      Utilice nuestra app "Vecinos POS" disponible en Google Play Store que ya
-                      incluye el SDK integrado.
+                  
+                  <li className="text-muted-foreground">
+                    <span className="font-medium text-black dark:text-white">Realice sincronización inicial</span>
+                    <p className="mt-1">
+                      Asegúrese de tener conexión a internet para realizar la sincronización inicial con el servidor. Después podrá operar sin conexión.
                     </p>
                   </li>
                 </ol>
-              </div>
-              
-              <div className="rounded-md border p-4 bg-gray-50">
-                <h3 className="font-medium mb-2">Soporte técnico</h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  Si necesita ayuda con la instalación o uso del SDK, contacte a nuestro equipo de soporte:
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="font-medium">Email de soporte</p>
-                    <p>soporte@cerfidoc.cl</p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Teléfono de soporte</p>
-                    <p>+56 2 2123 4567</p>
-                  </div>
+                
+                <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-md mt-4">
+                  <p className="text-sm">
+                    <span className="font-medium">Nota:</span> Si necesita asistencia durante la instalación, contacte a su supervisor o al soporte técnico de NotaryPro al +56 2 2123 4567.
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
-        
-        {/* TAB: DOCUMENTACIÓN */}
-        <TabsContent value="documentation">
+
+        {/* TAB: Funciones Avanzadas */}
+        <TabsContent value="avanzado" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Documentación técnica</CardTitle>
+              <CardTitle>Funciones Avanzadas</CardTitle>
               <CardDescription>
-                Guía completa del SDK para puntos de servicio Vecinos NotaryPro Express
+                Características adicionales para usuarios experimentados y casos de uso específicos
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-6">
-                <div className="prose">
-                  <h3>Introducción</h3>
-                  <p>
-                    El SDK de Vecinos NotaryPro Express es una herramienta diseñada para permitir a los puntos
-                    de servicio procesar documentos legales de forma rápida y sencilla. El SDK está optimizado
-                    para funcionar en tablets Android y permite operar incluso sin conexión a internet.
-                  </p>
-                  
-                  <h3>Configuración inicial</h3>
-                  <p>
-                    Para comenzar a utilizar el SDK, primero debe inicializar una instancia de la clase
-                    <code>VecinosPOS</code> con la configuración de su punto de servicio:
-                  </p>
-                  
-                  <pre className="bg-gray-50 p-3 rounded-md text-sm border overflow-auto">
-                    {`const pos = new VecinosPOS({
-  id: 123,                           // ID asignado a su tienda
-  nombre: "Minimarket Don Pedro",    // Nombre de su tienda
-  direccion: "Calle Principal 123",  // Dirección física
-  region: "Metropolitana",           // Región
-  comuna: "Santiago",                // Comuna
-  apiKey: "su-clave-secreta-aqui"    // Clave proporcionada por NotaryPro
-});`}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Manejo de Sincronización</h3>
+                <p className="text-muted-foreground">
+                  El SDK incluye varias opciones avanzadas para controlar manualmente la sincronización y manejar casos especiales.
+                </p>
+                
+                <div className="bg-gray-50 p-4 rounded-md">
+                  <pre className="text-sm overflow-auto">
+{`// Verificar estado de sincronización
+const pendientes = miPuntoDeServicio.documentosPendientes.length;
+console.log(\`Hay \${pendientes} documentos pendientes de sincronizar\`);
+
+// Forzar intento de sincronización
+await miPuntoDeServicio._sincronizar();
+
+// Configurar intervalo personalizado de verificación de conexión
+// (por defecto es 5 minutos)
+setTimeout(() => miPuntoDeServicio._verificarConexion(), 60000); // 1 minuto
+
+// Obtener estadísticas del punto de servicio
+const stats = await miPuntoDeServicio.obtenerEstadisticas();
+console.log("Estadísticas:", stats);
+// {
+//   totalDocumentos: 156,
+//   comisionPendiente: 45600,
+//   comisionPagada: 230400,
+//   totalVentas: 1840000
+// }`}
                   </pre>
-                  
-                  <h3>Flujo de trabajo</h3>
-                  <p>
-                    El SDK está diseñado para un flujo de trabajo de 3 pasos:
-                  </p>
-                  
-                  <h4>1. Registrar cliente</h4>
-                  <p>
-                    El primer paso es registrar los datos del cliente o buscar un cliente existente por su RUT:
-                  </p>
-                  
-                  <pre className="bg-gray-50 p-3 rounded-md text-sm border overflow-auto">
-                    {`const resultado = await pos.registrarCliente({
-  nombre: "María González",
-  rut: "12.345.678-9",
-  email: "maria@ejemplo.cl",
-  telefono: "912345678"  // opcional
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Integración con Hardware</h3>
+                
+                <h4 className="font-medium">Impresoras Bluetooth</h4>
+                <p className="text-muted-foreground">
+                  El SDK genera recibos en formato HTML que pueden enviarse a impresoras térmicas a través de la interfaz JavaScript-Java.
+                </p>
+                
+                <div className="bg-gray-50 p-4 rounded-md">
+                  <pre className="text-sm overflow-auto">
+{`// En JavaScript (WebView)
+const recibo = await miPuntoDeServicio.imprimirRecibo(documentoId, cliente, documento);
+
+// Enviar a la capa nativa para impresión
+Android.imprimirRecibo(recibo.reciboUrl);
+
+// En Java (Android)
+@JavascriptInterface
+public void imprimirRecibo(String reciboHtml) {
+    // Convertir HTML a formato para impresora térmica
+    byte[] datos = convertirHTMLaESC_POS(reciboHtml);
+    
+    // Enviar a la impresora Bluetooth
+    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    BluetoothDevice printer = bluetoothAdapter.getRemoteDevice(PRINTER_ADDRESS);
+    
+    try {
+        BluetoothSocket socket = printer.createRfcommSocketToServiceRecord(
+            UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
+        socket.connect();
+        OutputStream out = socket.getOutputStream();
+        out.write(datos);
+        out.close();
+        socket.close();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}`}
+                  </pre>
+                </div>
+                
+                <h4 className="font-medium mt-6">Lectores de Códigos de Barras</h4>
+                <p className="text-muted-foreground">
+                  Para agilizar la entrada de datos, puede integrar lectores de códigos de barras para capturar rápidamente información del RUT en cédulas de identidad.
+                </p>
+                
+                <div className="bg-gray-50 p-4 rounded-md">
+                  <pre className="text-sm overflow-auto">
+{`// Configurar un campo para recibir datos del lector
+// En su HTML:
+<input type="text" id="rutScanner" placeholder="Escanear RUT" />
+
+// En JavaScript:
+document.getElementById('rutScanner').addEventListener('change', function(e) {
+    const datosEscaneados = e.target.value;
+    
+    // Extraer RUT de los datos escaneados
+    // Formato típico de cédula chilena: RUN:12345678-9
+    const rutMatch = datosEscaneados.match(/RUN:([0-9]+-[0-9kK])/);
+    if (rutMatch && rutMatch[1]) {
+        const rut = formatearRut(rutMatch[1]);
+        document.getElementById('rut').value = rut;
+        
+        // Automáticamente buscar cliente por RUT
+        buscarClientePorRut(rut);
+    }
 });
 
-// Guardar el ID del cliente para el siguiente paso
-const clienteId = resultado.id;`}
+function formatearRut(rutSinFormato) {
+    // Convertir 12345678-9 a 12.345.678-9
+    return rutSinFormato.replace(/^(\d{1,2})(\d{3})(\d{3})([-][0-9kK])$/,
+                             '$1.$2.$3$4');
+}`}
                   </pre>
-                  
-                  <h4>2. Procesar documento</h4>
-                  <p>
-                    Con el cliente registrado, puede procesar un documento:
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Características de Seguridad</h3>
+                
+                <div className="space-y-2">
+                  <h4 className="font-medium">Validación de Datos</h4>
+                  <p className="text-muted-foreground">
+                    El SDK incluye funciones de validación que puede ampliar para sus necesidades específicas:
                   </p>
                   
-                  <pre className="bg-gray-50 p-3 rounded-md text-sm border overflow-auto">
-                    {`const resultado = await pos.procesarDocumento(clienteId, {
-  tipo: TIPO_DOCUMENTO.DECLARACION_JURADA,
-  titulo: "Declaración jurada de residencia",
-  detalle: "Para trámite municipal",  // opcional
-  monto: 5000,  // precio en pesos chilenos
-  metodoPago: METODO_PAGO.EFECTIVO
-});
+                  <div className="bg-gray-50 p-4 rounded-md">
+                    <pre className="text-sm overflow-auto">
+{`// Extender el SDK para agregar validaciones personalizadas
+VecinosPOS.prototype.validarRut = function(rut) {
+    // Implementar algoritmo de validación de RUT chileno
+    // Eliminar puntos y guión
+    const rutLimpio = rut.replace(/[.-]/g, '');
+    const dv = rutLimpio.slice(-1);
+    const rutNumerico = parseInt(rutLimpio.slice(0, -1), 10);
+    
+    // Algoritmo de validación...
+    
+    return esValido;
+};
 
-// Guardar el ID del documento para el siguiente paso
-const documentoId = resultado.documentoId;`}
-                  </pre>
-                  
-                  <h4>3. Imprimir recibo</h4>
-                  <p>
-                    Finalmente, genere e imprima un recibo para el cliente:
+// Implementar verificación de autenticidad de documentos
+VecinosPOS.prototype.verificarDocumento = async function(codigo) {
+    if (this.modoOffline) {
+        return { valido: false, razon: "Sin conexión a internet" };
+    }
+    
+    try {
+        const response = await fetch(
+            \`\${this.apiUrl}/api/verificar/\${codigo}\`,
+            {
+                headers: { "X-API-KEY": this.config.apiKey }
+            }
+        );
+        
+        if (response.ok) {
+            const datos = await response.json();
+            return {
+                valido: true,
+                documento: datos
+            };
+        } else {
+            return { 
+                valido: false, 
+                razon: "Código no válido o documento no encontrado" 
+            };
+        }
+    } catch (error) {
+        return { valido: false, razon: error.message };
+    }
+};`}
+                    </pre>
+                  </div>
+                </div>
+                
+                <div className="space-y-2 mt-4">
+                  <h4 className="font-medium">Respaldos y Recuperación</h4>
+                  <p className="text-muted-foreground">
+                    Amplíe las capacidades de almacenamiento local para soportar respaldos y recuperación de datos:
                   </p>
                   
-                  <pre className="bg-gray-50 p-3 rounded-md text-sm border overflow-auto">
-                    {`const reciboInfo = await pos.imprimirRecibo(
-  documentoId,
-  cliente,    // objeto con los datos del cliente
-  documento   // objeto con los datos del documento
-);
+                  <div className="bg-gray-50 p-4 rounded-md">
+                    <pre className="text-sm overflow-auto">
+{`// Exportar todos los datos locales a un archivo JSON
+VecinosPOS.prototype.exportarDatos = function() {
+    const datos = {
+        config: this.config,
+        clientes: this.clientesPendientes,
+        documentos: this.documentosPendientes,
+        timestamp: new Date().toISOString(),
+        version: "1.0"
+    };
+    
+    return JSON.stringify(datos);
+};
 
-// Acceder a la URL del recibo
-const reciboUrl = reciboInfo.reciboUrl;
-const codigoQR = reciboInfo.codigoQR;`}
-                  </pre>
-                  
-                  <h3>Modo offline</h3>
-                  <p>
-                    El SDK detecta automáticamente si hay conexión a internet. Si no hay conexión,
-                    guarda todas las operaciones localmente y las sincroniza cuando se restablece la conexión.
-                  </p>
-                  
-                  <h3>Constantes</h3>
-                  <p>
-                    Para garantizar la consistencia de los datos, utilice siempre las constantes
-                    proporcionadas por el SDK:
-                  </p>
-                  
-                  <h4>Tipos de documentos</h4>
-                  <ul>
-                    <li><code>TIPO_DOCUMENTO.PODER</code></li>
-                    <li><code>TIPO_DOCUMENTO.DECLARACION_JURADA</code></li>
-                    <li><code>TIPO_DOCUMENTO.CONTRATO</code></li>
-                    <li><code>TIPO_DOCUMENTO.CERTIFICADO</code></li>
-                    <li><code>TIPO_DOCUMENTO.FINIQUITO</code></li>
-                    <li><code>TIPO_DOCUMENTO.OTRO</code></li>
-                  </ul>
-                  
-                  <h4>Métodos de pago</h4>
-                  <ul>
-                    <li><code>METODO_PAGO.EFECTIVO</code></li>
-                    <li><code>METODO_PAGO.TARJETA</code></li>
-                    <li><code>METODO_PAGO.TRANSFERENCIA</code></li>
-                  </ul>
-                  
-                  <h4>Estados de documentos</h4>
-                  <ul>
-                    <li><code>ESTADO_DOCUMENTO.RECIBIDO</code></li>
-                    <li><code>ESTADO_DOCUMENTO.EN_PROCESO</code></li>
-                    <li><code>ESTADO_DOCUMENTO.COMPLETADO</code></li>
-                    <li><code>ESTADO_DOCUMENTO.RECHAZADO</code></li>
-                  </ul>
+// Importar datos desde un respaldo
+VecinosPOS.prototype.importarDatos = function(jsonString) {
+    try {
+        const datos = JSON.parse(jsonString);
+        
+        // Verificar versión compatible
+        if (datos.version !== "1.0") {
+            throw new Error("Versión de datos incompatible");
+        }
+        
+        // Restaurar datos
+        this.clientesPendientes = datos.clientes;
+        this.documentosPendientes = datos.documentos;
+        
+        // Guardar en almacenamiento local
+        this._saveToLocalStorage();
+        
+        return {
+            exito: true,
+            clientes: this.clientesPendientes.length,
+            documentos: this.documentosPendientes.length
+        };
+    } catch (error) {
+        return {
+            exito: false,
+            error: error.message
+        };
+    }
+};`}
+                    </pre>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
-      
-      <div className="mt-8 flex justify-between">
-        <Button variant="outline" asChild>
-          <Link href="/partners/sdk-demo">
-            <ArrowRight className="h-4 w-4 mr-2 rotate-180" />
-            Volver al demo del SDK
-          </Link>
-        </Button>
-        
-        <Button asChild>
-          <Link href="/admin-dashboard">
-            <ArrowRight className="h-4 w-4 ml-2" />
-            Ir al Panel de Administración
-          </Link>
-        </Button>
-      </div>
     </div>
   );
-}
+};
+
+export default AndroidSdkTest;
