@@ -9,7 +9,7 @@ export default function Footer() {
           <div>
             <Link href="/" className="flex items-center mb-4">
               <img 
-                src="/assets/notarypro-logo.png" 
+                src="/assets/nuevo-logo.png" 
                 alt="NotaryPro" 
                 className="h-10 w-auto"
               />

@@ -101,7 +101,7 @@ export default function AuthPage() {
           <div className="text-center mb-6">
             <Link href="/">
               <img 
-                src="/assets/notarypro-logo.png" 
+                src="/assets/nuevo-logo.png" 
                 alt="NotaryPro" 
                 className="h-12 w-auto mx-auto"
               />
