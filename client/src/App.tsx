@@ -43,6 +43,7 @@ import PartnersPublicPage from "@/pages/partners/public-page";
 import PartnerRegistrationForm from "@/pages/partners/registration-form";
 import PartnerLogin from "@/pages/partners/partner-login";
 import PosIntegrationPage from "@/pages/partners/pos-integration";
+import AndroidSdkTest from "@/pages/partners/android-sdk-test";
 
 // Admin pages
 import PosManagementPage from "@/pages/admin/pos-management";
@@ -137,6 +138,7 @@ function Router() {
       <Route path="/partners/public-page" component={PartnersPublicPage} />
       <Route path="/partners/registration-form" component={PartnerRegistrationForm} />
       <Route path="/partners/partner-login" component={PartnerLogin} />
+      <Route path="/partners/android-sdk-test" component={AndroidSdkTest} />
       <ProtectedRoute 
         path="/partners/pos-integration" 
         component={PosIntegrationPage} 
