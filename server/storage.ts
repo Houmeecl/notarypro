@@ -165,6 +165,8 @@ export class MemStorage implements IStorage {
     this.quizQuestions = new Map();
     this.quizAttempts = new Map();
     this.certificates = new Map();
+    this.videoCallServices = new Map();
+    this.videoCallSessions = new Map();
     
     this.currentUserId = 1;
     this.currentDocumentCategoryId = 1;
@@ -179,6 +181,8 @@ export class MemStorage implements IStorage {
     this.currentQuestionId = 1;
     this.currentAttemptId = 1;
     this.currentCertificateId = 1;
+    this.currentVideoCallServiceId = 1;
+    this.currentVideoCallSessionId = 1;
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000,
@@ -539,6 +543,118 @@ export class MemStorage implements IStorage {
     return Array.from(this.certificates.values()).find(
       certificate => certificate.certificateNumber === certificateNumber
     );
+  }
+  
+  // Video Call Service operations
+  async createVideoCallService(service: InsertVideoCallService): Promise<VideoCallService> {
+    const id = this.currentVideoCallServiceId++;
+    const createdAt = new Date();
+    const updatedAt = new Date();
+    
+    const videoCallService: VideoCallService = { 
+      ...service, 
+      id, 
+      createdAt,
+      updatedAt
+    };
+    
+    this.videoCallServices.set(id, videoCallService);
+    return videoCallService;
+  }
+  
+  async getVideoCallService(id: number): Promise<VideoCallService | undefined> {
+    return this.videoCallServices.get(id);
+  }
+  
+  async getAllVideoCallServices(): Promise<VideoCallService[]> {
+    return Array.from(this.videoCallServices.values());
+  }
+  
+  async getActiveVideoCallServices(): Promise<VideoCallService[]> {
+    return Array.from(this.videoCallServices.values()).filter(service => service.active);
+  }
+  
+  async updateVideoCallService(id: number, service: Partial<VideoCallService>): Promise<VideoCallService | undefined> {
+    const existing = this.videoCallServices.get(id);
+    if (!existing) {
+      return undefined;
+    }
+    
+    const updated = { 
+      ...existing, 
+      ...service,
+      updatedAt: new Date()
+    };
+    
+    this.videoCallServices.set(id, updated);
+    return updated;
+  }
+  
+  async deleteVideoCallService(id: number): Promise<boolean> {
+    return this.videoCallServices.delete(id);
+  }
+  
+  // Video Call Session operations
+  async createVideoCallSession(session: InsertVideoCallSession): Promise<VideoCallSession> {
+    const id = this.currentVideoCallSessionId++;
+    const createdAt = new Date();
+    const updatedAt = new Date();
+    
+    const videoCallSession: VideoCallSession = { 
+      ...session, 
+      id, 
+      certifierId: null,
+      meetingUrl: null,
+      meetingId: null,
+      meetingPassword: null,
+      paymentId: null,
+      paymentAmount: null,
+      paymentStatus: null,
+      notes: null,
+      createdAt,
+      updatedAt
+    };
+    
+    this.videoCallSessions.set(id, videoCallSession);
+    return videoCallSession;
+  }
+  
+  async getVideoCallSession(id: number): Promise<VideoCallSession | undefined> {
+    return this.videoCallSessions.get(id);
+  }
+  
+  async getUserVideoCallSessions(userId: number): Promise<VideoCallSession[]> {
+    return Array.from(this.videoCallSessions.values())
+      .filter(session => session.userId === userId)
+      .sort((a, b) => b.scheduledAt.getTime() - a.scheduledAt.getTime());
+  }
+  
+  async getCertifierVideoCallSessions(certifierId: number): Promise<VideoCallSession[]> {
+    return Array.from(this.videoCallSessions.values())
+      .filter(session => session.certifierId === certifierId)
+      .sort((a, b) => b.scheduledAt.getTime() - a.scheduledAt.getTime());
+  }
+  
+  async getVideoCallSessionsByStatus(status: string): Promise<VideoCallSession[]> {
+    return Array.from(this.videoCallSessions.values())
+      .filter(session => session.status === status)
+      .sort((a, b) => b.scheduledAt.getTime() - a.scheduledAt.getTime());
+  }
+  
+  async updateVideoCallSession(id: number, session: Partial<VideoCallSession>): Promise<VideoCallSession | undefined> {
+    const existing = this.videoCallSessions.get(id);
+    if (!existing) {
+      return undefined;
+    }
+    
+    const updated = { 
+      ...existing, 
+      ...session,
+      updatedAt: new Date()
+    };
+    
+    this.videoCallSessions.set(id, updated);
+    return updated;
   }
 }
 
