@@ -97,6 +97,90 @@ export default function Hero() {
         </div>
 
         {/* Stats */}
+        {/* Videos explicativos destacados */}
+        <div className="mt-12 mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-6 text-center">
+            Descubre cómo funciona NotaryPro
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Video explicativo general */}
+            <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300">
+              <div className="relative h-48 bg-gradient-to-r from-gray-100 to-gray-50">
+                <img 
+                  src="https://images.unsplash.com/photo-1554224155-8d04cb21ed6c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                  alt="Explicación general" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                  <ExplanatoryVideo
+                    videoType="explanation"
+                    triggerLabel="Ver explicación"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-primary/80 text-white flex items-center justify-center hover:bg-primary cursor-pointer transition-all">
+                      <Play className="h-8 w-8 ml-1" />
+                    </div>
+                  </ExplanatoryVideo>
+                </div>
+              </div>
+              <div className="p-5">
+                <h3 className="font-bold text-lg text-secondary mb-2">Cómo funciona NotaryPro</h3>
+                <p className="text-gray-600 text-sm">Descubre cómo nuestra plataforma te permite firmar documentos con validez legal siguiendo la Ley 19.799.</p>
+              </div>
+            </div>
+            
+            {/* Tutorial paso a paso */}
+            <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300">
+              <div className="relative h-48 bg-gradient-to-r from-gray-100 to-gray-50">
+                <img 
+                  src="https://images.unsplash.com/photo-1557200134-90327ee9fafa?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                  alt="Tutorial" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                  <ExplanatoryVideo
+                    videoType="tutorial"
+                    triggerLabel="Ver tutorial"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-primary/80 text-white flex items-center justify-center hover:bg-primary cursor-pointer transition-all">
+                      <Play className="h-8 w-8 ml-1" />
+                    </div>
+                  </ExplanatoryVideo>
+                </div>
+              </div>
+              <div className="p-5">
+                <h3 className="font-bold text-lg text-secondary mb-2">Tutorial: Firma de documentos</h3>
+                <p className="text-gray-600 text-sm">Guía paso a paso para firmar documentos en nuestra plataforma. Aprende a subir documentos y posicionar tu firma.</p>
+              </div>
+            </div>
+            
+            {/* Proceso de verificación */}
+            <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300">
+              <div className="relative h-48 bg-gradient-to-r from-gray-100 to-gray-50">
+                <img 
+                  src="https://images.unsplash.com/photo-1588702547923-7093a6c3ba33?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                  alt="Verificación" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                  <ExplanatoryVideo
+                    videoType="verification"
+                    triggerLabel="Ver proceso"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-primary/80 text-white flex items-center justify-center hover:bg-primary cursor-pointer transition-all">
+                      <Play className="h-8 w-8 ml-1" />
+                    </div>
+                  </ExplanatoryVideo>
+                </div>
+              </div>
+              <div className="p-5">
+                <h3 className="font-bold text-lg text-secondary mb-2">Proceso de verificación de identidad</h3>
+                <p className="text-gray-600 text-sm">Conoce cómo funciona nuestro proceso de verificación para garantizar la validez legal de tus documentos.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Estadísticas */}
         <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="text-primary mb-2">

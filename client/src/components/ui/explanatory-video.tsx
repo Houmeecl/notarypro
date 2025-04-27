@@ -18,9 +18,9 @@ interface ExplanatoryVideoProps {
  */
 // Videos explicativos profesionales para nuestra plataforma
 const defaultVideos = {
-  explanation: "https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4", // Explicación general de la plataforma
-  tutorial: "https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_2mb.mp4", // Tutorial paso a paso de firma de documentos
-  verification: "https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_5mb.mp4" // Proceso de verificación de identidad
+  explanation: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Explicación general de la plataforma
+  tutorial: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4", // Tutorial paso a paso de firma de documentos
+  verification: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" // Proceso de verificación de identidad
 };
 
 // Títulos y descripciones predeterminados para cada tipo de video
