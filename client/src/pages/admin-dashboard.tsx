@@ -370,6 +370,208 @@ export default function AdminDashboard() {
               </div>
             </TabsContent>
             
+            {/* Analytics Tab */}
+            <TabsContent value="analytics">
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-2xl font-bold">Análisis de Plataforma</h2>
+                  <DateRangePicker 
+                    dateRange={dateRange}
+                    onChange={setDateRange}
+                    className="w-80"
+                  />
+                </div>
+                
+                {/* Revenue Statistics */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-500">Ingresos Totales</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center">
+                        <DollarSign className="h-8 w-8 text-green-500 mr-3" />
+                        <div className="text-3xl font-bold">
+                          ${stats.totalRevenue.toLocaleString('es-CL')}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-500">Ingresos de Hoy</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center">
+                        <CreditCard className="h-8 w-8 text-blue-500 mr-3" />
+                        <div className="text-3xl font-bold">
+                          ${stats.revenueToday.toLocaleString('es-CL')}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-500">Ingresos Semanales</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center">
+                        <Calendar className="h-8 w-8 text-purple-500 mr-3" />
+                        <div className="text-3xl font-bold">
+                          ${stats.revenueThisWeek.toLocaleString('es-CL')}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-500">Ingresos Mensuales</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center">
+                        <TrendingUp className="h-8 w-8 text-orange-500 mr-3" />
+                        <div className="text-3xl font-bold">
+                          ${stats.revenueThisMonth.toLocaleString('es-CL')}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                {/* Charts */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* User Activity Chart */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Actividad de Usuarios</CardTitle>
+                      <CardDescription>
+                        Registro de nuevos usuarios por día
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-80">
+                        {isDailyEventsLoading ? (
+                          <div className="h-full flex items-center justify-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+                          </div>
+                        ) : dailyEventCounts && dailyEventCounts.length > 0 ? (
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={dailyEventCounts}>
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <XAxis 
+                                dataKey="date" 
+                                tickFormatter={(value) => {
+                                  const date = new Date(value);
+                                  return `${date.getDate()}/${date.getMonth() + 1}`;
+                                }}
+                              />
+                              <YAxis />
+                              <Tooltip 
+                                formatter={(value: number) => [value, 'Eventos']}
+                                labelFormatter={(label) => {
+                                  const date = new Date(label);
+                                  return date.toLocaleDateString('es-ES');
+                                }}
+                              />
+                              <Bar dataKey="count" fill="#4f46e5" />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        ) : (
+                          <div className="h-full flex flex-col items-center justify-center text-gray-500">
+                            <p>No hay datos disponibles para el rango seleccionado</p>
+                            <p className="mt-2 text-sm">Seleccione un rango de fechas diferente</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  {/* Revenue Distribution Chart */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Distribución de Ingresos</CardTitle>
+                      <CardDescription>
+                        División de ingresos por tipo de servicio
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-80">
+                        {isRevenueStatsLoading ? (
+                          <div className="h-full flex items-center justify-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+                          </div>
+                        ) : (
+                          <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                              <Pie
+                                data={[
+                                  { name: 'Documentos', value: stats.documentRevenue },
+                                  { name: 'Cursos', value: stats.courseRevenue },
+                                  { name: 'Videollamadas', value: stats.videoCallRevenue }
+                                ]}
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={100}
+                                fill="#8884d8"
+                                dataKey="value"
+                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                              >
+                                <Cell fill="#4f46e5" />
+                                <Cell fill="#22c55e" />
+                                <Cell fill="#f97316" />
+                              </Pie>
+                              <Legend />
+                              <Tooltip formatter={(value) => [`$${value.toLocaleString('es-CL')}`, 'Ingreso']} />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                {/* User Activity Stats */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Estadísticas de Actividad de Usuarios</CardTitle>
+                    <CardDescription>
+                      Detalle de registro de usuarios en diferentes períodos
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center mb-2">
+                          <UserCheck className="h-5 w-5 text-blue-500 mr-2" />
+                          <span className="text-sm font-medium">Usuarios Nuevos Hoy</span>
+                        </div>
+                        <p className="text-2xl font-bold">{stats.newUsersToday}</p>
+                      </div>
+                      
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center mb-2">
+                          <UserCheck className="h-5 w-5 text-green-500 mr-2" />
+                          <span className="text-sm font-medium">Usuarios Nuevos esta Semana</span>
+                        </div>
+                        <p className="text-2xl font-bold">{stats.newUsersThisWeek}</p>
+                      </div>
+                      
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center mb-2">
+                          <UserCheck className="h-5 w-5 text-purple-500 mr-2" />
+                          <span className="text-sm font-medium">Usuarios Nuevos este Mes</span>
+                        </div>
+                        <p className="text-2xl font-bold">{stats.newUsersThisMonth}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+            
             {/* Users Tab */}
             <TabsContent value="users">
               <Card>
