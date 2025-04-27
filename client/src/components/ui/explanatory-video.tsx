@@ -15,6 +15,13 @@ interface ExplanatoryVideoProps {
 /**
  * Componente para mostrar videos explicativos en distintas partes de la aplicación
  */
+// Videos animados predeterminados para distintos tipos de explicación
+const defaultVideos = {
+  explanation: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+  tutorial: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+  verification: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+};
+
 export const ExplanatoryVideo: React.FC<ExplanatoryVideoProps> = ({
   title,
   description,
@@ -24,13 +31,7 @@ export const ExplanatoryVideo: React.FC<ExplanatoryVideoProps> = ({
   children
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
-
-  // Videos animados predeterminados para distintos tipos de explicación
-  const defaultVideos = {
-    explanation: "https://assets.mixkit.co/videos/preview/mixkit-business-team-meeting-animated-video-4794-large.mp4",
-    tutorial: "https://assets.mixkit.co/videos/preview/mixkit-animated-professional-business-infographics-4796-large.mp4",
-    verification: "https://assets.mixkit.co/videos/preview/mixkit-animated-hands-demonstrating-mobile-app-3761-large.mp4"
-  };
+  console.log("Rendering ExplanatoryVideo component with src:", videoUrl || defaultVideos[videoType]);
 
   const videoSrc = videoUrl || defaultVideos[videoType];
 
@@ -76,6 +77,8 @@ export const ExplanatoryVideo: React.FC<ExplanatoryVideoProps> = ({
                 onEnded={() => setIsPlaying(false)}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
+                controls
+                preload="metadata"
                 poster="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 16 9'%3E%3C/svg%3E"
               />
             </div>
