@@ -221,9 +221,17 @@ const DocumentVerificationGame: React.FC = () => {
   // Mutación para verificar un documento
   const verifyDocumentMutation = useMutation({
     mutationFn: async (code: string) => {
-      const response = await apiRequest('POST', '/api/gamification/verify-document', { code });
-      const data = await response.json();
-      return data as DocumentVerification;
+      try {
+        // Intentar primero con la ruta de gamificación
+        const response = await apiRequest('POST', '/api/gamification/verify-document', { code });
+        const data = await response.json();
+        return data as DocumentVerification;
+      } catch (error) {
+        // Si falla, intentar con la ruta alternativa
+        const response = await apiRequest('POST', '/api/documents/verify', { code });
+        const data = await response.json();
+        return data as DocumentVerification;
+      }
     },
     onSuccess: (data) => {
       // Refrescar los datos relevantes

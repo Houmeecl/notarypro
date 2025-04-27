@@ -892,3 +892,14 @@ export type GamificationReward = typeof gamificationRewards.$inferSelect;
 export type InsertGamificationReward = z.infer<typeof insertGamificationRewardSchema>;
 export type UserClaimedReward = typeof userClaimedRewards.$inferSelect;
 export type InsertUserClaimedReward = z.infer<typeof insertUserClaimedRewardSchema>;
+
+// Interfaces de Gamificación
+// Estas interfaces se utilizan para la tipificación de los datos de gamificación
+export interface DocumentVerification {
+  id: number;
+  code: string;
+  documentId: number;
+  documentTitle: string;
+  verified: boolean;
+  verifiedAt: Date | null;
+}

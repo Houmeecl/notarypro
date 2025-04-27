@@ -1350,6 +1350,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Añadir ruta directa para verificación de documentos (para compatibilidad)
+  app.post('/api/documents/verify', isAuthenticated, async (req, res) => {
+    try {
+      const { code } = req.body;
+      if (!code) {
+        return res.status(400).json({ error: 'Código de verificación requerido' });
+      }
+      
+      const result = await verifyDocument(req.user!.id, code);
+      return res.json(result);
+    } catch (error: any) {
+      return res.status(400).json({ error: error.message });
+    }
+  });
+
   // Configurar WebSocket para comunicación en tiempo real
   const httpServer = createServer(app);
   
