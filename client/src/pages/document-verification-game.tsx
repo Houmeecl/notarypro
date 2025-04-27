@@ -16,7 +16,7 @@ import { Slider } from '@/components/ui/slider';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Confetti } from '@/components/ui/confetti';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Medal, Trophy, Star, Award, CheckCircle2, Lock, Shield, Key, Search, ArrowRight, Gift, TrendingUp, Clock, Target, Zap, ChevronRight, Info, AlertCircle, AlertTriangle } from 'lucide-react';
+import { Medal, Trophy, Star, Award, CheckCircle2, Lock, Shield, Key, Search, ArrowRight, Gift, TrendingUp, Clock, Target, Zap, ChevronRight, Info, AlertCircle, AlertTriangle, Copy, ClipboardCopy } from 'lucide-react';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -764,7 +764,7 @@ const DocumentVerificationGame: React.FC = () => {
                                 });
                               }}
                             >
-                              <Copy className="h-4 w-4" />
+                              <ClipboardCopy className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>

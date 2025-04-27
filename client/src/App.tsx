@@ -131,6 +131,7 @@ function Router() {
       <Route path="/conversor-presencial-online" component={ConversorPresencialOnline} />
       <Route path="/verificar-documento" component={VerificarDocumento} />
       <Route path="/verificar-documento/:code" component={VerificarDocumento} />
+      <Route path="/verification-game" component={DocumentVerificationGame} />
       <Route path="/curso-certificador" component={CursoCertificador} />
       <Route path="/vecinos-express" component={VecinosExpress} />
       <Route path="/service-selection" component={ServiceSelectionPage} />
