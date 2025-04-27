@@ -44,8 +44,9 @@ import PartnerRegistrationForm from "@/pages/partners/registration-form";
 import PartnerLogin from "@/pages/partners/partner-login";
 import PosIntegrationPage from "@/pages/partners/pos-integration";
 
-// Admin POS management
+// Admin pages
 import PosManagementPage from "@/pages/admin/pos-management";
+import ApiIntegrationsPage from "@/pages/admin/api-integrations";
 
 function Router() {
   return (
@@ -142,6 +143,13 @@ function Router() {
       <ProtectedRoute 
         path="/admin/pos-management" 
         component={PosManagementPage} 
+        allowedRoles={["admin"]} 
+      />
+      
+      {/* Admin API Integrations */}
+      <ProtectedRoute 
+        path="/admin/api-integrations" 
+        component={ApiIntegrationsPage} 
         allowedRoles={["admin"]} 
       />
       
