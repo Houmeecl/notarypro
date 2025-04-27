@@ -8,13 +8,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <Link href="/" className="flex items-center mb-4">
-              <span className="text-primary font-heading font-bold text-2xl">
-                Docu<span className="text-secondary">Sign</span>
-                <span className="text-primary">Pro</span>
-              </span>
+              <img 
+                src="/assets/notarypro-logo.png" 
+                alt="NotaryPro" 
+                className="h-10 w-auto"
+              />
             </Link>
             <p className="text-gray-600 mb-4">
-              Plataforma líder en firma electrónica avanzada y certificación digital para profesionales y empresas.
+              Plataforma líder en firma y certificación digital notarial para profesionales jurídicos y empresas en Canadá.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-primary transition-colors duration-150">
@@ -128,7 +129,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-200 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm">
-            &copy; {new Date().getFullYear()} DocuSignPro. Todos los derechos reservados.
+            &copy; {new Date().getFullYear()} NotaryPro. Todos los derechos reservados.
           </p>
           <div className="mt-4 md:mt-0">
             <img
