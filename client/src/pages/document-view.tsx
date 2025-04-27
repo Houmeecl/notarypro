@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import DocumentNavbar from "@/components/layout/DocumentNavbar";
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -119,144 +120,150 @@ export default function DocumentViewPage() {
 
   if (!document) {
     return (
-      <div className="container mx-auto py-8">
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-semibold mb-2">Documento no encontrado</h2>
-          <p className="text-gray-500 mb-6">El documento solicitado no existe o no tiene acceso a él.</p>
-          <Link href="/document-categories">
-            <Button>Ver categorías de documentos</Button>
-          </Link>
+      <>
+        <DocumentNavbar />
+        <div className="container mx-auto py-8">
+          <div className="text-center py-12">
+            <h2 className="text-2xl font-semibold mb-2">Documento no encontrado</h2>
+            <p className="text-gray-500 mb-6">El documento solicitado no existe o no tiene acceso a él.</p>
+            <Link href="/document-categories">
+              <Button>Ver categorías de documentos</Button>
+            </Link>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <Link href="/documents">
-        <a className="flex items-center text-primary mb-6 hover:underline">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Volver a mis documentos
-        </a>
-      </Link>
+    <>
+      <DocumentNavbar />
+      <div className="container mx-auto py-8">
+        <Link href="/documents">
+          <a className="flex items-center text-primary mb-6 hover:underline">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Volver a mis documentos
+          </a>
+        </Link>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-2">
-          <Card>
-            <CardHeader className="pb-4">
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-2xl">{document.title}</CardTitle>
-                {getStatusBadge(document.status)}
-              </div>
-              <CardDescription>
-                Documento creado el {new Date(document.createdAt || '').toLocaleDateString()}
-              </CardDescription>
-            </CardHeader>
-            <Separator />
-            <CardContent className="pt-6">
-              <div 
-                className="border rounded-md p-4 bg-white min-h-[500px]"
-                dangerouslySetInnerHTML={{ __html: previewHtml }}
-              />
-            </CardContent>
-            <CardFooter className="flex flex-wrap gap-4">
-              <Button variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                Descargar PDF
-              </Button>
-              
-              {document.status !== "signed" && (
-                <Button onClick={handleSign} disabled={signDocumentMutation.isPending}>
-                  {signDocumentMutation.isPending ? (
-                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Firmando...</>
-                  ) : (
-                    <><Pen className="mr-2 h-4 w-4" /> Firmar documento</>
-                  )}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="md:col-span-2">
+            <Card>
+              <CardHeader className="pb-4">
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-2xl">{document.title}</CardTitle>
+                  {getStatusBadge(document.status)}
+                </div>
+                <CardDescription>
+                  Documento creado el {new Date(document.createdAt || '').toLocaleDateString()}
+                </CardDescription>
+              </CardHeader>
+              <Separator />
+              <CardContent className="pt-6">
+                <div 
+                  className="border rounded-md p-4 bg-white min-h-[500px]"
+                  dangerouslySetInnerHTML={{ __html: previewHtml }}
+                />
+              </CardContent>
+              <CardFooter className="flex flex-wrap gap-4">
+                <Button variant="outline">
+                  <Download className="mr-2 h-4 w-4" />
+                  Descargar PDF
                 </Button>
-              )}
-            </CardFooter>
-          </Card>
-        </div>
-        
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Estado del documento</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Generado</span>
-                  <Check className="h-5 w-5 text-green-500" />
-                </div>
-                <Separator />
                 
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Validado</span>
-                  {document.status === "validated" || document.status === "signed" ? (
-                    <Check className="h-5 w-5 text-green-500" />
-                  ) : document.status === "rejected" ? (
-                    <X className="h-5 w-5 text-red-500" />
-                  ) : (
-                    <div className="text-sm text-muted-foreground">Pendiente</div>
-                  )}
-                </div>
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Firmado</span>
-                  {document.status === "signed" ? (
-                    <Check className="h-5 w-5 text-green-500" />
-                  ) : (
-                    <div className="text-sm text-muted-foreground">Pendiente</div>
-                  )}
-                </div>
-              </div>
-              
-              {document.status === "rejected" && document.rejectionReason && (
-                <div className="mt-6 p-3 bg-red-50 border border-red-200 rounded-md">
-                  <h4 className="font-semibold text-red-900 text-sm">Motivo de rechazo:</h4>
-                  <p className="text-sm text-red-800 mt-1">{document.rejectionReason}</p>
-                </div>
-              )}
-              
-              <div className="mt-6">
-                <h4 className="font-semibold mb-2">Verificación de identidad</h4>
-                {document.status === "pending" || document.status === "draft" ? (
-                  <Button variant="outline" className="w-full" size="sm">
-                    Verificar identidad
+                {document.status !== "signed" && (
+                  <Button onClick={handleSign} disabled={signDocumentMutation.isPending}>
+                    {signDocumentMutation.isPending ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Firmando...</>
+                    ) : (
+                      <><Pen className="mr-2 h-4 w-4" /> Firmar documento</>
+                    )}
                   </Button>
-                ) : (
-                  <p className="text-sm text-green-600 flex items-center">
-                    <Check className="h-4 w-4 mr-1" /> Identidad verificada
-                  </p>
                 )}
-              </div>
-            </CardContent>
-          </Card>
+              </CardFooter>
+            </Card>
+          </div>
           
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Acciones</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button variant="outline" className="w-full" size="sm">
-                <Download className="mr-2 h-4 w-4" /> Descargar PDF
-              </Button>
-              
-              {document.status === "signed" && (
+          <div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Estado del documento</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Generado</span>
+                    <Check className="h-5 w-5 text-green-500" />
+                  </div>
+                  <Separator />
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Validado</span>
+                    {document.status === "validated" || document.status === "signed" ? (
+                      <Check className="h-5 w-5 text-green-500" />
+                    ) : document.status === "rejected" ? (
+                      <X className="h-5 w-5 text-red-500" />
+                    ) : (
+                      <div className="text-sm text-muted-foreground">Pendiente</div>
+                    )}
+                  </div>
+                  <Separator />
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Firmado</span>
+                    {document.status === "signed" ? (
+                      <Check className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <div className="text-sm text-muted-foreground">Pendiente</div>
+                    )}
+                  </div>
+                </div>
+                
+                {document.status === "rejected" && document.rejectionReason && (
+                  <div className="mt-6 p-3 bg-red-50 border border-red-200 rounded-md">
+                    <h4 className="font-semibold text-red-900 text-sm">Motivo de rechazo:</h4>
+                    <p className="text-sm text-red-800 mt-1">{document.rejectionReason}</p>
+                  </div>
+                )}
+                
+                <div className="mt-6">
+                  <h4 className="font-semibold mb-2">Verificación de identidad</h4>
+                  {document.status === "pending" || document.status === "draft" ? (
+                    <Button variant="outline" className="w-full" size="sm">
+                      Verificar identidad
+                    </Button>
+                  ) : (
+                    <p className="text-sm text-green-600 flex items-center">
+                      <Check className="h-4 w-4 mr-1" /> Identidad verificada
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Acciones</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <Button variant="outline" className="w-full" size="sm">
-                  Compartir documento
+                  <Download className="mr-2 h-4 w-4" /> Descargar PDF
                 </Button>
-              )}
-              
-              <Button variant="outline" className="w-full" size="sm">
-                Ver historial
-              </Button>
-            </CardContent>
-          </Card>
+                
+                {document.status === "signed" && (
+                  <Button variant="outline" className="w-full" size="sm">
+                    Compartir documento
+                  </Button>
+                )}
+                
+                <Button variant="outline" className="w-full" size="sm">
+                  Ver historial
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

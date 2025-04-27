@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import DocumentNavbar from "@/components/layout/DocumentNavbar";
 
 export default function DocumentFormPage() {
   const { toast } = useToast();
@@ -140,126 +141,129 @@ export default function DocumentFormPage() {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <Link href={`/document-templates/${template?.categoryId}`}>
-        <a className="flex items-center text-primary mb-6 hover:underline">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Volver a plantillas
-        </a>
-      </Link>
+    <>
+      <DocumentNavbar />
+      <div className="container mx-auto py-8">
+        <Link href={`/document-templates/${template?.categoryId}`}>
+          <a className="flex items-center text-primary mb-6 hover:underline">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Volver a plantillas
+          </a>
+        </Link>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">Completa la información</CardTitle>
-              <CardDescription>
-                Por favor llena los campos solicitados para generar tu documento.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  {formSchema && Object.entries(formSchema.properties).map(([key, value]: [string, any]) => (
-                    <FormField
-                      key={key}
-                      control={form.control}
-                      name={key}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{value.title}</FormLabel>
-                          <FormControl>
-                            {value.type === "string" && value.format !== "date" && !value.multiline ? (
-                              <Input 
-                                {...field} 
-                                placeholder={value.placeholder || `Ingrese ${value.title.toLowerCase()}`} 
-                              />
-                            ) : value.type === "string" && value.multiline ? (
-                              <Textarea 
-                                {...field} 
-                                placeholder={value.placeholder || `Ingrese ${value.title.toLowerCase()}`} 
-                              />
-                            ) : value.type === "string" && value.format === "date" ? (
-                              <Input 
-                                {...field} 
-                                type="date" 
-                              />
-                            ) : value.type === "number" ? (
-                              <Input 
-                                {...field} 
-                                type="number" 
-                                placeholder={value.placeholder || `Ingrese ${value.title.toLowerCase()}`}
-                                onChange={e => field.onChange(parseFloat(e.target.value))}
-                              />
-                            ) : (
-                              <Input {...field} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="md:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl">Completa la información</CardTitle>
+                <CardDescription>
+                  Por favor llena los campos solicitados para generar tu documento.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    {formSchema && Object.entries(formSchema.properties).map(([key, value]: [string, any]) => (
+                      <FormField
+                        key={key}
+                        control={form.control}
+                        name={key}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{value.title}</FormLabel>
+                            <FormControl>
+                              {value.type === "string" && value.format !== "date" && !value.multiline ? (
+                                <Input 
+                                  {...field} 
+                                  placeholder={value.placeholder || `Ingrese ${value.title.toLowerCase()}`} 
+                                />
+                              ) : value.type === "string" && value.multiline ? (
+                                <Textarea 
+                                  {...field} 
+                                  placeholder={value.placeholder || `Ingrese ${value.title.toLowerCase()}`} 
+                                />
+                              ) : value.type === "string" && value.format === "date" ? (
+                                <Input 
+                                  {...field} 
+                                  type="date" 
+                                />
+                              ) : value.type === "number" ? (
+                                <Input 
+                                  {...field} 
+                                  type="number" 
+                                  placeholder={value.placeholder || `Ingrese ${value.title.toLowerCase()}`}
+                                  onChange={e => field.onChange(parseFloat(e.target.value))}
+                                />
+                              ) : (
+                                <Input {...field} />
+                              )}
+                            </FormControl>
+                            {value.description && (
+                              <FormDescription>{value.description}</FormDescription>
                             )}
-                          </FormControl>
-                          {value.description && (
-                            <FormDescription>{value.description}</FormDescription>
-                          )}
-                          <FormMessage />
-                        </FormItem>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    ))}
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      disabled={createDocumentMutation.isPending}
+                    >
+                      {createDocumentMutation.isPending ? (
+                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generando documento...</>
+                      ) : (
+                        <><Save className="mr-2 h-4 w-4" /> Generar documento</>
                       )}
-                    />
-                  ))}
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
-                    disabled={createDocumentMutation.isPending}
-                  >
-                    {createDocumentMutation.isPending ? (
-                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generando documento...</>
-                    ) : (
-                      <><Save className="mr-2 h-4 w-4" /> Generar documento</>
-                    )}
-                  </Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Información de la plantilla</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <h3 className="font-semibold text-lg">{template?.name}</h3>
-              <p className="text-sm text-gray-500 mt-2">{template?.description}</p>
-              
-              <Separator className="my-4" />
-              
-              <div className="flex items-center mt-4">
-                <FileText className="h-5 w-5 mr-2 text-primary" />
-                <p className="text-sm">Este documento será generado automáticamente.</p>
-              </div>
-              
-              <div className="mt-6">
-                <p className="font-semibold">Precio</p>
-                <p className="text-2xl font-bold text-primary">${template?.price / 100}</p>
-              </div>
-              
-              <div className="mt-6 space-y-2">
-                <p className="font-semibold">Instrucciones:</p>
-                <div className="flex items-start space-x-2">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-                  <p className="text-sm">Complete todos los campos requeridos.</p>
+                    </Button>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Información de la plantilla</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <h3 className="font-semibold text-lg">{template?.name}</h3>
+                <p className="text-sm text-gray-500 mt-2">{template?.description}</p>
+                
+                <Separator className="my-4" />
+                
+                <div className="flex items-center mt-4">
+                  <FileText className="h-5 w-5 mr-2 text-primary" />
+                  <p className="text-sm">Este documento será generado automáticamente.</p>
                 </div>
-                <div className="flex items-start space-x-2">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-                  <p className="text-sm">Verifique que la información sea correcta antes de enviar.</p>
+                
+                <div className="mt-6">
+                  <p className="font-semibold">Precio</p>
+                  <p className="text-2xl font-bold text-primary">${template?.price / 100}</p>
                 </div>
-                <div className="flex items-start space-x-2">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-                  <p className="text-sm">Después de generar, podrá firmar el documento digitalmente.</p>
+                
+                <div className="mt-6 space-y-2">
+                  <p className="font-semibold">Instrucciones:</p>
+                  <div className="flex items-start space-x-2">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                    <p className="text-sm">Complete todos los campos requeridos.</p>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                    <p className="text-sm">Verifique que la información sea correcta antes de enviar.</p>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                    <p className="text-sm">Después de generar, podrá firmar el documento digitalmente.</p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
