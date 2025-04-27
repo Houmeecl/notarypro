@@ -21,7 +21,8 @@ import {
   UserCheck, 
   CalendarClock,
   Info,
-  FileQuestion
+  FileQuestion,
+  Play
 } from "lucide-react";
 import { ExplanatoryVideo } from "@/components/ui/explanatory-video";
 
@@ -76,11 +77,30 @@ export default function CertificacionPorVideo() {
                 </div>
               </div>
               <div className="md:w-1/2">
-                <div className="aspect-video bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center relative">
-                  <Video className="h-16 w-16 text-gray-400" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end justify-center pb-4">
-                    <span className="text-white text-sm font-medium px-3 py-1 bg-primary/80 rounded-full">Video explicativo</span>
-                  </div>
+                <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden shadow-md">
+                  <ExplanatoryVideo
+                    title="¿Qué es la Certificación Remota por Video (RON)?"
+                    description="Conoce cómo la certificación remota por video está respaldada por la Ley 19.799 en Chile, otorgando validez legal a las firmas electrónicas y documentos certificados a distancia."
+                    videoType="explanation"
+                    triggerLabel="Ver explicación"
+                  >
+                    <div className="w-full h-full flex items-center justify-center cursor-pointer relative group">
+                      <img 
+                        src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                        alt="Mujer en videoconferencia"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                        <div className="bg-primary/90 text-white rounded-full p-3">
+                          <Play className="h-8 w-8" />
+                        </div>
+                      </div>
+                      <div className="absolute bottom-3 left-3 bg-primary/90 text-white text-sm font-medium px-3 py-1 rounded-full flex items-center gap-1">
+                        <Info className="h-3 w-3" />
+                        <span>Validez Legal</span>
+                      </div>
+                    </div>
+                  </ExplanatoryVideo>
                 </div>
               </div>
             </div>
@@ -158,10 +178,17 @@ export default function CertificacionPorVideo() {
             </div>
             
             <div className="flex justify-center mt-6">
-              <Button>
-                Ver demostración
-                <Video className="h-4 w-4 ml-2" />
-              </Button>
+              <ExplanatoryVideo
+                title="Proceso de Certificación por Video - Paso a Paso"
+                description="En este video detallamos cada etapa del proceso de certificación remota: desde la verificación de identidad, validación de documentos hasta la firma electrónica avanzada. Todos los pasos cumplen con la Ley 19.799 de Chile, garantizando la validez legal de los documentos certificados."
+                videoType="tutorial"
+                triggerLabel="Ver proceso completo"
+              >
+                <Button className="flex items-center gap-2">
+                  Ver demostración
+                  <FileQuestion className="h-4 w-4" />
+                </Button>
+              </ExplanatoryVideo>
             </div>
           </div>
           
