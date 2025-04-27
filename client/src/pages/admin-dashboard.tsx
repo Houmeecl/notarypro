@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 import { 
   Card, 
   CardContent, 
@@ -63,7 +64,9 @@ import {
   CreditCard,
   Activity,
   TrendingUp,
-  Calendar
+  Calendar,
+  Plug,
+  Video
 } from "lucide-react";
 import { User, Document, Course } from "@shared/schema";
 
