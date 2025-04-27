@@ -293,7 +293,7 @@ const AdminDocuments = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "pendiente":
-        return <Clock className="h-3 w-3" />;
+        return <AlertCircle className="h-3 w-3" />;
       case "firmado":
         return <CheckCircle className="h-3 w-3" />;
       case "certificado":
