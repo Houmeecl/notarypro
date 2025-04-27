@@ -864,6 +864,409 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Partner (Vecinos NotaryPro Express) routes
+  // Ruta pública para registro de partners
+  app.post("/api/partners/register", async (req, res) => {
+    try {
+      const validatedData = insertPartnerSchema.parse(req.body);
+      
+      // Verificar si ya existe un partner con ese email
+      const existingPartner = await storage.getPartnerByEmail(validatedData.email);
+      if (existingPartner) {
+        return res.status(400).json({ message: "Ya existe un partner registrado con ese email" });
+      }
+      
+      const partner = await storage.createPartner(validatedData);
+      
+      // Crear un evento de analytics
+      await storage.createAnalyticsEvent({
+        eventType: "partner_registration",
+        metadata: {
+          partnerId: partner.id,
+          region: partner.region,
+          commune: partner.commune
+        }
+      });
+      
+      res.status(201).json({
+        success: true,
+        message: "Solicitud de registro enviada con éxito. Revisaremos su información y le contactaremos pronto.",
+        partnerId: partner.id
+      });
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Obtener todos los partners (solo admin)
+  app.get("/api/partners", isAdmin, async (req, res) => {
+    try {
+      const partners = await storage.getAllPartners();
+      res.status(200).json(partners);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Obtener un partner específico
+  app.get("/api/partners/:id", isAuthenticated, async (req, res) => {
+    try {
+      const partnerId = parseInt(req.params.id);
+      const partner = await storage.getPartner(partnerId);
+      
+      if (!partner) {
+        return res.status(404).json({ message: "Partner no encontrado" });
+      }
+      
+      // Solo el propio partner, o un admin pueden ver los detalles
+      if (partner.userId !== req.user.id && req.user.role !== "admin") {
+        return res.status(403).json({ message: "No tiene permisos para ver estos datos" });
+      }
+      
+      res.status(200).json(partner);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Actualizar estado de un partner (solo admin)
+  app.patch("/api/partners/:id", isAdmin, async (req, res) => {
+    try {
+      const partnerId = parseInt(req.params.id);
+      const partner = await storage.getPartner(partnerId);
+      
+      if (!partner) {
+        return res.status(404).json({ message: "Partner no encontrado" });
+      }
+      
+      const updatedPartner = await storage.updatePartner(partnerId, req.body);
+      
+      // Si se está aprobando el partner, crear evento de analytics
+      if (req.body.status === "approved" && partner.status !== "approved") {
+        await storage.createAnalyticsEvent({
+          eventType: "partner_approved",
+          metadata: {
+            partnerId: partnerId,
+            region: partner.region,
+            commune: partner.commune
+          }
+        });
+      }
+      
+      res.status(200).json(updatedPartner);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Obtener partners filtrados por estado
+  app.get("/api/partners/filter/status/:status", isAdmin, async (req, res) => {
+    try {
+      const partners = await storage.getPartnersByStatus(req.params.status);
+      res.status(200).json(partners);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Obtener partners filtrados por región
+  app.get("/api/partners/filter/region/:region", isAdmin, async (req, res) => {
+    try {
+      const partners = await storage.getPartnersByRegion(req.params.region);
+      res.status(200).json(partners);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Obtener partners filtrados por comuna
+  app.get("/api/partners/filter/commune/:commune", isAdmin, async (req, res) => {
+    try {
+      const partners = await storage.getPartnersByCommune(req.params.commune);
+      res.status(200).json(partners);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Rutas para datos bancarios de los partners
+  app.post("/api/partner-bank-details", isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = insertPartnerBankDetailsSchema.parse(req.body);
+      
+      // Verificar que el partner existe y pertenece al usuario
+      const partner = await storage.getPartnerByUserId(req.user.id);
+      if (!partner) {
+        return res.status(403).json({ message: "No tiene permisos para realizar esta acción" });
+      }
+      
+      // Verificar si ya existen detalles bancarios para este partner
+      const existingDetails = await storage.getPartnerBankDetails(partner.id);
+      if (existingDetails) {
+        return res.status(400).json({ message: "Ya existen datos bancarios para este partner" });
+      }
+      
+      // Establecer el partnerId correcto (ignorar el que viene en el body)
+      const bankDetails = await storage.createPartnerBankDetails({
+        ...validatedData,
+        partnerId: partner.id
+      });
+      
+      res.status(201).json(bankDetails);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Obtener los detalles bancarios de un partner
+  app.get("/api/partner-bank-details/:partnerId", isAuthenticated, async (req, res) => {
+    try {
+      const partnerId = parseInt(req.params.partnerId);
+      
+      // Verificar que el partner existe y pertenece al usuario o es admin
+      const partner = await storage.getPartner(partnerId);
+      if (!partner) {
+        return res.status(404).json({ message: "Partner no encontrado" });
+      }
+      
+      if (partner.userId !== req.user.id && req.user.role !== "admin") {
+        return res.status(403).json({ message: "No tiene permisos para ver estos datos" });
+      }
+      
+      const bankDetails = await storage.getPartnerBankDetails(partnerId);
+      if (!bankDetails) {
+        return res.status(404).json({ message: "No se encontraron datos bancarios para este partner" });
+      }
+      
+      res.status(200).json(bankDetails);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Actualizar los detalles bancarios de un partner
+  app.patch("/api/partner-bank-details/:id", isAuthenticated, async (req, res) => {
+    try {
+      const detailsId = parseInt(req.params.id);
+      const bankDetails = await storage.getPartnerBankDetails(detailsId);
+      
+      if (!bankDetails) {
+        return res.status(404).json({ message: "Datos bancarios no encontrados" });
+      }
+      
+      // Verificar que el partner pertenece al usuario
+      const partner = await storage.getPartner(bankDetails.partnerId);
+      if (!partner || (partner.userId !== req.user.id && req.user.role !== "admin")) {
+        return res.status(403).json({ message: "No tiene permisos para actualizar estos datos" });
+      }
+      
+      const updatedDetails = await storage.updatePartnerBankDetails(detailsId, req.body);
+      res.status(200).json(updatedDetails);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Rutas para ventas de partners
+  app.post("/api/partner-sales", isAdmin, async (req, res) => {
+    try {
+      const validatedData = insertPartnerSaleSchema.parse(req.body);
+      
+      // Verificar que el partner existe
+      const partner = await storage.getPartner(validatedData.partnerId);
+      if (!partner) {
+        return res.status(404).json({ message: "Partner no encontrado" });
+      }
+      
+      // Crear la venta
+      const sale = await storage.createPartnerSale(validatedData);
+      
+      // Crear evento de analytics
+      await storage.createAnalyticsEvent({
+        eventType: "partner_sale_created",
+        metadata: {
+          partnerId: validatedData.partnerId,
+          documentId: validatedData.documentId,
+          amount: validatedData.amount,
+          commission: validatedData.commission
+        }
+      });
+      
+      res.status(201).json(sale);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Obtener ventas de un partner
+  app.get("/api/partner-sales/:partnerId", isAuthenticated, async (req, res) => {
+    try {
+      const partnerId = parseInt(req.params.partnerId);
+      
+      // Verificar que el partner existe y pertenece al usuario o es admin
+      const partner = await storage.getPartner(partnerId);
+      if (!partner) {
+        return res.status(404).json({ message: "Partner no encontrado" });
+      }
+      
+      if (partner.userId !== req.user.id && req.user.role !== "admin") {
+        return res.status(403).json({ message: "No tiene permisos para ver estos datos" });
+      }
+      
+      const status = req.query.status as string | undefined;
+      const sales = await storage.getPartnerSales(partnerId, { status });
+      
+      res.status(200).json(sales);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Obtener estadísticas de ventas de un partner
+  app.get("/api/partner-sales-stats/:partnerId", isAuthenticated, async (req, res) => {
+    try {
+      const partnerId = parseInt(req.params.partnerId);
+      
+      // Verificar que el partner existe y pertenece al usuario o es admin
+      const partner = await storage.getPartner(partnerId);
+      if (!partner) {
+        return res.status(404).json({ message: "Partner no encontrado" });
+      }
+      
+      if (partner.userId !== req.user.id && req.user.role !== "admin") {
+        return res.status(403).json({ message: "No tiene permisos para ver estos datos" });
+      }
+      
+      const stats = await storage.getPartnerSalesStats(partnerId);
+      res.status(200).json(stats);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Actualizar estado de una venta (solo admin)
+  app.patch("/api/partner-sales/:id", isAdmin, async (req, res) => {
+    try {
+      const saleId = parseInt(req.params.id);
+      const sale = await storage.getPartnerSale(saleId);
+      
+      if (!sale) {
+        return res.status(404).json({ message: "Venta no encontrada" });
+      }
+      
+      const updatedSale = await storage.updatePartnerSale(saleId, req.body);
+      
+      // Si la venta pasa a disponible, crear evento de analytics
+      if (req.body.status === "available" && sale.status !== "available") {
+        await storage.createAnalyticsEvent({
+          eventType: "partner_commission_available",
+          metadata: {
+            partnerId: sale.partnerId,
+            saleId: sale.id,
+            commission: sale.commission
+          }
+        });
+      }
+      
+      res.status(200).json(updatedSale);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Rutas para pagos a partners
+  app.post("/api/partner-payments", isAdmin, async (req, res) => {
+    try {
+      const validatedData = insertPartnerPaymentSchema.parse(req.body);
+      
+      // Verificar que el partner existe
+      const partner = await storage.getPartner(validatedData.partnerId);
+      if (!partner) {
+        return res.status(404).json({ message: "Partner no encontrado" });
+      }
+      
+      // Crear el pago
+      const payment = await storage.createPartnerPayment(validatedData);
+      
+      // Crear evento de analytics
+      await storage.createAnalyticsEvent({
+        eventType: "partner_payment_created",
+        metadata: {
+          partnerId: validatedData.partnerId,
+          amount: validatedData.amount,
+          paymentMethod: validatedData.paymentMethod
+        }
+      });
+      
+      res.status(201).json(payment);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Obtener pagos de un partner
+  app.get("/api/partner-payments/:partnerId", isAuthenticated, async (req, res) => {
+    try {
+      const partnerId = parseInt(req.params.partnerId);
+      
+      // Verificar que el partner existe y pertenece al usuario o es admin
+      const partner = await storage.getPartner(partnerId);
+      if (!partner) {
+        return res.status(404).json({ message: "Partner no encontrado" });
+      }
+      
+      if (partner.userId !== req.user.id && req.user.role !== "admin") {
+        return res.status(403).json({ message: "No tiene permisos para ver estos datos" });
+      }
+      
+      const payments = await storage.getPartnerPayments(partnerId);
+      res.status(200).json(payments);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Ruta pública para buscar puntos de servicio (partners aprobados)
+  app.get("/api/service-points", async (req, res) => {
+    try {
+      // Obtener todos los partners aprobados
+      const partners = await storage.getPartnersByStatus("approved");
+      
+      // Opcional: filtrar por región o comuna si se proporcionan
+      const region = req.query.region as string | undefined;
+      const commune = req.query.commune as string | undefined;
+      
+      let filteredPartners = partners;
+      
+      if (region) {
+        filteredPartners = filteredPartners.filter(partner => 
+          partner.region.toLowerCase() === region.toLowerCase()
+        );
+      }
+      
+      if (commune) {
+        filteredPartners = filteredPartners.filter(partner => 
+          partner.commune.toLowerCase() === commune.toLowerCase()
+        );
+      }
+      
+      // Transformar los datos para devolver solo la información pública
+      const servicePoints = filteredPartners.map(partner => ({
+        id: partner.id,
+        storeName: partner.storeName,
+        region: partner.region,
+        commune: partner.commune,
+        address: partner.address,
+        hasInternet: partner.hasInternet,
+        hasDevice: partner.hasDevice
+      }));
+      
+      res.status(200).json(servicePoints);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
