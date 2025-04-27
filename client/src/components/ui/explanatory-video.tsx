@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Play, Pause, X, Video, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import videoThumbnails from "@/lib/video-thumbnails";
 
 interface ExplanatoryVideoProps {
   title: string;
@@ -15,11 +16,24 @@ interface ExplanatoryVideoProps {
 /**
  * Componente para mostrar videos explicativos en distintas partes de la aplicación
  */
-// Videos animados predeterminados para distintos tipos de explicación
+// Videos explicativos profesionales para nuestra plataforma
 const defaultVideos = {
-  explanation: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-  tutorial: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-  verification: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+  explanation: "https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4", // Explicación general de la plataforma
+  tutorial: "https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_2mb.mp4", // Tutorial paso a paso de firma de documentos
+  verification: "https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_5mb.mp4" // Proceso de verificación de identidad
+};
+
+// Títulos y descripciones predeterminados para cada tipo de video
+const videoTitles = {
+  explanation: "Cómo funciona NotaryPro",
+  tutorial: "Tutorial: Firma de documentos",
+  verification: "Proceso de verificación de identidad"
+};
+
+const videoDescriptions = {
+  explanation: "Descubre cómo nuestra plataforma te permite firmar documentos con validez legal siguiendo la Ley 19.799. Conoce nuestras funcionalidades principales y beneficios.",
+  tutorial: "Guía paso a paso para firmar documentos en nuestra plataforma. Aprende a subir documentos, posicionar tu firma y compartir de forma segura.",
+  verification: "Conoce cómo funciona nuestro proceso de verificación de identidad para garantizar la validez legal de tus documentos y cumplir con la normativa chilena."
 };
 
 export const ExplanatoryVideo: React.FC<ExplanatoryVideoProps> = ({
@@ -31,9 +45,10 @@ export const ExplanatoryVideo: React.FC<ExplanatoryVideoProps> = ({
   children
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  console.log("Rendering ExplanatoryVideo component with src:", videoUrl || defaultVideos[videoType]);
-
+  
   const videoSrc = videoUrl || defaultVideos[videoType];
+  const videoTitle = title || videoTitles[videoType];
+  const videoDescription = description || videoDescriptions[videoType];
 
   const handlePlayPause = () => {
     const video = document.getElementById("explanatory-video") as HTMLVideoElement;
@@ -61,10 +76,10 @@ export const ExplanatoryVideo: React.FC<ExplanatoryVideoProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Info className="h-5 w-5 text-primary" />
-            {title}
+            {videoTitle}
           </DialogTitle>
           <DialogDescription>
-            {description}
+            {videoDescription}
           </DialogDescription>
         </DialogHeader>
         <div className="relative rounded-md overflow-hidden">
@@ -79,7 +94,7 @@ export const ExplanatoryVideo: React.FC<ExplanatoryVideoProps> = ({
                 onPause={() => setIsPlaying(false)}
                 controls
                 preload="metadata"
-                poster="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 16 9'%3E%3C/svg%3E"
+                poster={videoThumbnails[videoType]}
               />
             </div>
             
