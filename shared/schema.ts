@@ -240,8 +240,14 @@ export const insertCertificateSchema = createInsertSchema(certificates).pick({
 // Export types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+
+export type DocumentCategory = typeof documentCategories.$inferSelect;
+export type InsertDocumentCategory = z.infer<typeof insertDocumentCategorySchema>;
+export type DocumentTemplate = typeof documentTemplates.$inferSelect;
+export type InsertDocumentTemplate = z.infer<typeof insertDocumentTemplateSchema>;
 export type Document = typeof documents.$inferSelect;
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
+
 export type IdentityVerification = typeof identityVerifications.$inferSelect;
 export type InsertIdentityVerification = z.infer<typeof insertIdentityVerificationSchema>;
 export type Course = typeof courses.$inferSelect;

@@ -28,6 +28,21 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   getUsersByRole(role: string): Promise<User[]>;
   
+  // Document Category operations
+  createDocumentCategory(category: InsertDocumentCategory): Promise<DocumentCategory>;
+  getDocumentCategory(id: number): Promise<DocumentCategory | undefined>;
+  getAllDocumentCategories(): Promise<DocumentCategory[]>;
+  updateDocumentCategory(id: number, category: Partial<DocumentCategory>): Promise<DocumentCategory | undefined>;
+  deleteDocumentCategory(id: number): Promise<boolean>;
+  
+  // Document Template operations
+  createDocumentTemplate(template: InsertDocumentTemplate): Promise<DocumentTemplate>;
+  getDocumentTemplate(id: number): Promise<DocumentTemplate | undefined>;
+  getDocumentTemplatesByCategory(categoryId: number): Promise<DocumentTemplate[]>;
+  getAllDocumentTemplates(): Promise<DocumentTemplate[]>;
+  updateDocumentTemplate(id: number, template: Partial<DocumentTemplate>): Promise<DocumentTemplate | undefined>;
+  deleteDocumentTemplate(id: number): Promise<boolean>;
+  
   // Document operations
   createDocument(document: InsertDocument): Promise<Document>;
   getDocument(id: number): Promise<Document | undefined>;
@@ -35,6 +50,7 @@ export interface IStorage {
   updateDocument(id: number, document: Partial<Document>): Promise<Document | undefined>;
   getPendingDocuments(): Promise<Document[]>;
   getCertifierDocuments(certifierId: number): Promise<Document[]>;
+  getDocumentsByStatus(status: string): Promise<Document[]>;
   
   // Identity verification operations
   createIdentityVerification(verification: InsertIdentityVerification): Promise<IdentityVerification>;
@@ -83,6 +99,8 @@ export interface IStorage {
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
+  private documentCategories: Map<number, DocumentCategory>;
+  private documentTemplates: Map<number, DocumentTemplate>;
   private documents: Map<number, Document>;
   private identityVerifications: Map<number, IdentityVerification>;
   private courses: Map<number, Course>;
@@ -95,6 +113,8 @@ export class MemStorage implements IStorage {
   private certificates: Map<number, Certificate>;
   
   currentUserId: number;
+  currentDocumentCategoryId: number;
+  currentDocumentTemplateId: number;
   currentDocumentId: number;
   currentVerificationId: number;
   currentCourseId: number;
@@ -109,6 +129,8 @@ export class MemStorage implements IStorage {
 
   constructor() {
     this.users = new Map();
+    this.documentCategories = new Map();
+    this.documentTemplates = new Map();
     this.documents = new Map();
     this.identityVerifications = new Map();
     this.courses = new Map();
@@ -121,6 +143,8 @@ export class MemStorage implements IStorage {
     this.certificates = new Map();
     
     this.currentUserId = 1;
+    this.currentDocumentCategoryId = 1;
+    this.currentDocumentTemplateId = 1;
     this.currentDocumentId = 1;
     this.currentVerificationId = 1;
     this.currentCourseId = 1;
@@ -166,6 +190,94 @@ export class MemStorage implements IStorage {
     return Array.from(this.users.values()).filter(
       (user) => user.role === role,
     );
+  }
+  
+  // Document Category operations
+  async createDocumentCategory(category: InsertDocumentCategory): Promise<DocumentCategory> {
+    const id = this.currentDocumentCategoryId++;
+    const createdAt = new Date();
+    const documentCategory: DocumentCategory = { 
+      ...category, 
+      id, 
+      createdAt 
+    };
+    this.documentCategories.set(id, documentCategory);
+    return documentCategory;
+  }
+  
+  async getDocumentCategory(id: number): Promise<DocumentCategory | undefined> {
+    return this.documentCategories.get(id);
+  }
+  
+  async getAllDocumentCategories(): Promise<DocumentCategory[]> {
+    return Array.from(this.documentCategories.values())
+      .sort((a, b) => a.order - b.order);
+  }
+  
+  async updateDocumentCategory(id: number, category: Partial<DocumentCategory>): Promise<DocumentCategory | undefined> {
+    const existingCategory = this.documentCategories.get(id);
+    if (!existingCategory) return undefined;
+    
+    const updatedCategory = { 
+      ...existingCategory, 
+      ...category
+    };
+    this.documentCategories.set(id, updatedCategory);
+    return updatedCategory;
+  }
+  
+  async deleteDocumentCategory(id: number): Promise<boolean> {
+    return this.documentCategories.delete(id);
+  }
+
+  // Document Template operations
+  async createDocumentTemplate(template: InsertDocumentTemplate): Promise<DocumentTemplate> {
+    const id = this.currentDocumentTemplateId++;
+    const createdAt = new Date();
+    const updatedAt = new Date();
+    const documentTemplate: DocumentTemplate = {
+      ...template,
+      id,
+      createdAt,
+      updatedAt
+    };
+    this.documentTemplates.set(id, documentTemplate);
+    return documentTemplate;
+  }
+  
+  async getDocumentTemplate(id: number): Promise<DocumentTemplate | undefined> {
+    return this.documentTemplates.get(id);
+  }
+  
+  async getDocumentTemplatesByCategory(categoryId: number): Promise<DocumentTemplate[]> {
+    return Array.from(this.documentTemplates.values())
+      .filter(template => template.categoryId === categoryId && template.active);
+  }
+  
+  async getAllDocumentTemplates(): Promise<DocumentTemplate[]> {
+    return Array.from(this.documentTemplates.values());
+  }
+  
+  async updateDocumentTemplate(id: number, template: Partial<DocumentTemplate>): Promise<DocumentTemplate | undefined> {
+    const existingTemplate = this.documentTemplates.get(id);
+    if (!existingTemplate) return undefined;
+    
+    const updatedTemplate = {
+      ...existingTemplate,
+      ...template,
+      updatedAt: new Date()
+    };
+    this.documentTemplates.set(id, updatedTemplate);
+    return updatedTemplate;
+  }
+  
+  async deleteDocumentTemplate(id: number): Promise<boolean> {
+    return this.documentTemplates.delete(id);
+  }
+  
+  async getDocumentsByStatus(status: string): Promise<Document[]> {
+    return Array.from(this.documents.values())
+      .filter(document => document.status === status);
   }
 
   // Document operations
@@ -443,6 +555,85 @@ export class DatabaseStorage implements IStorage {
   async getUsersByRole(role: string): Promise<User[]> {
     return await db.select().from(users).where(eq(users.role, role));
   }
+  
+  // Document Category operations
+  async createDocumentCategory(category: InsertDocumentCategory): Promise<DocumentCategory> {
+    const [documentCategory] = await db
+      .insert(documentCategories)
+      .values(category)
+      .returning();
+    return documentCategory;
+  }
+  
+  async getDocumentCategory(id: number): Promise<DocumentCategory | undefined> {
+    const [category] = await db.select().from(documentCategories).where(eq(documentCategories.id, id));
+    return category || undefined;
+  }
+  
+  async getAllDocumentCategories(): Promise<DocumentCategory[]> {
+    return await db.select().from(documentCategories).orderBy(documentCategories.order);
+  }
+  
+  async updateDocumentCategory(id: number, category: Partial<DocumentCategory>): Promise<DocumentCategory | undefined> {
+    const [updatedCategory] = await db
+      .update(documentCategories)
+      .set(category)
+      .where(eq(documentCategories.id, id))
+      .returning();
+    return updatedCategory || undefined;
+  }
+  
+  async deleteDocumentCategory(id: number): Promise<boolean> {
+    const result = await db
+      .delete(documentCategories)
+      .where(eq(documentCategories.id, id));
+    return result.rowCount > 0;
+  }
+  
+  // Document Template operations
+  async createDocumentTemplate(template: InsertDocumentTemplate): Promise<DocumentTemplate> {
+    const [documentTemplate] = await db
+      .insert(documentTemplates)
+      .values(template)
+      .returning();
+    return documentTemplate;
+  }
+  
+  async getDocumentTemplate(id: number): Promise<DocumentTemplate | undefined> {
+    const [template] = await db.select().from(documentTemplates).where(eq(documentTemplates.id, id));
+    return template || undefined;
+  }
+  
+  async getDocumentTemplatesByCategory(categoryId: number): Promise<DocumentTemplate[]> {
+    return await db.select().from(documentTemplates)
+      .where(and(
+        eq(documentTemplates.categoryId, categoryId),
+        eq(documentTemplates.active, true)
+      ));
+  }
+  
+  async getAllDocumentTemplates(): Promise<DocumentTemplate[]> {
+    return await db.select().from(documentTemplates);
+  }
+  
+  async updateDocumentTemplate(id: number, template: Partial<DocumentTemplate>): Promise<DocumentTemplate | undefined> {
+    const [updatedTemplate] = await db
+      .update(documentTemplates)
+      .set({
+        ...template,
+        updatedAt: new Date()
+      })
+      .where(eq(documentTemplates.id, id))
+      .returning();
+    return updatedTemplate || undefined;
+  }
+  
+  async deleteDocumentTemplate(id: number): Promise<boolean> {
+    const result = await db
+      .delete(documentTemplates)
+      .where(eq(documentTemplates.id, id));
+    return result.rowCount > 0;
+  }
 
   // Document operations
   async createDocument(insertDocument: InsertDocument): Promise<Document> {
@@ -450,7 +641,7 @@ export class DatabaseStorage implements IStorage {
       .insert(documents)
       .values({
         ...insertDocument,
-        status: "pending",
+        status: "draft",
         certifierId: null,
         signatureData: null,
       })
@@ -485,6 +676,10 @@ export class DatabaseStorage implements IStorage {
 
   async getCertifierDocuments(certifierId: number): Promise<Document[]> {
     return await db.select().from(documents).where(eq(documents.certifierId, certifierId));
+  }
+  
+  async getDocumentsByStatus(status: string): Promise<Document[]> {
+    return await db.select().from(documents).where(eq(documents.status, status));
   }
 
   // Identity verification operations
