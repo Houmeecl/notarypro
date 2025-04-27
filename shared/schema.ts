@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, date, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, date, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -21,23 +21,74 @@ export const insertUserSchema = createInsertSchema(users).pick({
   role: true,
 });
 
+// Document Categories
+export const documentCategories = pgTable("document_categories", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  order: integer("order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertDocumentCategorySchema = createInsertSchema(documentCategories).pick({
+  name: true,
+  description: true,
+  order: true,
+});
+
+// Document Templates
+export const documentTemplates = pgTable("document_templates", {
+  id: serial("id").primaryKey(),
+  categoryId: integer("category_id").notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  htmlTemplate: text("html_template").notNull(),
+  price: integer("price").notNull().default(0), // Price in cents
+  formSchema: jsonb("form_schema").notNull(), // JSON schema for the form
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  active: boolean("active").notNull().default(true),
+});
+
+export const insertDocumentTemplateSchema = createInsertSchema(documentTemplates).pick({
+  categoryId: true,
+  name: true,
+  description: true,
+  htmlTemplate: true,
+  price: true,
+  formSchema: true,
+  active: true,
+});
+
 // Documents
 export const documents = pgTable("documents", {
   id: serial("id").primaryKey(),
-  title: text("title").notNull(),
   userId: integer("user_id").notNull(),
-  status: text("status").notNull().default("pending"), // pending, validated, signed, rejected
-  filePath: text("file_path").notNull(),
+  templateId: integer("template_id").notNull(),
+  title: text("title").notNull(),
+  formData: jsonb("form_data").notNull(), // JSON with form data
+  status: text("status").notNull().default("draft"), // draft, pending_payment, pending_identity, pending_signature, pending_certification, certified, rejected
+  filePath: text("file_path"),
+  pdfPath: text("pdf_path"),
+  qrCode: text("qr_code"),
   certifierId: integer("certifier_id"),
+  paymentId: text("payment_id"),
+  paymentAmount: integer("payment_amount"),
+  paymentStatus: text("payment_status"),
   signatureData: text("signature_data"),
+  signatureTimestamp: timestamp("signature_timestamp"),
+  certifierSignatureData: text("certifier_signature_data"),
+  certifierSignatureTimestamp: timestamp("certifier_signature_timestamp"),
+  rejectionReason: text("rejection_reason"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const insertDocumentSchema = createInsertSchema(documents).pick({
-  title: true,
   userId: true,
-  filePath: true,
+  templateId: true,
+  title: true,
+  formData: true,
 });
 
 // Identity Verification
