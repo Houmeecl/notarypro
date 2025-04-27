@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { gamificationService } from "./services/gamification-service";
+import * as gamificationService from "./services/gamification-service";
 import { z } from "zod";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -58,14 +58,13 @@ gamificationRouter.get("/leaderboard/:period", async (req, res) => {
   try {
     const period = req.params.period;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
-    const region = req.query.region as string | undefined;
     
     // Validar el periodo
     if (!["diario", "semanal", "mensual", "total"].includes(period)) {
       return res.status(400).json({ error: "Periodo no válido" });
     }
     
-    const leaderboard = await gamificationService.getLeaderboard(period, limit, region);
+    const leaderboard = await gamificationService.getLeaderboard(period, limit);
     res.status(200).json(leaderboard);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -77,7 +76,7 @@ gamificationRouter.get("/leaderboard/:period", async (req, res) => {
 // Obtener perfil de gamificación del usuario
 gamificationRouter.get("/profile", isAuthenticated, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user!.id;
     const profile = await gamificationService.getUserGameProfile(userId);
     
     if (!profile) {
@@ -93,7 +92,7 @@ gamificationRouter.get("/profile", isAuthenticated, async (req, res) => {
 // Obtener posición del usuario en la tabla de clasificación
 gamificationRouter.get("/my-rank/:period", isAuthenticated, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user!.id;
     const period = req.params.period;
     
     // Validar el periodo
@@ -116,7 +115,7 @@ gamificationRouter.get("/my-rank/:period", isAuthenticated, async (req, res) => 
 // Obtener historial de actividades del usuario
 gamificationRouter.get("/activities", isAuthenticated, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user!.id;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
     
     const activities = await gamificationService.getUserActivities(userId, limit);
@@ -139,7 +138,7 @@ gamificationRouter.post("/process-verification", isAuthenticated, async (req, re
     }
     
     const { verificationCode } = validationResult.data;
-    const userId = req.user.id;
+    const userId = req.user!.id;
     
     const result = await gamificationService.processDocumentVerification(userId, verificationCode);
     res.status(200).json(result);
@@ -151,8 +150,8 @@ gamificationRouter.post("/process-verification", isAuthenticated, async (req, re
 // Obtener recompensas disponibles
 gamificationRouter.get("/rewards", isAuthenticated, async (req, res) => {
   try {
-    const userId = req.user.id;
-    const rewards = await gamificationService.getAvailableRewards(userId);
+    const userId = req.user!.id;
+    const rewards = await gamificationService.getAvailableRewardsForUser(userId);
     res.status(200).json(rewards);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
