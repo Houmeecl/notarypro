@@ -43,7 +43,7 @@ export default function Hero() {
               <a href="#como-funciona">
                 <Button variant="ghost" className="w-full sm:w-auto">
                   Cómo funciona
-                  <Play className="ml-2 h-4 w-4" />
+                  <FileText className="ml-2 h-4 w-4" />
                 </Button>
               </a>
             </div>
@@ -83,13 +83,13 @@ export default function Hero() {
                 title="Cómo funciona NotaryPro"
                 description="Descubre cómo NotaryPro te permite firmar y certificar documentos con validez legal bajo la Ley 19.799. Conoce nuestra plataforma y beneficios."
                 videoType="explanation"
-                triggerLabel="Ver demostración"
+                triggerLabel="Ver guión"
               >
                 <button
                   className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary rounded-full p-5 shadow-lg focus:outline-none"
-                  aria-label="Reproducir video"
+                  aria-label="Ver guión"
                 >
-                  <Play className="h-6 w-6" />
+                  <FileText className="h-6 w-6" />
                 </button>
               </ExplanatoryVideo>
             </div>
@@ -170,10 +170,10 @@ export default function Hero() {
                     title="Programa Vecinos NotaryPro Express"
                     description="Conoce cómo funciona nuestro programa Vecinos NotaryPro Express que permite a tiendas locales, minimarkets y almacenes de barrio convertirse en puntos de certificación."
                     videoType="verification"
-                    triggerLabel="Ver programa"
+                    triggerLabel="Ver guión"
                   >
                     <div className="w-16 h-16 rounded-full bg-primary/80 text-white flex items-center justify-center hover:bg-primary cursor-pointer transition-all">
-                      <Play className="h-8 w-8 ml-1" />
+                      <FileText className="h-8 w-8" />
                     </div>
                   </ExplanatoryVideo>
                 </div>
