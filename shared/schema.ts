@@ -667,3 +667,228 @@ export type MessageTemplate = typeof messageTemplates.$inferSelect;
 export type InsertMessageTemplate = z.infer<typeof insertMessageTemplateSchema>;
 export type AutomationRule = typeof automationRules.$inferSelect;
 export type InsertAutomationRule = z.infer<typeof insertAutomationRuleSchema>;
+
+// ======= GAMIFICACIÓN DE AUTENTICACIÓN DE DOCUMENTOS =======
+
+// Desafíos de verificación de documentos
+export const verificationChallenges = pgTable("verification_challenges", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  points: integer("points").notNull(),
+  requiredActions: jsonb("required_actions").notNull(), // array de acciones necesarias para completar
+  completionCriteria: jsonb("completion_criteria").notNull(), // condiciones para completar el desafío
+  isActive: boolean("is_active").notNull().default(true),
+  difficultyLevel: integer("difficulty_level").notNull().default(1), // 1-5
+  imageUrl: text("image_url"),
+  badgeImage: text("badge_image"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertVerificationChallengeSchema = createInsertSchema(verificationChallenges).pick({
+  title: true,
+  description: true,
+  points: true,
+  requiredActions: true,
+  completionCriteria: true,
+  isActive: true,
+  difficultyLevel: true,
+  imageUrl: true,
+  badgeImage: true,
+});
+
+// Progreso de usuarios en desafíos
+export const userChallengeProgress = pgTable("user_challenge_progress", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  challengeId: integer("challenge_id").notNull(),
+  progress: jsonb("progress").notNull(), // estado actual de progreso
+  isCompleted: boolean("is_completed").notNull().default(false),
+  completedAt: timestamp("completed_at"),
+  awardedPoints: integer("awarded_points"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertUserChallengeProgressSchema = createInsertSchema(userChallengeProgress).pick({
+  userId: true,
+  challengeId: true,
+  progress: true,
+  isCompleted: true,
+  completedAt: true,
+  awardedPoints: true,
+});
+
+// Insignias de verificación
+export const verificationBadges = pgTable("verification_badges", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  imageUrl: text("image_url").notNull(),
+  requiredPoints: integer("required_points").notNull(),
+  tier: text("tier").notNull(), // bronce, plata, oro, platino, diamante
+  isRare: boolean("is_rare").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertVerificationBadgeSchema = createInsertSchema(verificationBadges).pick({
+  name: true,
+  description: true,
+  imageUrl: true,
+  requiredPoints: true,
+  tier: true,
+  isRare: true,
+});
+
+// Insignias conseguidas por usuario
+export const userBadges = pgTable("user_badges", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  badgeId: integer("badge_id").notNull(),
+  earnedAt: timestamp("earned_at").defaultNow(),
+  showcaseOrder: integer("showcase_order"), // posición para mostrar en perfil (NULL si no se muestra)
+});
+
+export const insertUserBadgeSchema = createInsertSchema(userBadges).pick({
+  userId: true,
+  badgeId: true,
+  showcaseOrder: true,
+});
+
+// Perfil de gamificación de usuario
+export const userGameProfiles = pgTable("user_game_profiles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().unique(),
+  totalPoints: integer("total_points").notNull().default(0),
+  level: integer("level").notNull().default(1),
+  consecutiveDays: integer("consecutive_days").notNull().default(0),
+  lastActive: timestamp("last_active").defaultNow(),
+  verificationStreak: integer("verification_streak").notNull().default(0),
+  totalVerifications: integer("total_verifications").notNull().default(0),
+  rank: text("rank").notNull().default("Novato"),
+  preferences: jsonb("preferences"), // preferencias de gamificación
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertUserGameProfileSchema = createInsertSchema(userGameProfiles).pick({
+  userId: true,
+  totalPoints: true,
+  level: true,
+  consecutiveDays: true,
+  lastActive: true,
+  verificationStreak: true,
+  totalVerifications: true,
+  rank: true,
+  preferences: true,
+});
+
+// Historial de actividades de gamificación
+export const gamificationActivities = pgTable("gamification_activities", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  activityType: text("activity_type").notNull(), // verificación, desafío_completado, insignia_ganada, nivel_subido
+  description: text("description").notNull(),
+  pointsEarned: integer("points_earned").notNull().default(0),
+  metadata: jsonb("metadata"), // datos adicionales sobre la actividad
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertGamificationActivitySchema = createInsertSchema(gamificationActivities).pick({
+  userId: true,
+  activityType: true,
+  description: true,
+  pointsEarned: true,
+  metadata: true,
+});
+
+// Tabla de clasificación (leaderboard)
+export const leaderboardEntries = pgTable("leaderboard_entries", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  period: text("period").notNull(), // diario, semanal, mensual, total
+  periodStart: timestamp("period_start").notNull(),
+  periodEnd: timestamp("period_end").notNull(),
+  score: integer("score").notNull().default(0),
+  rank: integer("rank").notNull(),
+  region: text("region"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertLeaderboardEntrySchema = createInsertSchema(leaderboardEntries).pick({
+  userId: true,
+  period: true,
+  periodStart: true,
+  periodEnd: true,
+  score: true,
+  rank: true,
+  region: true,
+});
+
+// Recompensas por logros de gamificación
+export const gamificationRewards = pgTable("gamification_rewards", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  rewardType: text("reward_type").notNull(), // descuento, crédito, físico, virtual
+  value: integer("value"), // valor de la recompensa (si aplica)
+  requiredPoints: integer("required_points").notNull(),
+  code: text("code"), // código de redención
+  expiresAt: timestamp("expires_at"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertGamificationRewardSchema = createInsertSchema(gamificationRewards).pick({
+  name: true,
+  description: true,
+  rewardType: true,
+  value: true,
+  requiredPoints: true,
+  code: true,
+  expiresAt: true,
+  isActive: true,
+});
+
+// Recompensas reclamadas por usuarios
+export const userClaimedRewards = pgTable("user_claimed_rewards", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  rewardId: integer("reward_id").notNull(),
+  claimedAt: timestamp("claimed_at").defaultNow(),
+  status: text("status").notNull().default("pending"), // pending, processed, delivered, expired
+  redemptionCode: text("redemption_code"),
+  expiresAt: timestamp("expires_at"),
+  processedAt: timestamp("processed_at"),
+});
+
+export const insertUserClaimedRewardSchema = createInsertSchema(userClaimedRewards).pick({
+  userId: true,
+  rewardId: true,
+  status: true,
+  redemptionCode: true,
+  expiresAt: true,
+  processedAt: true,
+});
+
+// Tipos de gamificación
+export type VerificationChallenge = typeof verificationChallenges.$inferSelect;
+export type InsertVerificationChallenge = z.infer<typeof insertVerificationChallengeSchema>;
+export type UserChallengeProgress = typeof userChallengeProgress.$inferSelect;
+export type InsertUserChallengeProgress = z.infer<typeof insertUserChallengeProgressSchema>;
+export type VerificationBadge = typeof verificationBadges.$inferSelect;
+export type InsertVerificationBadge = z.infer<typeof insertVerificationBadgeSchema>;
+export type UserBadge = typeof userBadges.$inferSelect;
+export type InsertUserBadge = z.infer<typeof insertUserBadgeSchema>;
+export type UserGameProfile = typeof userGameProfiles.$inferSelect;
+export type InsertUserGameProfile = z.infer<typeof insertUserGameProfileSchema>;
+export type GamificationActivity = typeof gamificationActivities.$inferSelect;
+export type InsertGamificationActivity = z.infer<typeof insertGamificationActivitySchema>;
+export type LeaderboardEntry = typeof leaderboardEntries.$inferSelect;
+export type InsertLeaderboardEntry = z.infer<typeof insertLeaderboardEntrySchema>;
+export type GamificationReward = typeof gamificationRewards.$inferSelect;
+export type InsertGamificationReward = z.infer<typeof insertGamificationRewardSchema>;
+export type UserClaimedReward = typeof userClaimedRewards.$inferSelect;
+export type InsertUserClaimedReward = z.infer<typeof insertUserClaimedRewardSchema>;

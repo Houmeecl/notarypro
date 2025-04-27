@@ -42,6 +42,7 @@ import { dialogflowService } from "./services/dialogflow-service";
 import { posService } from "./services/pos-service";
 import { WebSocketServer } from "ws";
 import { createSuperAdmin } from "./admin/seed-admin";
+import { gamificationRouter } from "./gamification-routes";
 
 // Ensure these directories exist
 const uploadsDir = path.join(process.cwd(), "uploads");
