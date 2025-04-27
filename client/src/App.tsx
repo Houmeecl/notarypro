@@ -41,6 +41,10 @@ import DocumentsPage from "@/pages/documents";
 import PartnersPublicPage from "@/pages/partners/public-page";
 import PartnerRegistrationForm from "@/pages/partners/registration-form";
 import PartnerLogin from "@/pages/partners/partner-login";
+import PosIntegrationPage from "@/pages/partners/pos-integration";
+
+// Admin POS management
+import PosManagementPage from "@/pages/admin/pos-management";
 
 function Router() {
   return (
@@ -126,6 +130,18 @@ function Router() {
       <Route path="/partners/public-page" component={PartnersPublicPage} />
       <Route path="/partners/registration-form" component={PartnerRegistrationForm} />
       <Route path="/partners/partner-login" component={PartnerLogin} />
+      <ProtectedRoute 
+        path="/partners/pos-integration" 
+        component={PosIntegrationPage} 
+        allowedRoles={["partner"]} 
+      />
+      
+      {/* Admin POS Management */}
+      <ProtectedRoute 
+        path="/admin/pos-management" 
+        component={PosManagementPage} 
+        allowedRoles={["admin"]} 
+      />
       
       {/* Videocall demo */}
       <ProtectedRoute 
