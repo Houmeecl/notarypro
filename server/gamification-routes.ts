@@ -147,6 +147,28 @@ gamificationRouter.post("/process-verification", isAuthenticated, async (req, re
   }
 });
 
+// Endpoint alternativo de verificación para compatibilidad con el frontend
+gamificationRouter.post("/verify-document", isAuthenticated, async (req, res) => {
+  try {
+    const schema = z.object({
+      code: z.string().min(1)
+    });
+    
+    const validationResult = schema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).json({ error: "Código de verificación requerido" });
+    }
+    
+    const { code } = validationResult.data;
+    const userId = req.user!.id;
+    
+    const result = await gamificationService.processDocumentVerification(userId, code);
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Obtener recompensas disponibles
 gamificationRouter.get("/rewards", isAuthenticated, async (req, res) => {
   try {
@@ -171,7 +193,7 @@ gamificationRouter.post("/claim-reward", isAuthenticated, async (req, res) => {
     }
     
     const { rewardId } = validationResult.data;
-    const userId = req.user.id;
+    const userId = req.user!.id;
     
     const result = await gamificationService.claimReward(userId, rewardId);
     res.status(200).json(result);

@@ -890,7 +890,12 @@ export async function processDocumentVerification(userId: number, code: string) 
  */
 export async function getAvailableRewardsForUser(userId: number) {
   const profile = await getUserGameProfile(userId);
-  const rewards = await getAvailableRewards();
+  // Obtener todas las recompensas activas
+  const rewards = await db
+    .select()
+    .from(gamificationRewards)
+    .where(eq(gamificationRewards.isActive, true))
+    .orderBy(gamificationRewards.requiredPoints);
   
   // Añadir información sobre si el usuario puede reclamar cada recompensa
   const rewardsWithAvailability = rewards.map(reward => ({

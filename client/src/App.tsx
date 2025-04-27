@@ -25,6 +25,7 @@ import UneteAlEquipo from "@/pages/unete-al-equipo";
 import ConversorPresencialOnline from "@/pages/conversor-presencial-online";
 import TemplateAdminPage from "@/pages/template-admin";
 import VerificarDocumento from "@/pages/verificar-documento";
+import DocumentVerificationGame from "@/pages/document-verification-game";
 import VideocallInterfaceDemo from "@/pages/videocall-interface-demo";
 import CursoCertificador from "@/pages/curso-certificador";
 import VecinosExpress from "@/pages/vecinos-express";
