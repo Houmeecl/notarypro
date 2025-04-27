@@ -11,7 +11,9 @@ import {
   quizzes, type Quiz, type InsertQuiz,
   quizQuestions, type QuizQuestion, type InsertQuizQuestion,
   quizAttempts, type QuizAttempt, type InsertQuizAttempt,
-  certificates, type Certificate, type InsertCertificate
+  certificates, type Certificate, type InsertCertificate,
+  videoCallServices, type VideoCallService, type InsertVideoCallService,
+  videoCallSessions, type VideoCallSession, type InsertVideoCallSession
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
@@ -96,6 +98,22 @@ export interface IStorage {
   getUserCertificates(userId: number): Promise<Certificate[]>;
   verifyCertificate(certificateNumber: string): Promise<Certificate | undefined>;
   
+  // Video Call Service operations
+  createVideoCallService(service: InsertVideoCallService): Promise<VideoCallService>;
+  getVideoCallService(id: number): Promise<VideoCallService | undefined>;
+  getAllVideoCallServices(): Promise<VideoCallService[]>;
+  getActiveVideoCallServices(): Promise<VideoCallService[]>;
+  updateVideoCallService(id: number, service: Partial<VideoCallService>): Promise<VideoCallService | undefined>;
+  deleteVideoCallService(id: number): Promise<boolean>;
+  
+  // Video Call Session operations
+  createVideoCallSession(session: InsertVideoCallSession): Promise<VideoCallSession>;
+  getVideoCallSession(id: number): Promise<VideoCallSession | undefined>;
+  getUserVideoCallSessions(userId: number): Promise<VideoCallSession[]>;
+  getCertifierVideoCallSessions(certifierId: number): Promise<VideoCallSession[]>;
+  getVideoCallSessionsByStatus(status: string): Promise<VideoCallSession[]>;
+  updateVideoCallSession(id: number, session: Partial<VideoCallSession>): Promise<VideoCallSession | undefined>;
+  
   sessionStore: session.Store;
 }
 
@@ -113,6 +131,8 @@ export class MemStorage implements IStorage {
   private quizQuestions: Map<number, QuizQuestion>;
   private quizAttempts: Map<number, QuizAttempt>;
   private certificates: Map<number, Certificate>;
+  private videoCallServices: Map<number, VideoCallService>;
+  private videoCallSessions: Map<number, VideoCallSession>;
   
   currentUserId: number;
   currentDocumentCategoryId: number;
@@ -127,6 +147,8 @@ export class MemStorage implements IStorage {
   currentQuestionId: number;
   currentAttemptId: number;
   currentCertificateId: number;
+  currentVideoCallServiceId: number;
+  currentVideoCallSessionId: number;
   sessionStore: session.Store;
 
   constructor() {

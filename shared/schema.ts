@@ -237,6 +237,51 @@ export const insertCertificateSchema = createInsertSchema(certificates).pick({
   certificateNumber: true,
 });
 
+// Video Call Services
+export const videoCallServices = pgTable("video_call_services", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  price: integer("price").notNull(), // Price in cents
+  duration: integer("duration").notNull(), // Duration in minutes
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertVideoCallServiceSchema = createInsertSchema(videoCallServices).pick({
+  name: true,
+  description: true,
+  price: true,
+  duration: true,
+  active: true,
+});
+
+// Video Call Sessions
+export const videoCallSessions = pgTable("video_call_sessions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  serviceId: integer("service_id").notNull(),
+  certifierId: integer("certifier_id"),
+  scheduledAt: timestamp("scheduled_at").notNull(),
+  status: text("status").notNull().default("pending_payment"), // pending_payment, scheduled, completed, cancelled
+  meetingUrl: text("meeting_url"),
+  meetingId: text("meeting_id"),
+  meetingPassword: text("meeting_password"),
+  paymentId: text("payment_id"),
+  paymentAmount: integer("payment_amount"),
+  paymentStatus: text("payment_status"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertVideoCallSessionSchema = createInsertSchema(videoCallSessions).pick({
+  userId: true,
+  serviceId: true,
+  scheduledAt: true,
+});
+
 // Export types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -266,3 +311,7 @@ export type QuizAttempt = typeof quizAttempts.$inferSelect;
 export type InsertQuizAttempt = z.infer<typeof insertQuizAttemptSchema>;
 export type Certificate = typeof certificates.$inferSelect;
 export type InsertCertificate = z.infer<typeof insertCertificateSchema>;
+export type VideoCallService = typeof videoCallServices.$inferSelect;
+export type InsertVideoCallService = z.infer<typeof insertVideoCallServiceSchema>;
+export type VideoCallSession = typeof videoCallSessions.$inferSelect;
+export type InsertVideoCallSession = z.infer<typeof insertVideoCallSessionSchema>;
