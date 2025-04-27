@@ -469,6 +469,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Verificar que el documento esté firmado
+      if (document.status !== "signed") {
+        return res.status(400).json({
+          verified: false,
+          message: "El documento existe pero aún no ha sido firmado oficialmente."
+        });
+      }
+      
       // Obtener datos del firmante
       const user = await storage.getUser(document.userId);
       
