@@ -21,7 +21,7 @@ export default function Header() {
             <Link href="/" className="flex items-center">
               <div className="flex items-center">
                 <img 
-                  src="/assets/logo.png" 
+                  src="/assets/nuevo-logo.png" 
                   alt="NotaryPro" 
                   className="h-10 w-auto"
                 />

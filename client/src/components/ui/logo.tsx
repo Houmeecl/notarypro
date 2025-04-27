@@ -18,7 +18,7 @@ export function Logo({
   linkTo = '/',
 }: LogoProps) {
   // Importar las imágenes de los logos
-  const logoImage = '/assets/logo.png';
+  const logoImage = '/assets/nuevo-logo.png';
   
   // Definir tamaños de logo según el parámetro size
   const logoSizes = {
