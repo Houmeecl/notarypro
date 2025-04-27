@@ -123,20 +123,58 @@ export default function ConversorPresencialOnline() {
           <div className="bg-primary/5 rounded-lg p-8 text-center">
             <h2 className="text-2xl font-bold mb-4">¿Listo para certificar sus documentos online?</h2>
             <p className="text-gray-700 mb-6 max-w-xl mx-auto">
-              Una vez que haya convertido su documento, puede programar una sesión de certificación por videollamada 
-              con uno de nuestros certificadores profesionales autorizados.
+              Una vez que haya convertido su documento, puede colaborar con uno de nuestros abogados para finalizarlo 
+              y luego programar una sesión de certificación por videollamada.
             </p>
-            <div className="flex flex-wrap gap-3 justify-center">
-              <Button asChild>
-                <Link href="/certificacion-por-video">
-                  Programar videollamada
-                </Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/notarize-online">
-                  Ver planes y precios
-                </Link>
-              </Button>
+            <div className="space-y-4">
+              <div className="flex flex-col gap-2 max-w-lg mx-auto bg-white p-4 rounded-md border border-gray-100">
+                <h3 className="font-semibold text-lg">Proceso de certificación online:</h3>
+                <ol className="text-left text-sm space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="bg-primary/10 h-5 w-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-primary text-xs font-bold">1</span>
+                    </span>
+                    <span>Redacte su documento con ayuda de nuestros abogados especializados</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-primary/10 h-5 w-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-primary text-xs font-bold">2</span>
+                    </span>
+                    <span>Realice el pago correspondiente según el tipo de documento</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-primary/10 h-5 w-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-primary text-xs font-bold">3</span>
+                    </span>
+                    <span>Agende una videollamada con un certificador autorizado</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-primary/10 h-5 w-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-primary text-xs font-bold">4</span>
+                    </span>
+                    <span>Reciba un enlace único para su sesión de certificación</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-primary/10 h-5 w-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-primary text-xs font-bold">5</span>
+                    </span>
+                    <span>Conéctese a la sesión donde se activarán ambas cámaras para la verificación de identidad</span>
+                  </li>
+                </ol>
+              </div>
+              
+              <div className="flex flex-wrap gap-3 justify-center mt-4">
+                <Button asChild>
+                  <Link href="/certificacion-por-video">
+                    Programar videollamada
+                  </Link>
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link href="/notarize-online">
+                    Ver planes y precios
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
