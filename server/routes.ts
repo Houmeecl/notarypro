@@ -8,6 +8,8 @@ import fs from "fs";
 import path from "path";
 import { 
   insertDocumentSchema, 
+  insertDocumentCategorySchema,
+  insertDocumentTemplateSchema,
   insertIdentityVerificationSchema,
   insertCourseSchema,
   insertCourseModuleSchema,
@@ -232,6 +234,158 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       res.status(200).json(updatedVerification);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Document categories routes
+  app.post("/api/document-categories", isAdmin, async (req, res) => {
+    try {
+      const validatedData = insertDocumentCategorySchema.parse(req.body);
+      const category = await storage.createDocumentCategory(validatedData);
+      res.status(201).json(category);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/document-categories", async (req, res) => {
+    try {
+      const categories = await storage.getAllDocumentCategories();
+      res.status(200).json(categories);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/document-categories/:id", async (req, res) => {
+    try {
+      const categoryId = parseInt(req.params.id);
+      const category = await storage.getDocumentCategory(categoryId);
+      
+      if (!category) {
+        return res.status(404).json({ message: "Document category not found" });
+      }
+      
+      res.status(200).json(category);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.patch("/api/document-categories/:id", isAdmin, async (req, res) => {
+    try {
+      const categoryId = parseInt(req.params.id);
+      const category = await storage.getDocumentCategory(categoryId);
+      
+      if (!category) {
+        return res.status(404).json({ message: "Document category not found" });
+      }
+      
+      const updatedCategory = await storage.updateDocumentCategory(categoryId, req.body);
+      res.status(200).json(updatedCategory);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.delete("/api/document-categories/:id", isAdmin, async (req, res) => {
+    try {
+      const categoryId = parseInt(req.params.id);
+      const category = await storage.getDocumentCategory(categoryId);
+      
+      if (!category) {
+        return res.status(404).json({ message: "Document category not found" });
+      }
+      
+      const deleted = await storage.deleteDocumentCategory(categoryId);
+      if (deleted) {
+        res.status(204).send();
+      } else {
+        res.status(500).json({ message: "Failed to delete category" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Document templates routes
+  app.post("/api/document-templates", isAdmin, async (req, res) => {
+    try {
+      const validatedData = insertDocumentTemplateSchema.parse(req.body);
+      const template = await storage.createDocumentTemplate(validatedData);
+      res.status(201).json(template);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/document-templates", async (req, res) => {
+    try {
+      const templates = await storage.getAllDocumentTemplates();
+      res.status(200).json(templates);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/document-templates/:id", async (req, res) => {
+    try {
+      const templateId = parseInt(req.params.id);
+      const template = await storage.getDocumentTemplate(templateId);
+      
+      if (!template) {
+        return res.status(404).json({ message: "Document template not found" });
+      }
+      
+      res.status(200).json(template);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/document-categories/:categoryId/templates", async (req, res) => {
+    try {
+      const categoryId = parseInt(req.params.categoryId);
+      const templates = await storage.getDocumentTemplatesByCategory(categoryId);
+      res.status(200).json(templates);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.patch("/api/document-templates/:id", isAdmin, async (req, res) => {
+    try {
+      const templateId = parseInt(req.params.id);
+      const template = await storage.getDocumentTemplate(templateId);
+      
+      if (!template) {
+        return res.status(404).json({ message: "Document template not found" });
+      }
+      
+      const updatedTemplate = await storage.updateDocumentTemplate(templateId, req.body);
+      res.status(200).json(updatedTemplate);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.delete("/api/document-templates/:id", isAdmin, async (req, res) => {
+    try {
+      const templateId = parseInt(req.params.id);
+      const template = await storage.getDocumentTemplate(templateId);
+      
+      if (!template) {
+        return res.status(404).json({ message: "Document template not found" });
+      }
+      
+      const deleted = await storage.deleteDocumentTemplate(templateId);
+      if (deleted) {
+        res.status(204).send();
+      } else {
+        res.status(500).json({ message: "Failed to delete template" });
+      }
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
