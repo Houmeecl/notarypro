@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Play, ArrowRight } from "lucide-react";
+import { Play, ArrowRight, Video } from "lucide-react";
+import { ExplanatoryVideo } from "@/components/ui/explanatory-video";
 
 export default function Hero() {
   return (
@@ -61,12 +62,20 @@ export default function Hero() {
                 className="w-full h-auto object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-              <button
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary rounded-full p-5 shadow-lg focus:outline-none"
-                aria-label="Reproducir video"
+              
+              <ExplanatoryVideo
+                title="¿Cómo funciona nuestra plataforma?"
+                description="Descubra cómo nuestra plataforma le permite firmar documentos con validez legal en simples pasos. Aprenda sobre la verificación de identidad, firmas electrónicas y más."
+                videoType="explanation"
+                triggerLabel="Ver demostración"
               >
-                <Play className="h-6 w-6" />
-              </button>
+                <button
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary rounded-full p-5 shadow-lg focus:outline-none"
+                  aria-label="Reproducir video"
+                >
+                  <Play className="h-6 w-6" />
+                </button>
+              </ExplanatoryVideo>
             </div>
           </div>
         </div>

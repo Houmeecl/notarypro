@@ -19,8 +19,11 @@ import {
   Globe, 
   LucideMonitor, 
   UserCheck, 
-  CalendarClock 
+  CalendarClock,
+  Info,
+  FileQuestion
 } from "lucide-react";
+import { ExplanatoryVideo } from "@/components/ui/explanatory-video";
 
 export default function CertificacionPorVideo() {
   const [selectedTab, setSelectedTab] = useState("individual");
