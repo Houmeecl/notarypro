@@ -29,6 +29,7 @@ import VideocallInterfaceDemo from "@/pages/videocall-interface-demo";
 import CursoCertificador from "@/pages/curso-certificador";
 import VecinosExpress from "@/pages/vecinos-express";
 import PartnerApplications from "@/pages/admin/partner-applications";
+import ServiceSelectionPage from "@/pages/service-selection";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -125,6 +126,7 @@ function Router() {
       <Route path="/verificar-documento/:code" component={VerificarDocumento} />
       <Route path="/curso-certificador" component={CursoCertificador} />
       <Route path="/vecinos-express" component={VecinosExpress} />
+      <Route path="/service-selection" component={ServiceSelectionPage} />
       
       {/* Partner pages */}
       <Route path="/partners/public-page" component={PartnersPublicPage} />

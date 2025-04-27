@@ -25,14 +25,20 @@ export default function Hero() {
               Rápido, seguro y desde cualquier dispositivo.
             </p>
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-              <Link href="/auth">
+              <Link href="/service-selection">
                 <Button className="w-full sm:w-auto bg-primary hover:bg-red-700 text-white">
                   Comenzar ahora
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <a href="#como-funciona">
+              <Link href="/auth">
                 <Button variant="outline" className="w-full sm:w-auto">
+                  Iniciar sesión
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <a href="#como-funciona">
+                <Button variant="ghost" className="w-full sm:w-auto">
                   Cómo funciona
                   <Play className="ml-2 h-4 w-4" />
                 </Button>
