@@ -99,9 +99,11 @@ export default function Footer() {
             <h3 className="text-lg font-semibold text-secondary mb-4">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">
-                  Términos y Condiciones
-                </a>
+                <Link href="/aviso-legal">
+                  <a className="text-gray-600 hover:text-primary transition-colors duration-150">
+                    Aviso Legal
+                  </a>
+                </Link>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">

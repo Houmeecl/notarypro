@@ -16,6 +16,7 @@ import CertifierDashboard from "@/pages/certifier-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
 import CoursePage from "@/pages/course-page";
 import DocumentSign from "@/pages/document-sign";
+import AvisoLegal from "@/pages/aviso-legal";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -81,6 +82,9 @@ function Router() {
         component={CoursePage} 
         allowedRoles={["user", "certifier", "admin"]} 
       />
+      
+      {/* Public pages */}
+      <Route path="/aviso-legal" component={AvisoLegal} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
