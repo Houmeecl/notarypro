@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Play, ArrowRight, Video } from "lucide-react";
+import { Play, ArrowRight, Video, FileText } from "lucide-react";
 import { ExplanatoryVideo } from "@/components/ui/explanatory-video";
 import logoImg from "@/assets/logo12582620.png";
 
@@ -116,10 +116,10 @@ export default function Hero() {
                     title="Cómo funciona NotaryPro"
                     description="Conoce todos los pasos para utilizar NotaryPro: desde la creación de tu cuenta hasta la firma y verificación de documentos."
                     videoType="explanation"
-                    triggerLabel="Ver explicación"
+                    triggerLabel="Ver guión"
                   >
                     <div className="w-16 h-16 rounded-full bg-primary/80 text-white flex items-center justify-center hover:bg-primary cursor-pointer transition-all">
-                      <Play className="h-8 w-8 ml-1" />
+                      <FileText className="h-8 w-8" />
                     </div>
                   </ExplanatoryVideo>
                 </div>
@@ -143,10 +143,10 @@ export default function Hero() {
                     title="NotaryPro para Empresas"
                     description="Dos ejecutivos discuten cómo implementar NotaryPro en su empresa y los beneficios para el negocio."
                     videoType="tutorial"
-                    triggerLabel="Ver discusión"
+                    triggerLabel="Ver guión"
                   >
                     <div className="w-16 h-16 rounded-full bg-primary/80 text-white flex items-center justify-center hover:bg-primary cursor-pointer transition-all">
-                      <Play className="h-8 w-8 ml-1" />
+                      <FileText className="h-8 w-8" />
                     </div>
                   </ExplanatoryVideo>
                 </div>
