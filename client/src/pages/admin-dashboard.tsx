@@ -27,6 +27,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useMutation } from "@tanstack/react-query";
 import { 
   Users, 
   FileText, 
@@ -45,8 +48,31 @@ import { User, Document, Course } from "@shared/schema";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // Mutation for updating course price
+  const updateCoursePriceMutation = useMutation({
+    mutationFn: async ({ courseId, price }: { courseId: number, price: number }) => {
+      const res = await apiRequest("PATCH", `/api/courses/${courseId}`, { price });
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/courses"] });
+      toast({
+        title: "Precio actualizado",
+        description: `El precio del curso ha sido actualizado a $${data.price / 100}.`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error al actualizar precio",
+        description: "No se pudo actualizar el precio del curso. Por favor, intente de nuevo.",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Fetch users
   const { data: users, isLoading: isUsersLoading } = useQuery<User[]>({
@@ -442,9 +468,21 @@ export default function AdminDashboard() {
                               </TableCell>
                               <TableCell className="text-right">
                                 <div className="flex justify-end gap-2">
-                                  <Button size="sm" variant="outline">
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => {
+                                      const price = prompt(`Actualizar precio para: ${course.title}\nPrecio actual: $${course.price / 100}\n\nIngrese el nuevo precio en pesos chilenos:`, (course.price / 100).toString());
+                                      if (price && !isNaN(Number(price))) {
+                                        updateCoursePriceMutation.mutate({ 
+                                          courseId: course.id, 
+                                          price: Math.round(Number(price) * 100) 
+                                        });
+                                      }
+                                    }}
+                                  >
                                     <Pencil className="h-4 w-4 mr-1" />
-                                    Editar
+                                    Editar Precio
                                   </Button>
                                   <Button size="sm">
                                     Ver Contenido
