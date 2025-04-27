@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Play, Pause, X, Video, Info } from "lucide-react";
+import { Play, Pause, X, Video, Info, FileText, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import videoThumbnails from "@/lib/video-thumbnails";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import videoThumbnails, { videoScripts } from "@/lib/video-thumbnails";
 
 interface ExplanatoryVideoProps {
   title: string;
@@ -31,9 +31,16 @@ const videoTitles = {
 };
 
 const videoDescriptions = {
-  explanation: "Descubre cómo nuestra plataforma te permite firmar documentos con validez legal siguiendo la Ley 19.799. Conoce nuestras funcionalidades principales y beneficios.",
-  tutorial: "Guía paso a paso para firmar documentos en nuestra plataforma. Aprende a subir documentos, posicionar tu firma y compartir de forma segura.",
-  verification: "Conoce cómo funciona nuestro proceso de verificación de identidad para garantizar la validez legal de tus documentos y cumplir con la normativa chilena."
+  explanation: "Descubre cómo NotaryPro te permite firmar y certificar documentos con validez legal bajo la Ley 19.799. Conoce nuestra plataforma, beneficios y red de Vecinos Express para una gestión documental simple, segura y legal en todo Chile.",
+  tutorial: "Aprende paso a paso cómo subir, preparar y firmar documentos digitales en nuestra plataforma. Este tutorial te muestra el proceso completo desde la carga del documento hasta la firma con validez legal y cómo compartirlo con otras personas.",
+  verification: "La verificación de identidad es fundamental para la validez legal de tus documentos. Conoce nuestros tres métodos de verificación: por videollamada con certificador profesional, mediante Clave Única del Estado o con verificación biométrica automatizada."
+};
+
+// Mensajes que se muestran al finalizar el video
+const videoCompletionMessages = {
+  explanation: "Ya conoces NotaryPro. ¡Prueba nuestra plataforma para experimentar todas sus ventajas!",
+  tutorial: "¡Felicidades! Ahora sabes cómo firmar documentos en NotaryPro. ¿Listo para comenzar?",
+  verification: "Ahora entiendes nuestro proceso de verificación seguro. Tu identidad está protegida con NotaryPro."
 };
 
 export const ExplanatoryVideo: React.FC<ExplanatoryVideoProps> = ({
@@ -139,6 +146,27 @@ export const ExplanatoryVideo: React.FC<ExplanatoryVideoProps> = ({
             </div>
           </div>
         </div>
+        
+        <DialogFooter className="mt-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full text-sm gap-4">
+            <div className="text-muted-foreground flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Duración estimada: {videoType === "tutorial" ? "2:30" : (videoType === "verification" ? "2:15" : "2:00")} min
+            </div>
+            
+            <a 
+              href={videoScripts[videoType]} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
+            >
+              <Button variant="outline" size="sm" className="gap-2">
+                <Download className="h-4 w-4" />
+                Descargar guión
+              </Button>
+            </a>
+          </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
