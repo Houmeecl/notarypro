@@ -19,7 +19,11 @@ import {
   insertQuizQuestionSchema,
   insertQuizAttemptSchema,
   insertAnalyticsEventSchema,
-  insertCertificateSchema
+  insertCertificateSchema,
+  insertPartnerSchema,
+  insertPartnerBankDetailsSchema,
+  insertPartnerSaleSchema,
+  insertPartnerPaymentSchema
 } from "@shared/schema";
 import { generateVerificationCode, generateQRCodeSVG, generateSignatureData } from "@shared/utils/verification-code";
 

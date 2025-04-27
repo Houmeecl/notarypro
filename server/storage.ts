@@ -14,7 +14,11 @@ import {
   certificates, type Certificate, type InsertCertificate,
   videoCallServices, type VideoCallService, type InsertVideoCallService,
   videoCallSessions, type VideoCallSession, type InsertVideoCallSession,
-  analyticsEvents, type AnalyticsEvent, type InsertAnalyticsEvent
+  analyticsEvents, type AnalyticsEvent, type InsertAnalyticsEvent,
+  partners, type Partner, type InsertPartner,
+  partnerBankDetails, type PartnerBankDetails, type InsertPartnerBankDetails,
+  partnerSales, type PartnerSale, type InsertPartnerSale,
+  partnerPayments, type PartnerPayment, type InsertPartnerPayment
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
@@ -59,6 +63,42 @@ export interface IStorage {
     courseRevenue: number;
     videoCallRevenue: number;
   }>;
+  
+  // Partner operations
+  createPartner(partner: InsertPartner): Promise<Partner>;
+  getPartner(id: number): Promise<Partner | undefined>;
+  getPartnerByEmail(email: string): Promise<Partner | undefined>;
+  getPartnerByUserId(userId: number): Promise<Partner | undefined>;
+  updatePartner(id: number, partner: Partial<Partner>): Promise<Partner | undefined>;
+  getAllPartners(): Promise<Partner[]>;
+  getPartnersByStatus(status: string): Promise<Partner[]>;
+  getPartnersByRegion(region: string): Promise<Partner[]>;
+  getPartnersByCommune(commune: string): Promise<Partner[]>;
+  
+  // Partner Bank Details operations
+  createPartnerBankDetails(bankDetails: InsertPartnerBankDetails): Promise<PartnerBankDetails>;
+  getPartnerBankDetails(partnerId: number): Promise<PartnerBankDetails | undefined>;
+  updatePartnerBankDetails(id: number, bankDetails: Partial<PartnerBankDetails>): Promise<PartnerBankDetails | undefined>;
+  
+  // Partner Sales operations
+  createPartnerSale(sale: InsertPartnerSale): Promise<PartnerSale>;
+  getPartnerSale(id: number): Promise<PartnerSale | undefined>;
+  getPartnerSales(partnerId: number, options?: { status?: string }): Promise<PartnerSale[]>;
+  updatePartnerSale(id: number, sale: Partial<PartnerSale>): Promise<PartnerSale | undefined>;
+  getPartnerSalesStats(partnerId: number): Promise<{
+    totalSales: number;
+    pendingCommission: number;
+    availableCommission: number;
+    paidCommission: number;
+    totalCommission: number;
+    salesCount: number;
+  }>;
+  
+  // Partner Payments operations
+  createPartnerPayment(payment: InsertPartnerPayment): Promise<PartnerPayment>;
+  getPartnerPayment(id: number): Promise<PartnerPayment | undefined>;
+  getPartnerPayments(partnerId: number): Promise<PartnerPayment[]>;
+  getPartnerPaymentsTotal(partnerId: number): Promise<number>;
   
   // User operations
   getUser(id: number): Promise<User | undefined>;
@@ -204,6 +244,10 @@ export class MemStorage implements IStorage {
   private videoCallServices: Map<number, VideoCallService>;
   private videoCallSessions: Map<number, VideoCallSession>;
   private analyticsEvents: Map<number, AnalyticsEvent>;
+  private partners: Map<number, Partner>;
+  private partnerBankDetails: Map<number, PartnerBankDetails>;
+  private partnerSales: Map<number, PartnerSale>;
+  private partnerPayments: Map<number, PartnerPayment>;
   currentAnalyticsEventId: number;
   
   currentUserId: number;
@@ -221,6 +265,10 @@ export class MemStorage implements IStorage {
   currentCertificateId: number;
   currentVideoCallServiceId: number;
   currentVideoCallSessionId: number;
+  currentPartnerId: number;
+  currentPartnerBankDetailsId: number;
+  currentPartnerSaleId: number;
+  currentPartnerPaymentId: number;
   sessionStore: session.Store;
 
   constructor() {
@@ -240,6 +288,10 @@ export class MemStorage implements IStorage {
     this.videoCallServices = new Map();
     this.videoCallSessions = new Map();
     this.analyticsEvents = new Map();
+    this.partners = new Map();
+    this.partnerBankDetails = new Map();
+    this.partnerSales = new Map();
+    this.partnerPayments = new Map();
     
     this.currentUserId = 1;
     this.currentDocumentCategoryId = 1;
@@ -257,6 +309,10 @@ export class MemStorage implements IStorage {
     this.currentVideoCallServiceId = 1;
     this.currentVideoCallSessionId = 1;
     this.currentAnalyticsEventId = 1;
+    this.currentPartnerId = 1;
+    this.currentPartnerBankDetailsId = 1;
+    this.currentPartnerSaleId = 1;
+    this.currentPartnerPaymentId = 1;
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000,
@@ -737,6 +793,253 @@ export class MemStorage implements IStorage {
     return updated;
   }
 
+  // Partner operations
+  async createPartner(insertPartner: InsertPartner): Promise<Partner> {
+    const id = this.currentPartnerId++;
+    const createdAt = new Date();
+    const updatedAt = new Date();
+    const userId = this.currentUserId++; // Creamos un usuario para el partner
+    
+    // Crear usuario asociado para el partner
+    const user: User = {
+      id: userId,
+      username: insertPartner.email.split('@')[0] + '-partner',
+      password: Math.random().toString(36).substring(2, 12), // Contraseña temporal
+      email: insertPartner.email,
+      fullName: insertPartner.managerName,
+      role: 'partner',
+      createdAt
+    };
+    this.users.set(userId, user);
+    
+    // Crear el partner
+    const partner: Partner = {
+      ...insertPartner,
+      id,
+      userId,
+      status: 'pending',
+      notes: null,
+      createdAt,
+      updatedAt
+    };
+    this.partners.set(id, partner);
+    return partner;
+  }
+  
+  async getPartner(id: number): Promise<Partner | undefined> {
+    return this.partners.get(id);
+  }
+  
+  async getPartnerByEmail(email: string): Promise<Partner | undefined> {
+    return Array.from(this.partners.values()).find(
+      (partner) => partner.email.toLowerCase() === email.toLowerCase()
+    );
+  }
+  
+  async getPartnerByUserId(userId: number): Promise<Partner | undefined> {
+    return Array.from(this.partners.values()).find(
+      (partner) => partner.userId === userId
+    );
+  }
+  
+  async updatePartner(id: number, partner: Partial<Partner>): Promise<Partner | undefined> {
+    const existingPartner = this.partners.get(id);
+    if (!existingPartner) return undefined;
+    
+    const updatedPartner = {
+      ...existingPartner,
+      ...partner,
+      updatedAt: new Date()
+    };
+    this.partners.set(id, updatedPartner);
+    return updatedPartner;
+  }
+  
+  async getAllPartners(): Promise<Partner[]> {
+    return Array.from(this.partners.values());
+  }
+  
+  async getPartnersByStatus(status: string): Promise<Partner[]> {
+    return Array.from(this.partners.values()).filter(
+      (partner) => partner.status === status
+    );
+  }
+  
+  async getPartnersByRegion(region: string): Promise<Partner[]> {
+    return Array.from(this.partners.values()).filter(
+      (partner) => partner.region === region
+    );
+  }
+  
+  async getPartnersByCommune(commune: string): Promise<Partner[]> {
+    return Array.from(this.partners.values()).filter(
+      (partner) => partner.commune === commune
+    );
+  }
+  
+  // Partner Bank Details operations
+  async createPartnerBankDetails(insertBankDetails: InsertPartnerBankDetails): Promise<PartnerBankDetails> {
+    const id = this.currentPartnerBankDetailsId++;
+    const createdAt = new Date();
+    const updatedAt = new Date();
+    
+    const bankDetails: PartnerBankDetails = {
+      ...insertBankDetails,
+      id,
+      createdAt,
+      updatedAt
+    };
+    this.partnerBankDetails.set(id, bankDetails);
+    return bankDetails;
+  }
+  
+  async getPartnerBankDetails(partnerId: number): Promise<PartnerBankDetails | undefined> {
+    return Array.from(this.partnerBankDetails.values()).find(
+      (details) => details.partnerId === partnerId
+    );
+  }
+  
+  async updatePartnerBankDetails(id: number, bankDetails: Partial<PartnerBankDetails>): Promise<PartnerBankDetails | undefined> {
+    const existingDetails = this.partnerBankDetails.get(id);
+    if (!existingDetails) return undefined;
+    
+    const updatedDetails = {
+      ...existingDetails,
+      ...bankDetails,
+      updatedAt: new Date()
+    };
+    this.partnerBankDetails.set(id, updatedDetails);
+    return updatedDetails;
+  }
+  
+  // Partner Sales operations
+  async createPartnerSale(insertSale: InsertPartnerSale): Promise<PartnerSale> {
+    const id = this.currentPartnerSaleId++;
+    const createdAt = new Date();
+    
+    const sale: PartnerSale = {
+      ...insertSale,
+      id,
+      status: 'pending',
+      paidAt: null,
+      createdAt
+    };
+    this.partnerSales.set(id, sale);
+    return sale;
+  }
+  
+  async getPartnerSale(id: number): Promise<PartnerSale | undefined> {
+    return this.partnerSales.get(id);
+  }
+  
+  async getPartnerSales(partnerId: number, options?: { status?: string }): Promise<PartnerSale[]> {
+    let sales = Array.from(this.partnerSales.values()).filter(
+      (sale) => sale.partnerId === partnerId
+    );
+    
+    if (options?.status) {
+      sales = sales.filter(sale => sale.status === options.status);
+    }
+    
+    return sales.sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }
+  
+  async updatePartnerSale(id: number, sale: Partial<PartnerSale>): Promise<PartnerSale | undefined> {
+    const existingSale = this.partnerSales.get(id);
+    if (!existingSale) return undefined;
+    
+    const updatedSale = {
+      ...existingSale,
+      ...sale
+    };
+    this.partnerSales.set(id, updatedSale);
+    return updatedSale;
+  }
+  
+  async getPartnerSalesStats(partnerId: number): Promise<{
+    totalSales: number;
+    pendingCommission: number;
+    availableCommission: number;
+    paidCommission: number;
+    totalCommission: number;
+    salesCount: number;
+  }> {
+    const sales = await this.getPartnerSales(partnerId);
+    
+    const pendingCommission = sales
+      .filter(sale => sale.status === 'pending')
+      .reduce((sum, sale) => sum + sale.commission, 0);
+      
+    const availableCommission = sales
+      .filter(sale => sale.status === 'available')
+      .reduce((sum, sale) => sum + sale.commission, 0);
+      
+    const paidCommission = sales
+      .filter(sale => sale.status === 'paid')
+      .reduce((sum, sale) => sum + sale.commission, 0);
+    
+    const totalCommission = pendingCommission + availableCommission + paidCommission;
+    const totalSales = sales.reduce((sum, sale) => sum + sale.amount, 0);
+    const salesCount = sales.length;
+    
+    return {
+      totalSales,
+      pendingCommission,
+      availableCommission,
+      paidCommission,
+      totalCommission,
+      salesCount
+    };
+  }
+  
+  // Partner Payments operations
+  async createPartnerPayment(insertPayment: InsertPartnerPayment): Promise<PartnerPayment> {
+    const id = this.currentPartnerPaymentId++;
+    const createdAt = new Date();
+    
+    const payment: PartnerPayment = {
+      ...insertPayment,
+      id,
+      createdAt
+    };
+    this.partnerPayments.set(id, payment);
+    
+    // Actualizar el estado de las ventas asociadas a 'paid'
+    const sales = await this.getPartnerSales(insertPayment.partnerId, { status: 'available' });
+    let remainingAmount = insertPayment.amount;
+    
+    for (const sale of sales) {
+      if (remainingAmount <= 0) break;
+      
+      const saleAmount = Math.min(sale.commission, remainingAmount);
+      remainingAmount -= saleAmount;
+      
+      await this.updatePartnerSale(sale.id, {
+        status: 'paid',
+        paidAt: insertPayment.paymentDate
+      });
+    }
+    
+    return payment;
+  }
+  
+  async getPartnerPayment(id: number): Promise<PartnerPayment | undefined> {
+    return this.partnerPayments.get(id);
+  }
+  
+  async getPartnerPayments(partnerId: number): Promise<PartnerPayment[]> {
+    return Array.from(this.partnerPayments.values())
+      .filter(payment => payment.partnerId === partnerId)
+      .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime());
+  }
+  
+  async getPartnerPaymentsTotal(partnerId: number): Promise<number> {
+    const payments = await this.getPartnerPayments(partnerId);
+    return payments.reduce((sum, payment) => sum + payment.amount, 0);
+  }
+  
   // Analytics operations
   async createAnalyticsEvent(insertEvent: InsertAnalyticsEvent): Promise<AnalyticsEvent> {
     const id = this.currentAnalyticsEventId++;
