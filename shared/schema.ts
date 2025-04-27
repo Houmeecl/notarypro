@@ -2,6 +2,19 @@ import { pgTable, text, serial, integer, boolean, date, timestamp, jsonb } from 
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Analytics Events
+export const analyticsEvents = pgTable("analytics_events", {
+  id: serial("id").primaryKey(),
+  eventType: text("event_type").notNull(), // document_created, document_signed, document_certified, user_registered, etc.
+  userId: integer("user_id"),
+  documentId: integer("document_id"),
+  templateId: integer("template_id"),
+  courseId: integer("course_id"),
+  videoCallId: integer("video_call_id"),
+  metadata: jsonb("metadata"), // Additional data related to the event
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Users
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -292,6 +305,18 @@ export type DocumentTemplate = typeof documentTemplates.$inferSelect;
 export type InsertDocumentTemplate = z.infer<typeof insertDocumentTemplateSchema>;
 export type Document = typeof documents.$inferSelect;
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
+
+export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
+export const insertAnalyticsEventSchema = createInsertSchema(analyticsEvents).pick({
+  eventType: true,
+  userId: true,
+  documentId: true,
+  templateId: true,
+  courseId: true,
+  videoCallId: true,
+  metadata: true,
+});
+export type InsertAnalyticsEvent = z.infer<typeof insertAnalyticsEventSchema>;
 
 export type IdentityVerification = typeof identityVerifications.$inferSelect;
 export type InsertIdentityVerification = z.infer<typeof insertIdentityVerificationSchema>;

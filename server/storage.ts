@@ -13,18 +13,53 @@ import {
   quizAttempts, type QuizAttempt, type InsertQuizAttempt,
   certificates, type Certificate, type InsertCertificate,
   videoCallServices, type VideoCallService, type InsertVideoCallService,
-  videoCallSessions, type VideoCallSession, type InsertVideoCallSession
+  videoCallSessions, type VideoCallSession, type InsertVideoCallSession,
+  analyticsEvents, type AnalyticsEvent, type InsertAnalyticsEvent
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 import connectPg from "connect-pg-simple";
 import { db, pool } from "./db";
-import { eq, and, asc, desc } from "drizzle-orm";
+import { eq, and, asc, desc, sql, count, gte, lte } from "drizzle-orm";
 
 const PostgresSessionStore = connectPg(session);
 const MemoryStore = createMemoryStore(session);
 
 export interface IStorage {
+  // Analytics operations
+  createAnalyticsEvent(event: InsertAnalyticsEvent): Promise<AnalyticsEvent>;
+  getAnalyticsEvents(options?: { 
+    startDate?: Date; 
+    endDate?: Date; 
+    eventType?: string; 
+    userId?: number 
+  }): Promise<AnalyticsEvent[]>;
+  getDailyEventCounts(options?: { 
+    startDate?: Date; 
+    endDate?: Date;
+    eventType?: string; 
+  }): Promise<{ date: string; count: number }[]>;
+  getUserActivityStats(): Promise<{ 
+    totalUsers: number; 
+    newUsersToday: number; 
+    newUsersThisWeek: number; 
+    newUsersThisMonth: number 
+  }>;
+  getDocumentStats(): Promise<{ 
+    totalDocuments: number; 
+    documentsCreatedToday: number; 
+    documentsByStatus: Record<string, number>;
+  }>;
+  getRevenueStats(): Promise<{
+    totalRevenue: number;
+    revenueToday: number;
+    revenueThisWeek: number;
+    revenueThisMonth: number;
+    documentRevenue: number;
+    courseRevenue: number;
+    videoCallRevenue: number;
+  }>;
+  
   // User operations
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -134,6 +169,8 @@ export class MemStorage implements IStorage {
   private certificates: Map<number, Certificate>;
   private videoCallServices: Map<number, VideoCallService>;
   private videoCallSessions: Map<number, VideoCallSession>;
+  private analyticsEvents: Map<number, AnalyticsEvent>;
+  currentAnalyticsEventId: number;
   
   currentUserId: number;
   currentDocumentCategoryId: number;
