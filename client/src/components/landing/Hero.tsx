@@ -80,8 +80,8 @@ export default function Hero() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
               
               <ExplanatoryVideo
-                title="¿Cómo funciona nuestra plataforma?"
-                description="Descubra cómo nuestra plataforma le permite firmar documentos con validez legal en simples pasos. Aprenda sobre la verificación de identidad, firmas electrónicas y más."
+                title="Cómo funciona NotaryPro"
+                description="Descubre cómo NotaryPro te permite firmar y certificar documentos con validez legal bajo la Ley 19.799. Conoce nuestra plataforma y beneficios."
                 videoType="explanation"
                 triggerLabel="Ver demostración"
               >
@@ -113,6 +113,8 @@ export default function Hero() {
                 />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                   <ExplanatoryVideo
+                    title="Cómo funciona NotaryPro"
+                    description="Descubre cómo NotaryPro te permite firmar y certificar documentos con validez legal bajo la Ley 19.799."
                     videoType="explanation"
                     triggerLabel="Ver explicación"
                   >
@@ -138,6 +140,8 @@ export default function Hero() {
                 />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                   <ExplanatoryVideo
+                    title="Tutorial: Firma de documentos"
+                    description="Aprende paso a paso cómo subir, preparar y firmar documentos digitales en nuestra plataforma."
                     videoType="tutorial"
                     triggerLabel="Ver tutorial"
                   >
@@ -163,6 +167,8 @@ export default function Hero() {
                 />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                   <ExplanatoryVideo
+                    title="Proceso de verificación de identidad"
+                    description="La verificación de identidad es fundamental para la validez legal de tus documentos. Conoce nuestros tres métodos de verificación seguros."
                     videoType="verification"
                     triggerLabel="Ver proceso"
                   >
