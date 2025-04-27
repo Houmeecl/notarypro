@@ -759,11 +759,11 @@ const PosManagementPage = () => {
                 </div>
               </div>
 
-              {filter.partnerId && (
+              {filter.partnerId && filter.partnerId !== "" && (
                 <div className="mb-4">
                   <Button
                     variant="outline"
-                    onClick={() => syncMutation.mutate(parseInt(filter.partnerId))}
+                    onClick={() => syncMutation.mutate(parseInt(filter.partnerId as string))}
                     disabled={syncMutation.isPending}
                   >
                     {syncMutation.isPending ? (

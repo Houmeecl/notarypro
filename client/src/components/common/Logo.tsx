@@ -45,10 +45,8 @@ const Logo: React.FC<LogoProps> = ({
   // Si se especifica un enlace, envolvemos el logo con un Link
   if (linkTo) {
     return (
-      <Link href={linkTo}>
-        <a className="flex items-center cursor-pointer">
-          {logoContainer}
-        </a>
+      <Link href={linkTo} className="flex items-center cursor-pointer">
+        {logoContainer}
       </Link>
     );
   }

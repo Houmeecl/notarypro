@@ -91,9 +91,21 @@ export default function Sidebar() {
       roles: ["user", "certifier", "admin"]
     },
     {
+      icon: <Store className="h-5 w-5" />,
+      label: "Integración POS",
+      href: "/partners/pos-integration",
+      roles: ["partner"]
+    },
+    {
       icon: <Settings className="h-5 w-5" />,
       label: "Administración",
       href: "/admin-dashboard",
+      roles: ["admin"]
+    },
+    {
+      icon: <Settings className="h-5 w-5" />,
+      label: "Admin POS",
+      href: "/admin/pos-management",
       roles: ["admin"]
     }
   ];
@@ -110,14 +122,7 @@ export default function Sidebar() {
   const desktopSidebar = (
     <div className="w-64 bg-sidebar h-screen flex flex-col border-r border-sidebar-border fixed left-0 top-0">
       <div className="p-4 border-b border-sidebar-border">
-        <Link href="/">
-          <a className="flex items-center">
-            <span className="text-primary font-heading font-bold text-2xl">
-              Docu<span className="text-secondary">Sign</span>
-              <span className="text-primary">Pro</span>
-            </span>
-          </a>
-        </Link>
+        <Logo size="md" variant="full" />
       </div>
       
       <div className="flex-1 p-4 overflow-y-auto">
@@ -164,14 +169,7 @@ export default function Sidebar() {
   // Mobile header with hamburger menu
   const mobileHeader = (
     <div className="bg-white shadow-sm p-4 flex justify-between items-center md:hidden sticky top-0 z-30">
-      <Link href="/">
-        <a className="flex items-center">
-          <span className="text-primary font-heading font-bold text-xl">
-            Docu<span className="text-secondary">Sign</span>
-            <span className="text-primary">Pro</span>
-          </span>
-        </a>
-      </Link>
+      <Logo size="sm" variant="icon" />
       
       <Button variant="ghost" onClick={toggleMobileMenu} size="icon">
         {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
