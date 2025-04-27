@@ -18,11 +18,11 @@ export default function ConversorPresencialRemoto() {
           <div className="bg-white rounded-lg shadow-sm p-8 mb-10">
             <div className="max-w-3xl mx-auto text-center mb-8">
               <h1 className="text-3xl font-bold mb-4">
-                Conversor de Documentos Presenciales a Remotos
+                Conversor de Documentos Presenciales a Online
               </h1>
               <p className="text-gray-600 mb-4">
                 Esta herramienta convierte automáticamente la terminología de documentos diseñados para procesos presenciales
-                a formatos adaptados para certificación remota por videollamada, conforme a la Ley 19.799.
+                a formatos adaptados para certificación online por videollamada, conforme a la Ley 19.799.
               </p>
               <div className="flex flex-wrap gap-2 justify-center">
                 <Badge variant="outline" className="bg-gray-100">Compatible con Ley 19.799</Badge>
@@ -44,7 +44,7 @@ export default function ConversorPresencialRemoto() {
               </CardHeader>
               <CardContent className="text-sm text-gray-600">
                 La herramienta identifica y reemplaza automáticamente términos como "presencial", "físicamente", 
-                "en persona" y "notario público" por sus equivalentes remotos, adaptando el documento a un formato
+                "en persona" y "notario público" por sus equivalentes online, adaptando el documento a un formato
                 compatible con certificación digital.
               </CardContent>
             </Card>
@@ -102,7 +102,7 @@ export default function ConversorPresencialRemoto() {
                   <p className="text-gray-600">
                     Haga clic en el botón "Convertir" para iniciar el proceso de conversión. 
                     La herramienta detectará automáticamente todos los términos presenciales y los reemplazará 
-                    por sus equivalentes para entornos remotos.
+                    por sus equivalentes para entornos online.
                   </p>
                 </div>
               </div>
@@ -115,7 +115,7 @@ export default function ConversorPresencialRemoto() {
                   <h3 className="font-bold mb-1">Revise los cambios</h3>
                   <p className="text-gray-600">
                     Examine el informe detallado que muestra todos los cambios realizados. Verifique el texto convertido 
-                    y si está satisfecho, copie el resultado para usarlo en su trámite de certificación remota.
+                    y si está satisfecho, copie el resultado para usarlo en su trámite de certificación online.
                   </p>
                 </div>
               </div>
@@ -123,7 +123,7 @@ export default function ConversorPresencialRemoto() {
           </div>
 
           <div className="bg-primary/5 rounded-lg p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">¿Listo para certificar sus documentos remotamente?</h2>
+            <h2 className="text-2xl font-bold mb-4">¿Listo para certificar sus documentos online?</h2>
             <p className="text-gray-700 mb-6 max-w-xl mx-auto">
               Una vez que haya convertido su documento, puede programar una sesión de certificación por videollamada 
               con uno de nuestros certificadores profesionales autorizados.

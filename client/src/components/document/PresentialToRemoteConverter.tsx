@@ -10,7 +10,7 @@ import { ArrowRight, Check, AlertCircle, FileText, FileCode, RotateCw } from "lu
 // NOTA: Estas funciones son una copia de las que están en shared/utils/text-converter.ts
 // pero se implementan directamente aquí para evitar problemas de importación en el cliente
 
-// Mapeo de términos presenciales a sus equivalentes remotos
+// Mapeo de términos presenciales a sus equivalentes online
 const PRESENTIAL_TO_REMOTE_TERMS: Record<string, string> = {
   // Términos generales
   'presencial': 'remoto',
@@ -53,7 +53,7 @@ const PRESENTIAL_TO_REMOTE_TERMS: Record<string, string> = {
 const convertPresentialToRemote = (text: string): string => {
   let convertedText = text;
   
-  // Reemplazar todos los términos presenciales por sus equivalentes remotos
+  // Reemplazar todos los términos presenciales por sus equivalentes online
   for (const [presential, remote] of Object.entries(PRESENTIAL_TO_REMOTE_TERMS)) {
     // Usa una expresión regular para hacer coincidir el término completo y con distinción entre mayúsculas/minúsculas
     const regex = new RegExp(`\\b${presential}\\b`, 'gi');
@@ -151,10 +151,10 @@ export default function PresentialToRemoteConverter() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <RotateCw className="h-5 w-5 text-primary mr-2" />
-            Conversor de Terminología: Presencial a Remota
+            Conversor de Terminología: Presencial a Online
           </CardTitle>
           <CardDescription>
-            Convierte automáticamente la terminología presencial en documentos a sus equivalentes remotos,
+            Convierte automáticamente la terminología presencial en documentos a sus equivalentes online,
             para adaptarlos a procesos de certificación por videollamada.
           </CardDescription>
         </CardHeader>
