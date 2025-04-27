@@ -123,6 +123,12 @@ interface DocumentVerification {
   verifiedAt: Date | null;
 }
 
+interface VerificationStats {
+  totalVerifications: number;
+  verificationsByDay: { date: string; count: number }[];
+  mostVerifiedDocuments: { documentId: number; title: string; count: number }[];
+}
+
 const DocumentVerificationGame: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -218,6 +224,22 @@ const DocumentVerificationGame: React.FC = () => {
     }
   });
   
+  // Query para obtener estadísticas de verificación
+  const {
+    data: verificationStats,
+    isLoading: isLoadingStats,
+    isError: isErrorStats,
+    refetch: refetchStats
+  } = useQuery({
+    queryKey: ['/api/gamification/verification-stats'],
+    enabled: !!user,
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/gamification/verification-stats');
+      const data = await response.json();
+      return data as VerificationStats;
+    }
+  });
+  
   // Mutación para verificar un documento
   const verifyDocumentMutation = useMutation({
     mutationFn: async (code: string) => {
@@ -238,6 +260,7 @@ const DocumentVerificationGame: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['/api/gamification/profile'] });
       queryClient.invalidateQueries({ queryKey: ['/api/gamification/challenges'] });
       queryClient.invalidateQueries({ queryKey: ['/api/gamification/badges'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/gamification/verification-stats'] });
       
       if (data.verified) {
         setShowConfetti(true);
@@ -407,6 +430,144 @@ const DocumentVerificationGame: React.FC = () => {
     );
   }
   
+  // Componente para mostrar estadísticas de verificación
+  const VerificationStatsCard = () => {
+    if (isLoadingStats) {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart2 className="h-5 w-5" />
+              Estadísticas de verificación
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex justify-center py-8">
+            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    if (isErrorStats || !verificationStats) {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart2 className="h-5 w-5" />
+              Estadísticas de verificación
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>
+                No se pudieron cargar las estadísticas de verificación.
+              </AlertDescription>
+            </Alert>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => refetchStats()}
+              className="w-full"
+            >
+              Intentar nuevamente
+            </Button>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart2 className="h-5 w-5" />
+            Estadísticas de verificación
+          </CardTitle>
+          <CardDescription>
+            Resumen de tu actividad de verificación de documentos
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="flex items-center justify-between p-4 bg-muted rounded-md">
+            <div className="flex items-center gap-3">
+              <div className="bg-blue-100 text-blue-700 p-2 rounded-full">
+                <Shield className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">Total de verificaciones</p>
+                <p className="text-muted-foreground text-xs">Documentos verificados</p>
+              </div>
+            </div>
+            <div className="text-2xl font-bold">{verificationStats.totalVerifications}</div>
+          </div>
+          
+          {verificationStats.mostVerifiedDocuments.length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                <PieChart className="h-4 w-4" /> 
+                Documentos más verificados
+              </h4>
+              <div className="space-y-2">
+                {verificationStats.mostVerifiedDocuments.slice(0, 3).map((doc, index) => (
+                  <div key={index} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="h-6 w-6 p-0 flex items-center justify-center">
+                        {index + 1}
+                      </Badge>
+                      <span className="truncate max-w-[180px]">{doc.title}</span>
+                    </div>
+                    <Badge variant="secondary">{doc.count}</Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {verificationStats.verificationsByDay.length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
+                <LineChart className="h-4 w-4" /> 
+                Actividad reciente
+              </h4>
+              <div className="h-[100px] flex items-end gap-1">
+                {verificationStats.verificationsByDay.slice(-14).map((day, index) => {
+                  // Encontrar el valor máximo para normalizar
+                  const maxCount = Math.max(...verificationStats.verificationsByDay.map(d => d.count));
+                  const heightPercentage = maxCount > 0 ? (day.count / maxCount) * 100 : 0;
+                  
+                  // Formato de fecha para tooltip
+                  const date = new Date(day.date);
+                  const formattedDate = date.toLocaleDateString('es-ES', { 
+                    day: '2-digit',
+                    month: '2-digit'
+                  });
+                  
+                  return (
+                    <div 
+                      key={index} 
+                      className="flex-1 flex flex-col items-center group relative"
+                      title={`${formattedDate}: ${day.count} verificaciones`}
+                    >
+                      <div 
+                        className={`w-full ${day.count > 0 ? 'bg-blue-500' : 'bg-blue-100'} rounded-t-sm transition-all duration-300 hover:bg-blue-600`} 
+                        style={{ height: `${Math.max(heightPercentage, 5)}%` }}
+                      ></div>
+                      <span className="text-[9px] text-muted-foreground mt-1 hidden md:inline">
+                        {formattedDate.split('/')[0]}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       {showConfetti && <Confetti />}
@@ -503,6 +664,11 @@ const DocumentVerificationGame: React.FC = () => {
           Gana puntos al verificar documentos y completa desafíos para subir de nivel
         </CardFooter>
       </Card>
+      
+      {/* Sección de estadísticas */}
+      <div className="mb-8">
+        <VerificationStatsCard />
+      </div>
       
       {/* Tabs de contenido principal */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
