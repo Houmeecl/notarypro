@@ -65,7 +65,7 @@ export function PartnerLogo({
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }) {
-  const partnerLogoImage = '/src/assets/corporate-logo.jpeg';
+  const partnerLogoImage = '/assets/corporate-logo.jpeg';
   
   const logoSizes = {
     sm: 'h-8',
