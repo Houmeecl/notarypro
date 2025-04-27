@@ -205,6 +205,7 @@ export class MemStorage implements IStorage {
     this.certificates = new Map();
     this.videoCallServices = new Map();
     this.videoCallSessions = new Map();
+    this.analyticsEvents = new Map();
     
     this.currentUserId = 1;
     this.currentDocumentCategoryId = 1;
@@ -221,6 +222,7 @@ export class MemStorage implements IStorage {
     this.currentCertificateId = 1;
     this.currentVideoCallServiceId = 1;
     this.currentVideoCallSessionId = 1;
+    this.currentAnalyticsEventId = 1;
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000,
@@ -699,6 +701,169 @@ export class MemStorage implements IStorage {
     
     this.videoCallSessions.set(id, updated);
     return updated;
+  }
+
+  // Analytics operations
+  async createAnalyticsEvent(insertEvent: InsertAnalyticsEvent): Promise<AnalyticsEvent> {
+    const id = this.currentAnalyticsEventId++;
+    const createdAt = new Date();
+    const event: AnalyticsEvent = { ...insertEvent, id, createdAt };
+    this.analyticsEvents.set(id, event);
+    return event;
+  }
+
+  async getAnalyticsEvents(options?: { 
+    startDate?: Date; 
+    endDate?: Date; 
+    eventType?: string; 
+    userId?: number 
+  }): Promise<AnalyticsEvent[]> {
+    let events = Array.from(this.analyticsEvents.values());
+    
+    if (options) {
+      if (options.startDate) {
+        events = events.filter(event => event.createdAt >= options.startDate!);
+      }
+      
+      if (options.endDate) {
+        events = events.filter(event => event.createdAt <= options.endDate!);
+      }
+      
+      if (options.eventType) {
+        events = events.filter(event => event.eventType === options.eventType);
+      }
+      
+      if (options.userId) {
+        events = events.filter(event => event.userId === options.userId);
+      }
+    }
+    
+    return events.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getDailyEventCounts(options?: { 
+    startDate?: Date; 
+    endDate?: Date;
+    eventType?: string; 
+  }): Promise<{ date: string; count: number }[]> {
+    const events = await this.getAnalyticsEvents(options);
+    
+    const dailyCounts: Record<string, number> = {};
+    
+    events.forEach(event => {
+      const dateStr = event.createdAt.toISOString().split('T')[0];
+      dailyCounts[dateStr] = (dailyCounts[dateStr] || 0) + 1;
+    });
+    
+    return Object.entries(dailyCounts)
+      .map(([date, count]) => ({ date, count }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }
+
+  async getUserActivityStats(): Promise<{ 
+    totalUsers: number; 
+    newUsersToday: number; 
+    newUsersThisWeek: number; 
+    newUsersThisMonth: number 
+  }> {
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    
+    const oneWeekAgo = new Date(today);
+    oneWeekAgo.setDate(today.getDate() - 7);
+    
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    
+    const users = Array.from(this.users.values());
+    
+    return {
+      totalUsers: users.length,
+      newUsersToday: users.filter(user => user.createdAt >= startOfDay).length,
+      newUsersThisWeek: users.filter(user => user.createdAt >= oneWeekAgo).length,
+      newUsersThisMonth: users.filter(user => user.createdAt >= startOfMonth).length
+    };
+  }
+
+  async getDocumentStats(): Promise<{ 
+    totalDocuments: number; 
+    documentsCreatedToday: number; 
+    documentsByStatus: Record<string, number>;
+  }> {
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    
+    const documents = Array.from(this.documents.values());
+    const documentsByStatus: Record<string, number> = {};
+    
+    documents.forEach(doc => {
+      documentsByStatus[doc.status] = (documentsByStatus[doc.status] || 0) + 1;
+    });
+    
+    return {
+      totalDocuments: documents.length,
+      documentsCreatedToday: documents.filter(doc => doc.createdAt >= startOfDay).length,
+      documentsByStatus
+    };
+  }
+
+  async getRevenueStats(): Promise<{
+    totalRevenue: number;
+    revenueToday: number;
+    revenueThisWeek: number;
+    revenueThisMonth: number;
+    documentRevenue: number;
+    courseRevenue: number;
+    videoCallRevenue: number;
+  }> {
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    
+    const oneWeekAgo = new Date(today);
+    oneWeekAgo.setDate(today.getDate() - 7);
+    
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    
+    // Calculate document revenue
+    const documents = Array.from(this.documents.values());
+    const paidDocuments = documents.filter(doc => doc.paymentStatus === 'completed');
+    
+    const documentRevenue = paidDocuments.reduce((sum, doc) => sum + (doc.paymentAmount || 0), 0);
+    
+    // Calculate course revenue
+    const enrollments = Array.from(this.courseEnrollments.values());
+    const courseRevenue = 0; // To be implemented
+    
+    // Calculate video call revenue
+    const videoSessions = Array.from(this.videoCallSessions.values());
+    const paidSessions = videoSessions.filter(session => session.paymentStatus === 'completed');
+    
+    const videoCallRevenue = paidSessions.reduce((sum, session) => sum + (session.paymentAmount || 0), 0);
+    
+    // Calculate total revenue
+    const totalRevenue = documentRevenue + courseRevenue + videoCallRevenue;
+    
+    // Calculate revenue by time period
+    const revenueToday = paidDocuments
+      .filter(doc => doc.updatedAt >= startOfDay)
+      .reduce((sum, doc) => sum + (doc.paymentAmount || 0), 0);
+    
+    const revenueThisWeek = paidDocuments
+      .filter(doc => doc.updatedAt >= oneWeekAgo)
+      .reduce((sum, doc) => sum + (doc.paymentAmount || 0), 0);
+    
+    const revenueThisMonth = paidDocuments
+      .filter(doc => doc.updatedAt >= startOfMonth)
+      .reduce((sum, doc) => sum + (doc.paymentAmount || 0), 0);
+    
+    return {
+      totalRevenue,
+      revenueToday,
+      revenueThisWeek,
+      revenueThisMonth,
+      documentRevenue,
+      courseRevenue,
+      videoCallRevenue
+    };
   }
 }
 

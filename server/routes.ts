@@ -18,6 +18,7 @@ import {
   insertQuizSchema,
   insertQuizQuestionSchema,
   insertQuizAttemptSchema,
+  insertAnalyticsEventSchema,
   insertCertificateSchema
 } from "@shared/schema";
 import { generateVerificationCode, generateQRCodeSVG, generateSignatureData } from "@shared/utils/verification-code";
