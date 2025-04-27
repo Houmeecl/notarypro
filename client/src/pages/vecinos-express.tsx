@@ -75,11 +75,52 @@ export default function VecinosExpress() {
     window.scrollTo(0, 0);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí iría la lógica para enviar los datos del formulario
-    alert("¡Formulario enviado con éxito! Pronto nos pondremos en contacto.");
-    setLocation("/");
+    
+    try {
+      // Mostrar loading state
+      const loadingToast = {
+        title: "Enviando solicitud",
+        description: "Procesando su solicitud, por favor espere...",
+        variant: "default"
+      };
+      
+      // Aquí enviaríamos los datos del formulario a la API
+      // Por ahora simulamos un delay para mostrar el proceso
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Mostrar confirmación
+      const successToast = {
+        title: "¡Solicitud enviada con éxito!",
+        description: "Hemos recibido su solicitud. Una supervisora revisará sus datos y se pondrá en contacto con usted en breve para coordinar la entrega y configuración de su equipo.",
+        variant: "success"
+      };
+      
+      // Reset form
+      setFormData({
+        businessName: "",
+        businessType: "",
+        ownerName: "",
+        email: "",
+        phone: "",
+        address: "",
+        city: "",
+        rut: "",
+        bankAccount: "",
+        bankName: "",
+      });
+      
+      // Mostrar página de confirmación
+      setFormStep(4);
+    } catch (error) {
+      console.error("Error al enviar la solicitud:", error);
+      const errorToast = {
+        title: "Error al enviar solicitud",
+        description: "Ha ocurrido un error al procesar su solicitud. Por favor, intente nuevamente.",
+        variant: "destructive"
+      };
+    }
   };
 
   // Componente para cada paso del formulario
@@ -249,6 +290,55 @@ export default function VecinosExpress() {
                 Enviar Solicitud
               </Button>
             </div>
+          </div>
+        );
+      case 4:
+        return (
+          <div className="text-center py-8 px-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-6">
+              <Check className="h-8 w-8 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold mb-4">¡Solicitud enviada con éxito!</h2>
+            <div className="max-w-md mx-auto mb-8">
+              <p className="text-gray-600 mb-4">
+                Gracias por su interés en unirse al programa Vecinos NotaryPro Express. Hemos recibido su solicitud y será revisada por nuestro equipo de supervisión.
+              </p>
+              <div className="bg-gray-50 p-4 rounded-md border border-gray-200 mb-6">
+                <h3 className="font-semibold text-lg mb-2">Próximos pasos:</h3>
+                <ul className="text-left space-y-2">
+                  <li className="flex items-start">
+                    <span className="inline-block bg-primary/10 rounded-full p-1 mr-2 mt-0.5">
+                      <Check className="h-4 w-4 text-primary" />
+                    </span>
+                    <span>Una supervisora revisará su solicitud en un plazo de 48 horas.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="inline-block bg-primary/10 rounded-full p-1 mr-2 mt-0.5">
+                      <Check className="h-4 w-4 text-primary" />
+                    </span>
+                    <span>Recibirá un correo de confirmación con sus credenciales de acceso al sistema.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="inline-block bg-primary/10 rounded-full p-1 mr-2 mt-0.5">
+                      <Check className="h-4 w-4 text-primary" />
+                    </span>
+                    <span>La supervisora coordinará la entrega y configuración del equipamiento en su negocio.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="inline-block bg-primary/10 rounded-full p-1 mr-2 mt-0.5">
+                      <Check className="h-4 w-4 text-primary" />
+                    </span>
+                    <span>Recibirá capacitación sobre el uso del sistema.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <Button 
+              onClick={() => setLocation("/")}
+              className="bg-primary hover:bg-red-700"
+            >
+              Volver a la página principal
+            </Button>
           </div>
         );
       default:

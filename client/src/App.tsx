@@ -28,6 +28,7 @@ import VerificarDocumento from "@/pages/verificar-documento";
 import VideocallInterfaceDemo from "@/pages/videocall-interface-demo";
 import CursoCertificador from "@/pages/curso-certificador";
 import VecinosExpress from "@/pages/vecinos-express";
+import PartnerApplications from "@/pages/admin/partner-applications";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -95,6 +96,11 @@ function Router() {
         path="/template-admin" 
         component={TemplateAdminPage} 
         allowedRoles={["admin"]} 
+      />
+      <ProtectedRoute 
+        path="/admin/partner-applications" 
+        component={PartnerApplications}
+        allowedRoles={["admin", "supervisor"]} 
       />
       
       {/* Course routes */}
