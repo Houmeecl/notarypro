@@ -269,6 +269,72 @@ export default function AdminDashboard() {
                 </Card>
               </div>
               
+              {/* Configuración y accesos rápidos */}
+              <div className="mb-8">
+                <h3 className="text-lg font-medium mb-4">Configuración y servicios</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <Link href="/admin/api-integrations">
+                    <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-base">Integraciones API</CardTitle>
+                          <Plug className="h-5 w-5 text-purple-500" />
+                        </div>
+                        <CardDescription>
+                          Configure las conexiones con servicios externos
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center space-x-2">
+                          <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
+                          <span className="text-xs">4 servicios no configurados</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                  
+                  <Link href="/videocall-interface-demo">
+                    <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-base">VideoConferencia</CardTitle>
+                          <Video className="h-5 w-5 text-red-500" />
+                        </div>
+                        <CardDescription>
+                          Sistema de videoconferencia para certificaciones
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center space-x-2">
+                          <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                          <span className="text-xs">Demo disponible</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                  
+                  <Link href="/admin/pos-management">
+                    <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-base">Gestión POS</CardTitle>
+                          <BarChart3 className="h-5 w-5 text-blue-500" />
+                        </div>
+                        <CardDescription>
+                          Ventas y comisiones de puntos Vecinos
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center space-x-2">
+                          <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                          <span className="text-xs">Sistema activo</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </div>
+              </div>
+              
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Recent Users */}
                 <Card>
