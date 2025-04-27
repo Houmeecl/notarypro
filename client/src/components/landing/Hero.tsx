@@ -8,10 +8,9 @@ export default function Hero() {
   return (
     <section className="relative bg-light pt-16 pb-32 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Logo section at the top */}
-        <div className="flex justify-between items-center mb-12">
-          <Logo size="lg" showText={true} />
-          <PartnerLogo size="md" />
+        {/* Solo logo principal - centrado y más grande */}
+        <div className="flex justify-center items-center mb-16">
+          <Logo size="lg" showText={true} className="scale-110" />
         </div>
         
         <div className="flex flex-col md:flex-row items-center">
@@ -70,8 +69,8 @@ export default function Hero() {
           <div className="md:w-1/2 mt-10 md:mt-0">
             <div className="relative h-auto w-full rounded-xl overflow-hidden shadow-xl">
               <img
-                src="https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
-                alt="Proceso de firma digital"
+                src="https://images.unsplash.com/photo-1554224155-8d04cb21ed6c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                alt="Firma digital de documentos"
                 className="w-full h-auto object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>

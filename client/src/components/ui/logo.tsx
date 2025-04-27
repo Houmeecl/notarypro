@@ -22,9 +22,9 @@ export function Logo({
   
   // Definir tamaños de logo según el parámetro size
   const logoSizes = {
-    sm: 'h-6',
-    md: 'h-8',
-    lg: 'h-12',
+    sm: 'h-8',
+    md: 'h-12',
+    lg: 'h-16',
   };
   
   // Definir colores de texto según la variante
@@ -42,7 +42,7 @@ export function Logo({
       />
       
       {showText && (
-        <span className={cn('font-bold text-xl', textColors[variant])}>
+        <span className={cn(`font-bold ${size === 'lg' ? 'text-2xl' : size === 'md' ? 'text-xl' : 'text-lg'}`, textColors[variant])}>
           NotaryPro
         </span>
       )}
