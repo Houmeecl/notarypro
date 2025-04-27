@@ -19,11 +19,14 @@ export default function Header() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
-              <img 
-                src="/assets/logo.png" 
-                alt="Certificadora" 
-                className="h-12 w-auto"
-              />
+              <div className="flex items-center">
+                <img 
+                  src="/assets/logo.png" 
+                  alt="NotaryPro" 
+                  className="h-10 w-auto"
+                />
+                <span className="ml-2 font-bold text-xl text-gray-900">NotaryPro</span>
+              </div>
             </Link>
           </div>
 

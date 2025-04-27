@@ -18,7 +18,7 @@ export function Logo({
   linkTo = '/',
 }: LogoProps) {
   // Importar las imágenes de los logos
-  const logoImage = '/src/assets/notarypro-logo.png';
+  const logoImage = '/assets/logo.png';
   
   // Definir tamaños de logo según el parámetro size
   const logoSizes = {
@@ -43,7 +43,7 @@ export function Logo({
       
       {showText && (
         <span className={cn('font-bold text-xl', textColors[variant])}>
-          NotaryPro Certificación Digital
+          NotaryPro
         </span>
       )}
     </div>
