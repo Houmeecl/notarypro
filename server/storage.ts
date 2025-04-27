@@ -1,0 +1,405 @@
+import {
+  users, type User, type InsertUser,
+  documents, type Document, type InsertDocument,
+  identityVerifications, type IdentityVerification, type InsertIdentityVerification,
+  courses, type Course, type InsertCourse,
+  courseModules, type CourseModule, type InsertCourseModule,
+  courseContents, type CourseContent, type InsertCourseContent,
+  courseEnrollments, type CourseEnrollment, type InsertCourseEnrollment,
+  quizzes, type Quiz, type InsertQuiz,
+  quizQuestions, type QuizQuestion, type InsertQuizQuestion,
+  quizAttempts, type QuizAttempt, type InsertQuizAttempt,
+  certificates, type Certificate, type InsertCertificate
+} from "@shared/schema";
+import session from "express-session";
+import createMemoryStore from "memorystore";
+
+const MemoryStore = createMemoryStore(session);
+
+export interface IStorage {
+  // User operations
+  getUser(id: number): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  getUsersByRole(role: string): Promise<User[]>;
+  
+  // Document operations
+  createDocument(document: InsertDocument): Promise<Document>;
+  getDocument(id: number): Promise<Document | undefined>;
+  getUserDocuments(userId: number): Promise<Document[]>;
+  updateDocument(id: number, document: Partial<Document>): Promise<Document | undefined>;
+  getPendingDocuments(): Promise<Document[]>;
+  getCertifierDocuments(certifierId: number): Promise<Document[]>;
+  
+  // Identity verification operations
+  createIdentityVerification(verification: InsertIdentityVerification): Promise<IdentityVerification>;
+  getIdentityVerification(id: number): Promise<IdentityVerification | undefined>;
+  getIdentityVerificationByDocument(documentId: number): Promise<IdentityVerification | undefined>;
+  updateIdentityVerification(id: number, verification: Partial<IdentityVerification>): Promise<IdentityVerification | undefined>;
+  
+  // Course operations
+  createCourse(course: InsertCourse): Promise<Course>;
+  getCourse(id: number): Promise<Course | undefined>;
+  getAllCourses(): Promise<Course[]>;
+  
+  // Course Module operations
+  createCourseModule(module: InsertCourseModule): Promise<CourseModule>;
+  getCourseModules(courseId: number): Promise<CourseModule[]>;
+  
+  // Course Content operations
+  createCourseContent(content: InsertCourseContent): Promise<CourseContent>;
+  getCourseContents(moduleId: number): Promise<CourseContent[]>;
+  
+  // Course Enrollment operations
+  createCourseEnrollment(enrollment: InsertCourseEnrollment): Promise<CourseEnrollment>;
+  getUserEnrollments(userId: number): Promise<CourseEnrollment[]>;
+  updateCourseEnrollment(id: number, enrollment: Partial<CourseEnrollment>): Promise<CourseEnrollment | undefined>;
+  
+  // Quiz operations
+  createQuiz(quiz: InsertQuiz): Promise<Quiz>;
+  getQuiz(id: number): Promise<Quiz | undefined>;
+  getModuleQuizzes(moduleId: number): Promise<Quiz[]>;
+  
+  // Quiz Question operations
+  createQuizQuestion(question: InsertQuizQuestion): Promise<QuizQuestion>;
+  getQuizQuestions(quizId: number): Promise<QuizQuestion[]>;
+  
+  // Quiz Attempt operations
+  createQuizAttempt(attempt: InsertQuizAttempt): Promise<QuizAttempt>;
+  getUserQuizAttempts(userId: number, quizId: number): Promise<QuizAttempt[]>;
+  
+  // Certificate operations
+  createCertificate(certificate: InsertCertificate): Promise<Certificate>;
+  getUserCertificates(userId: number): Promise<Certificate[]>;
+  verifyCertificate(certificateNumber: string): Promise<Certificate | undefined>;
+  
+  sessionStore: session.SessionStore;
+}
+
+export class MemStorage implements IStorage {
+  private users: Map<number, User>;
+  private documents: Map<number, Document>;
+  private identityVerifications: Map<number, IdentityVerification>;
+  private courses: Map<number, Course>;
+  private courseModules: Map<number, CourseModule>;
+  private courseContents: Map<number, CourseContent>;
+  private courseEnrollments: Map<number, CourseEnrollment>;
+  private quizzes: Map<number, Quiz>;
+  private quizQuestions: Map<number, QuizQuestion>;
+  private quizAttempts: Map<number, QuizAttempt>;
+  private certificates: Map<number, Certificate>;
+  
+  currentUserId: number;
+  currentDocumentId: number;
+  currentVerificationId: number;
+  currentCourseId: number;
+  currentModuleId: number;
+  currentContentId: number;
+  currentEnrollmentId: number;
+  currentQuizId: number;
+  currentQuestionId: number;
+  currentAttemptId: number;
+  currentCertificateId: number;
+  sessionStore: session.SessionStore;
+
+  constructor() {
+    this.users = new Map();
+    this.documents = new Map();
+    this.identityVerifications = new Map();
+    this.courses = new Map();
+    this.courseModules = new Map();
+    this.courseContents = new Map();
+    this.courseEnrollments = new Map();
+    this.quizzes = new Map();
+    this.quizQuestions = new Map();
+    this.quizAttempts = new Map();
+    this.certificates = new Map();
+    
+    this.currentUserId = 1;
+    this.currentDocumentId = 1;
+    this.currentVerificationId = 1;
+    this.currentCourseId = 1;
+    this.currentModuleId = 1;
+    this.currentContentId = 1;
+    this.currentEnrollmentId = 1;
+    this.currentQuizId = 1;
+    this.currentQuestionId = 1;
+    this.currentAttemptId = 1;
+    this.currentCertificateId = 1;
+    
+    this.sessionStore = new MemoryStore({
+      checkPeriod: 86400000,
+    });
+  }
+
+  // User operations
+  async getUser(id: number): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.username.toLowerCase() === username.toLowerCase(),
+    );
+  }
+  
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.email.toLowerCase() === email.toLowerCase(),
+    );
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = this.currentUserId++;
+    const createdAt = new Date();
+    const user: User = { ...insertUser, id, createdAt };
+    this.users.set(id, user);
+    return user;
+  }
+  
+  async getUsersByRole(role: string): Promise<User[]> {
+    return Array.from(this.users.values()).filter(
+      (user) => user.role === role,
+    );
+  }
+
+  // Document operations
+  async createDocument(insertDocument: InsertDocument): Promise<Document> {
+    const id = this.currentDocumentId++;
+    const createdAt = new Date();
+    const updatedAt = new Date();
+    const document: Document = { 
+      ...insertDocument, 
+      id, 
+      createdAt, 
+      updatedAt, 
+      status: "pending", 
+      certifierId: undefined,
+      signatureData: undefined
+    };
+    this.documents.set(id, document);
+    return document;
+  }
+
+  async getDocument(id: number): Promise<Document | undefined> {
+    return this.documents.get(id);
+  }
+
+  async getUserDocuments(userId: number): Promise<Document[]> {
+    return Array.from(this.documents.values()).filter(
+      (document) => document.userId === userId,
+    );
+  }
+
+  async updateDocument(id: number, document: Partial<Document>): Promise<Document | undefined> {
+    const existingDocument = this.documents.get(id);
+    if (!existingDocument) return undefined;
+    
+    const updatedDocument = { 
+      ...existingDocument, 
+      ...document, 
+      updatedAt: new Date() 
+    };
+    this.documents.set(id, updatedDocument);
+    return updatedDocument;
+  }
+
+  async getPendingDocuments(): Promise<Document[]> {
+    return Array.from(this.documents.values()).filter(
+      (document) => document.status === "pending",
+    );
+  }
+
+  async getCertifierDocuments(certifierId: number): Promise<Document[]> {
+    return Array.from(this.documents.values()).filter(
+      (document) => document.certifierId === certifierId,
+    );
+  }
+
+  // Identity verification operations
+  async createIdentityVerification(insertVerification: InsertIdentityVerification): Promise<IdentityVerification> {
+    const id = this.currentVerificationId++;
+    const createdAt = new Date();
+    const verification: IdentityVerification = { 
+      ...insertVerification, 
+      id, 
+      createdAt, 
+      status: "pending", 
+      certifierId: undefined,
+      notes: undefined
+    };
+    this.identityVerifications.set(id, verification);
+    return verification;
+  }
+
+  async getIdentityVerification(id: number): Promise<IdentityVerification | undefined> {
+    return this.identityVerifications.get(id);
+  }
+
+  async getIdentityVerificationByDocument(documentId: number): Promise<IdentityVerification | undefined> {
+    return Array.from(this.identityVerifications.values()).find(
+      (verification) => verification.documentId === documentId,
+    );
+  }
+
+  async updateIdentityVerification(id: number, verification: Partial<IdentityVerification>): Promise<IdentityVerification | undefined> {
+    const existingVerification = this.identityVerifications.get(id);
+    if (!existingVerification) return undefined;
+    
+    const updatedVerification = { 
+      ...existingVerification, 
+      ...verification
+    };
+    this.identityVerifications.set(id, updatedVerification);
+    return updatedVerification;
+  }
+
+  // Course operations
+  async createCourse(insertCourse: InsertCourse): Promise<Course> {
+    const id = this.currentCourseId++;
+    const createdAt = new Date();
+    const course: Course = { ...insertCourse, id, createdAt };
+    this.courses.set(id, course);
+    return course;
+  }
+
+  async getCourse(id: number): Promise<Course | undefined> {
+    return this.courses.get(id);
+  }
+
+  async getAllCourses(): Promise<Course[]> {
+    return Array.from(this.courses.values());
+  }
+
+  // Course Module operations
+  async createCourseModule(insertModule: InsertCourseModule): Promise<CourseModule> {
+    const id = this.currentModuleId++;
+    const module: CourseModule = { ...insertModule, id };
+    this.courseModules.set(id, module);
+    return module;
+  }
+
+  async getCourseModules(courseId: number): Promise<CourseModule[]> {
+    return Array.from(this.courseModules.values())
+      .filter(module => module.courseId === courseId)
+      .sort((a, b) => a.order - b.order);
+  }
+
+  // Course Content operations
+  async createCourseContent(insertContent: InsertCourseContent): Promise<CourseContent> {
+    const id = this.currentContentId++;
+    const content: CourseContent = { ...insertContent, id };
+    this.courseContents.set(id, content);
+    return content;
+  }
+
+  async getCourseContents(moduleId: number): Promise<CourseContent[]> {
+    return Array.from(this.courseContents.values())
+      .filter(content => content.moduleId === moduleId)
+      .sort((a, b) => a.order - b.order);
+  }
+
+  // Course Enrollment operations
+  async createCourseEnrollment(insertEnrollment: InsertCourseEnrollment): Promise<CourseEnrollment> {
+    const id = this.currentEnrollmentId++;
+    const enrolledAt = new Date();
+    const enrollment: CourseEnrollment = { 
+      ...insertEnrollment, 
+      id, 
+      enrolledAt, 
+      completed: false,
+      completedAt: undefined
+    };
+    this.courseEnrollments.set(id, enrollment);
+    return enrollment;
+  }
+
+  async getUserEnrollments(userId: number): Promise<CourseEnrollment[]> {
+    return Array.from(this.courseEnrollments.values()).filter(
+      enrollment => enrollment.userId === userId
+    );
+  }
+
+  async updateCourseEnrollment(id: number, enrollment: Partial<CourseEnrollment>): Promise<CourseEnrollment | undefined> {
+    const existingEnrollment = this.courseEnrollments.get(id);
+    if (!existingEnrollment) return undefined;
+    
+    const updatedEnrollment = { 
+      ...existingEnrollment, 
+      ...enrollment
+    };
+    this.courseEnrollments.set(id, updatedEnrollment);
+    return updatedEnrollment;
+  }
+
+  // Quiz operations
+  async createQuiz(insertQuiz: InsertQuiz): Promise<Quiz> {
+    const id = this.currentQuizId++;
+    const quiz: Quiz = { ...insertQuiz, id };
+    this.quizzes.set(id, quiz);
+    return quiz;
+  }
+
+  async getQuiz(id: number): Promise<Quiz | undefined> {
+    return this.quizzes.get(id);
+  }
+
+  async getModuleQuizzes(moduleId: number): Promise<Quiz[]> {
+    return Array.from(this.quizzes.values()).filter(
+      quiz => quiz.moduleId === moduleId
+    );
+  }
+
+  // Quiz Question operations
+  async createQuizQuestion(insertQuestion: InsertQuizQuestion): Promise<QuizQuestion> {
+    const id = this.currentQuestionId++;
+    const question: QuizQuestion = { ...insertQuestion, id };
+    this.quizQuestions.set(id, question);
+    return question;
+  }
+
+  async getQuizQuestions(quizId: number): Promise<QuizQuestion[]> {
+    return Array.from(this.quizQuestions.values()).filter(
+      question => question.quizId === quizId
+    );
+  }
+
+  // Quiz Attempt operations
+  async createQuizAttempt(insertAttempt: InsertQuizAttempt): Promise<QuizAttempt> {
+    const id = this.currentAttemptId++;
+    const attemptedAt = new Date();
+    const attempt: QuizAttempt = { ...insertAttempt, id, attemptedAt };
+    this.quizAttempts.set(id, attempt);
+    return attempt;
+  }
+
+  async getUserQuizAttempts(userId: number, quizId: number): Promise<QuizAttempt[]> {
+    return Array.from(this.quizAttempts.values()).filter(
+      attempt => attempt.userId === userId && attempt.quizId === quizId
+    );
+  }
+
+  // Certificate operations
+  async createCertificate(insertCertificate: InsertCertificate): Promise<Certificate> {
+    const id = this.currentCertificateId++;
+    const issuedAt = new Date();
+    const certificate: Certificate = { ...insertCertificate, id, issuedAt };
+    this.certificates.set(id, certificate);
+    return certificate;
+  }
+
+  async getUserCertificates(userId: number): Promise<Certificate[]> {
+    return Array.from(this.certificates.values()).filter(
+      certificate => certificate.userId === userId
+    );
+  }
+
+  async verifyCertificate(certificateNumber: string): Promise<Certificate | undefined> {
+    return Array.from(this.certificates.values()).find(
+      certificate => certificate.certificateNumber === certificateNumber
+    );
+  }
+}
+
+export const storage = new MemStorage();
