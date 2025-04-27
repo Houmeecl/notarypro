@@ -100,11 +100,13 @@ export default function AuthPage() {
         <div className="w-full max-w-md">
           <div className="text-center mb-6">
             <Link href="/">
-              <img 
-                src="/assets/nuevo-logo.png" 
-                alt="NotaryPro" 
-                className="h-12 w-auto mx-auto"
-              />
+              <div className="flex justify-center">
+                <img 
+                  src="/assets/logo12582620.png" 
+                  alt="NotaryPro Chile" 
+                  className="h-12 w-auto mx-auto"
+                />
+              </div>
             </Link>
           </div>
 
