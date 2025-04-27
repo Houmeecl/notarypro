@@ -115,6 +115,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/admin/pos', adminPosRouter);
   app.use('/api/partners/pos', partnerPosRouter);
 
+  // Registrar rutas de gamificación
+  app.use('/api/gamification', gamificationRouter);
+
   // Registrar rutas de APIs de integraciones
   registerAdminApiRoutes(app);
   
