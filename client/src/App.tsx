@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import NotFound from "@/pages/not-found";
 import { AuthProvider } from "@/hooks/use-auth";
+import { OnboardingProvider } from "@/hooks/use-onboarding";
 import { ProtectedRoute } from "./lib/protected-route";
 
 // Pages
@@ -33,6 +34,11 @@ import DocumentTemplatesPage from "@/pages/document-templates";
 import DocumentFormPage from "@/pages/document-form";
 import DocumentViewPage from "@/pages/document-view";
 import DocumentsPage from "@/pages/documents";
+
+// Partner pages
+import PartnersPublicPage from "@/pages/partners/public-page";
+import PartnerRegistrationForm from "@/pages/partners/registration-form";
+import PartnerLogin from "@/pages/partners/partner-login";
 
 function Router() {
   return (
@@ -108,6 +114,11 @@ function Router() {
       <Route path="/verificar-documento/:code" component={VerificarDocumento} />
       <Route path="/curso-certificador" component={CursoCertificador} />
       
+      {/* Partner pages */}
+      <Route path="/partners/public-page" component={PartnersPublicPage} />
+      <Route path="/partners/registration-form" component={PartnerRegistrationForm} />
+      <Route path="/partners/partner-login" component={PartnerLogin} />
+      
       {/* Videocall demo */}
       <ProtectedRoute 
         path="/videocall-interface-demo" 
@@ -125,12 +136,14 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ThemeProvider attribute="class" defaultTheme="light">
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
-        </ThemeProvider>
+        <OnboardingProvider>
+          <ThemeProvider attribute="class" defaultTheme="light">
+            <TooltipProvider>
+              <Toaster />
+              <Router />
+            </TooltipProvider>
+          </ThemeProvider>
+        </OnboardingProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
