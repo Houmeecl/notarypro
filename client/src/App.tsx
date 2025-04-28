@@ -14,6 +14,7 @@ import LandingPage from "@/pages/landing-page";
 import AuthPage from "@/pages/auth-page";
 import UserDashboard from "@/pages/user-dashboard";
 import CertifierDashboard from "@/pages/certifier-dashboard";
+import LawyerDashboard from "@/pages/lawyer-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
 import CoursePage from "@/pages/course-page";
 import DocumentSign from "@/pages/document-sign";
@@ -31,6 +32,9 @@ import CursoCertificador from "@/pages/curso-certificador";
 import VecinosExpress from "@/pages/vecinos-express";
 import PartnerApplications from "@/pages/admin/partner-applications";
 import ServiceSelectionPage from "@/pages/service-selection";
+import RonVideocall from "@/pages/ron-videocall";
+import VideoConsultation from "@/pages/video-consultation";
+import PurchaseCode from "@/pages/purchase-code";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";

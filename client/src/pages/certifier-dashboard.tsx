@@ -1,16 +1,29 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import Sidebar from "@/components/dashboard/Sidebar";
-import PendingDocuments from "@/components/certifier/PendingDocuments";
-import VideoCallSystemExplanation from "@/components/certifier/VideoCallSystemExplanation";
-import { Button } from "@/components/ui/button";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
+  Calendar, 
+  CheckCircle, 
+  Clock, 
+  FileText, 
+  Users, 
+  Video, 
+  ChevronRight, 
+  Search, 
+  Filter, 
+  Download,
+  Plus,
+  CalendarClock
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import CertifierNavbar from "@/components/layout/CertifierNavbar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -19,243 +32,547 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
-  FileCheck, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  Shield, 
-  Users, 
-  TrendingUp,
-  Calendar,
-  Video
-} from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
-import { Document } from "@shared/schema";
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+
+const statusColors: Record<string, string> = {
+  "pendiente": "text-yellow-500 bg-yellow-100",
+  "programada": "text-blue-500 bg-blue-100",
+  "completada": "text-green-500 bg-green-100",
+  "cancelada": "text-red-500 bg-red-100",
+  "enProceso": "text-purple-500 bg-purple-100",
+};
 
 export default function CertifierDashboard() {
+  const { toast } = useToast();
   const { user } = useAuth();
-  
-  // Fetch certifier documents
-  const { data: certifierDocuments } = useQuery<Document[]>({
-    queryKey: ["/api/certifier/my-documents"],
-  });
-  
-  // Fetch pending documents
-  const { data: pendingDocuments } = useQuery<Document[]>({
-    queryKey: ["/api/certifier/documents"],
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("todas");
+  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<any>(null);
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [selectedTime, setSelectedTime] = useState<string>("");
+
+  // Consulta para obtener las sesiones de certificación
+  const { data: certificationSessions, isLoading } = useQuery({
+    queryKey: ['/api/certification-sessions'],
   });
 
-  // Status badge for documents
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "pending":
-        return <Badge variant="outline" className="bg-yellow-100 border-yellow-200 text-yellow-800">Pendiente</Badge>;
-      case "validated":
-        return <Badge variant="outline" className="bg-green-100 border-green-200 text-green-800">Validado</Badge>;
-      case "signed":
-        return <Badge variant="outline" className="bg-blue-100 border-blue-200 text-blue-800">Firmado</Badge>;
-      case "rejected":
-        return <Badge variant="outline" className="bg-red-100 border-red-200 text-red-800">Rechazado</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
+  // Consulta para obtener los documentos pendientes
+  const { data: pendingDocuments } = useQuery({
+    queryKey: ['/api/documents/pending-certification'],
+  });
+
+  // Consulta para obtener los clientes disponibles para programar
+  const { data: clients } = useQuery({
+    queryKey: ['/api/clients'],
+  });
+
+  // Mutación para aceptar un documento
+  const acceptDocumentMutation = useMutation({
+    mutationFn: async (documentId: string) => {
+      const response = await apiRequest("POST", `/api/documents/${documentId}/accept`, {});
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Documento aceptado",
+        description: "El documento ha sido aceptado para certificación.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/documents/pending-certification'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo aceptar el documento.",
+        variant: "destructive",
+      });
     }
-  };
+  });
 
-  // Format date helper
-  const formatDate = (dateString: Date) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
+  // Mutación para rechazar un documento
+  const rejectDocumentMutation = useMutation({
+    mutationFn: async ({ documentId, reason }: { documentId: string, reason: string }) => {
+      const response = await apiRequest("POST", `/api/documents/${documentId}/reject`, { reason });
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Documento rechazado",
+        description: "El documento ha sido rechazado.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/documents/pending-certification'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo rechazar el documento.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Mutación para programar una sesión de certificación
+  const scheduleSessionMutation = useMutation({
+    mutationFn: async (sessionData: any) => {
+      const response = await apiRequest("POST", "/api/certification-sessions/schedule", sessionData);
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Sesión programada",
+        description: "La sesión de certificación ha sido programada correctamente.",
+      });
+      setShowScheduleDialog(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/certification-sessions'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo programar la sesión.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Filtrar sesiones según los criterios
+  const filteredSessions = certificationSessions
+    ? certificationSessions.filter((session: any) => {
+        const matchesSearch = 
+          session.client.toLowerCase().includes(searchTerm.toLowerCase()) || 
+          session.id.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesStatus = filterStatus === "todas" || session.status === filterStatus;
+        
+        return matchesSearch && matchesStatus;
+      })
+    : [];
+
+  // Manejador para programar sesión
+  const handleScheduleSession = () => {
+    if (!selectedClient || !selectedDate || !selectedTime) {
+      toast({
+        title: "Datos incompletos",
+        description: "Por favor complete todos los campos requeridos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    scheduleSessionMutation.mutate({
+      clientId: selectedClient.id,
+      scheduledFor: `${selectedDate}T${selectedTime}:00`,
+      type: "videoconference"
     });
   };
 
-  // Mock metrics for dashboard
-  const metrics = {
-    documentsValidated: certifierDocuments?.filter(d => d.status === "validated").length || 0,
-    documentsRejected: certifierDocuments?.filter(d => d.status === "rejected").length || 0,
-    pendingCount: pendingDocuments?.length || 0,
-    averageValidationTime: "45 min"
+  // Manejador para rechazar documento con razón
+  const handleRejectDocument = (documentId: string) => {
+    const reason = prompt("Por favor, ingrese el motivo del rechazo:");
+    if (reason) {
+      rejectDocumentMutation.mutate({ documentId, reason });
+    }
   };
 
-  // Get recent activity from certifier documents
-  const recentActivity = certifierDocuments?.slice(0, 5) || [];
-
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <Sidebar />
-      
-      <div className="md:pl-64 p-6">
-        <div className="max-w-6xl mx-auto">
-          <header className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Panel del Certificador</h1>
-            <p className="text-gray-500 mt-1">
-              Bienvenido, {user?.fullName}. Gestiona y valida documentos para certificación.
-            </p>
-          </header>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-500">Documentos Pendientes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center">
-                  <Clock className="h-8 w-8 text-yellow-500 mr-3" />
-                  <div className="text-3xl font-bold">{metrics.pendingCount}</div>
-                </div>
-              </CardContent>
-            </Card>
+    <>
+      <CertifierNavbar />
+      <div className="container mx-auto py-6">
+        <header className="mb-6">
+          <h1 className="text-3xl font-bold">Panel de Certificador</h1>
+          <p className="text-muted-foreground">
+            Gestione sus sesiones de certificación y documentos pendientes
+          </p>
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center text-xl">
+                <Calendar className="mr-2 h-5 w-5 text-blue-500" />
+                Sesiones Hoy
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pb-2">
+              <div className="text-3xl font-bold">
+                {certificationSessions?.filter((s: any) => 
+                  new Date(s.scheduledFor).toDateString() === new Date().toDateString()
+                ).length || 0}
+              </div>
+            </CardContent>
+            <CardFooter>
+              <p className="text-xs text-muted-foreground">
+                <Clock className="inline h-3 w-3 mr-1" />
+                Próxima: {certificationSessions?.filter((s: any) => 
+                  new Date(s.scheduledFor) > new Date()
+                ).sort((a: any, b: any) => 
+                  new Date(a.scheduledFor).getTime() - new Date(b.scheduledFor).getTime()
+                )[0]?.scheduledTime || "No hay sesiones programadas"}
+              </p>
+            </CardFooter>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center text-xl">
+                <FileText className="mr-2 h-5 w-5 text-green-500" />
+                Documentos Pendientes
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pb-2">
+              <div className="text-3xl font-bold">
+                {pendingDocuments?.length || 0}
+              </div>
+            </CardContent>
+            <CardFooter>
+              <p className="text-xs text-muted-foreground">
+                <CheckCircle className="inline h-3 w-3 mr-1" />
+                {pendingDocuments?.filter((d: any) => d.status === "signed").length || 0} documentos firmados pendientes de certificación
+              </p>
+            </CardFooter>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center text-xl">
+                <Users className="mr-2 h-5 w-5 text-purple-500" />
+                Clientes Activos
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pb-2">
+              <div className="text-3xl font-bold">
+                {clients?.length || 0}
+              </div>
+            </CardContent>
+            <CardFooter>
+              <p className="text-xs text-muted-foreground">
+                <Video className="inline h-3 w-3 mr-1" />
+                {certificationSessions?.filter((s: any) => s.status === "completada").length || 0} sesiones completadas este mes
+              </p>
+            </CardFooter>
+          </Card>
+        </div>
+
+        <div className="mb-6">
+          <Tabs defaultValue="sesiones" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="sesiones">Sesiones de Certificación</TabsTrigger>
+              <TabsTrigger value="documentos">Documentos Pendientes</TabsTrigger>
+            </TabsList>
             
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-500">Validados</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center">
-                  <CheckCircle className="h-8 w-8 text-green-500 mr-3" />
-                  <div className="text-3xl font-bold">{metrics.documentsValidated}</div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-500">Rechazados</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center">
-                  <XCircle className="h-8 w-8 text-red-500 mr-3" />
-                  <div className="text-3xl font-bold">{metrics.documentsRejected}</div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-500">Tiempo Promedio</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center">
-                  <TrendingUp className="h-8 w-8 text-blue-500 mr-3" />
-                  <div className="text-3xl font-bold">{metrics.averageValidationTime}</div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <PendingDocuments />
-              
-              <div>
-                <h2 className="text-xl font-bold mb-4">Sistema de Certificación por Video</h2>
-                <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-4">
-                  <div className="flex gap-3 items-center">
-                    <Video className="h-5 w-5 text-blue-500" />
-                    <p className="text-blue-700 font-medium">
-                      Sistema pionero en Chile para certificación online de documentos mediante videollamada
-                    </p>
+            <TabsContent value="sesiones" className="space-y-4">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <div className="flex gap-2 flex-1">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Buscar por cliente o ID..."
+                      className="pl-8"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                   </div>
+                  <Select 
+                    value={filterStatus} 
+                    onValueChange={setFilterStatus}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <Filter className="h-4 w-4 mr-2" />
+                      <SelectValue placeholder="Filtrar por estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todas">Todas</SelectItem>
+                      <SelectItem value="pendiente">Pendientes</SelectItem>
+                      <SelectItem value="programada">Programadas</SelectItem>
+                      <SelectItem value="enProceso">En Proceso</SelectItem>
+                      <SelectItem value="completada">Completadas</SelectItem>
+                      <SelectItem value="cancelada">Canceladas</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 
-                {/* Importar el componente de explicación del sistema */}
-                <VideoCallSystemExplanation />
-              </div>
-            </div>
-            
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5" />
-                    Actividad Reciente
-                  </CardTitle>
-                  <CardDescription>
-                    Últimos documentos validados o rechazados
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {recentActivity.length === 0 ? (
-                    <div className="text-center py-6">
-                      <FileCheck className="h-10 w-10 text-gray-300 mx-auto mb-2" />
-                      <p className="text-gray-500">No hay actividad reciente</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {recentActivity.map((doc) => (
-                        <div key={doc.id} className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                          <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
-                              {doc.status === "validated" ? (
-                                <CheckCircle className="h-4 w-4 text-green-500" />
-                              ) : doc.status === "rejected" ? (
-                                <XCircle className="h-4 w-4 text-red-500" />
-                              ) : (
-                                <FileCheck className="h-4 w-4 text-gray-500" />
-                              )}
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium line-clamp-1">{doc.title}</p>
-                              <p className="text-xs text-gray-500">{formatDate(doc.updatedAt)}</p>
-                            </div>
-                          </div>
-                          <div>
-                            {getStatusBadge(doc.status)}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Shield className="h-5 w-5" />
-                    Información del Certificador
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-center mb-4">
-                      <div className="h-20 w-20 bg-primary/10 rounded-full flex items-center justify-center text-primary text-2xl font-bold">
-                        {user?.fullName.charAt(0)}
+                <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <CalendarClock className="mr-2 h-4 w-4" />
+                      Programar Sesión
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Programar Sesión de Certificación</DialogTitle>
+                      <DialogDescription>
+                        Complete los detalles para programar una nueva sesión de certificación remota.
+                      </DialogDescription>
+                    </DialogHeader>
+                    
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Cliente</label>
+                        <Select 
+                          onValueChange={(value) => {
+                            const client = clients?.find((c: any) => c.id === value);
+                            setSelectedClient(client);
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar cliente" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {clients?.map((client: any) => (
+                              <SelectItem key={client.id} value={client.id}>
+                                {client.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Fecha</label>
+                        <Input 
+                          type="date" 
+                          min={new Date().toISOString().split('T')[0]}
+                          value={selectedDate}
+                          onChange={(e) => setSelectedDate(e.target.value)}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Hora</label>
+                        <Input 
+                          type="time"
+                          value={selectedTime}
+                          onChange={(e) => setSelectedTime(e.target.value)}
+                        />
                       </div>
                     </div>
                     
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Nombre Completo</p>
-                      <p className="font-medium">{user?.fullName}</p>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowScheduleDialog(false)}>
+                        Cancelar
+                      </Button>
+                      <Button 
+                        onClick={handleScheduleSession}
+                        disabled={scheduleSessionMutation.isPending}
+                      >
+                        {scheduleSessionMutation.isPending ? "Programando..." : "Programar"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID Sesión</TableHead>
+                      <TableHead>Cliente</TableHead>
+                      <TableHead>Fecha y Hora</TableHead>
+                      <TableHead>Estado</TableHead>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {isLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8">
+                          <div className="flex justify-center">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                          </div>
+                          <p className="mt-2 text-sm text-muted-foreground">Cargando sesiones...</p>
+                        </TableCell>
+                      </TableRow>
+                    ) : filteredSessions.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8">
+                          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                            <Calendar className="h-6 w-6 text-muted-foreground" />
+                          </div>
+                          <p className="mt-2 text-sm text-muted-foreground">No se encontraron sesiones</p>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredSessions.map((session: any) => (
+                        <TableRow key={session.id}>
+                          <TableCell className="font-medium">{session.id}</TableCell>
+                          <TableCell>{session.client}</TableCell>
+                          <TableCell>
+                            {new Date(session.scheduledFor).toLocaleDateString()} - {session.scheduledTime}
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={statusColors[session.status] || ""}>
+                              {session.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {session.type === "videoconference" ? (
+                              <span className="flex items-center">
+                                <Video className="h-4 w-4 mr-1" /> Video
+                              </span>
+                            ) : (
+                              <span className="flex items-center">
+                                <Users className="h-4 w-4 mr-1" /> Presencial
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <ChevronRight className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                
+                                {session.status === "programada" && (
+                                  <>
+                                    <DropdownMenuItem>
+                                      <Link href={`/ron-videocall/${session.id}`}>
+                                        <span className="flex items-center w-full">
+                                          <Video className="mr-2 h-4 w-4" /> Iniciar video
+                                        </span>
+                                      </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                      <span className="flex items-center">
+                                        <Clock className="mr-2 h-4 w-4" /> Reprogramar
+                                      </span>
+                                    </DropdownMenuItem>
+                                  </>
+                                )}
+                                
+                                {session.status === "completada" && (
+                                  <DropdownMenuItem>
+                                    <span className="flex items-center">
+                                      <Download className="mr-2 h-4 w-4" /> Descargar acta
+                                    </span>
+                                  </DropdownMenuItem>
+                                )}
+                                
+                                <DropdownMenuItem>
+                                  <Link href={`/certification-details/${session.id}`}>
+                                    <span className="flex items-center w-full">
+                                      <FileText className="mr-2 h-4 w-4" /> Ver detalles
+                                    </span>
+                                  </Link>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="documentos">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Documentos Pendientes de Certificación</CardTitle>
+                  <CardDescription>
+                    Documentos que requieren su revisión y certificación
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {pendingDocuments?.length === 0 ? (
+                    <div className="text-center py-8">
+                      <FileText className="h-12 w-12 mx-auto text-muted-foreground opacity-20 mb-2" />
+                      <h3 className="text-lg font-medium mb-1">No hay documentos pendientes</h3>
+                      <p className="text-muted-foreground text-sm">
+                        Todos los documentos han sido procesados.
+                      </p>
                     </div>
-                    
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Correo Electrónico</p>
-                      <p className="font-medium">{user?.email}</p>
-                    </div>
-                    
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Estado</p>
-                      <Badge variant="outline" className="bg-green-100 border-green-200 text-green-800 mt-1">
-                        Certificador Activo
-                      </Badge>
-                    </div>
-                    
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Certificaciones Realizadas</p>
-                      <p className="font-medium">{metrics.documentsValidated + metrics.documentsRejected}</p>
-                    </div>
-                  </div>
+                  ) : (
+                    <ScrollArea className="h-[400px] pr-4">
+                      <div className="space-y-4">
+                        {pendingDocuments?.map((doc: any) => (
+                          <Card key={doc.id}>
+                            <CardHeader className="pb-2">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <CardTitle>{doc.title}</CardTitle>
+                                  <CardDescription>
+                                    Enviado por: {doc.authorName} - {new Date(doc.createdAt).toLocaleDateString()}
+                                  </CardDescription>
+                                </div>
+                                <Badge variant={doc.status === "signed" ? "default" : "outline"}>
+                                  {doc.status === "signed" ? "Firmado" : doc.status}
+                                </Badge>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="pb-2">
+                              <div className="flex items-center text-sm text-muted-foreground">
+                                <FileText className="h-4 w-4 mr-1" />
+                                {doc.category} - {doc.type}
+                              </div>
+                            </CardContent>
+                            <CardFooter className="flex justify-between gap-2">
+                              <Button variant="outline" size="sm" className="flex-1">
+                                <Link href={`/documents/${doc.id}`}>
+                                  <span className="flex items-center justify-center w-full">
+                                    <FileText className="mr-2 h-4 w-4" /> Ver
+                                  </span>
+                                </Link>
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                className="flex-1"
+                                onClick={() => acceptDocumentMutation.mutate(doc.id)}
+                                disabled={acceptDocumentMutation.isPending}
+                              >
+                                <CheckCircle className="mr-2 h-4 w-4" /> Aceptar
+                              </Button>
+                              <Button 
+                                variant="destructive" 
+                                size="sm" 
+                                className="flex-1"
+                                onClick={() => handleRejectDocument(doc.id)}
+                                disabled={rejectDocumentMutation.isPending}
+                              >
+                                Rechazar
+                              </Button>
+                            </CardFooter>
+                          </Card>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  )}
                 </CardContent>
               </Card>
-            </div>
-          </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
-    </div>
+    </>
   );
 }
