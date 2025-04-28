@@ -11,7 +11,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useParams, useLocation } from "wouter";
 import { ExplanatoryVideo } from "@/components/ui/explanatory-video";
-import { VerificationRewards } from "@/components/gamification/verification-rewards";
+import VerificationRewards from "@/components/document-verification/VerificationRewards";
 import { Leaderboard } from "@/components/gamification/leaderboard";
 import { UserProfile } from "@/components/gamification/user-profile";
 import { GamificationModal } from "@/components/gamification/gamification-modal";

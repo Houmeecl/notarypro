@@ -1,7 +1,11 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-// Componente para botones de compartir en redes sociales
 interface SocialShareButtonHelperProps {
   network: 'twitter' | 'facebook' | 'linkedin' | 'whatsapp' | 'instagram' | 'pinterest';
   shareUrl: string;
@@ -53,51 +57,36 @@ export const SocialShareButtonHelper: React.FC<SocialShareButtonHelperProps> = (
         // Instagram no tiene API de compartir directa, pero podemos redirigir a la app
         return `instagram://camera`;
       case 'pinterest':
-        return `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(shareUrl)}&description=${encodeURIComponent(title)}`;
+        return `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(shareUrl)}&media=&description=${encodeURIComponent(title)}`;
       default:
-        return '#';
+        return shareUrl;
     }
   };
   
-  // Manejar clic en el botón de compartir
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
+  // Abrir ventana emergente para compartir
+  const handleShare = () => {
+    const url = getShareUrl();
     
-    // Obtener la URL para compartir
-    const shareUrl = getShareUrl();
-    
-    // Manejar casos especiales para mobile
-    if (network === 'whatsapp' && /Android|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)) {
-      // En dispositivos móviles, abre WhatsApp en la misma ventana
-      window.location.href = shareUrl;
-      return;
-    }
-    
-    // Para Instagram, solo intentar abrir la app (no funcionará en desktop)
     if (network === 'instagram') {
-      try {
-        window.location.href = shareUrl;
-      } catch (e) {
-        // Fallback - mostrar un mensaje o notificación
-        console.log('Instagram app no disponible. Se requiere la app para compartir.');
-      }
+      // Para Instagram abrimos en la misma ventana ya que tiene que ser manejado por la app
+      window.location.href = url;
       return;
     }
     
-    // Para otras redes, abrir ventana popup
-    const width = 550;
-    const height = 450;
-    const left = (window.innerWidth - width) / 2;
-    const top = (window.innerHeight - height) / 2;
+    // Para otras redes, abrimos popup
+    const windowWidth = 600;
+    const windowHeight = 400;
+    const left = (window.innerWidth - windowWidth) / 2;
+    const top = (window.innerHeight - windowHeight) / 2;
     
     window.open(
-      shareUrl,
+      url,
       `share-${network}`,
-      `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`
+      `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${windowWidth}, height=${windowHeight}, top=${top}, left=${left}`
     );
   };
   
-  // Obtener el nombre de la red social para accesibilidad
+  // Nombres de las redes para tooltips
   const getNetworkName = () => {
     switch (network) {
       case 'twitter': return 'Twitter/X';
@@ -106,21 +95,30 @@ export const SocialShareButtonHelper: React.FC<SocialShareButtonHelperProps> = (
       case 'whatsapp': return 'WhatsApp';
       case 'instagram': return 'Instagram';
       case 'pinterest': return 'Pinterest';
-      default: return network;
+      default: return 'Compartir';
     }
   };
   
   return (
-    <Button
-      variant={variant}
-      size={size === "icon" && !showLabel ? "icon" : size}
-      className={className}
-      onClick={handleClick}
-      aria-label={`Compartir en ${getNetworkName()}`}
-    >
-      {icon}
-      {showLabel && (displayText || getNetworkName())}
-    </Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant={variant}
+            size={size}
+            onClick={handleShare}
+            className={className}
+            aria-label={`Compartir en ${getNetworkName()}`}
+          >
+            {icon}
+            {showLabel && <span className="ml-2">{displayText || getNetworkName()}</span>}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Compartir en {getNetworkName()}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 

@@ -24,10 +24,10 @@ const ShareAchievement = () => {
     isError,
     error,
   } = useQuery({
-    queryKey: [`/api/micro-interactions/achievements/${achievementId}`],
+    queryKey: [`/api/micro-interactions/public/achievements/${achievementId}`],
     queryFn: async () => {
       if (!achievementId) throw new Error("ID de logro no válido");
-      const response = await apiRequest("GET", `/api/micro-interactions/achievements/${achievementId}`);
+      const response = await apiRequest("GET", `/api/micro-interactions/public/achievements/${achievementId}`);
       const data = await response.json();
       return data;
     },
