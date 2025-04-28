@@ -3,6 +3,7 @@ import { db } from '../db';
 import { partnerStores, users, documentTemplates, partnerTransactions } from '@shared/schema';
 import { eq, and, desc } from 'drizzle-orm';
 import { z } from 'zod';
+import { generateRandomPassword } from '@shared/utils/password-util';
 
 export const webappRouter = Router();
 
