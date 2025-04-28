@@ -45,6 +45,7 @@ import ShareAchievementPage from "@/pages/share-achievement";
 import RonLoginPage from "@/pages/ron-login";
 import RonPlatform from "@/pages/ron-platform";
 import RonSession from "@/pages/ron-session";
+import AyudaLegal from "@/pages/ayuda-legal";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -255,6 +256,13 @@ function Router() {
       <Route path="/ron-login" component={RonLoginPage} />
       <Route path="/ron-platform" component={RonPlatform} />
       <Route path="/ron-session/:id?" component={RonSession} />
+      
+      {/* Ayuda Legal */}
+      <ProtectedRoute 
+        path="/ayuda-legal" 
+        component={AyudaLegal} 
+        allowedRoles={["lawyer", "certifier", "admin"]} 
+      />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
