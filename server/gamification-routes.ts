@@ -117,13 +117,14 @@ gamificationRouter.get("/my-rank/:period", isAuthenticated, async (req, res) => 
 gamificationRouter.get("/verification-stats", isAuthenticated, async (req, res) => {
   try {
     // Si es admin, puede obtener estadísticas globales
-    if (req.user.role === 'admin' && req.query.global === 'true') {
+    if (req.user && req.user.role === 'admin' && req.query.global === 'true') {
       const stats = await gamificationService.getVerificationStats();
       return res.status(200).json(stats);
     }
     
     // Para usuarios normales, solo sus propias estadísticas
-    const stats = await gamificationService.getVerificationStats(req.user.id);
+    // Usando non-null assertion (!) ya que isAuthenticated garantiza que req.user existe
+    const stats = await gamificationService.getVerificationStats(req.user!.id);
     res.status(200).json(stats);
   } catch (error: any) {
     res.status(500).json({ 

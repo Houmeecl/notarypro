@@ -927,9 +927,9 @@ export async function getVerificationStats(userId?: number) {
 
   // Ejecutar consulta por día
   const byDayResults = await byDayQuery;
-  verificationsByDay = byDayResults.map(r => ({ 
-    date: r.date.toString(), 
-    count: Number(r.count) 
+  verificationsByDay = byDayResults.map((r: any) => ({ 
+    date: r.date ? r.date.toString() : new Date().toISOString().split('T')[0], 
+    count: Number(r.count || 0) 
   }));
 
   // Consulta para obtener los documentos más verificados usando sql directo para evitar problemas de tipado
@@ -949,7 +949,8 @@ export async function getVerificationStats(userId?: number) {
 
   // Ejecutar consulta de documentos más verificados
   const mostVerifiedResults = await mostVerifiedQuery;
-  mostVerifiedDocuments = mostVerifiedResults.map(r => ({
+  // Asegurarnos de manejar correctamente el tipo de resultado
+  mostVerifiedDocuments = (Array.isArray(mostVerifiedResults) ? mostVerifiedResults : (mostVerifiedResults.rows || [])).map((r: any) => ({
     documentId: Number(r.documentId || 0),
     title: r.title || 'Documento desconocido',
     count: Number(r.count || 0)
