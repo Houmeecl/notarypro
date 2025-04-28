@@ -13,7 +13,14 @@ import {
   Filter, 
   Download,
   Plus,
-  CalendarClock
+  CalendarClock,
+  HelpCircle,
+  MessageSquare,
+  Phone,
+  Mail,
+  MessageCircle,
+  BookOpen,
+  Info
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
@@ -57,6 +64,13 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Textarea } from "@/components/ui/textarea";
 
 const statusColors: Record<string, string> = {
   "pendiente": "text-yellow-500 bg-yellow-100",
@@ -289,10 +303,11 @@ export default function CertifierDashboard() {
 
         <div className="mb-6">
           <Tabs defaultValue="sesiones" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="sesiones">Sesiones de Certificación</TabsTrigger>
               <TabsTrigger value="documentos">Documentos Pendientes</TabsTrigger>
               <TabsTrigger value="ron">Certificación Remota (RON)</TabsTrigger>
+              <TabsTrigger value="ayudalegal">Ayuda Legal</TabsTrigger>
             </TabsList>
             
             <TabsContent value="sesiones" className="space-y-4">
@@ -751,6 +766,196 @@ export default function CertifierDashboard() {
                       </div>
                     </ScrollArea>
                   )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            {/* Nueva pestaña para Ayuda Legal */}
+            <TabsContent value="ayudalegal">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <HelpCircle className="h-5 w-5 mr-2 text-primary" />
+                    Consultas sobre Documentos Legales
+                  </CardTitle>
+                  <CardDescription>
+                    Resuelva dudas sobre documentos legales, normativas y certificación
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {/* Buscador de preguntas frecuentes */}
+                    <div className="relative">
+                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Buscar respuestas o documentación legal..."
+                        className="pl-8"
+                      />
+                    </div>
+                    
+                    {/* Preguntas frecuentes */}
+                    <div className="rounded-md border">
+                      <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="item-1">
+                          <AccordionTrigger className="px-4">
+                            ¿Qué documentos requieren certificación presencial obligatoria?
+                          </AccordionTrigger>
+                          <AccordionContent className="px-4 pb-4">
+                            <p className="text-sm text-muted-foreground">
+                              Según la ley vigente, los siguientes documentos requieren certificación presencial:
+                            </p>
+                            <ul className="list-disc pl-5 mt-2 text-sm text-muted-foreground space-y-1">
+                              <li>Testamentos y disposiciones de última voluntad</li>
+                              <li>Escrituras de compraventa de bienes inmuebles</li>
+                              <li>Documentos de constitución de ciertas sociedades mercantiles</li>
+                              <li>Poderes generales que incluyen facultades especiales específicas</li>
+                            </ul>
+                            <p className="text-sm mt-2">
+                              <Link href="/guia-documentos" className="text-primary hover:underline flex items-center">
+                                <FileText className="h-3.5 w-3.5 mr-1" />
+                                Ver guía completa de documentos
+                              </Link>
+                            </p>
+                          </AccordionContent>
+                        </AccordionItem>
+                        
+                        <AccordionItem value="item-2">
+                          <AccordionTrigger className="px-4">
+                            ¿Cuál es la diferencia entre firma electrónica simple y avanzada?
+                          </AccordionTrigger>
+                          <AccordionContent className="px-4 pb-4">
+                            <p className="text-sm text-muted-foreground">
+                              <strong>Firma electrónica simple:</strong> Permite identificar al firmante pero no garantiza la integridad del documento ni la vinculación exclusiva con el firmante.
+                            </p>
+                            <p className="text-sm text-muted-foreground mt-2">
+                              <strong>Firma electrónica avanzada:</strong> Cumple con todos los requisitos legales según la Ley 19.799, garantizando:
+                            </p>
+                            <ul className="list-disc pl-5 mt-2 text-sm text-muted-foreground space-y-1">
+                              <li>Identificación inequívoca del firmante</li>
+                              <li>Vinculación exclusiva con el firmante</li>
+                              <li>Control único del firmante sobre los medios de creación</li>
+                              <li>Posibilidad de detectar cualquier alteración posterior</li>
+                              <li>Certificación por una entidad acreditada</li>
+                            </ul>
+                          </AccordionContent>
+                        </AccordionItem>
+                        
+                        <AccordionItem value="item-3">
+                          <AccordionTrigger className="px-4">
+                            ¿Qué hacer si un cliente presenta un documento con irregularidades?
+                          </AccordionTrigger>
+                          <AccordionContent className="px-4 pb-4">
+                            <p className="text-sm text-muted-foreground">
+                              Si detecta irregularidades en un documento presentado para certificación, siga este protocolo:
+                            </p>
+                            <ol className="list-decimal pl-5 mt-2 text-sm text-muted-foreground space-y-1">
+                              <li>Informe al cliente sobre las irregularidades específicas</li>
+                              <li>Documente las observaciones en el sistema</li>
+                              <li>Rechace formalmente la certificación indicando los motivos</li>
+                              <li>Si hay sospechas de ilegalidad, notifique a su supervisor</li>
+                              <li>En casos graves, contacte con asesoría legal interna</li>
+                            </ol>
+                          </AccordionContent>
+                        </AccordionItem>
+                        
+                        <AccordionItem value="item-4">
+                          <AccordionTrigger className="px-4">
+                            ¿Cómo verificar la identidad en certificaciones remotas (RON)?
+                          </AccordionTrigger>
+                          <AccordionContent className="px-4 pb-4">
+                            <p className="text-sm text-muted-foreground">
+                              Para certificaciones remotas, el protocolo de verificación de identidad incluye:
+                            </p>
+                            <ol className="list-decimal pl-5 mt-2 text-sm text-muted-foreground space-y-1">
+                              <li>Verificación de documento de identidad oficial con foto (mostrado en cámara)</li>
+                              <li>Contraste con la base de datos del Registro Civil</li>
+                              <li>Verificación biométrica facial (comparación con foto oficial)</li>
+                              <li>Preguntas de verificación basadas en información personal no pública</li>
+                              <li>Registro completo de la sesión de video</li>
+                            </ol>
+                            <p className="text-sm text-muted-foreground mt-2">
+                              Recuerde que todo el proceso debe quedar documentado en la plataforma para futuras auditorías.
+                            </p>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                    </div>
+                    
+                    {/* Asistente de consultas */}
+                    <Card className="bg-muted/30 border-dashed">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-md">Asistente de consultas legales</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex flex-col space-y-4">
+                          <div className="flex items-start space-x-4">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                              <MessageSquare className="h-4 w-4 text-primary" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm text-muted-foreground">
+                                Escriba su consulta sobre documentos, normativas o procedimientos legales:
+                              </p>
+                              <Textarea className="mt-2" placeholder="Ej: ¿Cómo debo certificar un documento de traspaso de acciones?" />
+                              <Button className="mt-2" size="sm">Enviar consulta</Button>
+                            </div>
+                          </div>
+                          
+                          <div className="pt-4">
+                            <h4 className="text-sm font-medium mb-2">Contactar asesoría legal especializada</h4>
+                            <div className="flex flex-wrap gap-2">
+                              <Button variant="outline" size="sm">
+                                <Phone className="h-3.5 w-3.5 mr-1.5" /> Llamada
+                              </Button>
+                              <Button variant="outline" size="sm">
+                                <Video className="h-3.5 w-3.5 mr-1.5" /> Videollamada
+                              </Button>
+                              <Button variant="outline" size="sm">
+                                <Mail className="h-3.5 w-3.5 mr-1.5" /> Email
+                              </Button>
+                              <Button variant="outline" size="sm">
+                                <MessageCircle className="h-3.5 w-3.5 mr-1.5" /> Chat
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    {/* Recursos legales */}
+                    <div>
+                      <h3 className="text-sm font-medium mb-3">Recursos legales</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Link href="/guia-normativa-certificacion" className="block">
+                          <Card className="h-full hover:bg-muted/30 transition-colors">
+                            <CardContent className="p-4 flex items-center space-x-3">
+                              <div className="bg-primary/10 p-2 rounded-full">
+                                <BookOpen className="h-5 w-5 text-primary" />
+                              </div>
+                              <div>
+                                <h4 className="font-medium">Guía Normativa de Certificación</h4>
+                                <p className="text-xs text-muted-foreground">Actualizada según Ley 19.799</p>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </Link>
+                        
+                        <Link href="/recursos-legales" className="block">
+                          <Card className="h-full hover:bg-muted/30 transition-colors">
+                            <CardContent className="p-4 flex items-center space-x-3">
+                              <div className="bg-primary/10 p-2 rounded-full">
+                                <FileText className="h-5 w-5 text-primary" />
+                              </div>
+                              <div>
+                                <h4 className="font-medium">Formatos y Plantillas</h4>
+                                <p className="text-xs text-muted-foreground">Documentos de referencia y modelos</p>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
