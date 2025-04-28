@@ -164,6 +164,7 @@ function Router() {
       <Route path="/partners/registration-form" component={PartnerRegistrationForm} />
       <Route path="/partners/partner-login" component={PartnerLogin} />
       <Route path="/partners/android-sdk-test" component={AndroidSdkTest} />
+      <Route path="/partners/password-generator" component={PasswordGenerator} />
       <ProtectedRoute 
         path="/partners/pos-integration" 
         component={PosIntegrationPage} 
