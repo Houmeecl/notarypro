@@ -1,54 +1,66 @@
-import React, { useEffect, useState } from 'react';
-import ReactConfetti from 'react-confetti';
+import { useState, useEffect } from "react";
+import ReactConfetti from "react-confetti";
 
-export const Confetti: React.FC = () => {
-  const [windowSize, setWindowSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
+interface ConfettiProps {
+  duration?: number;
+}
+
+/**
+ * Componente de confeti para celebraciones
+ * Muestra una animación de confeti que se detiene automáticamente después de la duración especificada
+ */
+export const Confetti: React.FC<ConfettiProps> = ({ duration = 5000 }) => {
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: typeof window !== "undefined" ? window.innerWidth : 0,
+    height: typeof window !== "undefined" ? window.innerHeight : 0,
   });
-
-  const [isVisible, setIsVisible] = useState(true);
+  const [isActive, setIsActive] = useState(true);
 
   useEffect(() => {
-    // Función para actualizar las dimensiones del confeti
+    // Detectar dimensiones de la ventana
     const handleResize = () => {
-      setWindowSize({
+      setWindowDimensions({
         width: window.innerWidth,
         height: window.innerHeight,
       });
     };
 
-    // Agregar el event listener
-    window.addEventListener('resize', handleResize);
+    // Agregar listener para redimensionamiento
+    window.addEventListener("resize", handleResize);
 
-    // Ocultar el confeti después de 4 segundos
+    // Desactivar el confeti después de la duración especificada
     const timer = setTimeout(() => {
-      setIsVisible(false);
-    }, 4000);
+      setIsActive(false);
+    }, duration);
 
-    // Limpiar event listeners y timers
+    // Limpieza
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
       clearTimeout(timer);
     };
-  }, []);
+  }, [duration]);
 
-  if (!isVisible) return null;
+  if (!isActive) {
+    return null;
+  }
 
   return (
     <ReactConfetti
-      width={windowSize.width}
-      height={windowSize.height}
+      width={windowDimensions.width}
+      height={windowDimensions.height}
       recycle={false}
       numberOfPieces={200}
-      gravity={0.2}
-      colors={['#EC1C24', '#333333', '#F2F2F2', '#FFFFFF', '#FFD700']}
-      confettiSource={{
-        x: windowSize.width / 2,
-        y: 0,
-        w: 0,
-        h: 0,
-      }}
+      gravity={0.15}
+      colors={[
+        "#EC1C24", // Rojo principal
+        "#F87171", // Rojo claro
+        "#3B82F6", // Azul
+        "#10B981", // Verde
+        "#F59E0B", // Ámbar
+        "#8B5CF6", // Púrpura
+      ]}
     />
   );
 };
+
+export default Confetti;
