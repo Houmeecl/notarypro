@@ -14,7 +14,8 @@ import {
   Briefcase,
   UserPlus,
   ClipboardCheck,
-  BarChart
+  BarChart,
+  Info
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
@@ -72,6 +73,7 @@ const statusMap: Record<string, { label: string, color: string }> = {
 };
 
 // Datos simulados para ilustrar la página
+// Datos de muestra para videoconsultas
 const mockVideoConsultations = [
   { 
     id: "VC-2025-001", 
@@ -96,6 +98,46 @@ const mockVideoConsultations = [
     status: "finalizada", 
     topic: "Revisión documentos inmobiliarios",
     duration: 45
+  }
+];
+
+// Datos de muestra para certificaciones remotas (RON)
+const mockRonRequests = [
+  {
+    id: "RON-2025-001",
+    clientName: "Luis Mendoza",
+    documentType: "Poder Notarial",
+    region: "Santiago",
+    status: "pendiente",
+    isLocal: true,
+    requestedAt: "2025-04-28T09:15:00"
+  },
+  {
+    id: "RON-2025-002",
+    clientName: "Carmen Vega",
+    documentType: "Declaración Jurada",
+    region: "Santiago",
+    status: "pendiente",
+    isLocal: true,
+    requestedAt: "2025-04-28T11:30:00"
+  },
+  {
+    id: "RON-2025-003",
+    clientName: "Roberto Torres",
+    documentType: "Contrato de Arrendamiento",
+    region: "Valparaíso",
+    status: "pendiente_asignacion",
+    isLocal: false,
+    requestedAt: "2025-04-27T16:45:00"
+  },
+  {
+    id: "RON-2025-004",
+    clientName: "Elena Paredes",
+    documentType: "Testamento",
+    region: "Concepción",
+    status: "pendiente_asignacion",
+    isLocal: false,
+    requestedAt: "2025-04-27T14:20:00"
   }
 ];
 
