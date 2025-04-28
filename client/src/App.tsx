@@ -42,6 +42,9 @@ import VideoConsultation from "@/pages/video-consultation";
 import PurchaseCode from "@/pages/purchase-code";
 import MicroInteractionsDemo from "@/pages/micro-interactions-demo";
 import ShareAchievementPage from "@/pages/share-achievement";
+import RonLoginPage from "@/pages/ron-login";
+import RonPlatform from "@/pages/ron-platform";
+import RonSession from "@/pages/ron-session";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -247,6 +250,11 @@ function Router() {
       
       {/* Achievement Sharing */}
       <Route path="/share-achievement/:id" component={ShareAchievementPage} />
+      
+      {/* RON Platform (Independent Access) */}
+      <Route path="/ron-login" component={RonLoginPage} />
+      <Route path="/ron-platform" component={RonPlatform} />
+      <Route path="/ron-session/:id?" component={RonSession} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
