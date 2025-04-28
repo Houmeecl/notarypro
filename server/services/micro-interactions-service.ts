@@ -409,10 +409,12 @@ export class MicroInteractionsService {
       }
       
       // Obtener información básica del usuario (solo nombre de usuario)
-      const [userInfo] = await db
+      const result = await db
         .execute(sql`
           SELECT username FROM users WHERE id = ${achievementInfo.userId}
         `);
+      
+      const userInfo = Array.isArray(result) && result.length > 0 ? result[0] : null;
       
       // Construir objeto de respuesta con información limitada
       const publicInfo = {
