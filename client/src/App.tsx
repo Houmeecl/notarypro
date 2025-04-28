@@ -62,6 +62,8 @@ import PartnerLogin from "@/pages/partners/partner-login";
 import PosIntegrationPage from "@/pages/partners/pos-integration";
 import AndroidSdkTest from "@/pages/partners/android-sdk-test";
 import PasswordGenerator from "@/pages/partners/password-generator";
+import WebappLogin from "@/pages/partners/webapp-login";
+import WebAppPOS from "@/pages/partners/webapp-pos";
 
 // Admin pages
 import PosManagementPage from "@/pages/admin/pos-management";
@@ -165,6 +167,8 @@ function Router() {
       <Route path="/partners/partner-login" component={PartnerLogin} />
       <Route path="/partners/android-sdk-test" component={AndroidSdkTest} />
       <Route path="/partners/password-generator" component={PasswordGenerator} />
+      <Route path="/partners/webapp-login" component={WebappLogin} />
+      <Route path="/partners/webapp-pos" component={WebAppPOS} />
       <ProtectedRoute 
         path="/partners/pos-integration" 
         component={PosIntegrationPage} 
