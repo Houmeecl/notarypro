@@ -1,266 +1,227 @@
 import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { Copy } from 'lucide-react';
+import { ClipboardCopy, RefreshCw, Lock } from 'lucide-react';
 
-export default function PasswordGenerator() {
-  const [passwordLength, setPasswordLength] = useState(12);
-  const [includeUppercase, setIncludeUppercase] = useState(true);
-  const [includeNumbers, setIncludeNumbers] = useState(true);
-  const [includeSymbols, setIncludeSymbols] = useState(true);
-  const [generatedPassword, setGeneratedPassword] = useState('');
+const PasswordGenerator = () => {
+  const [password, setPassword] = useState<string>('');
+  const [length, setLength] = useState<number>(12);
+  const [includeUppercase, setIncludeUppercase] = useState<boolean>(true);
+  const [includeLowercase, setIncludeLowercase] = useState<boolean>(true);
+  const [includeNumbers, setIncludeNumbers] = useState<boolean>(true);
+  const [includeSymbols, setIncludeSymbols] = useState<boolean>(true);
   const { toast } = useToast();
 
-  // Función para generar contraseña directamente en el frontend para demo
   const generatePassword = () => {
-    // Caracteres posibles para la contraseña
-    const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
-    const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const numberChars = '0123456789';
-    const symbolChars = '!@#$%^&*()_-+=<>?';
-
-    // Inicio con caracteres en minúscula
-    let allChars = lowercaseChars;
+    let charset = '';
+    let newPassword = '';
     
-    // Agregar otros conjuntos de caracteres según sea necesario
-    if (includeUppercase) allChars += uppercaseChars;
-    if (includeNumbers) allChars += numberChars;
-    if (includeSymbols) allChars += symbolChars;
-
-    // Generar la contraseña
-    let password = '';
+    if (includeLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
+    if (includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if (includeNumbers) charset += '0123456789';
+    if (includeSymbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
     
-    // Asegurar que la contraseña contenga al menos un carácter de cada tipo incluido
-    if (includeUppercase) {
-      password += uppercaseChars.charAt(Math.floor(Math.random() * uppercaseChars.length));
+    if (charset === '') {
+      toast({
+        title: 'Error',
+        description: 'Debes seleccionar al menos un tipo de carácter',
+        variant: 'destructive',
+      });
+      return;
     }
     
-    if (includeNumbers) {
-      password += numberChars.charAt(Math.floor(Math.random() * numberChars.length));
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      newPassword += charset[randomIndex];
     }
     
-    if (includeSymbols) {
-      password += symbolChars.charAt(Math.floor(Math.random() * symbolChars.length));
-    }
+    setPassword(newPassword);
     
-    // Completar el resto de la contraseña
-    while (password.length < passwordLength) {
-      const randomIndex = Math.floor(Math.random() * allChars.length);
-      password += allChars.charAt(randomIndex);
-    }
-    
-    // Mezclar caracteres para evitar un patrón predecible
-    password = shuffleString(password);
-    
-    setGeneratedPassword(password);
+    toast({
+      title: 'Contraseña generada',
+      description: 'Se ha generado una nueva contraseña segura',
+    });
   };
-
-  // Mezclar caracteres de una cadena
-  const shuffleString = (str: string): string => {
-    const arr = str.split('');
-    
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    
-    return arr.join('');
-  };
-
-  // Copiar contraseña al portapapeles
+  
   const copyToClipboard = () => {
-    if (generatedPassword) {
-      navigator.clipboard.writeText(generatedPassword).then(() => {
+    if (!password) {
+      toast({
+        title: 'Error',
+        description: 'No hay contraseña para copiar',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    navigator.clipboard.writeText(password)
+      .then(() => {
         toast({
-          title: 'Contraseña copiada',
-          description: 'La contraseña ha sido copiada al portapapeles',
+          title: 'Copiado',
+          description: 'Contraseña copiada al portapapeles',
+        });
+      })
+      .catch(() => {
+        toast({
+          title: 'Error',
+          description: 'No se pudo copiar al portapapeles',
+          variant: 'destructive',
         });
       });
-    }
   };
-
-  // Evaluar la fortaleza de la contraseña
-  const evaluatePasswordStrength = (password: string) => {
-    if (!password) return { strength: 0, text: '', color: '' };
+  
+  const calculatePasswordStrength = (): { strength: string; color: string } => {
+    if (!password) return { strength: 'Sin contraseña', color: 'bg-gray-300' };
     
-    let strength = 0;
+    let score = 0;
     
-    // Longitud contribuye a la fortaleza
-    if (password.length >= 8) strength += 1;
-    if (password.length >= 12) strength += 1;
-    if (password.length >= 16) strength += 1;
+    // Length factor
+    if (length > 10) score += 2;
+    else if (length > 8) score += 1;
     
-    // Variedad de caracteres contribuye a la fortaleza
-    if (/[A-Z]/.test(password)) strength += 1;
-    if (/[0-9]/.test(password)) strength += 1;
-    if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+    // Character types
+    if (includeUppercase) score += 1;
+    if (includeLowercase) score += 1;
+    if (includeNumbers) score += 1;
+    if (includeSymbols) score += 2;
     
-    // Clasificación de fortaleza
-    if (strength <= 2) return { strength: 1, text: 'Débil', color: 'bg-red-500' };
-    if (strength <= 4) return { strength: 2, text: 'Moderada', color: 'bg-yellow-500' };
-    return { strength: 3, text: 'Fuerte', color: 'bg-green-500' };
+    // Variety check
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasLowercase = /[a-z]/.test(password);
+    const hasNumbers = /[0-9]/.test(password);
+    const hasSymbols = /[^A-Za-z0-9]/.test(password);
+    
+    if (hasUppercase) score += 1;
+    if (hasLowercase) score += 1;
+    if (hasNumbers) score += 1;
+    if (hasSymbols) score += 2;
+    
+    // Final strength assessment
+    if (score >= 10) return { strength: 'Muy fuerte', color: 'bg-green-500' };
+    if (score >= 7) return { strength: 'Fuerte', color: 'bg-green-400' };
+    if (score >= 5) return { strength: 'Moderada', color: 'bg-yellow-400' };
+    if (score >= 3) return { strength: 'Débil', color: 'bg-orange-400' };
+    return { strength: 'Muy débil', color: 'bg-red-500' };
   };
-
-  const passwordStrength = evaluatePasswordStrength(generatedPassword);
-
+  
+  const { strength, color } = calculatePasswordStrength();
+  
   return (
-    <div className="container py-10">
-      <h1 className="text-3xl font-bold mb-8 text-center">Generador de Contraseñas Seguras</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Configuración</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label htmlFor="password-length">Longitud de la contraseña: {passwordLength}</Label>
-                </div>
+    <div className="container flex items-center justify-center min-h-screen py-8">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lock className="h-5 w-5" />
+            Generador de Contraseñas
+          </CardTitle>
+          <CardDescription>
+            Genera contraseñas seguras para usuarios POS de Vecinos Express
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative">
+            <Input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Tu contraseña aparecerá aquí"
+              className="pr-12"
+              readOnly
+            />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="absolute right-0 top-0 h-full px-3"
+              onClick={copyToClipboard}
+            >
+              <ClipboardCopy className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <div className="space-y-1">
+            <div className="flex justify-between text-sm">
+              <span>Fortaleza: {strength}</span>
+              <span className="font-medium">{length} caracteres</span>
+            </div>
+            <div className="h-2 w-full rounded-full bg-gray-200">
+              <div 
+                className={`h-full rounded-full ${color}`} 
+                style={{ width: `${(calculatePasswordStrength().strength === 'Sin contraseña' ? 0 : (password.length / length) * 100)}%` }} 
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label htmlFor="length">Longitud</Label>
+              <div className="flex items-center space-x-2">
                 <Slider
-                  id="password-length"
-                  min={6}
-                  max={32}
+                  id="length"
+                  value={[length]}
+                  min={8}
+                  max={30}
                   step={1}
-                  value={[passwordLength]}
-                  onValueChange={(value) => setPasswordLength(value[0])}
-                  className="w-full"
+                  onValueChange={(value) => setLength(value[0])}
+                  className="flex-1"
+                />
+                <span className="w-12 text-center">{length}</span>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="uppercase">Incluir mayúsculas (A-Z)</Label>
+                <Switch
+                  id="uppercase"
+                  checked={includeUppercase}
+                  onCheckedChange={setIncludeUppercase}
                 />
               </div>
               
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="uppercase" 
-                    checked={includeUppercase}
-                    onCheckedChange={(checked) => setIncludeUppercase(!!checked)}
-                  />
-                  <Label htmlFor="uppercase">Incluir letras mayúsculas (A-Z)</Label>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="numbers" 
-                    checked={includeNumbers}
-                    onCheckedChange={(checked) => setIncludeNumbers(!!checked)}
-                  />
-                  <Label htmlFor="numbers">Incluir números (0-9)</Label>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="symbols" 
-                    checked={includeSymbols}
-                    onCheckedChange={(checked) => setIncludeSymbols(!!checked)}
-                  />
-                  <Label htmlFor="symbols">Incluir símbolos (!@#$%^&*)</Label>
-                </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="lowercase">Incluir minúsculas (a-z)</Label>
+                <Switch
+                  id="lowercase"
+                  checked={includeLowercase}
+                  onCheckedChange={setIncludeLowercase}
+                />
               </div>
               
-              <Button 
-                onClick={generatePassword} 
-                className="w-full"
-              >
-                Generar Contraseña
-              </Button>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="numbers">Incluir números (0-9)</Label>
+                <Switch
+                  id="numbers"
+                  checked={includeNumbers}
+                  onCheckedChange={setIncludeNumbers}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <Label htmlFor="symbols">Incluir símbolos (!@#$%)</Label>
+                <Switch
+                  id="symbols"
+                  checked={includeSymbols}
+                  onCheckedChange={setIncludeSymbols}
+                />
+              </div>
             </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Contraseña Generada</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {generatedPassword ? (
-                <>
-                  <div className="flex">
-                    <Input 
-                      value={generatedPassword} 
-                      readOnly 
-                      className="font-mono text-lg"
-                    />
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={copyToClipboard}
-                      className="ml-2"
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Fortaleza:</span>
-                      <span>{passwordStrength.text}</span>
-                    </div>
-                    <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full ${passwordStrength.color}`} 
-                        style={{ width: `${(passwordStrength.strength / 3) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="text-sm space-y-1">
-                    <p className="font-semibold">Seguridad de tu contraseña:</p>
-                    <ul className="list-disc list-inside space-y-1">
-                      <li>Longitud: {generatedPassword.length} caracteres</li>
-                      <li>Contiene letras minúsculas: {/[a-z]/.test(generatedPassword) ? '✓' : '✗'}</li>
-                      <li>Contiene letras mayúsculas: {/[A-Z]/.test(generatedPassword) ? '✓' : '✗'}</li>
-                      <li>Contiene números: {/[0-9]/.test(generatedPassword) ? '✓' : '✗'}</li>
-                      <li>Contiene símbolos: {/[^A-Za-z0-9]/.test(generatedPassword) ? '✓' : '✗'}</li>
-                    </ul>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center py-10 text-gray-500">
-                  <p>Configura los parámetros y genera una contraseña</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="mt-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Acerca de la generación de contraseñas seguras</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p>
-              En el sistema Vecinos, utilizamos un algoritmo avanzado para generar contraseñas seguras para los usuarios de los puntos de servicio POS. 
-              Estas contraseñas se generan automáticamente cuando:
-            </p>
-            <ul className="list-disc list-inside space-y-1">
-              <li>Se crea una nueva tienda asociada en el panel de administración</li>
-              <li>Se registra un nuevo socio a través del formulario de afiliación</li>
-              <li>Se resetea manualmente la contraseña de un usuario POS</li>
-            </ul>
-            <p>
-              Las contraseñas generadas cumplen con los estándares más altos de seguridad:
-            </p>
-            <ul className="list-disc list-inside space-y-1">
-              <li>Mínimo de 12 caracteres para mayor seguridad</li>
-              <li>Combinación de letras mayúsculas y minúsculas</li>
-              <li>Inclusión de números y símbolos especiales</li>
-              <li>Distribución aleatoria para evitar patrones predecibles</li>
-            </ul>
-            <p className="text-red-500 font-semibold">
-              ¡Importante! Las contraseñas generadas deben ser guardadas y comunicadas de forma segura a los usuarios finales.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button 
+            onClick={generatePassword} 
+            className="w-full"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Generar contraseña
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
-}
+};
+
+export default PasswordGenerator;
