@@ -43,6 +43,7 @@ import { posService } from "./services/pos-service";
 import { WebSocketServer } from "ws";
 import { createSuperAdmin } from "./admin/seed-admin";
 import { gamificationRouter } from "./gamification-routes";
+import { microInteractionsRouter } from "./micro-interactions-routes";
 import { verifyDocument } from "./services/gamification-service";
 
 // Ensure these directories exist
@@ -118,6 +119,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Registrar rutas de gamificación
   app.use('/api/gamification', gamificationRouter);
+  
+  // Registrar rutas de micro-interacciones
+  app.use('/api/micro-interactions', microInteractionsRouter);
 
   // Registrar rutas de APIs de integraciones
   registerAdminApiRoutes(app);
