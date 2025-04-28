@@ -38,6 +38,7 @@ import RonVideocall from "@/pages/ron-videocall";
 import VideoConsultation from "@/pages/video-consultation";
 import PurchaseCode from "@/pages/purchase-code";
 import MicroInteractionsDemo from "@/pages/micro-interactions-demo";
+import ShareAchievementPage from "@/pages/share-achievement";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -233,6 +234,9 @@ function Router() {
         component={MicroInteractionsDemo} 
         allowedRoles={["user", "certifier", "lawyer", "admin"]}
       />
+      
+      {/* Achievement Sharing */}
+      <Route path="/share-achievement/:id" component={ShareAchievementPage} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />

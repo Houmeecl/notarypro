@@ -153,3 +153,26 @@ microInteractionsRouter.post('/trigger-interaction', isAuthenticated, async (req
     res.status(500).json({ error: error.message });
   }
 });
+
+// Obtener información pública de un logro (para compartir)
+microInteractionsRouter.get('/public/achievements/:id', async (req, res) => {
+  try {
+    const achievementId = parseInt(req.params.id);
+    
+    if (isNaN(achievementId)) {
+      return res.status(400).json({ error: 'ID de logro inválido' });
+    }
+    
+    // Acceder a información pública del logro 
+    const achievement = await microInteractionsService.getPublicAchievementInfo(achievementId);
+    
+    if (!achievement) {
+      return res.status(404).json({ error: 'Logro no encontrado' });
+    }
+    
+    res.status(200).json(achievement);
+  } catch (error: any) {
+    console.error('Error obteniendo información pública del logro:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
