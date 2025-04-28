@@ -45,6 +45,7 @@ import { createSuperAdmin } from "./admin/seed-admin";
 import { gamificationRouter } from "./gamification-routes";
 import { microInteractionsRouter } from "./micro-interactions-routes";
 import { verifyDocument } from "./services/gamification-service";
+import { ronRouter } from "./ron-routes";
 
 // Ensure these directories exist
 const uploadsDir = path.join(process.cwd(), "uploads");
