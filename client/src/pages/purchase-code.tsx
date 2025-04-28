@@ -1,233 +1,252 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/use-auth";
-import { Button } from "@/components/ui/button";
+
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle2, CreditCard, Gift, Lock, Receipt, Video } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
+import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import MainNavbar from "@/components/layout/MainNavbar";
 
-export default function PurchaseCodePage() {
-  const { toast } = useToast();
-  const { user } = useAuth();
-  const [, setLocation] = useLocation();
-  const [purchaseCode, setPurchaseCode] = useState("");
-  const [codeValidated, setCodeValidated] = useState(false);
-  const [purchaseDetails, setPurchaseDetails] = useState<any>(null);
+const formSchema = z.object({
+  code: z.string()
+    .min(12, { message: "El código debe tener al menos 12 caracteres" })
+    .regex(/^CERFI-[A-Z0-9]{8}$/, { 
+      message: "El código debe tener formato CERFI-XXXXXXXX donde X es una letra o número" 
+    })
+});
 
-  // Mutación para validar el código de compra
+type FormData = z.infer<typeof formSchema>;
+
+export default function PurchaseCodePage() {
+  const [location, setLocation] = useLocation();
+  const { toast } = useToast();
+  const [purchaseDetails, setPurchaseDetails] = useState<any>(null);
+  const [isActivating, setIsActivating] = useState(false);
+  const [activationSuccess, setActivationSuccess] = useState(false);
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      code: ""
+    }
+  });
+
   const validateCodeMutation = useMutation({
-    mutationFn: async (code: string) => {
-      const response = await apiRequest("POST", "/api/validate-purchase-code", { code });
-      return await response.json();
+    mutationFn: async (data: FormData) => {
+      const response = await apiRequest("POST", "/api/validate-purchase-code", data);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Error validando el código");
+      }
+      return response.json();
     },
     onSuccess: (data) => {
-      toast({
-        title: "Código validado",
-        description: "El código de compra es válido.",
-      });
-      setCodeValidated(true);
       setPurchaseDetails(data);
-    },
-    onError: (error: any) => {
       toast({
-        title: "Código inválido",
-        description: error.message || "El código proporcionado no es válido o ya ha sido utilizado.",
+        title: "Código válido",
+        description: "El código de compra ha sido verificado correctamente",
+        variant: "default",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error de validación",
+        description: error.message,
         variant: "destructive",
       });
     }
   });
 
-  // Mutación para activar el servicio
   const activateServiceMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest("POST", "/api/activate-service", { 
-        code: purchaseCode,
-        userId: user?.id
-      });
-      return await response.json();
+    mutationFn: async (code: string) => {
+      const response = await apiRequest("POST", "/api/activate-service", { code });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Error activando el servicio");
+      }
+      return response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
+      setActivationSuccess(true);
       toast({
         title: "Servicio activado",
-        description: "El servicio ha sido activado correctamente en su cuenta.",
+        description: "El servicio ha sido activado correctamente. Serás redirigido en breve.",
+        variant: "default",
       });
-      
-      // Redirigir al usuario según el tipo de servicio
-      if (data.serviceType === "videoconsult") {
-        setTimeout(() => {
-          setLocation("/video-consultations");
-        }, 1500);
-      } else {
-        setTimeout(() => {
-          setLocation("/dashboard");
-        }, 1500);
-      }
+      // Redireccionar después de una activación exitosa
+      setTimeout(() => {
+        setLocation("/user-dashboard");
+      }, 3000);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
+      setIsActivating(false);
       toast({
         title: "Error de activación",
-        description: error.message || "No se pudo activar el servicio.",
+        description: error.message,
         variant: "destructive",
       });
     }
   });
 
-  // Manejar la validación del código
-  const handleValidateCode = () => {
-    if (!purchaseCode.trim()) {
-      toast({
-        title: "Código requerido",
-        description: "Por favor ingrese un código de compra.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    validateCodeMutation.mutate(purchaseCode);
+  const onSubmit = (data: FormData) => {
+    validateCodeMutation.mutate(data);
   };
 
-  // Manejar la activación del servicio
   const handleActivateService = () => {
-    activateServiceMutation.mutate();
+    if (!purchaseDetails?.code) return;
+    
+    setIsActivating(true);
+    activateServiceMutation.mutate(purchaseDetails.code);
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('es-CL', { 
+      style: 'currency', 
+      currency: 'CLP',
+      maximumFractionDigits: 0 
+    }).format(amount);
   };
 
   return (
     <>
       <MainNavbar />
-      <div className="container mx-auto py-12 px-4">
-        <h1 className="text-3xl font-bold text-center mb-8">Activar Código de Compra</h1>
-        
-        <div className="max-w-md mx-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Gift className="h-5 w-5 mr-2 text-primary" />
-                Código de Compra
-              </CardTitle>
-              <CardDescription>
-                Ingrese el código de compra para activar su servicio
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {!codeValidated ? (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Código</label>
-                    <Input
-                      placeholder="Ingrese su código de compra"
-                      value={purchaseCode}
-                      onChange={(e) => setPurchaseCode(e.target.value)}
-                    />
-                  </div>
-                  
-                  <div className="flex items-start space-x-2 text-sm text-muted-foreground">
-                    <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                    <p>
-                      Los códigos de compra son de un solo uso y no pueden ser transferidos
-                      una vez activados.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="rounded-lg bg-green-50 p-4 border border-green-100">
-                    <div className="flex">
-                      <div className="flex-shrink-0">
-                        <CheckCircle2 className="h-5 w-5 text-green-500" />
-                      </div>
-                      <div className="ml-3">
-                        <h3 className="text-sm font-medium text-green-800">Código válido</h3>
-                        <div className="mt-2 text-sm text-green-700">
-                          <p>El código de compra es válido y está listo para ser activado.</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <h3 className="font-medium">Detalles del servicio:</h3>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="text-muted-foreground">Servicio:</div>
-                      <div className="font-medium">{purchaseDetails?.serviceName}</div>
-                      
-                      <div className="text-muted-foreground">Tipo:</div>
-                      <div className="font-medium">
-                        {purchaseDetails?.serviceType === "videoconsult" ? (
-                          <span className="flex items-center">
-                            <Video className="h-3.5 w-3.5 mr-1" /> Videoconsulta
-                          </span>
-                        ) : (
-                          purchaseDetails?.serviceType
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-3xl font-bold mb-2">Activar Código de Compra</h1>
+          <p className="text-gray-600 mb-8">
+            Ingresa el código de compra que recibiste para activar tu servicio
+          </p>
+
+          {activationSuccess ? (
+            <Alert className="mb-6 bg-green-50 border-green-200">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              <AlertTitle className="text-green-800">Servicio activado correctamente</AlertTitle>
+              <AlertDescription className="text-green-700">
+                Tu servicio ha sido activado con éxito. Estás siendo redirigido a tu panel de usuario...
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <>
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle>Validar Código</CardTitle>
+                  <CardDescription>
+                    Ingresa el código de compra en formato CERFI-XXXXXXXX
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="code"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Código de compra</FormLabel>
+                            <FormControl>
+                              <Input 
+                                {...field} 
+                                placeholder="CERFI-A1B2C3D4" 
+                                className="uppercase"
+                                disabled={validateCodeMutation.isPending || !!purchaseDetails || isActivating}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
                         )}
+                      />
+                      <Button 
+                        type="submit" 
+                        disabled={validateCodeMutation.isPending || !!purchaseDetails || isActivating}
+                      >
+                        {validateCodeMutation.isPending && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Validar Código
+                      </Button>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+
+              {validateCodeMutation.isError && (
+                <Alert variant="destructive" className="mb-6">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Error</AlertTitle>
+                  <AlertDescription>
+                    {validateCodeMutation.error.message}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {purchaseDetails && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Detalles del Servicio</CardTitle>
+                    <CardDescription>
+                      Confirma los detalles del servicio que estás a punto de activar
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500">Código</h3>
+                        <p className="text-lg font-semibold">{purchaseDetails.code}</p>
                       </div>
-                      
-                      <div className="text-muted-foreground">Duración:</div>
-                      <div className="font-medium">{purchaseDetails?.duration}</div>
-                      
-                      <div className="text-muted-foreground">Valor:</div>
-                      <div className="font-medium">
-                        {purchaseDetails?.currency} {purchaseDetails?.amount.toLocaleString()}
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500">Servicio</h3>
+                        <p className="text-lg font-semibold">{purchaseDetails.serviceName}</p>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500">Duración</h3>
+                        <p className="text-lg font-semibold">{purchaseDetails.duration}</p>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500">Valor</h3>
+                        <p className="text-lg font-semibold">{formatCurrency(purchaseDetails.amount)}</p>
                       </div>
                     </div>
-                  </div>
-                </div>
+                    
+                    <Separator className="my-4" />
+                    
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500">Fecha de expiración</h3>
+                      <p className="text-base">
+                        {new Date(purchaseDetails.expirationDate).toLocaleDateString('es-CL')}
+                      </p>
+                    </div>
+
+                    <Alert variant="default" className="bg-blue-50 border-blue-100 text-blue-800">
+                      <AlertCircle className="h-4 w-4 text-blue-600" />
+                      <AlertDescription className="text-blue-700">
+                        Al activar este código, estarás habilitando el servicio en tu cuenta. 
+                        El código solo puede ser utilizado una vez.
+                      </AlertDescription>
+                    </Alert>
+                  </CardContent>
+                  <CardFooter>
+                    <Button 
+                      onClick={handleActivateService} 
+                      disabled={isActivating}
+                      className="w-full"
+                    >
+                      {isActivating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Activar Servicio
+                    </Button>
+                  </CardFooter>
+                </Card>
               )}
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button variant="outline" onClick={() => window.history.back()}>
-                Cancelar
-              </Button>
-              
-              {!codeValidated ? (
-                <Button 
-                  onClick={handleValidateCode}
-                  disabled={validateCodeMutation.isPending || !purchaseCode.trim()}
-                >
-                  {validateCodeMutation.isPending ? "Validando..." : "Validar código"}
-                </Button>
-              ) : (
-                <Button 
-                  onClick={handleActivateService}
-                  disabled={activateServiceMutation.isPending}
-                >
-                  {activateServiceMutation.isPending ? "Activando..." : "Activar servicio"}
-                </Button>
-              )}
-            </CardFooter>
-          </Card>
-          
-          <div className="mt-8">
-            <h2 className="text-lg font-semibold mb-4">Preguntas frecuentes</h2>
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-medium mb-1">¿Dónde encuentro mi código de compra?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Después de completar su compra, el código es enviado a su correo electrónico 
-                  y también aparece en la página de confirmación.
-                </p>
-              </div>
-              
-              <div>
-                <h3 className="font-medium mb-1">¿Por cuánto tiempo es válido mi código?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Los códigos de compra son válidos por 30 días a partir de la fecha de compra.
-                </p>
-              </div>
-              
-              <div>
-                <h3 className="font-medium mb-1">¿Qué hago si mi código no funciona?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Si su código no funciona, verifique que lo haya ingresado correctamente. 
-                  Si el problema persiste, contáctenos a través de nuestro 
-                  <a href="/contacto" className="text-primary"> formulario de contacto</a>.
-                </p>
-              </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
       </div>
     </>
