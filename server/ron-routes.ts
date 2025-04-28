@@ -40,9 +40,8 @@ ronRouter.post("/login", async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Credenciales incorrectas" });
     }
     
-    // Verificar la contraseña - en producción usar comparePasswords
-    // Para simplificar las pruebas, comparamos directamente
-    if (password !== user.password) {
+    // Verificar la contraseña usando el método de hash y sal correcto
+    if (!(await comparePasswords(password, user.password))) {
       return res.status(401).json({ message: "Credenciales incorrectas" });
     }
     
