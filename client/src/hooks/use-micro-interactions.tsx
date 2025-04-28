@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useEffect, ReactNode } from
 import { useAuth } from './use-auth';
 import { queryClient, apiRequest } from '@/lib/queryClient';
 import { useToast } from './use-toast';
-import confetti from 'react-confetti';
+import ReactConfetti from 'react-confetti';
 import { useMutation } from '@tanstack/react-query';
 
 // Lista de eventos predefinidos que pueden activar micro-interacciones
@@ -237,7 +237,7 @@ export const MicroInteractionProvider: React.FC<{ children: ReactNode }> = ({ ch
     >
       {showConfetti && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 9999, pointerEvents: 'none' }}>
-          <confetti
+          <ReactConfetti
             width={window.innerWidth}
             height={window.innerHeight}
             recycle={false}

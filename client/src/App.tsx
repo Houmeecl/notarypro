@@ -7,6 +7,8 @@ import { ThemeProvider } from "next-themes";
 import NotFound from "@/pages/not-found";
 import { AuthProvider } from "@/hooks/use-auth";
 import { OnboardingProvider } from "@/hooks/use-onboarding";
+import { MicroInteractionProvider } from "@/hooks/use-micro-interactions";
+import { MicroInteractionDisplay } from "@/components/micro-interactions/MicroInteractionDisplay";
 import { ProtectedRoute } from "./lib/protected-route";
 
 // Pages
@@ -35,6 +37,7 @@ import ServiceSelectionPage from "@/pages/service-selection";
 import RonVideocall from "@/pages/ron-videocall";
 import VideoConsultation from "@/pages/video-consultation";
 import PurchaseCode from "@/pages/purchase-code";
+import MicroInteractionsDemo from "@/pages/micro-interactions-demo";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -224,6 +227,13 @@ function Router() {
       {/* Purchase Code */}
       <Route path="/purchase-code" component={PurchaseCode} />
       
+      {/* Micro-Interactions Demo */}
+      <ProtectedRoute 
+        path="/micro-interactions-demo" 
+        component={MicroInteractionsDemo} 
+        allowedRoles={["user", "certifier", "lawyer", "admin"]}
+      />
+      
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
@@ -235,12 +245,15 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <OnboardingProvider>
-          <ThemeProvider attribute="class" defaultTheme="light">
-            <TooltipProvider>
-              <Toaster />
-              <Router />
-            </TooltipProvider>
-          </ThemeProvider>
+          <MicroInteractionProvider>
+            <ThemeProvider attribute="class" defaultTheme="light">
+              <TooltipProvider>
+                <Toaster />
+                <MicroInteractionDisplay />
+                <Router />
+              </TooltipProvider>
+            </ThemeProvider>
+          </MicroInteractionProvider>
         </OnboardingProvider>
       </AuthProvider>
     </QueryClientProvider>
