@@ -932,33 +932,20 @@ export async function getVerificationStats(userId?: number) {
     count: Number(r.count) 
   }));
 
-  // Consulta para obtener los documentos más verificados
-  const mostVerifiedQuery = userId
-    ? db.select({
-        documentId: gamificationActivities.metadata.documentId,
-        title: documents.title,
-        count: sql`count(*)`
-      })
-      .from(gamificationActivities)
-      .leftJoin(documents, eq(documents.id, gamificationActivities.metadata.documentId))
-      .where(and(
-        eq(gamificationActivities.userId, userId),
-        eq(gamificationActivities.activityType, 'document_verification')
-      ))
-      .groupBy(gamificationActivities.metadata.documentId, documents.title)
-      .orderBy(desc(sql`count(*)`))
-      .limit(5)
-    : db.select({
-        documentId: gamificationActivities.metadata.documentId,
-        title: documents.title,
-        count: sql`count(*)`
-      })
-      .from(gamificationActivities)
-      .leftJoin(documents, eq(documents.id, gamificationActivities.metadata.documentId))
-      .where(eq(gamificationActivities.activityType, 'document_verification'))
-      .groupBy(gamificationActivities.metadata.documentId, documents.title)
-      .orderBy(desc(sql`count(*)`))
-      .limit(5);
+  // Consulta para obtener los documentos más verificados usando sql directo para evitar problemas de tipado
+  const mostVerifiedQuery = db.execute(sql`
+    SELECT 
+      CAST(ga.metadata->>'documentId' AS INTEGER) as "documentId",
+      COALESCE(d.title, ga.metadata->>'documentTitle', 'Documento sin título') as "title",
+      COUNT(*) as "count"
+    FROM gamification_activities ga
+    LEFT JOIN documents d ON d.id = CAST(ga.metadata->>'documentId' AS INTEGER)
+    WHERE ga.activity_type = 'document_verification'
+    ${userId ? sql`AND ga.user_id = ${userId}` : sql``}
+    GROUP BY CAST(ga.metadata->>'documentId' AS INTEGER), d.title, ga.metadata->>'documentTitle'
+    ORDER BY COUNT(*) DESC
+    LIMIT 5
+  `);
 
   // Ejecutar consulta de documentos más verificados
   const mostVerifiedResults = await mostVerifiedQuery;
