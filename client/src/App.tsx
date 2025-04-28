@@ -48,6 +48,7 @@ import DocumentTemplatesPage from "@/pages/document-templates";
 import DocumentFormPage from "@/pages/document-form";
 import DocumentViewPage from "@/pages/document-view";
 import DocumentsPage from "@/pages/documents";
+import DocumentProcessor from "@/pages/document-processor";
 
 // Partner pages
 import PartnersPublicPage from "@/pages/partners/public-page";
@@ -99,6 +100,11 @@ function Router() {
         path="/documents/:documentId" 
         component={DocumentViewPage} 
         allowedRoles={["user", "certifier", "admin"]} 
+      />
+      <ProtectedRoute 
+        path="/document-processor" 
+        component={DocumentProcessor} 
+        allowedRoles={["user", "certifier", "admin", "partner"]} 
       />
       
       {/* Certifier routes */}
