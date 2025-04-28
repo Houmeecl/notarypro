@@ -123,6 +123,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Registrar rutas de micro-interacciones
   app.use('/api/micro-interactions', microInteractionsRouter);
+  
+  // Registrar rutas de la plataforma RON
+  app.use('/api/ron', ronRouter);
 
   // Registrar rutas de APIs de integraciones
   registerAdminApiRoutes(app);
