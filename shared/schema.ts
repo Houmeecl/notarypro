@@ -1019,3 +1019,251 @@ export type QuickAchievement = typeof quickAchievements.$inferSelect;
 export type InsertQuickAchievement = z.infer<typeof insertQuickAchievementSchema>;
 export type UserAchievementProgress = typeof userAchievementProgress.$inferSelect;
 export type InsertUserAchievementProgress = z.infer<typeof insertUserAchievementProgressSchema>;
+
+// =====================================================
+// Notary Public Section (Desactivado inicialmente)
+// =====================================================
+
+// Notary Profiles
+export const notaryProfiles = pgTable("notary_profiles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  registryNumber: text("registry_number").notNull().unique(),
+  licenseNumber: text("license_number").notNull().unique(),
+  jurisdiction: text("jurisdiction").notNull(),
+  officeAddress: text("office_address").notNull(),
+  officePhone: text("office_phone").notNull(),
+  officeEmail: text("office_email").notNull(),
+  website: text("website"),
+  bio: text("bio"),
+  specializations: jsonb("specializations"), // Array of specializations
+  serviceArea: jsonb("service_area"), // Array of regions/jurisdictions served
+  isActive: boolean("is_active").default(true),
+  verificationStatus: text("verification_status").notNull().default("pending"), // pending, verified, rejected
+  profileImageUrl: text("profile_image_url"),
+  digitalSignatureId: text("digital_signature_id"), // ID of digital signature certificate
+  digitalSignatureExpiry: date("digital_signature_expiry"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertNotaryProfileSchema = createInsertSchema(notaryProfiles).pick({
+  userId: true,
+  registryNumber: true,
+  licenseNumber: true,
+  jurisdiction: true,
+  officeAddress: true,
+  officePhone: true,
+  officeEmail: true,
+  website: true,
+  bio: true,
+  specializations: true,
+  serviceArea: true,
+  isActive: true,
+  profileImageUrl: true,
+  digitalSignatureId: true,
+  digitalSignatureExpiry: true,
+});
+
+export type NotaryProfile = typeof notaryProfiles.$inferSelect;
+export type InsertNotaryProfile = z.infer<typeof insertNotaryProfileSchema>;
+
+// Notary Protocol Books
+export const notaryProtocolBooks = pgTable("notary_protocol_books", {
+  id: serial("id").primaryKey(),
+  notaryId: integer("notary_id").notNull().references(() => notaryProfiles.id),
+  year: integer("year").notNull(),
+  bookNumber: integer("book_number").notNull(),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date"),
+  totalDocuments: integer("total_documents").default(0),
+  status: text("status").notNull().default("active"), // active, archived, closed
+  physicalLocation: text("physical_location"),
+  digitalBackupUrl: text("digital_backup_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertNotaryProtocolBookSchema = createInsertSchema(notaryProtocolBooks).pick({
+  notaryId: true,
+  year: true,
+  bookNumber: true,
+  startDate: true,
+  endDate: true,
+  totalDocuments: true,
+  status: true,
+  physicalLocation: true,
+  digitalBackupUrl: true,
+});
+
+export type NotaryProtocolBook = typeof notaryProtocolBooks.$inferSelect;
+export type InsertNotaryProtocolBook = z.infer<typeof insertNotaryProtocolBookSchema>;
+
+// Notary Deeds and Documents
+export const notaryDeeds = pgTable("notary_deeds", {
+  id: serial("id").primaryKey(),
+  notaryId: integer("notary_id").notNull().references(() => notaryProfiles.id),
+  protocolBookId: integer("protocol_book_id").references(() => notaryProtocolBooks.id),
+  deedNumber: text("deed_number").notNull(),
+  deedType: text("deed_type").notNull(), // power_of_attorney, real_estate, will, etc.
+  deedTitle: text("deed_title").notNull(),
+  executionDate: date("execution_date").notNull(),
+  folio: text("folio"),
+  parties: jsonb("parties"), // Array of involved parties
+  folioCount: integer("folio_count").default(1),
+  digitalCopy: text("digital_copy"), // URL to digital copy
+  status: text("status").notNull().default("active"), // active, cancelled, amended
+  relatedDeedId: integer("related_deed_id"), // For amendments or related deeds
+  notes: text("notes"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertNotaryDeedSchema = createInsertSchema(notaryDeeds).pick({
+  notaryId: true,
+  protocolBookId: true,
+  deedNumber: true,
+  deedType: true,
+  deedTitle: true,
+  executionDate: true,
+  folio: true,
+  parties: true,
+  folioCount: true,
+  digitalCopy: true,
+  status: true,
+  relatedDeedId: true,
+  notes: true,
+  metadata: true,
+});
+
+export type NotaryDeed = typeof notaryDeeds.$inferSelect;
+export type InsertNotaryDeed = z.infer<typeof insertNotaryDeedSchema>;
+
+// Notary Fee Schedule
+export const notaryFeeSchedules = pgTable("notary_fee_schedules", {
+  id: serial("id").primaryKey(),
+  notaryId: integer("notary_id").notNull().references(() => notaryProfiles.id),
+  serviceType: text("service_type").notNull(), // deed, certification, authentication, etc.
+  serviceName: text("service_name").notNull(),
+  description: text("description"),
+  basePrice: integer("base_price").notNull(), // In cents
+  variableRate: boolean("variable_rate").default(false),
+  variableFactor: text("variable_factor"), // What the variable price depends on
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertNotaryFeeScheduleSchema = createInsertSchema(notaryFeeSchedules).pick({
+  notaryId: true,
+  serviceType: true,
+  serviceName: true,
+  description: true,
+  basePrice: true,
+  variableRate: true,
+  variableFactor: true,
+  isActive: true,
+});
+
+export type NotaryFeeSchedule = typeof notaryFeeSchedules.$inferSelect;
+export type InsertNotaryFeeSchedule = z.infer<typeof insertNotaryFeeScheduleSchema>;
+
+// Notary Appointments
+export const notaryAppointments = pgTable("notary_appointments", {
+  id: serial("id").primaryKey(),
+  notaryId: integer("notary_id").notNull().references(() => notaryProfiles.id),
+  clientId: integer("client_id").notNull().references(() => users.id),
+  serviceType: text("service_type").notNull(),
+  appointmentDate: timestamp("appointment_date").notNull(),
+  duration: integer("duration").notNull().default(30), // In minutes
+  status: text("status").notNull().default("scheduled"), // scheduled, completed, cancelled, no_show
+  notes: text("notes"),
+  location: text("location").notNull().default("office"), // office, remote, client_location
+  clientLocationAddress: text("client_location_address"),
+  meetingUrl: text("meeting_url"), // For remote appointments
+  reminderSent: boolean("reminder_sent").default(false),
+  feeEstimate: integer("fee_estimate"), // Estimated fee in cents
+  actualFee: integer("actual_fee"), // Actual charged fee in cents
+  paymentStatus: text("payment_status").default("pending"), // pending, paid, waived
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertNotaryAppointmentSchema = createInsertSchema(notaryAppointments).pick({
+  notaryId: true,
+  clientId: true,
+  serviceType: true,
+  appointmentDate: true,
+  duration: true,
+  notes: true,
+  location: true,
+  clientLocationAddress: true,
+  meetingUrl: true,
+  feeEstimate: true,
+});
+
+export type NotaryAppointment = typeof notaryAppointments.$inferSelect;
+export type InsertNotaryAppointment = z.infer<typeof insertNotaryAppointmentSchema>;
+
+// Notary Biometric Verifications
+export const notaryBiometricVerifications = pgTable("notary_biometric_verifications", {
+  id: serial("id").primaryKey(),
+  notaryId: integer("notary_id").notNull().references(() => notaryProfiles.id),
+  clientId: integer("client_id").notNull().references(() => users.id),
+  deedId: integer("deed_id").references(() => notaryDeeds.id),
+  verificationType: text("verification_type").notNull(), // fingerprint, face, id_scan
+  verificationData: jsonb("verification_data").notNull(),
+  verificationResult: boolean("verification_result").notNull(),
+  confidenceScore: real("confidence_score"),
+  verificationTimestamp: timestamp("verification_timestamp").defaultNow().notNull(),
+  ipAddress: text("ip_address"),
+  deviceInfo: text("device_info"),
+  geoLocation: text("geo_location"),
+  storageReference: text("storage_reference"), // Reference to stored biometric data
+  expiryDate: date("expiry_date"), // When this verification expires
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertNotaryBiometricVerificationSchema = createInsertSchema(notaryBiometricVerifications).pick({
+  notaryId: true,
+  clientId: true,
+  deedId: true,
+  verificationType: true,
+  verificationData: true,
+  verificationResult: true,
+  confidenceScore: true,
+  ipAddress: true,
+  deviceInfo: true,
+  geoLocation: true,
+  storageReference: true,
+  expiryDate: true,
+});
+
+export type NotaryBiometricVerification = typeof notaryBiometricVerifications.$inferSelect;
+export type InsertNotaryBiometricVerification = z.infer<typeof insertNotaryBiometricVerificationSchema>;
+
+// Notary Registry Connections
+export const notaryRegistryConnections = pgTable("notary_registry_connections", {
+  id: serial("id").primaryKey(),
+  notaryId: integer("notary_id").notNull().references(() => notaryProfiles.id),
+  registryName: text("registry_name").notNull(), // property_registry, commercial_registry, etc.
+  apiEndpoint: text("api_endpoint").notNull(),
+  apiCredentialId: text("api_credential_id").notNull(),
+  status: text("status").notNull().default("active"), // active, inactive, error
+  lastSyncTimestamp: timestamp("last_sync_timestamp"),
+  errorMessage: text("error_message"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertNotaryRegistryConnectionSchema = createInsertSchema(notaryRegistryConnections).pick({
+  notaryId: true,
+  registryName: true,
+  apiEndpoint: true,
+  apiCredentialId: true,
+  status: true,
+});
+
+export type NotaryRegistryConnection = typeof notaryRegistryConnections.$inferSelect;
+export type InsertNotaryRegistryConnection = z.infer<typeof insertNotaryRegistryConnectionSchema>;

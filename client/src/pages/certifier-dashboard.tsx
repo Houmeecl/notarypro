@@ -289,9 +289,10 @@ export default function CertifierDashboard() {
 
         <div className="mb-6">
           <Tabs defaultValue="sesiones" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="sesiones">Sesiones de Certificación</TabsTrigger>
               <TabsTrigger value="documentos">Documentos Pendientes</TabsTrigger>
+              <TabsTrigger value="ron">Certificación Remota (RON)</TabsTrigger>
             </TabsList>
             
             <TabsContent value="sesiones" className="space-y-4">
@@ -504,6 +505,178 @@ export default function CertifierDashboard() {
                   </TableBody>
                 </Table>
               </div>
+            </TabsContent>
+            
+            {/* Nueva pestaña para RON con priorización regional */}
+            <TabsContent value="ron">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Video className="h-5 w-5 mr-2 text-primary" />
+                    Certificación Remota en Línea (RON)
+                  </CardTitle>
+                  <CardDescription>
+                    Gestione solicitudes de certificación remota priorizadas por ubicación
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {/* Sección de solicitudes prioritarias (misma región) */}
+                    <div>
+                      <h3 className="text-sm font-semibold mb-3 flex items-center">
+                        <Badge variant="outline" className="mr-2 bg-green-50 text-green-700 border-green-200">Prioritarias</Badge>
+                        Solicitudes en su región: Santiago
+                      </h3>
+                      
+                      <div className="rounded-md border">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Cliente</TableHead>
+                              <TableHead>Documento</TableHead>
+                              <TableHead>Ubicación</TableHead>
+                              <TableHead>Solicitado</TableHead>
+                              <TableHead>Estado</TableHead>
+                              <TableHead className="text-right">Acciones</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            <TableRow>
+                              <TableCell className="font-medium">Ana Martínez</TableCell>
+                              <TableCell>Poder Notarial</TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                                  Santiago (Su región)
+                                </Badge>
+                              </TableCell>
+                              <TableCell>Hace 32 minutos</TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                                  Pendiente
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button size="sm" className="mr-2">
+                                  <Video className="h-4 w-4 mr-2" />
+                                  Iniciar RON
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell className="font-medium">Carlos Rojas</TableCell>
+                              <TableCell>Declaración Jurada</TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                                  Santiago (Su región)
+                                </Badge>
+                              </TableCell>
+                              <TableCell>Hace 1 hora</TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                                  Pendiente
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button size="sm" className="mr-2">
+                                  <Video className="h-4 w-4 mr-2" />
+                                  Iniciar RON
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </div>
+                    
+                    {/* Sección de solicitudes de otras regiones */}
+                    <div>
+                      <h3 className="text-sm font-semibold mb-3 flex items-center">
+                        <Badge variant="outline" className="mr-2 bg-blue-50 text-blue-700 border-blue-200">Otras Regiones</Badge>
+                        Solicitudes en espera de otras regiones
+                      </h3>
+                      
+                      <div className="rounded-md border">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Cliente</TableHead>
+                              <TableHead>Documento</TableHead>
+                              <TableHead>Ubicación</TableHead>
+                              <TableHead>Solicitado</TableHead>
+                              <TableHead>Estado</TableHead>
+                              <TableHead className="text-right">Acciones</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            <TableRow>
+                              <TableCell className="font-medium">Marcela Jiménez</TableCell>
+                              <TableCell>Contrato de Arrendamiento</TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                                  Valparaíso
+                                </Badge>
+                              </TableCell>
+                              <TableCell>Hace 2 horas</TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                                  Sin certificador local
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button size="sm" variant="outline" className="mr-2">
+                                  <Video className="h-4 w-4 mr-2" />
+                                  Aceptar
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell className="font-medium">Roberto Soto</TableCell>
+                              <TableCell>Autorización de Viaje</TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                                  Concepción
+                                </Badge>
+                              </TableCell>
+                              <TableCell>Hace 3 horas</TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                                  Sin certificador local
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button size="sm" variant="outline" className="mr-2">
+                                  <Video className="h-4 w-4 mr-2" />
+                                  Aceptar
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </div>
+                    
+                    {/* Sección de información y política de priorización */}
+                    <Card className="bg-muted/40 border-dashed">
+                      <CardContent className="pt-6">
+                        <div className="flex items-start space-x-4">
+                          <div className="bg-blue-100 p-2 rounded-full">
+                            <Info className="h-5 w-5 text-blue-700" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium mb-1">Política de priorización regional</h4>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              Para brindar un mejor servicio, el sistema prioriza la asignación de certificadores de la misma región del cliente. Cuando no hay disponibilidad regional, se permite que certificadores de otras regiones acepten las solicitudes.
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Las solicitudes de su región aparecen como "Prioritarias" y se recomienda atenderlas primero.
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
             
             <TabsContent value="documentos">
