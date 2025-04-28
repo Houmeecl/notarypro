@@ -556,6 +556,163 @@ export default function LawyerDashboard() {
               </CardFooter>
             </Card>
             
+            {/* Sección de RON con priorización regional */}
+            <Card className="mt-6">
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle className="flex items-center">
+                    <Video className="h-5 w-5 mr-2 text-primary" />
+                    Certificación Remota en Línea (RON)
+                  </CardTitle>
+                  <Button size="sm">
+                    <Plus className="h-4 w-4 mr-1" /> Nueva Solicitud RON
+                  </Button>
+                </div>
+                <CardDescription>Solicitudes de certificación remota priorizadas por región</CardDescription>
+              </CardHeader>
+
+              <CardContent>
+                <Tabs defaultValue="local" className="w-full">
+                  <TabsList className="grid grid-cols-2 mb-4">
+                    <TabsTrigger value="local">Mi Región</TabsTrigger>
+                    <TabsTrigger value="other">Otras Regiones</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="local">
+                    {mockRonRequests.filter(req => req.isLocal).length > 0 ? (
+                      <div className="rounded-md border">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Cliente</TableHead>
+                              <TableHead>Documento</TableHead>
+                              <TableHead>Solicitado</TableHead>
+                              <TableHead>Estado</TableHead>
+                              <TableHead className="text-right">Acciones</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {mockRonRequests
+                              .filter(req => req.isLocal)
+                              .map(request => (
+                                <TableRow key={request.id}>
+                                  <TableCell className="font-medium">{request.clientName}</TableCell>
+                                  <TableCell>{request.documentType}</TableCell>
+                                  <TableCell>{new Date(request.requestedAt).toLocaleString(undefined, {
+                                    dateStyle: 'short',
+                                    timeStyle: 'short'
+                                  })}</TableCell>
+                                  <TableCell>
+                                    <Badge className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                                      Pendiente
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    <Button size="sm" variant="default">
+                                      <Video className="h-4 w-4 mr-2" />
+                                      Ver detalles
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                          <Video className="h-6 w-6 text-muted-foreground" />
+                        </div>
+                        <h3 className="mt-4 text-lg font-semibold">Sin solicitudes en su región</h3>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                          No hay solicitudes pendientes de certificación remota en su región.
+                        </p>
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="other">
+                    {mockRonRequests.filter(req => !req.isLocal).length > 0 ? (
+                      <div className="rounded-md border">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Cliente</TableHead>
+                              <TableHead>Documento</TableHead>
+                              <TableHead>Región</TableHead>
+                              <TableHead>Solicitado</TableHead>
+                              <TableHead>Estado</TableHead>
+                              <TableHead className="text-right">Acciones</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {mockRonRequests
+                              .filter(req => !req.isLocal)
+                              .map(request => (
+                                <TableRow key={request.id}>
+                                  <TableCell className="font-medium">{request.clientName}</TableCell>
+                                  <TableCell>{request.documentType}</TableCell>
+                                  <TableCell>
+                                    <Badge className="bg-blue-50 text-blue-700 border-blue-200">
+                                      {request.region}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell>{new Date(request.requestedAt).toLocaleString(undefined, {
+                                    dateStyle: 'short',
+                                    timeStyle: 'short'
+                                  })}</TableCell>
+                                  <TableCell>
+                                    <Badge className="bg-amber-50 text-amber-700 border-amber-200">
+                                      Sin certificador local
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    <Button size="sm" variant="outline">
+                                      <Video className="h-4 w-4 mr-2" />
+                                      Ver detalles
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                          <Video className="h-6 w-6 text-muted-foreground" />
+                        </div>
+                        <h3 className="mt-4 text-lg font-semibold">Sin solicitudes de otras regiones</h3>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                          No hay solicitudes pendientes de certificación remota de otras regiones.
+                        </p>
+                      </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
+
+                {/* Información sobre la priorización regional */}
+                <Card className="bg-muted/40 border-dashed mt-4">
+                  <CardContent className="pt-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="bg-blue-100 p-2 rounded-full">
+                        <Info className="h-5 w-5 text-blue-700" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium mb-1">Sistema de priorización regional</h4>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          Para brindar un mejor servicio, la plataforma prioriza que los documentos sean certificados por profesionales de la misma región del cliente. Esto reduce tiempos de espera y mejora la calidad del servicio.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Las solicitudes de otras regiones solo serán asignadas a certificadores externos cuando no hay disponibilidad local.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CardContent>
+            </Card>
+            
             {/* Casos recientes */}
             <Card className="mt-6">
               <CardHeader>
