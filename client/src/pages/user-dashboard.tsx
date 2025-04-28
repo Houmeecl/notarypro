@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
+import { useMicroInteractions } from "@/hooks/use-micro-interactions";
+import { AchievementsList } from "@/components/micro-interactions/AchievementsList";
 import { 
   FileText, 
   Upload, 
@@ -37,7 +39,9 @@ import {
   Loader2, 
   FileSignature, 
   Eye, 
-  PlusCircle 
+  PlusCircle,
+  Award,
+  Trophy
 } from "lucide-react";
 import { Document } from "@shared/schema";
 
@@ -46,7 +50,7 @@ export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState("documents");
 
   // Fetch user documents
-  const { data: documents, isLoading: isDocumentsLoading } = useQuery<Document[]>({
+  const { data: documents, isLoading: isDocumentsLoading } = useQuery<any[]>({
     queryKey: ["/api/documents"],
   });
 
@@ -87,7 +91,8 @@ export default function UserDashboard() {
   };
 
   // Format date helper
-  const formatDate = (dateString: Date) => {
+  const formatDate = (dateString: Date | null) => {
+    if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleString('es-ES', {
       day: '2-digit',
@@ -126,6 +131,10 @@ export default function UserDashboard() {
                 <TabsTrigger value="upload" className="gap-2">
                   <Upload className="h-4 w-4" />
                   <span>Subir Documento</span>
+                </TabsTrigger>
+                <TabsTrigger value="achievements" className="gap-2">
+                  <Trophy className="h-4 w-4" />
+                  <span>Mis Logros</span>
                 </TabsTrigger>
               </TabsList>
               
@@ -266,6 +275,20 @@ export default function UserDashboard() {
             
             <TabsContent value="upload">
               <DocumentUpload />
+            </TabsContent>
+            
+            <TabsContent value="achievements">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl">Mis Logros</CardTitle>
+                  <CardDescription>
+                    Mira los logros que has desbloqueado y compártelos
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <AchievementsList className="mt-2" />
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>
