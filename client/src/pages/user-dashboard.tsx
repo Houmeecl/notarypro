@@ -135,15 +135,15 @@ export default function UserDashboard() {
           >
             <div className="flex justify-between items-center">
               <TabsList>
-                <TabsTrigger value="documents" className="gap-2">
+                <TabsTrigger id="documents-tab" value="documents" className="gap-2">
                   <FileText className="h-4 w-4" />
                   <span>Mis Documentos</span>
                 </TabsTrigger>
-                <TabsTrigger value="upload" className="gap-2">
+                <TabsTrigger id="upload-tab" value="upload" className="gap-2">
                   <Upload className="h-4 w-4" />
                   <span>Subir Documento</span>
                 </TabsTrigger>
-                <TabsTrigger value="achievements" className="gap-2">
+                <TabsTrigger id="achievements-tab" value="achievements" className="gap-2">
                   <Trophy className="h-4 w-4" />
                   <span>Mis Logros</span>
                 </TabsTrigger>

@@ -130,7 +130,7 @@ export default function Sidebar() {
           {user?.role === "certifier" ? "Certificador" : (user?.role === "admin" ? "Administrador" : "Usuario")}
         </div>
         
-        <nav className="space-y-1">
+        <nav id="dashboard-menu" className="space-y-1">
           {filteredRoutes.map((route, index) => (
             <NavItem
               key={index}

@@ -7,6 +7,8 @@ import { ThemeProvider } from "next-themes";
 import NotFound from "@/pages/not-found";
 import { AuthProvider } from "@/hooks/use-auth";
 import { OnboardingProvider } from "@/hooks/use-onboarding";
+import OnboardingPopup from "@/components/onboarding/OnboardingPopup";
+import HelpButton from "@/components/onboarding/HelpButton";
 import { MicroInteractionProvider } from "@/hooks/use-micro-interactions";
 import { MicroInteractionDisplay } from "@/components/micro-interactions/MicroInteractionDisplay";
 import { ProtectedRoute } from "./lib/protected-route";
@@ -254,6 +256,8 @@ function App() {
               <TooltipProvider>
                 <Toaster />
                 <MicroInteractionDisplay />
+                <OnboardingPopup />
+                <HelpButton />
                 <Router />
               </TooltipProvider>
             </ThemeProvider>
