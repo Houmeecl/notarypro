@@ -903,3 +903,119 @@ export interface DocumentVerification {
   verified: boolean;
   verifiedAt: Date | null;
 }
+
+// ======= SISTEMA DE MICRO-INTERACCIONES =======
+
+// Definición de micro-interacciones
+export const microInteractions = pgTable("micro_interactions", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // 'confetti', 'achievement', 'toast', 'animation', 'sound', 'badge'
+  triggerEvent: text("trigger_event").notNull(), // Evento que activa la interacción
+  displayMessage: text("display_message").notNull(),
+  animationData: jsonb("animation_data"), // Configuración de la animación
+  soundUrl: text("sound_url"), // URL del sonido a reproducir
+  visualAsset: text("visual_asset"), // URL a un asset visual (imagen, icono)
+  duration: integer("duration"), // Duración en milisegundos
+  pointsAwarded: integer("points_awarded").default(0), // Puntos otorgados al usuario
+  requiredLevel: integer("required_level").default(1), // Nivel mínimo requerido
+  frequency: text("frequency").default("always"), // 'always', 'once', 'daily', 'weekly'
+  cooldownSeconds: integer("cooldown_seconds").default(0), // Tiempo de espera entre activaciones
+  isActive: boolean("is_active").notNull().default(true),
+  showInHistory: boolean("show_in_history").notNull().default(false), // Si se muestra en el historial del usuario
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertMicroInteractionSchema = createInsertSchema(microInteractions).pick({
+  name: true,
+  type: true,
+  triggerEvent: true,
+  displayMessage: true,
+  animationData: true,
+  soundUrl: true, 
+  visualAsset: true,
+  duration: true,
+  pointsAwarded: true,
+  requiredLevel: true,
+  frequency: true,
+  cooldownSeconds: true,
+  isActive: true,
+  showInHistory: true
+});
+
+// Historial de micro-interacciones por usuario
+export const userInteractionHistory = pgTable("user_interaction_history", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  interactionId: integer("interaction_id").notNull(),
+  triggeredAt: timestamp("triggered_at").defaultNow(),
+  pointsAwarded: integer("points_awarded").default(0),
+  context: jsonb("context"), // Datos adicionales sobre cuando ocurrió
+  viewed: boolean("viewed").notNull().default(true),
+});
+
+export const insertUserInteractionHistorySchema = createInsertSchema(userInteractionHistory).pick({
+  userId: true,
+  interactionId: true,
+  pointsAwarded: true,
+  context: true,
+  viewed: true
+});
+
+// Logros rápidos (Quick Achievements)
+export const quickAchievements = pgTable("quick_achievements", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  icon: text("icon").notNull(), // URL al icono
+  threshold: integer("threshold").notNull(), // Valor necesario para desbloquear
+  metricType: text("metric_type").notNull(), // Tipo de métrica: 'consecutive_days', 'verifications', etc.
+  rewardPoints: integer("reward_points").notNull().default(0),
+  badgeId: integer("badge_id"), // Opcional: insignia relacionada
+  level: integer("level").notNull().default(1), // Nivel de dificultad o progresión
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertQuickAchievementSchema = createInsertSchema(quickAchievements).pick({
+  name: true,
+  description: true,
+  icon: true,
+  threshold: true,
+  metricType: true,
+  rewardPoints: true,
+  badgeId: true,
+  level: true,
+  isActive: true
+});
+
+// Progreso de logros por usuario
+export const userAchievementProgress = pgTable("user_achievement_progress", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  achievementId: integer("achievement_id").notNull(),
+  currentValue: integer("current_value").notNull().default(0),
+  unlocked: boolean("unlocked").notNull().default(false),
+  unlockedAt: timestamp("unlocked_at"),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+});
+
+export const insertUserAchievementProgressSchema = createInsertSchema(userAchievementProgress).pick({
+  userId: true,
+  achievementId: true,
+  currentValue: true,
+  unlocked: true,
+  unlockedAt: true
+});
+
+// Exportar tipos para el sistema de micro-interacciones
+export type MicroInteraction = typeof microInteractions.$inferSelect;
+export type InsertMicroInteraction = z.infer<typeof insertMicroInteractionSchema>;
+export type UserInteractionHistory = typeof userInteractionHistory.$inferSelect;
+export type InsertUserInteractionHistory = z.infer<typeof insertUserInteractionHistorySchema>;
+export type QuickAchievement = typeof quickAchievements.$inferSelect;
+export type InsertQuickAchievement = z.infer<typeof insertQuickAchievementSchema>;
+export type UserAchievementProgress = typeof userAchievementProgress.$inferSelect;
+export type InsertUserAchievementProgress = z.infer<typeof insertUserAchievementProgressSchema>;
