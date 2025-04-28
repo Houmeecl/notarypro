@@ -202,10 +202,21 @@ export default function CertifierDashboard() {
       <CertifierNavbar />
       <div className="container mx-auto py-6">
         <header className="mb-6">
-          <h1 className="text-3xl font-bold">Panel de Certificador</h1>
-          <p className="text-muted-foreground">
-            Gestione sus sesiones de certificación y documentos pendientes
-          </p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold">Panel de Certificador</h1>
+              <p className="text-muted-foreground">
+                Gestione sus sesiones de certificación y documentos pendientes
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Link href="/">
+                <Button variant="outline" size="sm">
+                  Volver al inicio
+                </Button>
+              </Link>
+            </div>
+          </div>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

@@ -110,10 +110,21 @@ export default function UserDashboard() {
       <div className="md:pl-64 p-6">
         <div className="max-w-6xl mx-auto">
           <header className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-500 mt-1">
-              Bienvenido, {user?.fullName}. Gestiona tus documentos y firma electrónicamente.
-            </p>
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+                <p className="text-gray-500 mt-1">
+                  Bienvenido, {user?.fullName}. Gestiona tus documentos y firma electrónicamente.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Link href="/">
+                  <Button variant="outline" size="sm">
+                    Volver al inicio
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </header>
           
           <Tabs 
