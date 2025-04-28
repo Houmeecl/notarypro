@@ -200,6 +200,30 @@ function Router() {
         allowedRoles={["certifier", "admin"]} 
       />
       
+      {/* RON (Remote Online Notarization) */}
+      <ProtectedRoute 
+        path="/ron-videocall/:sessionId" 
+        component={RonVideocall} 
+        allowedRoles={["certifier", "admin"]} 
+      />
+      
+      {/* Lawyer Dashboard */}
+      <ProtectedRoute 
+        path="/lawyer-dashboard" 
+        component={LawyerDashboard} 
+        allowedRoles={["lawyer", "admin"]} 
+      />
+      
+      {/* Video Consultation */}
+      <ProtectedRoute 
+        path="/video-consultation/:consultationId" 
+        component={VideoConsultation} 
+        allowedRoles={["lawyer", "admin"]} 
+      />
+      
+      {/* Purchase Code */}
+      <Route path="/purchase-code" component={PurchaseCode} />
+      
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

@@ -1365,6 +1365,301 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // === Rutas para videoconsultas y códigos de compra ===
+  
+  // Validar código de compra
+  app.post("/api/validate-purchase-code", async (req, res) => {
+    try {
+      const { code } = req.body;
+      
+      if (!code) {
+        return res.status(400).json({ error: "El código de compra es requerido" });
+      }
+      
+      // En un escenario real, esto buscaría en la base de datos
+      // Por ahora, aceptamos cualquier código que tenga un formato específico
+      const isValidCode = /^CERFI-[A-Z0-9]{8}$/.test(code);
+      
+      if (!isValidCode) {
+        return res.status(400).json({ error: "Código de compra inválido" });
+      }
+      
+      // Simular detalles del servicio asociado al código
+      const purchaseDetails = {
+        code,
+        serviceName: "Videoconsulta Legal",
+        serviceType: "videoconsult",
+        duration: "60 minutos",
+        amount: 45000,
+        currency: "CLP",
+        isUsed: false,
+        expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      };
+      
+      res.status(200).json(purchaseDetails);
+    } catch (error: any) {
+      res.status(500).json({ 
+        error: "Error al validar el código de compra",
+        message: error.message 
+      });
+    }
+  });
+  
+  // Activar servicio con código de compra
+  app.post("/api/activate-service", async (req, res) => {
+    try {
+      const { code, userId } = req.body;
+      
+      if (!code) {
+        return res.status(400).json({ error: "El código de compra es requerido" });
+      }
+      
+      // En un escenario real, esto marcaría el código como usado en la base de datos
+      // y activaría el servicio correspondiente para el usuario
+      
+      // Simular activación exitosa
+      const activationDetails = {
+        success: true,
+        message: "Servicio activado correctamente",
+        serviceType: "videoconsult",
+        activationDate: new Date().toISOString(),
+        userId: userId || (req.user ? req.user.id : null)
+      };
+      
+      res.status(200).json(activationDetails);
+    } catch (error: any) {
+      res.status(500).json({ 
+        error: "Error al activar el servicio",
+        message: error.message 
+      });
+    }
+  });
+  
+  // Obtener sesiones de videoconsulta (para abogados)
+  app.get("/api/video-consultations", isAuthenticated, async (req, res) => {
+    try {
+      // En un escenario real, se obtendrían las videoconsultas del abogado desde la base de datos
+      
+      // Datos simulados
+      const consultations = [
+        { 
+          id: "VC-2025-001", 
+          clientName: "Maria Rodríguez", 
+          scheduledFor: "2025-04-29T14:30:00", 
+          status: "agendada", 
+          topic: "Consulta contratos comerciales",
+          duration: 30
+        },
+        { 
+          id: "VC-2025-002", 
+          clientName: "Juan Pérez", 
+          scheduledFor: "2025-04-30T10:00:00", 
+          status: "agendada", 
+          topic: "Asesoría laboral",
+          duration: 60
+        },
+        { 
+          id: "VC-2025-003", 
+          clientName: "Laura González", 
+          scheduledFor: "2025-04-28T16:15:00", 
+          status: "finalizada", 
+          topic: "Revisión documentos inmobiliarios",
+          duration: 45
+        }
+      ];
+      
+      res.status(200).json(consultations);
+    } catch (error: any) {
+      res.status(500).json({ 
+        error: "Error al obtener las videoconsultas",
+        message: error.message 
+      });
+    }
+  });
+  
+  // Obtener detalles de videoconsulta específica
+  app.get("/api/video-consultations/:consultationId", isAuthenticated, async (req, res) => {
+    try {
+      const { consultationId } = req.params;
+      
+      // En un escenario real, se obtendría la videoconsulta específica de la base de datos
+      
+      // Datos simulados
+      const mockConsultations: Record<string, any> = {
+        "VC-2025-001": { 
+          id: "VC-2025-001", 
+          clientName: "Maria Rodríguez", 
+          clientEmail: "maria.rodriguez@example.com",
+          clientPhone: "+56 9 1234 5678",
+          scheduledFor: "2025-04-29T14:30:00", 
+          status: "agendada", 
+          topic: "Consulta contratos comerciales",
+          duration: 30,
+          notes: ""
+        },
+        "VC-2025-002": { 
+          id: "VC-2025-002", 
+          clientName: "Juan Pérez", 
+          clientEmail: "juan.perez@example.com",
+          clientPhone: "+56 9 8765 4321",
+          scheduledFor: "2025-04-30T10:00:00", 
+          status: "agendada", 
+          topic: "Asesoría laboral",
+          duration: 60,
+          notes: ""
+        },
+        "VC-2025-003": { 
+          id: "VC-2025-003", 
+          clientName: "Laura González", 
+          clientEmail: "laura.gonzalez@example.com",
+          clientPhone: "+56 9 5555 5555",
+          scheduledFor: "2025-04-28T16:15:00", 
+          status: "finalizada", 
+          topic: "Revisión documentos inmobiliarios",
+          duration: 45,
+          notes: "Cliente satisfecho con el servicio. Requiere seguimiento en 2 semanas."
+        }
+      };
+      
+      const consultation = mockConsultations[consultationId];
+      
+      if (!consultation) {
+        return res.status(404).json({ error: "Videoconsulta no encontrada" });
+      }
+      
+      res.status(200).json(consultation);
+    } catch (error: any) {
+      res.status(500).json({ 
+        error: "Error al obtener la videoconsulta",
+        message: error.message 
+      });
+    }
+  });
+  
+  // Finalizar videoconsulta
+  app.post("/api/video-consultations/:consultationId/end", isAuthenticated, async (req, res) => {
+    try {
+      const { consultationId } = req.params;
+      const { notes, duration } = req.body;
+      
+      // En un escenario real, se actualizaría el estado de la videoconsulta en la base de datos
+      
+      res.status(200).json({
+        success: true,
+        message: "Videoconsulta finalizada correctamente",
+        consultationId,
+        duration: duration || 0,
+        endedAt: new Date().toISOString()
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        error: "Error al finalizar la videoconsulta",
+        message: error.message 
+      });
+    }
+  });
+  
+  // Crear nueva videoconsulta
+  app.post("/api/video-consultations", isAuthenticated, async (req, res) => {
+    try {
+      const { clientName, email, phone, topic, scheduledFor, duration, lawyerId } = req.body;
+      
+      if (!clientName || !email || !topic || !scheduledFor || !duration) {
+        return res.status(400).json({ error: "Faltan datos requeridos para crear la videoconsulta" });
+      }
+      
+      // En un escenario real, se crearía la videoconsulta en la base de datos
+      
+      // Generar ID único para la consulta
+      const consultationId = `VC-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+      
+      const newConsultation = {
+        id: consultationId,
+        clientName,
+        clientEmail: email,
+        clientPhone: phone || "",
+        scheduledFor,
+        status: "agendada",
+        topic,
+        duration,
+        lawyerId: lawyerId || (req.user ? req.user.id : null),
+        createdAt: new Date().toISOString()
+      };
+      
+      res.status(201).json(newConsultation);
+    } catch (error: any) {
+      res.status(500).json({ 
+        error: "Error al crear la videoconsulta",
+        message: error.message 
+      });
+    }
+  });
+  
+  // Obtener documentos compartidos en una videoconsulta
+  app.get("/api/video-consultations/:consultationId/documents", isAuthenticated, async (req, res) => {
+    try {
+      const { consultationId } = req.params;
+      
+      // En un escenario real, se obtendrían los documentos compartidos en la videoconsulta
+      
+      // Datos simulados
+      const sharedDocuments = [
+        {
+          id: 1,
+          name: "Contrato de Arrendamiento.pdf",
+          type: "PDF",
+          size: 2540000,
+          sharedAt: "2025-04-28T16:30:25",
+          sharedBy: "lawyer"
+        },
+        {
+          id: 2,
+          name: "Clausulas_Adicionales.docx",
+          type: "DOCX",
+          size: 1250000,
+          sharedAt: "2025-04-28T16:35:12",
+          sharedBy: "lawyer"
+        }
+      ];
+      
+      res.status(200).json(sharedDocuments);
+    } catch (error: any) {
+      res.status(500).json({ 
+        error: "Error al obtener los documentos compartidos",
+        message: error.message 
+      });
+    }
+  });
+  
+  // Obtener estadísticas del abogado
+  app.get("/api/lawyer/stats", isAuthenticated, async (req, res) => {
+    try {
+      // En un escenario real, se obtendrían las estadísticas del abogado desde la base de datos
+      
+      // Datos simulados
+      const lawyerStats = {
+        activeCases: 12,
+        completedCasesMonth: 4,
+        activeClients: 17,
+        newClientsMonth: 3,
+        monthlyRevenue: 2450000,
+        revenueGrowth: "+12%",
+        billedHours: 32,
+        successRate: 92,
+        clientSatisfaction: 4.8
+      };
+      
+      res.status(200).json(lawyerStats);
+    } catch (error: any) {
+      res.status(500).json({ 
+        error: "Error al obtener las estadísticas del abogado",
+        message: error.message 
+      });
+    }
+  });
+  
+  // === Fin rutas de videoconsultas y códigos de compra ===
+
   // Configurar WebSocket para comunicación en tiempo real
   const httpServer = createServer(app);
   
