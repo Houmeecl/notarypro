@@ -161,7 +161,6 @@ export default function CertifierNavbar() {
               <div className="mt-6 flex flex-col gap-4">
                 <div className="flex items-center gap-2">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={user?.avatarUrl} alt={user?.username} />
                     <AvatarFallback>
                       {user?.username?.substring(0, 2).toUpperCase() || "CD"}
                     </AvatarFallback>
