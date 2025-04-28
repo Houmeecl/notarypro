@@ -188,6 +188,12 @@ export default function MainNavbar() {
                     <span>Inicio</span>
                   </a>
                 </Link>
+                <Link href="/quienes-somos" onClick={() => setIsMobileMenuOpen(false)}>
+                  <a className="flex items-center gap-2 py-2">
+                    <Info className="h-4 w-4" />
+                    <span>Quiénes Somos</span>
+                  </a>
+                </Link>
                 <Link href="/document-categories" onClick={() => setIsMobileMenuOpen(false)}>
                   <a className="flex items-center gap-2 py-2">
                     <FileText className="h-4 w-4" />
