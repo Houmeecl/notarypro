@@ -19,7 +19,8 @@ interface SocialShareButtonProps {
   className?: string;
 }
 
-const SocialShareButton: React.FC<SocialShareButtonProps> = ({ 
+// Componente helper para compartir en redes sociales
+export const SocialShareButtonHelper: React.FC<SocialShareButtonProps> = ({ 
   network, 
   shareUrl, 
   title, 
@@ -281,7 +282,7 @@ export const ShareableBadge: React.FC<ShareableBadgeProps> = ({
                 <h4 className="text-sm font-medium mb-3">Compartir en redes sociales</h4>
                 <div className="grid grid-cols-4 gap-2">
                   {/* Twitter/X */}
-                  <SocialShareButton 
+                  <SocialShareButtonHelper 
                     network="twitter" 
                     shareUrl={`${window.location.origin}/share-achievement/${achievement.id}`}
                     title={`¡He desbloqueado el logro "${achievement.name}" en Cerfidoc! #VerificaciónDigital #Cerfidoc`}
@@ -294,7 +295,7 @@ export const ShareableBadge: React.FC<ShareableBadgeProps> = ({
                   />
                   
                   {/* Facebook */}
-                  <SocialShareButton 
+                  <SocialShareButtonHelper 
                     network="facebook" 
                     shareUrl={`${window.location.origin}/share-achievement/${achievement.id}`}
                     quote={`¡He desbloqueado el logro "${achievement.name}" en Cerfidoc!`}
@@ -307,7 +308,7 @@ export const ShareableBadge: React.FC<ShareableBadgeProps> = ({
                   />
                   
                   {/* LinkedIn */}
-                  <SocialShareButton 
+                  <SocialShareButtonHelper 
                     network="linkedin" 
                     shareUrl={`${window.location.origin}/share-achievement/${achievement.id}`}
                     title={`¡He desbloqueado el logro "${achievement.name}" en Cerfidoc!`}
@@ -321,7 +322,7 @@ export const ShareableBadge: React.FC<ShareableBadgeProps> = ({
                   />
                   
                   {/* WhatsApp */}
-                  <SocialShareButton 
+                  <SocialShareButtonHelper 
                     network="whatsapp" 
                     shareUrl={`${window.location.origin}/share-achievement/${achievement.id}`}
                     title={`¡He desbloqueado el logro "${achievement.name}" en Cerfidoc!`}

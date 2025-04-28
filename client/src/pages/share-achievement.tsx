@@ -5,12 +5,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Award, CheckCircle, Copy, Home, Trophy } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ShareableBadge } from '@/components/micro-interactions/ShareableBadge';
+import { ShareableBadge, SocialShareButtonHelper } from '@/components/micro-interactions/ShareableBadge';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'wouter';
 import logo from '@assets/logo12582620.png';
 
-// Componente para botones de compartir en redes sociales
+// Componente para botones de compartir en redes sociales con textos
 interface SocialShareButtonProps {
   network: 'twitter' | 'facebook' | 'linkedin' | 'whatsapp';
   shareUrl: string;
