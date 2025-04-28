@@ -25,6 +25,7 @@ import createMemoryStore from "memorystore";
 import connectPg from "connect-pg-simple";
 import { db, pool } from "./db";
 import { eq, and, asc, desc, sql, count, gte, lte } from "drizzle-orm";
+import { generateRandomPassword } from "@shared/utils/password-util";
 
 const PostgresSessionStore = connectPg(session);
 const MemoryStore = createMemoryStore(session);
@@ -339,6 +340,12 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
     const createdAt = new Date();
+    
+    // Si no se proporciona una contraseña y es un usuario POS, generar una segura
+    if (!insertUser.password && insertUser.role === 'pos-user') {
+      insertUser.password = generateRandomPassword(12, true, true, true);
+    }
+    
     const user: User = { ...insertUser, id, createdAt };
     this.users.set(id, user);
     return user;
@@ -800,11 +807,14 @@ export class MemStorage implements IStorage {
     const updatedAt = new Date();
     const userId = this.currentUserId++; // Creamos un usuario para el partner
     
+    // Generar contraseña segura para el partner
+    const securePassword = generateRandomPassword(12, true, true, true);
+    
     // Crear usuario asociado para el partner
     const user: User = {
       id: userId,
       username: insertPartner.email.split('@')[0] + '-partner',
-      password: Math.random().toString(36).substring(2, 12), // Contraseña temporal
+      password: securePassword, // Contraseña segura generada aleatoriamente
       email: insertPartner.email,
       fullName: insertPartner.managerName,
       role: 'partner',

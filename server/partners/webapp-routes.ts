@@ -171,6 +171,96 @@ webappRouter.post('/store-logout', (req: Request, res: Response) => {
   res.status(200).json({ message: 'Sesión cerrada correctamente' });
 });
 
+// Schema para validar la creación de una tienda
+const createStoreSchema = z.object({
+  name: z.string().min(3, { message: "El nombre debe tener al menos 3 caracteres" }),
+  address: z.string().min(5, { message: "La dirección debe tener al menos 5 caracteres" }),
+  ownerName: z.string().min(3, { message: "El nombre del propietario debe tener al menos 3 caracteres" }),
+  ownerEmail: z.string().email({ message: "Email inválido" }),
+  region: z.string().min(3, { message: "La región debe tener al menos 3 caracteres" }),
+  commune: z.string().min(3, { message: "La comuna debe tener al menos 3 caracteres" }),
+});
+
+// Crear una nueva tienda y su usuario POS
+webappRouter.post('/create-store', async (req: Request, res: Response) => {
+  try {
+    // Validar que sea un administrador o supervisor quien crea la tienda
+    if (!req.isAuthenticated || !req.user || !['admin', 'supervisor'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'No tiene permisos para crear tiendas' });
+    }
+
+    // Validar los datos de entrada
+    const validatedData = createStoreSchema.parse(req.body);
+    
+    // Verificar si ya existe un usuario con ese email
+    const [existingUser] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, validatedData.ownerEmail));
+    
+    if (existingUser) {
+      return res.status(400).json({ error: 'Ya existe un usuario con ese email' });
+    }
+    
+    // Generar código único para la tienda (formato: 'VC-' + 6 dígitos)
+    const storeCode = 'VC-' + Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Generar contraseña segura aleatoria para el usuario
+    const securePassword = generateRandomPassword(12, true, true, true);
+    
+    // Crear el usuario propietario
+    const [owner] = await db
+      .insert(users)
+      .values({
+        username: validatedData.ownerEmail.split('@')[0] + '-pos',
+        password: securePassword, // Aquí usamos la contraseña generada aleatoriamente
+        email: validatedData.ownerEmail,
+        fullName: validatedData.ownerName,
+        role: 'pos-user'
+      })
+      .returning();
+    
+    // Crear la tienda
+    const [store] = await db
+      .insert(partnerStores)
+      .values({
+        ownerId: owner.id,
+        name: validatedData.name,
+        address: validatedData.address,
+        storeCode: storeCode,
+        commissionRate: 0.15, // 15% por defecto
+        active: true
+      })
+      .returning();
+    
+    // Devolver la información de la tienda y las credenciales de acceso
+    res.status(201).json({
+      store: {
+        id: store.id,
+        name: store.name,
+        address: store.address,
+        storeCode: store.storeCode,
+        commissionRate: store.commissionRate,
+        createdAt: store.createdAt
+      },
+      credentials: {
+        username: owner.username,
+        password: securePassword, // Enviamos la contraseña generada para que pueda ser comunicada al propietario
+        email: owner.email
+      },
+      message: 'Tienda creada exitosamente. Guarde las credenciales en un lugar seguro.'
+    });
+  } catch (error) {
+    console.error("Error creando tienda:", error);
+    
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: 'Datos inválidos', details: error.errors });
+    }
+    
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
 // Obtener historial de transacciones de un local
 webappRouter.get('/transactions/:storeId', async (req: Request, res: Response) => {
   try {

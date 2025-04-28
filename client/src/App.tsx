@@ -61,6 +61,7 @@ import PartnerRegistrationForm from "@/pages/partners/registration-form";
 import PartnerLogin from "@/pages/partners/partner-login";
 import PosIntegrationPage from "@/pages/partners/pos-integration";
 import AndroidSdkTest from "@/pages/partners/android-sdk-test";
+import PasswordGenerator from "@/pages/partners/password-generator";
 
 // Admin pages
 import PosManagementPage from "@/pages/admin/pos-management";
