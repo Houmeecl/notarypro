@@ -22,7 +22,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   email: text("email").notNull().unique(),
   fullName: text("full_name").notNull(),
-  role: text("role").notNull().default("user"), // user, certifier, admin
+  role: text("role").notNull().default("user"), // user, certifier, admin, lawyer, notary, partner
   createdAt: timestamp("created_at").defaultNow(),
 });
 
