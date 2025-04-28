@@ -8,7 +8,8 @@ import {
   Home,
   FileText,
   CreditCard,
-  HelpCircle
+  HelpCircle,
+  Info
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -69,6 +70,12 @@ export default function MainNavbar() {
             <a className="px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-100 flex items-center">
               <Home className="h-4 w-4 mr-2" />
               Inicio
+            </a>
+          </Link>
+          <Link href="/quienes-somos">
+            <a className="px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-100 flex items-center">
+              <Info className="h-4 w-4 mr-2" />
+              Quiénes Somos
             </a>
           </Link>
           <Link href="/document-categories">

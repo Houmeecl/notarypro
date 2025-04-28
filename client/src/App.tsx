@@ -28,6 +28,7 @@ import NotarizeOnline from "@/pages/notarize-online";
 import CertificacionPorVideo from "@/pages/certificacion-por-video";
 import UneteAlEquipo from "@/pages/unete-al-equipo";
 import ConversorPresencialOnline from "@/pages/conversor-presencial-online";
+import QuienesSomosPage from "@/pages/quienes-somos";
 import TemplateAdminPage from "@/pages/template-admin";
 import VerificarDocumento from "@/pages/verificar-documento";
 import DocumentVerificationGame from "@/pages/document-verification-game";
@@ -151,6 +152,7 @@ function Router() {
       <Route path="/curso-certificador" component={CursoCertificador} />
       <Route path="/vecinos-express" component={VecinosExpress} />
       <Route path="/service-selection" component={ServiceSelectionPage} />
+      <Route path="/quienes-somos" component={QuienesSomosPage} />
       
       {/* Partner pages */}
       <Route path="/partners/public-page" component={PartnersPublicPage} />
