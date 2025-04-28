@@ -11,7 +11,9 @@ import {
   Video,
   Home,
   Briefcase,
-  Users
+  Users,
+  HelpCircle,
+  BookOpen
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -101,6 +103,12 @@ export default function LawyerNavbar() {
               Videoconsultas
             </a>
           </Link>
+          <Link href="/ayuda-legal">
+            <a className="px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-100 flex items-center">
+              <HelpCircle className="h-4 w-4 mr-2" />
+              Ayuda Legal
+            </a>
+          </Link>
         </nav>
 
         {/* Perfil de usuario para escritorio */}
@@ -109,7 +117,6 @@ export default function LawyerNavbar() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 h-9 w-9 rounded-full p-0">
                 <Avatar className="h-9 w-9">
-                  <AvatarImage src={user?.avatarUrl} alt={user?.username} />
                   <AvatarFallback>
                     {user?.username?.substring(0, 2).toUpperCase() || "AB"}
                   </AvatarFallback>
@@ -162,7 +169,6 @@ export default function LawyerNavbar() {
               <div className="mt-6 flex flex-col gap-4">
                 <div className="flex items-center gap-2">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={user?.avatarUrl} alt={user?.username} />
                     <AvatarFallback>
                       {user?.username?.substring(0, 2).toUpperCase() || "AB"}
                     </AvatarFallback>
@@ -201,6 +207,12 @@ export default function LawyerNavbar() {
                   <a className="flex items-center gap-2 py-2">
                     <Video className="h-4 w-4" />
                     <span>Videoconsultas</span>
+                  </a>
+                </Link>
+                <Link href="/ayuda-legal" onClick={() => setIsMobileMenuOpen(false)}>
+                  <a className="flex items-center gap-2 py-2">
+                    <HelpCircle className="h-4 w-4" />
+                    <span>Ayuda Legal</span>
                   </a>
                 </Link>
                 <Separator />
