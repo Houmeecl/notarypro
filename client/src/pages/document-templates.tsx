@@ -87,7 +87,7 @@ export default function DocumentTemplatesPage() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="document-template-list" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {templates.map((template) => (
             <Link key={template.id} href={`/document-form/${template.id}`}>
               <a className="block h-full transition-transform hover:scale-105">

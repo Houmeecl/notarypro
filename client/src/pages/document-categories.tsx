@@ -45,7 +45,7 @@ export default function DocumentCategoriesPage() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="document-category-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories?.map((category) => (
             <Link key={category.id} href={`/document-templates/${category.id}`}>
               <a className="block h-full transition-transform hover:scale-105">

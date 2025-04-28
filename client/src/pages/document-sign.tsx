@@ -249,7 +249,7 @@ export default function DocumentSign() {
                 </TabsContent>
   
                 {/* Sign Document */}
-                <TabsContent value="sign">
+                <TabsContent value="sign" id="document-sign-section">
                   {document && (
                     <SignatureCanvas 
                       document={document} 
