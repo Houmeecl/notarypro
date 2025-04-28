@@ -373,6 +373,68 @@ export class MicroInteractionsService {
   }
   
   /**
+   * Obtiene información pública de un logro para compartir
+   * Solo retorna información que puede ser vista públicamente
+   */
+  async getPublicAchievementInfo(achievementId: number): Promise<any> {
+    try {
+      // Obtener el logro y el usuario que lo ha desbloqueado
+      const [achievementInfo] = await db
+        .select({
+          id: quickAchievements.id,
+          name: quickAchievements.name,
+          description: quickAchievements.description,
+          level: quickAchievements.level,
+          rewardPoints: quickAchievements.rewardPoints,
+          userId: userAchievementProgress.userId,
+          unlockedAt: userAchievementProgress.unlockedAt
+        })
+        .from(quickAchievements)
+        .innerJoin(
+          userAchievementProgress,
+          and(
+            eq(userAchievementProgress.achievementId, quickAchievements.id),
+            eq(userAchievementProgress.unlocked, true)
+          )
+        )
+        .where(
+          and(
+            eq(quickAchievements.id, achievementId),
+            eq(quickAchievements.isActive, true)
+          )
+        );
+      
+      if (!achievementInfo) {
+        return null;
+      }
+      
+      // Obtener información básica del usuario (solo nombre de usuario)
+      const [userInfo] = await db
+        .execute(sql`
+          SELECT username FROM users WHERE id = ${achievementInfo.userId}
+        `);
+      
+      // Construir objeto de respuesta con información limitada
+      const publicInfo = {
+        id: achievementInfo.id,
+        name: achievementInfo.name,
+        description: achievementInfo.description,
+        level: achievementInfo.level,
+        rewardPoints: achievementInfo.rewardPoints,
+        unlockedAt: achievementInfo.unlockedAt,
+        userName: userInfo?.username || 'Usuario Cerfidoc',
+        // Generar URL de la insignia basada en el ID del logro
+        badgeImageUrl: `/api/micro-interactions/badges/${achievementInfo.id}.png`
+      };
+      
+      return publicInfo;
+    } catch (error) {
+      console.error('Error obteniendo información pública del logro:', error);
+      return null;
+    }
+  }
+  
+  /**
    * Obtiene el perfil de juego de un usuario
    */
   private async getUserGameProfile(userId: number) {

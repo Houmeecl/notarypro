@@ -1,12 +1,15 @@
 import React from 'react';
 import { useMicroInteractions } from '@/hooks/use-micro-interactions';
-import { Award, Lock, CheckCircle } from 'lucide-react';
+import { Award, Lock, CheckCircle, Share2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ShareableBadge } from './ShareableBadge';
 
 interface AchievementsListProps {
   showLocked?: boolean;
@@ -17,6 +20,50 @@ interface AchievementsListProps {
 /**
  * Componente para mostrar lista de logros del usuario
  */
+// Componente botón para compartir logros
+interface ShareableButtonProps {
+  achievement: any;
+}
+
+const ShareableAchievementButton: React.FC<ShareableButtonProps> = ({ achievement }) => {
+  const badgeData = {
+    id: achievement.id,
+    name: achievement.name,
+    description: achievement.description,
+    level: achievement.level,
+    badgeImageUrl: achievement.icon,
+    unlockedAt: achievement.unlockedAt,
+    rewardPoints: achievement.rewardPoints,
+  };
+  
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 p-0"
+          title="Compartir logro"
+        >
+          <Share2 className="h-3 w-3 text-primary" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Compartir logro</DialogTitle>
+          <DialogDescription>
+            Comparte este logro con tus amigos y colegas
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="py-4">
+          <ShareableBadge achievement={badgeData} className="mx-auto max-w-xs" />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 export const AchievementsList: React.FC<AchievementsListProps> = ({ 
   showLocked = true,
   limit,
@@ -135,7 +182,10 @@ export const AchievementsList: React.FC<AchievementsListProps> = ({
                     {achievement.currentValue || 0}/{achievement.threshold}
                   </span>
                 </div>
-                <div>
+                <div className="flex items-center gap-2">
+                  {achievement.unlocked && (
+                    <ShareableAchievementButton achievement={achievement} />
+                  )}
                   <Badge 
                     variant={achievement.unlocked ? "default" : "outline"} 
                     className={achievement.unlocked ? "bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400" : ""}
