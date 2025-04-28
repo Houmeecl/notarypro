@@ -46,10 +46,15 @@ export default function RonService() {
             </div>
 
             <div className="flex flex-wrap gap-4">
-              <Button asChild className="px-6">
+              <Button asChild className="px-6 bg-primary">
+                <Link href="/ron-login">
+                  Ingresar a la plataforma
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="px-6">
                 <Link href="/certificacion-por-video">
                   Ver detalles
-                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <ExplanatoryVideo

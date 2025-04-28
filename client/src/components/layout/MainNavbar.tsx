@@ -9,7 +9,8 @@ import {
   FileText,
   CreditCard,
   HelpCircle,
-  Info
+  Info,
+  Video
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -88,6 +89,12 @@ export default function MainNavbar() {
             <a className="px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-100 flex items-center">
               <CreditCard className="h-4 w-4 mr-2" />
               Servicios
+            </a>
+          </Link>
+          <Link href="/ron-login">
+            <a className="px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-100 flex items-center">
+              <Video className="h-4 w-4 mr-2" />
+              Plataforma RON
             </a>
           </Link>
           <Link href="/contacto">
@@ -204,6 +211,12 @@ export default function MainNavbar() {
                   <a className="flex items-center gap-2 py-2">
                     <CreditCard className="h-4 w-4" />
                     <span>Servicios</span>
+                  </a>
+                </Link>
+                <Link href="/ron-login" onClick={() => setIsMobileMenuOpen(false)}>
+                  <a className="flex items-center gap-2 py-2">
+                    <Video className="h-4 w-4" />
+                    <span>Plataforma RON</span>
                   </a>
                 </Link>
                 <Link href="/contacto" onClick={() => setIsMobileMenuOpen(false)}>
