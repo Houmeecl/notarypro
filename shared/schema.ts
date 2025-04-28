@@ -1,6 +1,7 @@
 import { pgTable, text, serial, integer, boolean, date, timestamp, jsonb, real } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { eq, and } from "drizzle-orm";
 
 // Analytics Events
 export const analyticsEvents = pgTable("analytics_events", {
@@ -319,6 +320,38 @@ export const partners = pgTable("partners", {
   lastSyncedAt: timestamp("last_synced_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Partner Stores (for the webapp alternative)
+export const partnerStores = pgTable("partner_stores", {
+  id: serial("id").primaryKey(),
+  ownerId: integer("owner_id").notNull().references(() => users.id),
+  name: text("name").notNull(),
+  address: text("address").notNull(),
+  storeCode: text("store_code").notNull().unique(), // Unique code for webapp login
+  commissionRate: real("commission_rate").notNull().default(0.1), // Default 10%
+  active: boolean("active").notNull().default(true),
+  lastLoginAt: timestamp("last_login_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Partner Transactions (for the webapp alternative)
+export const partnerTransactions = pgTable("partner_transactions", {
+  id: serial("id").primaryKey(),
+  storeId: integer("store_id").notNull().references(() => partnerStores.id),
+  documentTemplateId: integer("document_template_id").notNull().references(() => documentTemplates.id),
+  clientName: text("client_name").notNull(),
+  clientEmail: text("client_email").notNull(),
+  clientPhone: text("client_phone").notNull(),
+  clientDocument: text("client_document"),
+  amount: integer("amount").notNull(), // Total amount in cents
+  commission: integer("commission").notNull(), // Commission amount in cents
+  status: text("status").notNull().default("pending"), // pending, completed, cancelled
+  processingCode: text("processing_code").notNull().unique(), // Unique code for tracking
+  completedAt: timestamp("completed_at"),
+  paymentMethod: text("payment_method"),
+  paymentReference: text("payment_reference"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const insertPartnerSchema = createInsertSchema(partners).pick({

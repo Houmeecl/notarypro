@@ -46,6 +46,7 @@ import { gamificationRouter } from "./gamification-routes";
 import { microInteractionsRouter } from "./micro-interactions-routes";
 import { verifyDocument } from "./services/gamification-service";
 import { ronRouter } from "./ron-routes";
+import { webappRouter } from "./partners/webapp-routes";
 
 // Ensure these directories exist
 const uploadsDir = path.join(process.cwd(), "uploads");
@@ -126,6 +127,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Registrar rutas de la plataforma RON
   app.use('/api/ron', ronRouter);
+  
+  // Registrar rutas de la webapp para socios (alternativa a la app Android)
+  app.use('/api/partners', webappRouter);
 
   // Registrar rutas de APIs de integraciones
   registerAdminApiRoutes(app);
