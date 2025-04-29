@@ -31,7 +31,17 @@ export default function TestDocumentGenerator() {
 
   // Verificar que el usuario sea administrador
   useEffect(() => {
-    if (user && user.role !== "admin") {
+    if (!user) {
+      toast({
+        title: "Sesión requerida",
+        description: "Debe iniciar sesión como administrador para acceder a esta página.",
+        variant: "destructive",
+      });
+      setLocation("/auth");
+      return;
+    }
+    
+    if (user.role !== "admin") {
       toast({
         title: "Acceso denegado",
         description: "Solo los administradores pueden acceder a esta página.",
@@ -69,6 +79,7 @@ export default function TestDocumentGenerator() {
       title: "",
       testCode: "7723", // Código de prueba predefinido
     },
+    mode: "onChange", // Validación en tiempo real
   });
 
   // Formulario dinámico para los campos de la plantilla
@@ -112,16 +123,31 @@ export default function TestDocumentGenerator() {
   const createDocumentMutation = useMutation({
     mutationFn: async (data: any) => {
       if (!selectedTemplate) throw new Error("Plantilla no disponible");
+      if (!user) throw new Error("Debe iniciar sesión para realizar esta acción");
       
       const documentData = {
         templateId: parseInt(data.templateId),
         title: data.title,
         formData: data.formData,
-        testCode: data.testCode
+        testCode: data.testCode || "7723" // Asegurar que el código siempre esté presente
       };
       
-      const response = await apiRequest("POST", "/api/admin/documents/create-from-template", documentData);
-      return await response.json();
+      // Log para diagnóstico
+      console.log("Enviando solicitud de creación de documento:", documentData);
+      
+      try {
+        const response = await apiRequest("POST", "/api/admin/documents/create-from-template", documentData);
+        const result = await response.json();
+        console.log("Respuesta de creación:", result);
+        return result;
+      } catch (error) {
+        console.error("Error en la solicitud:", error);
+        // Verificar si es un error de autenticación
+        if (error.message && error.message.includes("401")) {
+          throw new Error("La sesión ha expirado. Por favor, inicie sesión nuevamente.");
+        }
+        throw error;
+      }
     },
     onSuccess: (data) => {
       toast({
@@ -142,11 +168,21 @@ export default function TestDocumentGenerator() {
         description: error.message || "No se pudo crear el documento.",
         variant: "destructive",
       });
+      
+      // Si es un error de autenticación, redirigir al login
+      if (error.message && error.message.includes("sesión")) {
+        setLocation("/auth");
+      }
     }
   });
 
   // Manejar envío del formulario
   const onSubmit = (baseData: z.infer<typeof formBaseSchema>) => {
+    // Asegurarse de que el código de prueba está presente
+    if (!baseData.testCode) {
+      baseData.testCode = "7723";
+    }
+    
     // Validar el formulario dinámico
     dynamicForm.handleSubmit((dynamicData) => {
       // Combinar datos de ambos formularios
@@ -154,6 +190,19 @@ export default function TestDocumentGenerator() {
         ...baseData,
         formData: dynamicData
       };
+      
+      console.log("Datos completos a enviar:", completeData);
+      
+      // Verificar que tenemos un usuario autenticado
+      if (!user) {
+        toast({
+          title: "No se puede crear el documento",
+          description: "Su sesión ha expirado. Por favor, inicie sesión nuevamente.",
+          variant: "destructive",
+        });
+        setLocation("/auth");
+        return;
+      }
       
       // Crear el documento
       createDocumentMutation.mutate(completeData);
@@ -325,12 +374,24 @@ export default function TestDocumentGenerator() {
                       name="testCode"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Código de prueba</FormLabel>
+                          <div className="flex items-center space-x-2">
+                            <FormLabel>Código de prueba</FormLabel>
+                            {field.value === "7723" && (
+                              <Badge variant="outline" className="bg-green-50 text-green-600">
+                                <CheckCircle2 className="h-3 w-3 mr-1" /> Válido
+                              </Badge>
+                            )}
+                          </div>
                           <FormControl>
-                            <Input {...field} readOnly />
+                            <div className="relative">
+                              <Input {...field} value="7723" readOnly />
+                              <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                              </div>
+                            </div>
                           </FormControl>
                           <FormDescription>
-                            Código especial que permite crear y firmar documentos sin costo.
+                            Código especial predefinido que permite crear y firmar documentos sin costo.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
