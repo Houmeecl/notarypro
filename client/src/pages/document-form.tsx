@@ -39,8 +39,14 @@ export default function DocumentFormPage() {
   const [formSchema, setFormSchema] = useState<any>(null);
   const { user, isLoading: authLoading } = useAuth();
 
-  // Ya no necesitamos este useEffect de redirección aquí porque
-  // el ProtectedRoute ya maneja la redirección automáticamente
+  // Redirección manual en caso de no estar autenticado
+  useEffect(() => {
+    console.log("Estado de autenticación:", { user, authLoading });
+    if (!authLoading && !user) {
+      console.log("Usuario no autenticado, redirigiendo a /auth");
+      setLocation("/auth");
+    }
+  }, [user, authLoading, setLocation]);
 
   const { data: template, isLoading: templateLoading, error } = useQuery<DocumentTemplate>({
     queryKey: ['/api/document-templates', templateId],
