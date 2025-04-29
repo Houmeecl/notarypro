@@ -144,11 +144,9 @@ export default function DocumentFormPage() {
     <>
       <DocumentNavbar />
       <div className="container mx-auto py-8">
-        <Link href={`/document-templates/${template?.categoryId}`}>
-          <a className="flex items-center text-primary mb-6 hover:underline">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver a plantillas
-          </a>
+        <Link href={`/document-templates/${template?.categoryId}`} className="flex items-center text-primary mb-6 hover:underline">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Volver a plantillas
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

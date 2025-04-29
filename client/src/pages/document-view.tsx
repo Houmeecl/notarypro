@@ -214,11 +214,9 @@ export default function DocumentViewPage() {
     <>
       <DocumentNavbar />
       <div className="container mx-auto py-8">
-        <Link href="/documents">
-          <a className="flex items-center text-primary mb-6 hover:underline">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver a mis documentos
-          </a>
+        <Link href="/documents" className="flex items-center text-primary mb-6 hover:underline">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Volver a mis documentos
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
