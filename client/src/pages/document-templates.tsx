@@ -51,11 +51,9 @@ export default function DocumentTemplatesPage() {
       <>
         <DocumentNavbar />
         <div className="container mx-auto py-8">
-          <Link href="/document-categories">
-            <a className="flex items-center text-primary mb-6 hover:underline">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Volver a categorías
-            </a>
+          <Link href="/document-categories" className="flex items-center text-primary mb-6 hover:underline">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Volver a categorías
           </Link>
           <div className="text-center py-12">
             <h2 className="text-2xl font-semibold mb-2">No hay plantillas disponibles</h2>
@@ -73,11 +71,9 @@ export default function DocumentTemplatesPage() {
     <>
       <DocumentNavbar />
       <div className="container mx-auto py-8">
-        <Link href="/document-categories">
-          <a className="flex items-center text-primary mb-6 hover:underline">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver a categorías
-          </a>
+        <Link href="/document-categories" className="flex items-center text-primary mb-6 hover:underline">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Volver a categorías
         </Link>
 
         <div className="mb-8">
@@ -89,34 +85,32 @@ export default function DocumentTemplatesPage() {
         
         <div id="document-template-list" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {templates.map((template) => (
-            <Link key={template.id} href={`/document-form/${template.id}`}>
-              <a className="block h-full transition-transform hover:scale-105">
-                <Card className="h-full flex flex-col">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <CardTitle className="text-xl">{template.name}</CardTitle>
-                      <Badge variant={template.active ? "default" : "secondary"}>
-                        {template.active ? "Activo" : "Inactivo"}
-                      </Badge>
-                    </div>
-                    <CardDescription>{template.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                    <Separator className="my-2" />
-                    <div className="mt-4">
-                      <p className="text-sm text-gray-500">
-                        Esta plantilla incluye un formulario para completar los datos necesarios para generar el documento.
-                      </p>
-                      <p className="font-medium text-lg mt-4">
-                        ${template.price / 100}
-                      </p>
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button className="w-full">Usar esta plantilla</Button>
-                  </CardFooter>
-                </Card>
-              </a>
+            <Link key={template.id} href={`/document-form/${template.id}`} className="block h-full transition-transform hover:scale-105">
+              <Card className="h-full flex flex-col">
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-xl">{template.name}</CardTitle>
+                    <Badge variant={template.active ? "default" : "secondary"}>
+                      {template.active ? "Activo" : "Inactivo"}
+                    </Badge>
+                  </div>
+                  <CardDescription>{template.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <Separator className="my-2" />
+                  <div className="mt-4">
+                    <p className="text-sm text-gray-500">
+                      Esta plantilla incluye un formulario para completar los datos necesarios para generar el documento.
+                    </p>
+                    <p className="font-medium text-lg mt-4">
+                      ${template.price / 100}
+                    </p>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full">Usar esta plantilla</Button>
+                </CardFooter>
+              </Card>
             </Link>
           ))}
         </div>
