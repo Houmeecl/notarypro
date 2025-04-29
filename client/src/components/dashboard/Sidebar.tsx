@@ -30,9 +30,9 @@ interface NavItemProps {
 const NavItem = ({ icon, label, href, isActive, isMobile, onClick }: NavItemProps) => {
   return (
     <Link href={href}>
-      <a
+      <div
         className={cn(
-          "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+          "flex items-center gap-3 px-3 py-2 rounded-md transition-colors cursor-pointer",
           isActive 
             ? "bg-sidebar-accent text-sidebar-accent-foreground" 
             : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
@@ -45,7 +45,7 @@ const NavItem = ({ icon, label, href, isActive, isMobile, onClick }: NavItemProp
           <span>{label}</span>
         </div>
         {isMobile && <ChevronRight className="h-4 w-4" />}
-      </a>
+      </div>
     </Link>
   );
 };
