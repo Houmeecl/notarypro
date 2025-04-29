@@ -11,6 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import DocumentNavbar from "@/components/layout/DocumentNavbar";
 import TranslationWidget from "@/components/document/TranslationWidget";
+// Importar el componente SignatureCanvas
+import SignatureCanvas from "@/components/dashboard/SignatureCanvas";
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -59,7 +61,7 @@ export default function DocumentViewPage() {
             "GET", 
             `/api/documents/${document.id}/preview`, 
             null,
-            { responseType: "text" }
+            { responseType: "text", headers: { "Accept": "text/html" } }
           );
           
           if (response.ok) {
@@ -167,14 +169,19 @@ export default function DocumentViewPage() {
     }
   });
 
-  const handleSign = () => {
-    // En un escenario real, aquí se abriría un canvas para que el usuario dibuje su firma
-    // Por ahora, simplemente enviaremos una cadena que representa la firma
-    const mockSignatureData = `data:image/svg+xml;base64,${btoa(
-      '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="50"><path d="M10,25 C20,10 30,40 40,25 C50,10 60,40 70,25 C80,10 90,40 100,25 C110,10 120,40 130,25 C140,10 150,40 160,25 C170,10 180,40 190,25" fill="none" stroke="black" stroke-width="2"/></svg>'
-    )}`;
+  const [isSignatureDialogOpen, setIsSignatureDialogOpen] = useState(false);
+  const [signatureData, setSignatureData] = useState<string | null>(null);
+  
+  const handleSignatureComplete = (signatureDataUrl: string) => {
+    setSignatureData(signatureDataUrl);
+    setIsSignatureDialogOpen(false);
     
-    signDocumentMutation.mutate(mockSignatureData);
+    // Enviar la firma al servidor
+    signDocumentMutation.mutate(signatureDataUrl);
+  };
+  
+  const handleSign = () => {
+    setIsSignatureDialogOpen(true);
   };
 
   if (isLoading) {
@@ -256,6 +263,13 @@ export default function DocumentViewPage() {
                 )}
               </CardFooter>
             </Card>
+            
+            {/* Componente de firma digital */}
+            <SignatureCanvas 
+              isOpen={isSignatureDialogOpen}
+              onClose={() => setIsSignatureDialogOpen(false)}
+              onComplete={handleSignatureComplete}
+            />
           </div>
           
           <div>

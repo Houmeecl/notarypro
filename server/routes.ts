@@ -799,14 +799,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Document must be validated for advanced signatures" });
       }
       
+      // Obtener datos de firma del request body o generar si no existen
+      let signatureData = req.body.signatureData;
       // Generar código de verificación único
       const verificationCode = generateVerificationCode(documentId, document.title);
       
       // Generar SVG del código QR para la verificación
       const qrCodeSvg = generateQRCodeSVG(verificationCode);
       
-      // Generar datos de firma con el código de verificación
-      const signatureData = generateSignatureData(req.user.id, documentId, verificationCode);
+      // Si no hay datos de firma en el request body, generarlos
+      if (!signatureData) {
+        signatureData = generateSignatureData(req.user.id, documentId, verificationCode);
+      }
       
       // Actualizar el documento con el código de verificación y datos de firma
       const updatedDocument = await storage.updateDocument(documentId, {

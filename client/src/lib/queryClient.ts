@@ -11,11 +11,22 @@ export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
-  options?: RequestInit,
+  options?: RequestInit & { responseType?: string },
 ): Promise<Response> {
+  // Configurar cabeceras según el tipo de respuesta esperada
+  let headers: HeadersInit = data ? { "Content-Type": "application/json" } : {};
+  
+  // Si se solicita respuesta en texto plano o HTML, ajustar cabeceras
+  if (options?.responseType === "text") {
+    headers = {
+      ...headers,
+      "Accept": "text/html, text/plain"
+    };
+  }
+  
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
     ...options,
