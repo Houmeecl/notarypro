@@ -490,8 +490,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden" });
       }
       
-      // For advanced signatures, the document must be validated
-      if (req.body.type === "advanced" && document.status !== "validated") {
+      // Los administradores pueden usar firmas avanzadas sin validación previa y sin pago
+      const isAdmin = req.user.role === 'admin';
+      
+      // Para firmas avanzadas, el documento debe estar validado (a menos que sea administrador)
+      if (req.body.type === "advanced" && document.status !== "validated" && !isAdmin) {
         return res.status(400).json({ message: "Document must be validated for advanced signatures" });
       }
       

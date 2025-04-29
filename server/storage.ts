@@ -1260,7 +1260,42 @@ export class DatabaseStorage implements IStorage {
     documentsCreatedToday: number; 
     documentsByStatus: Record<string, number>;
   }> {
-    return await getDocumentStats();
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const [totalCount] = await db
+        .select({ count: sql`COUNT(*)` })
+        .from(documents);
+      
+      const [todayCount] = await db
+        .select({ count: sql`COUNT(*)` })
+        .from(documents)
+        .where(sql`${documents.createdAt} >= ${today}`);
+      
+      const statusCounts = await db
+        .select({
+          status: documents.status,
+          count: sql`COUNT(*)`
+        })
+        .from(documents)
+        .groupBy(documents.status);
+      
+      const documentsByStatus: Record<string, number> = {};
+      
+      statusCounts.forEach(item => {
+        documentsByStatus[item.status] = Number(item.count);
+      });
+      
+      return {
+        totalDocuments: Number(totalCount.count),
+        documentsCreatedToday: Number(todayCount.count),
+        documentsByStatus
+      };
+    } catch (error) {
+      console.error("Error en getDocumentStats:", error);
+      throw error;
+    }
   }
   
   async getRevenueStats(): Promise<{
@@ -1272,7 +1307,73 @@ export class DatabaseStorage implements IStorage {
     courseRevenue: number;
     videoCallRevenue: number;
   }> {
-    return await getRevenueStats();
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const oneWeekAgo = new Date(today);
+      oneWeekAgo.setDate(today.getDate() - 7);
+      
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      
+      // Calculate document revenue
+      const [documentTotal] = await db
+        .select({ total: sql`COALESCE(SUM(${documents.paymentAmount}), 0)` })
+        .from(documents)
+        .where(eq(documents.paymentStatus, 'completed'));
+      
+      // Calculate video call revenue
+      const [videoCallTotal] = await db
+        .select({ total: sql`COALESCE(SUM(${videoCallSessions.paymentAmount}), 0)` })
+        .from(videoCallSessions)
+        .where(eq(videoCallSessions.paymentStatus, 'completed'));
+      
+      // Calculate today's revenue
+      const [todayTotal] = await db
+        .select({ total: sql`COALESCE(SUM(${documents.paymentAmount}), 0)` })
+        .from(documents)
+        .where(and(
+          eq(documents.paymentStatus, 'completed'),
+          sql`${documents.updatedAt} >= ${today}`
+        ));
+      
+      // Calculate week's revenue
+      const [weekTotal] = await db
+        .select({ total: sql`COALESCE(SUM(${documents.paymentAmount}), 0)` })
+        .from(documents)
+        .where(and(
+          eq(documents.paymentStatus, 'completed'),
+          sql`${documents.updatedAt} >= ${oneWeekAgo}`
+        ));
+      
+      // Calculate month's revenue
+      const [monthTotal] = await db
+        .select({ total: sql`COALESCE(SUM(${documents.paymentAmount}), 0)` })
+        .from(documents)
+        .where(and(
+          eq(documents.paymentStatus, 'completed'),
+          sql`${documents.updatedAt} >= ${startOfMonth}`
+        ));
+      
+      // For course revenue, we can add this later if needed
+      const courseRevenue = 0;
+      
+      const documentRevenue = Number(documentTotal.total);
+      const videoCallRevenue = Number(videoCallTotal.total);
+      
+      return {
+        totalRevenue: documentRevenue + courseRevenue + videoCallRevenue,
+        revenueToday: Number(todayTotal.total),
+        revenueThisWeek: Number(weekTotal.total),
+        revenueThisMonth: Number(monthTotal.total),
+        documentRevenue,
+        courseRevenue,
+        videoCallRevenue
+      };
+    } catch (error) {
+      console.error("Error en getRevenueStats:", error);
+      throw error;
+    }
   }
 
   // User operations
