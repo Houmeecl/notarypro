@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/form";
 import { LogIn, UserPlus, Lock, Mail, User } from "lucide-react";
 import { Link } from "wouter";
+import { useWebSocket } from "@/hooks/use-websocket";
+import { WebSocketDebugger } from "@/components/utils/WebSocketDebugger";
 
 // Validation schemas
 const loginSchema = z.object({
@@ -92,6 +94,9 @@ export default function AuthPage() {
       role: "user", // Default role is user
     });
   };
+
+  // Inicializar el WebSocket
+  const { status } = useWebSocket();
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">

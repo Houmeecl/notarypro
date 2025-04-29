@@ -318,6 +318,7 @@ function App() {
                 <MicroInteractionDisplay />
                 <OnboardingPopup />
                 <HelpButton />
+                <WebSocketDebugger />
                 <Router />
               </TooltipProvider>
             </ThemeProvider>
