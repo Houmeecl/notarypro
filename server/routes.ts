@@ -148,21 +148,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
 
   // Document routes
-  app.post("/api/documents", isAuthenticated, upload.single("document"), async (req, res) => {
+  app.post("/api/documents", isAuthenticated, async (req, res) => {
     try {
-      if (!req.file) {
-        return res.status(400).json({ message: "No document file provided" });
-      }
-
       const validatedData = insertDocumentSchema.parse({
-        title: req.body.title,
+        ...req.body,
         userId: req.user.id,
-        filePath: req.file.path,
       });
 
       const document = await storage.createDocument(validatedData);
-      res.status(201).json(document);
+      
+      // Generar código de verificación único
+      const verificationCode = generateVerificationCode(document.id, document.title);
+      
+      // Generar SVG del código QR para la verificación
+      const qrCodeSvg = generateQRCodeSVG(verificationCode);
+      
+      // Actualizar el documento con el código QR
+      const updatedDocument = await storage.updateDocument(document.id, {
+        qrCode: qrCodeSvg
+      });
+      
+      res.status(201).json(updatedDocument);
     } catch (error) {
+      console.error("Error al crear documento:", error);
       res.status(400).json({ message: error.message });
     }
   });
