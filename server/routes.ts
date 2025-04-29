@@ -6,6 +6,7 @@ import multer from "multer";
 import { nanoid } from "nanoid";
 import fs from "fs";
 import path from "path";
+import { generateVerificationCode, generateQRCodeSVG, generateSignatureData } from "@shared/utils/document-utils";
 import { 
   insertDocumentSchema, 
   insertDocumentCategorySchema,
@@ -164,6 +165,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(document);
     } catch (error) {
       res.status(400).json({ message: error.message });
+    }
+  });
+  
+  // Ruta para que los administradores creen documentos directamente desde plantillas
+  app.post("/api/admin/documents/create-from-template", isAdmin, async (req, res) => {
+    try {
+      const { templateId, title, formData, testCode } = req.body;
+      
+      // Validación del código de prueba 7723
+      if (testCode !== "7723") {
+        return res.status(400).json({ message: "Código de prueba inválido" });
+      }
+      
+      // Obtener la plantilla
+      const template = await storage.getDocumentTemplate(parseInt(templateId));
+      if (!template) {
+        return res.status(404).json({ message: "Plantilla no encontrada" });
+      }
+      
+      // Crear el documento
+      const document = await storage.createDocument({
+        userId: req.user.id,
+        templateId: parseInt(templateId),
+        title: title || `${template.name} - ${new Date().toLocaleDateString()}`,
+        formData
+      });
+      
+      // Generar código de verificación único
+      const verificationCode = generateVerificationCode(document.id, document.title);
+      
+      // Generar SVG del código QR para la verificación
+      const qrCodeSvg = generateQRCodeSVG(verificationCode);
+      
+      // Generar datos de firma con el código de verificación
+      const signatureData = generateSignatureData(req.user.id, document.id, verificationCode);
+      
+      // Actualizar documento con firma avanzada directamente
+      const signedDocument = await storage.updateDocument(document.id, {
+        signatureData,
+        status: "signed",
+        qrCode: verificationCode,
+        signatureTimestamp: new Date(),
+        paymentStatus: "completed", // Marcar como pagado para administradores
+        paymentAmount: 0 // Sin costo para administradores
+      });
+      
+      res.status(201).json({
+        message: "Documento creado y firmado exitosamente",
+        document: signedDocument,
+        verificationCode
+      });
+    } catch (error) {
+      console.error("Error creando documento administrativo:", error);
+      res.status(500).json({ message: error.message });
     }
   });
 
