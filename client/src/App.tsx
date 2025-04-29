@@ -14,6 +14,7 @@ import { MicroInteractionDisplay } from "@/components/micro-interactions/MicroIn
 import { ProtectedRoute } from "./lib/protected-route";
 import { webSocketService } from "./lib/websocket";
 import { useEffect } from "react";
+import { WebSocketDebugger } from "@/components/utils/WebSocketDebugger";
 
 // Pages
 import LandingPage from "@/pages/landing-page";

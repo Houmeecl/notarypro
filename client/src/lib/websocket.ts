@@ -33,7 +33,12 @@ class WebSocketService {
 
     this.socket.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data);
+        // Asegurarse de que estamos trabajando con una cadena
+        const dataString = typeof event.data === 'string' 
+          ? event.data 
+          : new TextDecoder().decode(event.data as ArrayBuffer);
+        
+        const data = JSON.parse(dataString);
         if (data && data.type) {
           this.notifyListeners(data.type, data);
         }
@@ -77,7 +82,7 @@ class WebSocketService {
    * Envía un mensaje al servidor
    */
   public send(type: string, data: any = {}) {
-    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+    if (this.socket && this.socket.readyState === 1) { // 1 = OPEN
       this.socket.send(JSON.stringify({
         type,
         ...data
@@ -130,7 +135,7 @@ class WebSocketService {
    * Verifica si la conexión WebSocket está activa
    */
   public isConnected(): boolean {
-    return this.socket !== null && this.socket.readyState === WebSocket.OPEN;
+    return this.socket !== null && this.socket.readyState === 1; // 1 = OPEN
   }
 }
 
