@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import { Loader2 } from "lucide-react";
 import { DocumentCategory } from "@shared/schema";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import DocumentNavbar from "@/components/layout/DocumentNavbar";
 
 export default function DocumentCategoriesPage() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const { data: categories, isLoading, error } = useQuery<DocumentCategory[]>({ 
     queryKey: ['/api/document-categories'] 
   });
@@ -47,7 +48,11 @@ export default function DocumentCategoriesPage() {
         
         <div id="document-category-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories?.map((category) => (
-            <Link key={category.id} href={`/document-templates/${category.id}`} className="block h-full transition-transform hover:scale-105">
+            <div 
+              key={category.id} 
+              onClick={() => setLocation(`/document-templates/${category.id}`)}
+              className="block h-full transition-transform hover:scale-105 cursor-pointer"
+            >
               <Card className="h-full flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-xl">{category.name}</CardTitle>
@@ -63,7 +68,7 @@ export default function DocumentCategoriesPage() {
                   <Button className="w-full">Ver Plantillas</Button>
                 </CardFooter>
               </Card>
-            </Link>
+            </div>
           ))}
         </div>
       </div>

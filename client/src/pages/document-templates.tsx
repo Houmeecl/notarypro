@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useRoute, Link } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { DocumentCategory, DocumentTemplate } from "@shared/schema";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +13,7 @@ import DocumentNavbar from "@/components/layout/DocumentNavbar";
 export default function DocumentTemplatesPage() {
   const { toast } = useToast();
   const [, params] = useRoute("/document-templates/:categoryId");
+  const [, setLocation] = useLocation();
   const categoryId = params?.categoryId;
 
   const { data: category, isLoading: categoryLoading } = useQuery<DocumentCategory>({
@@ -51,16 +52,19 @@ export default function DocumentTemplatesPage() {
       <>
         <DocumentNavbar />
         <div className="container mx-auto py-8">
-          <Link href="/document-categories" className="flex items-center text-primary mb-6 hover:underline">
+          <div 
+            onClick={() => setLocation("/document-categories")}
+            className="flex items-center text-primary mb-6 hover:underline cursor-pointer"
+          >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver a categorías
-          </Link>
+          </div>
           <div className="text-center py-12">
             <h2 className="text-2xl font-semibold mb-2">No hay plantillas disponibles</h2>
             <p className="text-gray-500 mb-6">No se encontraron plantillas de documentos en esta categoría.</p>
-            <Link href="/document-categories">
-              <Button>Volver a categorías</Button>
-            </Link>
+            <Button onClick={() => setLocation("/document-categories")}>
+              Volver a categorías
+            </Button>
           </div>
         </div>
       </>
@@ -71,10 +75,13 @@ export default function DocumentTemplatesPage() {
     <>
       <DocumentNavbar />
       <div className="container mx-auto py-8">
-        <Link href="/document-categories" className="flex items-center text-primary mb-6 hover:underline">
+        <div 
+          onClick={() => setLocation("/document-categories")}
+          className="flex items-center text-primary mb-6 hover:underline cursor-pointer"
+        >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Volver a categorías
-        </Link>
+        </div>
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">{category?.name}</h1>
@@ -85,7 +92,11 @@ export default function DocumentTemplatesPage() {
         
         <div id="document-template-list" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {templates.map((template) => (
-            <Link key={template.id} href={`/document-form/${template.id}`} className="block h-full transition-transform hover:scale-105">
+            <div 
+              key={template.id}
+              onClick={() => setLocation(`/document-form/${template.id}`)}
+              className="block h-full transition-transform hover:scale-105 cursor-pointer"
+            >
               <Card className="h-full flex flex-col">
                 <CardHeader>
                   <div className="flex justify-between items-start">
@@ -111,7 +122,7 @@ export default function DocumentTemplatesPage() {
                   <Button className="w-full">Usar esta plantilla</Button>
                 </CardFooter>
               </Card>
-            </Link>
+            </div>
           ))}
         </div>
       </div>

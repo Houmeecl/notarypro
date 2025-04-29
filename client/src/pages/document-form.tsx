@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useRoute, Link, useLocation } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { Loader2, ArrowLeft, FileText, Save, CheckCircle } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -153,10 +153,13 @@ export default function DocumentFormPage() {
     <>
       <DocumentNavbar />
       <div className="container mx-auto py-8">
-        <Link href={`/document-templates/${template?.categoryId}`} className="flex items-center text-primary mb-6 hover:underline">
+        <div 
+          onClick={() => setLocation(`/document-templates/${template?.categoryId}`)}
+          className="flex items-center text-primary mb-6 hover:underline cursor-pointer"
+        >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Volver a plantillas
-        </Link>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2">

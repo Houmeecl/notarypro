@@ -13,52 +13,54 @@ export default function DocumentNavbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link href="/">
-              <a className="flex items-center mr-8">
-                <FileText className="h-6 w-6 text-primary mr-2" />
-                <span className="text-xl font-semibold">NotaryPro Chile</span>
-              </a>
-            </Link>
+            <div className="flex items-center mr-8 cursor-pointer" onClick={() => window.location.href = '/'}>
+              <FileText className="h-6 w-6 text-primary mr-2" />
+              <span className="text-xl font-semibold">NotaryPro Chile</span>
+            </div>
             
             <nav className="hidden md:flex space-x-8">
-              <Link href="/document-categories">
-                <a className={`flex items-center text-sm font-medium transition-colors hover:text-primary ${
+              <div 
+                className={`flex items-center text-sm font-medium transition-colors hover:text-primary cursor-pointer ${
                   isActive("/document-categories") || isActive("/document-templates") || isActive("/document-form") 
                     ? "text-primary" 
                     : "text-gray-600"
-                }`}>
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Nuevo documento
-                </a>
-              </Link>
+                }`}
+                onClick={() => window.location.href = '/document-categories'}
+              >
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Nuevo documento
+              </div>
               
-              <Link href="/documents">
-                <a className={`flex items-center text-sm font-medium transition-colors hover:text-primary ${
+              <div 
+                className={`flex items-center text-sm font-medium transition-colors hover:text-primary cursor-pointer ${
                   isActive("/documents") ? "text-primary" : "text-gray-600"
-                }`}>
-                  <FileText className="h-4 w-4 mr-2" />
-                  Mis documentos
-                </a>
-              </Link>
+                }`}
+                onClick={() => window.location.href = '/documents'}
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Mis documentos
+              </div>
               
-              <Link href="/courses">
-                <a className={`flex items-center text-sm font-medium transition-colors hover:text-primary ${
+              <div 
+                className={`flex items-center text-sm font-medium transition-colors hover:text-primary cursor-pointer ${
                   isActive("/courses") ? "text-primary" : "text-gray-600"
-                }`}>
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  Cursos
-                </a>
-              </Link>
+                }`}
+                onClick={() => window.location.href = '/courses'}
+              >
+                <BookOpen className="h-4 w-4 mr-2" />
+                Cursos
+              </div>
             </nav>
           </div>
           
           <div className="flex items-center">
-            <Link href="/user-dashboard">
-              <a className="flex items-center px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-                <User className="h-4 w-4 mr-2" />
-                Mi cuenta
-              </a>
-            </Link>
+            <div 
+              className="flex items-center px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer"
+              onClick={() => window.location.href = '/user-dashboard'}
+            >
+              <User className="h-4 w-4 mr-2" />
+              Mi cuenta
+            </div>
           </div>
         </div>
       </div>
