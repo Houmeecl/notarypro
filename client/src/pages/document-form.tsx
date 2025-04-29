@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import DocumentNavbar from "@/components/layout/DocumentNavbar";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function DocumentFormPage() {
   const { toast } = useToast();
