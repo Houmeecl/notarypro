@@ -17,12 +17,12 @@ export default function DocumentTemplatesPage() {
   const categoryId = params?.categoryId;
 
   const { data: category, isLoading: categoryLoading } = useQuery<DocumentCategory>({
-    queryKey: ['/api/document-categories', categoryId],
+    queryKey: [`/api/document-categories/${categoryId}`],
     enabled: !!categoryId,
   });
 
   const { data: templates, isLoading: templatesLoading, error } = useQuery<DocumentTemplate[]>({
-    queryKey: ['/api/document-categories', categoryId, 'templates'],
+    queryKey: [`/api/document-categories/${categoryId}/templates`],
     enabled: !!categoryId,
   });
 
@@ -101,8 +101,8 @@ export default function DocumentTemplatesPage() {
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-xl">{template.name}</CardTitle>
-                    <Badge variant={template.active ? "default" : "secondary"}>
-                      {template.active ? "Activo" : "Inactivo"}
+                    <Badge variant="default">
+                      Activo
                     </Badge>
                   </div>
                   <CardDescription>{template.description}</CardDescription>

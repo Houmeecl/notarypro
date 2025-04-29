@@ -616,7 +616,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error.message });
     }
   });
-
+  
   app.get("/api/document-categories/:id", async (req, res) => {
     try {
       const categoryId = parseInt(req.params.id);

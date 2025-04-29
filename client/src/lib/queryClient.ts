@@ -42,7 +42,17 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    // Construir la URL basada en los elementos del queryKey
+    let url: string;
+    if (Array.isArray(queryKey) && queryKey.length > 1) {
+      // Si el queryKey es un array con múltiples elementos, construir una URL
+      url = queryKey.join('/').replace(/\/+/g, '/');
+    } else {
+      // Si es solo un elemento o no es un array, usar el primer elemento
+      url = queryKey[0] as string;
+    }
+    
+    const res = await fetch(url, {
       credentials: "include",
     });
 
