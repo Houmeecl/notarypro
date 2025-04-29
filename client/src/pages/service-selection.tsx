@@ -47,14 +47,14 @@ const services = [
     title: 'Crear un documento',
     description: 'Encuentre y cree documentos legales personalizados en línea: redáctelos usted mismo o pruebe la redacción de documentos experta con NotaryPro.',
     icon: <FileText className="h-8 w-8 text-primary" />,
-    path: '/document-form'
+    path: '/document-categories'
   },
   {
     id: 'sign-document',
     title: 'Firmar un documento',
     description: 'Firme documentos existentes de forma electrónica con validez legal. Perfecta para contratos, acuerdos y todo tipo de documentación oficial.',
     icon: <FileSignature className="h-8 w-8 text-primary" />,
-    path: '/document-sign'
+    path: '/documents'
   }
 ];
 
