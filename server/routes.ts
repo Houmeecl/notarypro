@@ -909,8 +909,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const stats = await storage.getDocumentStats();
       res.status(200).json(stats);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
+    } catch (error: any) {
+      console.error("Error en getDocumentStats:", error);
+      res.status(500).json({ message: error.message || "Error al obtener estadísticas de documentos" });
     }
   });
   
@@ -918,8 +919,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const stats = await storage.getRevenueStats();
       res.status(200).json(stats);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
+    } catch (error: any) {
+      console.error("Error en getRevenueStats:", error);
+      res.status(500).json({ message: error.message || "Error al obtener estadísticas de ingresos" });
     }
   });
 
