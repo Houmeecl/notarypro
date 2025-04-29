@@ -4,7 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, Plus, CheckCircle2, Database } from "lucide-react";
 import { useEffect, useState } from "react";
 import { seedAllTemplates } from "@/lib/document-template-data";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
 export default function DocumentTemplatesManager() {
@@ -12,7 +12,7 @@ export default function DocumentTemplatesManager() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [templates, setTemplates] = useState<any[]>([]);
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   // Obtener plantillas existentes al cargar
@@ -64,12 +64,12 @@ export default function DocumentTemplatesManager() {
   };
 
   const handleBackToAdmin = () => {
-    navigate('/admin-dashboard');
+    setLocation('/admin-dashboard');
   };
 
   const handleAddTemplate = () => {
     // En futuras versiones: Navegar a un formulario para crear plantillas
-    navigate('/admin/test-document-generator');
+    setLocation('/admin/test-document-generator');
   };
 
   return (
@@ -193,7 +193,7 @@ export default function DocumentTemplatesManager() {
                   <Button 
                     variant="outline" 
                     className="w-full"
-                    onClick={() => navigate(`/admin/test-document-generator?templateId=${template.id}`)}
+                    onClick={() => setLocation(`/admin/test-document-generator?templateId=${template.id}`)}
                   >
                     Usar plantilla
                   </Button>

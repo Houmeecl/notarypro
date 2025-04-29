@@ -66,7 +66,8 @@ import {
   TrendingUp,
   Calendar,
   Plug,
-  Video
+  Video,
+  Database
 } from "lucide-react";
 import { User, Document, Course } from "@shared/schema";
 
@@ -336,6 +337,26 @@ export default function AdminDashboard() {
                     </Card>
                   </Link>
                   
+                  <Link href="/admin/document-templates-manager">
+                    <Card className="hover:shadow-md transition-shadow cursor-pointer border-green-100 bg-green-50">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-base">Plantillas de Documentos</CardTitle>
+                          <FileText className="h-5 w-5 text-green-600" />
+                        </div>
+                        <CardDescription>
+                          Administre las plantillas del sistema
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center space-x-2">
+                          <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                          <span className="text-xs">Gestor de plantillas</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                  
                   <Link href="/admin/test-document-generator">
                     <Card className="hover:shadow-md transition-shadow cursor-pointer border-red-100 bg-red-50">
                       <CardHeader className="pb-2">
@@ -355,6 +376,8 @@ export default function AdminDashboard() {
                       </CardContent>
                     </Card>
                   </Link>
+                  
+
                 </div>
               </div>
               
