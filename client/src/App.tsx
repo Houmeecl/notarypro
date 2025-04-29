@@ -1,11 +1,11 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import NotFound from "@/pages/not-found";
-import { AuthProvider } from "@/hooks/use-auth";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { OnboardingProvider } from "@/hooks/use-onboarding";
 import OnboardingPopup from "@/components/onboarding/OnboardingPopup";
 import HelpButton from "@/components/onboarding/HelpButton";
@@ -15,6 +15,7 @@ import { ProtectedRoute } from "./lib/protected-route";
 import { webSocketService } from "./lib/websocket";
 import { useEffect } from "react";
 import { WebSocketDebugger } from "@/components/utils/WebSocketDebugger";
+import { Loader2 } from "lucide-react";
 
 // Pages
 import LandingPage from "@/pages/landing-page";
