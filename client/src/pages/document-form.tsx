@@ -100,10 +100,10 @@ export default function DocumentFormPage() {
           fieldSchema = z.number();
           // Si hay mensajes de error personalizados, agregar
           if (property.minimum !== undefined) {
-            fieldSchema = fieldSchema.min(property.minimum, `Debe ser mayor o igual a ${property.minimum}`);
+            fieldSchema = fieldSchema.gte(property.minimum, `Debe ser mayor o igual a ${property.minimum}`);
           }
           if (property.maximum !== undefined) {
-            fieldSchema = fieldSchema.max(property.maximum, `Debe ser menor o igual a ${property.maximum}`);
+            fieldSchema = fieldSchema.lte(property.maximum, `Debe ser menor o igual a ${property.maximum}`);
           }
         } else if (property.type === "string") {
           if (property.format === "date") {

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { LoadingSpinner } from "@/lib/route-utils";
 import Sidebar from "@/components/dashboard/Sidebar";
 import DocumentUpload from "@/components/dashboard/DocumentUpload";
 import IdentityVerification from "@/components/dashboard/IdentityVerification";

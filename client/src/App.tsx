@@ -91,11 +91,7 @@ function Router() {
         component={UserDashboard} 
         allowedRoles={["user", "certifier", "admin"]} 
       />
-      <ProtectedRoute 
-        path="/document-sign/:id" 
-        component={DocumentSign} 
-        allowedRoles={["user", "certifier", "admin"]} 
-      />
+      <Route path="/document-sign/:id" component={DocumentSign} />
       
       {/* Document routes */}
       <Route path="/document-categories" component={DocumentCategoriesPage} />
@@ -106,11 +102,7 @@ function Router() {
         component={DocumentsPage} 
         allowedRoles={["user", "certifier", "admin"]} 
       />
-      <ProtectedRoute 
-        path="/documents/:documentId" 
-        component={DocumentViewPage} 
-        allowedRoles={["user", "certifier", "admin"]} 
-      />
+      <Route path="/documents/:documentId" component={DocumentViewPage} />
       <ProtectedRoute 
         path="/document-processor" 
         component={DocumentProcessor} 
