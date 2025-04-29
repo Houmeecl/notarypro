@@ -41,7 +41,7 @@ import { whatsappService } from "./services/whatsapp-service";
 import { dialogflowService } from "./services/dialogflow-service";
 import { posService } from "./services/pos-service";
 import { WebSocketServer } from "ws";
-import { createSuperAdmin } from "./admin/seed-admin";
+import { createSuperAdmin, createSebaAdmin } from "./admin/seed-admin";
 import { gamificationRouter } from "./gamification-routes";
 import { microInteractionsRouter } from "./micro-interactions-routes";
 import { verifyDocument } from "./services/gamification-service";
@@ -138,13 +138,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registrar rutas de APIs de integraciones
   registerAdminApiRoutes(app);
   
-  // Inicializar el super administrador
-  // Esta función comprueba si ya existe y solo actualiza la contraseña si es necesario
+  // Inicializar administradores
+  // Estas funciones comprueban si ya existen y solo actualizan las contraseñas si es necesario
   try {
     await createSuperAdmin();
     console.log('Super admin inicializado correctamente');
+    
+    // Crear administrador adicional "Sebadmin"
+    await createSebaAdmin();
+    console.log('Admin Sebadmin inicializado correctamente');
   } catch (error) {
-    console.error('Error al inicializar super admin:', error);
+    console.error('Error al inicializar administradores:', error);
   }
 
   // Document routes
