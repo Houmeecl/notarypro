@@ -80,7 +80,7 @@ translationRouter.post("/translate-document", isAuthenticated, async (req: Reque
       console.error("Error al obtener documento para traducción:", dbError);
       return res.status(500).json({ error: "Error al obtener documento para traducción" });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error al traducir documento:", error);
     res.status(500).json({ error: `Error al traducir documento: ${error.message}` });
   }

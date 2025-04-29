@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import DocumentNavbar from "@/components/layout/DocumentNavbar";
+import TranslationWidget from "@/components/document/TranslationWidget";
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -18,7 +19,7 @@ const getStatusBadge = (status: string) => {
     case "pending":
       return <Badge variant="secondary">Pendiente</Badge>;
     case "validated":
-      return <Badge variant="success">Validado</Badge>;
+      return <Badge className="bg-green-500 hover:bg-green-600">Validado</Badge>;
     case "signed":
       return <Badge variant="default">Firmado</Badge>;
     case "rejected":
@@ -164,6 +165,12 @@ export default function DocumentViewPage() {
                   className="border rounded-md p-4 bg-white min-h-[500px]"
                   dangerouslySetInnerHTML={{ __html: previewHtml }}
                 />
+                <div className="mt-4">
+                  <TranslationWidget 
+                    content={previewHtml}
+                    onTranslationComplete={(translatedContent) => setPreviewHtml(translatedContent)}
+                  />
+                </div>
               </CardContent>
               <CardFooter className="flex flex-wrap gap-4">
                 <Button variant="outline">

@@ -67,7 +67,7 @@ export async function translateText(
     // Extraer el texto traducido de la respuesta
     const translatedText = response.choices[0].message.content || "";
     return translatedText;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error en la traducción:", error);
     throw new Error(`Error al traducir el texto: ${error.message}`);
   }
