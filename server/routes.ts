@@ -480,7 +480,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/documents/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/documents/:id", async (req, res) => {
     try {
       const documentId = parseInt(req.params.id);
       const document = await storage.getDocument(documentId);
@@ -489,9 +489,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Document not found" });
       }
       
-      // Only the document owner, certifiers, or admins can update the document
-      if (document.userId !== req.user.id && req.user.role !== "certifier" && req.user.role !== "admin") {
-        return res.status(403).json({ message: "Forbidden" });
+      // Si el usuario está autenticado, verificamos permisos
+      if (req.isAuthenticated()) {
+        const user = req.user as any; // Necesario por los errores de TypeScript
+        // Solo el propietario del documento, certificadores o administradores pueden actualizar el documento
+        if (document.userId !== user.id && user.role !== "certifier" && user.role !== "admin") {
+          return res.status(403).json({ message: "Forbidden" });
+        }
+      } else {
+        // Para invitados, verificamos que el documento pertenezca a un invitado (userId = 1)
+        if (document.userId !== 1) {
+          return res.status(403).json({ message: "Forbidden" });
+        }
       }
       
       const updatedDocument = await storage.updateDocument(documentId, req.body);

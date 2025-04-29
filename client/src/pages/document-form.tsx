@@ -15,7 +15,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import DocumentNavbar from "@/components/layout/DocumentNavbar";
-import { useRequireAuth, LoadingSpinner } from "@/lib/route-utils";
+import { useAuth } from "@/hooks/use-auth";
+import { LoadingSpinner } from "@/lib/route-utils";
 
 // Definir tipos para el esquema de formulario
 type FormSchemaProperty = {
@@ -38,19 +39,19 @@ export default function DocumentFormPage() {
   const templateId = params?.templateId;
   const [formSchema, setFormSchema] = useState<any>(null);
   
-  // Usar el hook de autenticación personalizado
-  const { user, isLoading: authLoading } = useRequireAuth();
+  // Obtener información del usuario si está autenticado, pero no requerirla
+  const { user, isLoading: authLoading } = useAuth();
   
   // Si está cargando la autenticación, mostrar loading spinner
   if (authLoading) {
     return <LoadingSpinner />;
   }
   
-  // Si el usuario no está autenticado, el hook ya se encargó de la redirección
+  // Permitir acceso tanto a usuarios autenticados como invitados
 
   const { data: template, isLoading: templateLoading, error } = useQuery<DocumentTemplate>({
     queryKey: ['/api/document-templates', templateId],
-    enabled: !!templateId && !!user,
+    enabled: !!templateId, // No requerimos que user esté presente
   });
 
   useEffect(() => {
