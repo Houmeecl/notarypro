@@ -23,10 +23,23 @@ export default function DocumentFormPage() {
   const [, params] = useRoute("/document-form/:templateId");
   const templateId = params?.templateId;
   const [formSchema, setFormSchema] = useState<any>(null);
+  const { user, isLoading: authLoading } = useAuth();
+
+  // Redirigir a la página de autenticación si el usuario no está autenticado
+  useEffect(() => {
+    if (!authLoading && !user) {
+      toast({
+        title: "Inicio de sesión requerido",
+        description: "Debes iniciar sesión para crear documentos",
+        variant: "destructive",
+      });
+      setLocation("/auth");
+    }
+  }, [authLoading, user, setLocation, toast]);
 
   const { data: template, isLoading: templateLoading, error } = useQuery<DocumentTemplate>({
     queryKey: ['/api/document-templates', templateId],
-    enabled: !!templateId,
+    enabled: !!templateId && !!user,
   });
 
   useEffect(() => {
@@ -252,7 +265,7 @@ export default function DocumentFormPage() {
                 
                 <div className="mt-6">
                   <p className="font-semibold">Precio</p>
-                  <p className="text-2xl font-bold text-primary">${template?.price / 100}</p>
+                  <p className="text-2xl font-bold text-primary">${template?.price ? template.price / 100 : 0}</p>
                 </div>
                 
                 <div className="mt-6 space-y-2">
