@@ -12,6 +12,8 @@ import HelpButton from "@/components/onboarding/HelpButton";
 import { MicroInteractionProvider } from "@/hooks/use-micro-interactions";
 import { MicroInteractionDisplay } from "@/components/micro-interactions/MicroInteractionDisplay";
 import { ProtectedRoute } from "./lib/protected-route";
+import { webSocketService } from "./lib/websocket";
+import { useEffect } from "react";
 
 // Pages
 import LandingPage from "@/pages/landing-page";
@@ -293,6 +295,17 @@ function Router() {
 }
 
 function App() {
+  // Iniciar la conexión WebSocket cuando se monta el componente
+  useEffect(() => {
+    // Iniciar la conexión WebSocket
+    webSocketService.connect();
+
+    // Limpiar conexión cuando se desmonta
+    return () => {
+      webSocketService.disconnect();
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
