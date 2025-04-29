@@ -51,7 +51,7 @@ export const contractoCompraventaTemplate = {
         
         <div class="section">
             <h2>SEGUNDO: PRECIO Y FORMA DE PAGO</h2>
-            <p>El precio de la compraventa es la suma de ${{precioVenta}} ({{precioVentaPalabras}}), que el COMPRADOR pagará al VENDEDOR de la siguiente forma: {{formaPago}}.</p>
+            <p>El precio de la compraventa es la suma de $\{{precioVenta\}} (\{{precioVentaPalabras\}}), que el COMPRADOR pagará al VENDEDOR de la siguiente forma: {{formaPago}}.</p>
         </div>
         
         <div class="section">
@@ -409,7 +409,7 @@ export const actaConstitucionTemplate = {
         
         <div class="section">
             <h2>CUARTO: CAPITAL SOCIAL</h2>
-            <p>El capital social es de ${{capitalSocialNumero}} ({{capitalSocialPalabras}}), dividido en {{numeroAcciones}} acciones/participaciones con un valor nominal de ${{valorNominalAccion}} cada una, suscritas y pagadas de la siguiente manera:</p>
+            <p>El capital social es de $\{{capitalSocialNumero\}} (\{{capitalSocialPalabras\}}), dividido en {{numeroAcciones}} acciones/participaciones con un valor nominal de $\{{valorNominalAccion\}} cada una, suscritas y pagadas de la siguiente manera:</p>
             <p>{{distribucionCapital}}</p>
         </div>
         

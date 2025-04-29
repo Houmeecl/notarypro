@@ -70,7 +70,7 @@ export async function seedDocumentTemplates() {
         
         <div class="section">
             <h2>SEGUNDO: PRECIO Y FORMA DE PAGO</h2>
-            <p>El precio de la compraventa es la suma de ${{precio}} ({{precioPalabras}}), que el COMPRADOR pagará al VENDEDOR de la siguiente forma: {{formaPago}}.</p>
+            <p>El precio de la compraventa es la suma de $\{{precio\}} (\{{precioPalabras\}}), que el COMPRADOR pagará al VENDEDOR de la siguiente forma: {{formaPago}}.</p>
         </div>
         
         <div class="section">
@@ -422,7 +422,7 @@ export async function seedDocumentTemplates() {
         
         <div class="section">
             <h2>CUARTO: CAPITAL SOCIAL</h2>
-            <p>El capital social es de ${{capitalSocial}} ({{capitalSocialPalabras}}), dividido en {{numeroAcciones}} acciones/participaciones con un valor nominal de ${{valorNominal}} cada una, suscritas y pagadas de la siguiente manera:</p>
+            <p>El capital social es de $\{{capitalSocial\}} (\{{capitalSocialPalabras\}}), dividido en {{numeroAcciones}} acciones/participaciones con un valor nominal de $\{{valorNominal\}} cada una, suscritas y pagadas de la siguiente manera:</p>
             <p>{{distribucionCapital}}</p>
         </div>
         
@@ -771,7 +771,7 @@ export async function seedDocumentTemplates() {
         
         <div class="section">
             <h2>SEGUNDO: PRECIO Y FORMA DE PAGO</h2>
-            <p>El precio de la compraventa prometida es la suma de ${{precioVenta}} ({{precioVentaPalabras}}), que el Promitente Comprador pagará al Promitente Vendedor de la siguiente forma:</p>
+            <p>El precio de la compraventa prometida es la suma de $\{{precioVenta\}} (\{{precioVentaPalabras\}}), que el Promitente Comprador pagará al Promitente Vendedor de la siguiente forma:</p>
             <p>{{formaPago}}</p>
         </div>
         
@@ -787,7 +787,7 @@ export async function seedDocumentTemplates() {
         
         <div class="section">
             <h2>QUINTO: ARRAS</h2>
-            <p>Como garantía de celebración del contrato definitivo, el Promitente Comprador entrega en este acto al Promitente Vendedor la suma de ${{montoArras}} ({{montoArrasPalabras}}) en calidad de arras.</p>
+            <p>Como garantía de celebración del contrato definitivo, el Promitente Comprador entrega en este acto al Promitente Vendedor la suma de $\{{montoArras\}} (\{{montoArrasPalabras\}}) en calidad de arras.</p>
         </div>
         
         <div class="section">
@@ -1012,13 +1012,13 @@ export async function seedDocumentTemplates() {
                 <p><strong>Fecha de Emisión:</strong> {{date}}</p>
             </div>
             <div>
-                <p><strong>Monto:</strong> <span class="amount">${{montoPagare}}</span></p>
+                <p><strong>Monto:</strong> <span class="amount">$\{{montoPagare\}}</span></p>
                 <p><strong>Vencimiento:</strong> {{fechaVencimiento}}</p>
             </div>
         </div>
         
         <div class="main-content">
-            <p>Por este pagaré, yo <strong>{{nombreDeudor}}</strong>, RUT {{rutDeudor}}, domiciliado en {{domicilioDeudor}}, me obligo a pagar incondicionalmente a la orden de <strong>{{nombreAcreedor}}</strong>, RUT {{rutAcreedor}}, domiciliado en {{domicilioAcreedor}}, o a quien sus derechos represente, la suma de <strong>${{montoPagare}} ({{montoPagarePalabras}})</strong>.</p>
+            <p>Por este pagaré, yo <strong>{{nombreDeudor}}</strong>, RUT {{rutDeudor}}, domiciliado en {{domicilioDeudor}}, me obligo a pagar incondicionalmente a la orden de <strong>{{nombreAcreedor}}</strong>, RUT {{rutAcreedor}}, domiciliado en {{domicilioAcreedor}}, o a quien sus derechos represente, la suma de <strong>$\{{montoPagare\}} (\{{montoPagarePalabras\}})</strong>.</p>
             
             <p>El pago de esta obligación se realizará {{formaPago}}.</p>
             
@@ -1184,7 +1184,7 @@ export async function seedDocumentTemplates() {
         
         <div class="section">
             <h2>PRIMERO: OBJETO DEL CONTRATO</h2>
-            <p>Por el presente instrumento, el PRESTAMISTA otorga en préstamo al PRESTATARIO, quien acepta y recibe a su entera satisfacción, la suma de ${{montoPrestamo}} ({{montoPrestamoLetras}}).</p>
+            <p>Por el presente instrumento, el PRESTAMISTA otorga en préstamo al PRESTATARIO, quien acepta y recibe a su entera satisfacción, la suma de $\{{montoPrestamo\}} (\{{montoPrestamoLetras\}}).</p>
         </div>
         
         <div class="section">
