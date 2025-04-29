@@ -128,6 +128,15 @@ export default function DocumentFormPage() {
   });
 
   const onSubmit = (data: z.infer<typeof zodSchema>) => {
+    if (!template || !templateId) {
+      toast({
+        title: "Error",
+        description: "No se pudo obtener la información de la plantilla.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     createDocumentMutation.mutate(data);
   };
 
