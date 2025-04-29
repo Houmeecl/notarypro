@@ -100,11 +100,7 @@ function Router() {
       {/* Document routes */}
       <Route path="/document-categories" component={DocumentCategoriesPage} />
       <Route path="/document-templates/:categoryId" component={DocumentTemplatesPage} />
-      <ProtectedRoute 
-        path="/document-form/:templateId" 
-        component={DocumentFormPage} 
-        allowedRoles={["user", "certifier", "admin"]} 
-      />
+      <Route path="/document-form/:templateId" component={DocumentFormPage} />
       <ProtectedRoute 
         path="/documents" 
         component={DocumentsPage} 
