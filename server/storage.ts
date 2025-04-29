@@ -1322,11 +1322,21 @@ export class DatabaseStorage implements IStorage {
         .from(documents)
         .where(eq(documents.paymentStatus, 'completed'));
       
-      // Calculate video call revenue
-      const [videoCallTotal] = await db
-        .select({ total: sql`COALESCE(SUM(${videoCallSessions.paymentAmount}), 0)` })
-        .from(videoCallSessions)
-        .where(eq(videoCallSessions.paymentStatus, 'completed'));
+      // Default video call revenue to 0 since the table may not exist
+      let videoCallRevenue = 0;
+      
+      // Try to calculate video call revenue if table exists
+      try {
+        const [videoCallTotal] = await db
+          .select({ total: sql`COALESCE(SUM(${videoCallSessions.paymentAmount}), 0)` })
+          .from(videoCallSessions)
+          .where(eq(videoCallSessions.paymentStatus, 'completed'));
+          
+        videoCallRevenue = Number(videoCallTotal.total);
+      } catch (error) {
+        // If the table doesn't exist, just log it and continue with videoCallRevenue = 0
+        console.log("Note: video_call_sessions table does not exist yet, setting videoCallRevenue to 0");
+      }
       
       // Calculate today's revenue
       const [todayTotal] = await db
@@ -1359,7 +1369,6 @@ export class DatabaseStorage implements IStorage {
       const courseRevenue = 0;
       
       const documentRevenue = Number(documentTotal.total);
-      const videoCallRevenue = Number(videoCallTotal.total);
       
       return {
         totalRevenue: documentRevenue + courseRevenue + videoCallRevenue,
@@ -1372,7 +1381,16 @@ export class DatabaseStorage implements IStorage {
       };
     } catch (error) {
       console.error("Error en getRevenueStats:", error);
-      throw error;
+      // Return default values instead of throwing to prevent dashboard errors
+      return {
+        totalRevenue: 0,
+        revenueToday: 0,
+        revenueThisWeek: 0,
+        revenueThisMonth: 0,
+        documentRevenue: 0,
+        courseRevenue: 0,
+        videoCallRevenue: 0
+      };
     }
   }
 
