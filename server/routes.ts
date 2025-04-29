@@ -439,6 +439,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: error.message });
     }
   });
+  
+  // Special seed route for admin development
+  app.post("/api/admin/seed-templates", async (req, res) => {
+    // Verificar código secreto para proteger esta ruta sin autenticación
+    if (req.body.secretCode !== '7723') {
+      return res.status(403).json({ message: "Código incorrecto" });
+    }
+    
+    try {
+      // Crear plantillas para documentos
+      if (req.body.templates) {
+        let createdCount = 0;
+        // Obtener plantillas existentes para verificar duplicados
+        const existingTemplates = await storage.getAllDocumentTemplates();
+        const existingNames = existingTemplates.map(t => t.name);
+        
+        for (const template of req.body.templates) {
+          // Verificar que no exista una plantilla con el mismo nombre
+          if (!existingNames.includes(template.name)) {
+            const validateResult = insertDocumentTemplateSchema.safeParse(template);
+            if (validateResult.success) {
+              await storage.createDocumentTemplate(validateResult.data);
+              createdCount++;
+            }
+          }
+        }
+        
+        return res.status(200).json({ 
+          message: `Se agregaron ${createdCount} nuevas plantillas` 
+        });
+      } else {
+        return res.status(400).json({ message: "No hay plantillas para agregar" });
+      }
+    } catch (error) {
+      console.error("Error sembrando plantillas:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
 
   app.get("/api/document-templates", async (req, res) => {
     try {
