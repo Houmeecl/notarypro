@@ -46,8 +46,6 @@ export default function DocumentFormPage() {
   if (authLoading) {
     return <LoadingSpinner />;
   }
-  
-  // Permitir acceso tanto a usuarios autenticados como invitados
 
   const { data: template, isLoading: templateLoading, error } = useQuery<DocumentTemplate>({
     queryKey: ['/api/document-templates', templateId],
@@ -139,7 +137,7 @@ export default function DocumentFormPage() {
   });
 
   const createDocumentMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: Record<string, any>) => {
       if (!template || !templateId) throw new Error("Plantilla no disponible");
       
       const documentData = {
