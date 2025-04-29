@@ -249,6 +249,215 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error.message });
     }
   });
+  
+  // Función para generar HTML de documento a partir de plantilla y datos
+  function generateDocumentHtml(document, template, formData) {
+    // Obtener CSS base para todos los documentos
+    const baseStyles = `
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .document-header {
+        text-align: center;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+      }
+      .document-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+      }
+      .document-subtitle {
+        font-size: 16px;
+        color: #666;
+      }
+      .document-reference {
+        text-align: right;
+        margin-bottom: 20px;
+        color: #666;
+        font-size: 14px;
+      }
+      .document-content {
+        margin: 30px 0;
+        background-color: white;
+        padding: 20px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      }
+      .field {
+        margin-bottom: 15px;
+      }
+      .field-label {
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+        font-weight: bold;
+      }
+      .field-value {
+        padding: 8px;
+        background-color: #f9f9f9;
+        border-radius: 4px;
+        border: 1px solid #eee;
+      }
+      .signature-area {
+        margin-top: 40px;
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .signature-box {
+        border: 1px dashed #ccc;
+        width: 200px;
+        height: 100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #888;
+      }
+      .document-footer {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 12px;
+        color: #999;
+      }
+    `;
+    
+    // Generar HTML con los datos del formulario
+    const formDataHtml = Object.entries(formData)
+      .map(([key, value]) => `
+        <div class="field">
+          <div class="field-label">${key}</div>
+          <div class="field-value">${value}</div>
+        </div>
+      `)
+      .join('');
+    
+    // Crear HTML completo
+    const html = `
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${document.title}</title>
+        <style>${baseStyles}</style>
+      </head>
+      <body>
+        <div class="document-reference">
+          <div>Ref: ${document.id}</div>
+          <div>Fecha: ${new Date(document.createdAt || '').toLocaleDateString()}</div>
+        </div>
+        
+        <div class="document-header">
+          <div class="document-title">${document.title}</div>
+          <div class="document-subtitle">${template.name || ''}</div>
+        </div>
+        
+        <div class="document-content">
+          ${formDataHtml || '<p>No hay datos disponibles para este documento.</p>'}
+        </div>
+        
+        <div class="signature-area">
+          <div>
+            <p>Estado: <strong>${document.status}</strong></p>
+            ${document.certifierId ? '<p>Certificado por un notario autorizado.</p>' : ''}
+          </div>
+          
+          ${document.signatureData ? `
+            <div class="signature-box">
+              <p>Documento firmado electrónicamente</p>
+              <p>${new Date(document.updatedAt || '').toLocaleDateString()}</p>
+            </div>
+          ` : `
+            <div class="signature-box">
+              <p>Zona para firma</p>
+            </div>
+          `}
+        </div>
+        
+        <div class="document-footer">
+          <p>Este documento es una representación digital del original.</p>
+          <p>Generado por Vecinos NotaryPro el ${new Date().toLocaleDateString()}</p>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    return html;
+  }
+  
+  // Obtener vista previa HTML renderizada del documento
+  app.get("/api/documents/:id/preview", isAuthenticated, async (req, res) => {
+    try {
+      const documentId = parseInt(req.params.id);
+      const document = await storage.getDocument(documentId);
+      
+      if (!document) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      // Verificar que el usuario tenga acceso al documento
+      if (document.userId !== req.user.id && req.user.role !== "admin" && req.user.role !== "certifier" && document.certifierId !== req.user.id) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      // Obtener la plantilla del documento
+      const template = await storage.getDocumentTemplate(document.templateId);
+      
+      if (!template) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      
+      // Obtener los datos del formulario
+      let formData = {};
+      try {
+        formData = document.formData ? 
+          (typeof document.formData === 'string' ? JSON.parse(document.formData) : document.formData) : 
+          {};
+      } catch (e) {
+        console.error("Error parsing form data:", e);
+      }
+      
+      // Formatear los datos según el formulario
+      let formattedData = {};
+      if (template.formSchema) {
+        const schema = typeof template.formSchema === 'string' ? 
+          JSON.parse(template.formSchema) : template.formSchema;
+        
+        for (const [key, value] of Object.entries(formData)) {
+          const propertySchema = schema.properties?.[key];
+          if (propertySchema) {
+            formattedData[propertySchema.title || key] = value;
+          } else {
+            formattedData[key] = value;
+          }
+        }
+      } else {
+        formattedData = formData;
+      }
+      
+      // Generar HTML basado en la plantilla y los datos
+      const html = generateDocumentHtml(document, template, formattedData);
+      
+      // Responder con HTML
+      res.setHeader('Content-Type', 'text/html');
+      res.send(html);
+    } catch (error) {
+      console.error("Error generating document preview:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
 
   app.patch("/api/documents/:id", isAuthenticated, async (req, res) => {
     try {

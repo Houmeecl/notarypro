@@ -52,27 +52,94 @@ export default function DocumentViewPage() {
 
   useEffect(() => {
     if (document) {
-      // En un escenario real, aquí haríamos una petición para obtener el HTML renderizado
-      // Por ahora, simularemos el HTML usando la información del documento
-      const mockHtml = `
-        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #333; text-align: center;">${document.title}</h1>
-          <div style="margin-top: 20px;">
-            <p>Este es el contenido del documento basado en la plantilla seleccionada.</p>
-            <p>Los datos del formulario se insertarían aquí formateados según la plantilla.</p>
-            <p>Estado actual: <strong>${document.status}</strong></p>
-            ${document.certifierId ? '<p>Certificado por un notario autorizado.</p>' : ''}
-            ${document.signatureData ? '<p>Este documento ha sido firmado electrónicamente.</p>' : ''}
-          </div>
-          <div style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px;">
-            <p style="font-size: 12px; color: #666;">Documento generado el ${new Date(document.createdAt || '').toLocaleDateString()}</p>
-          </div>
-        </div>
-      `;
+      // Obtener el HTML renderizado del servidor
+      const fetchDocumentHtml = async () => {
+        try {
+          const response = await apiRequest(
+            "GET", 
+            `/api/documents/${document.id}/preview`, 
+            null,
+            { responseType: "text" }
+          );
+          
+          if (response.ok) {
+            const htmlContent = await response.text();
+            setPreviewHtml(htmlContent);
+          } else {
+            // Fallback en caso de error
+            const fallbackHtml = renderFallbackDocument(document);
+            setPreviewHtml(fallbackHtml);
+            
+            toast({
+              title: "Advertencia",
+              description: "No se pudo cargar la vista previa del documento. Mostrando versión simplificada.",
+              variant: "warning",
+            });
+          }
+        } catch (error) {
+          console.error("Error al obtener la vista previa del documento:", error);
+          // Fallback en caso de error
+          const fallbackHtml = renderFallbackDocument(document);
+          setPreviewHtml(fallbackHtml);
+        }
+      };
       
-      setPreviewHtml(mockHtml);
+      fetchDocumentHtml();
     }
-  }, [document]);
+  }, [document, toast]);
+  
+  // Función para renderizar una versión fallback del documento
+  const renderFallbackDocument = (doc: Document) => {
+    // Recuperar datos del formulario si existen
+    const formData = doc.formData ? 
+      JSON.parse(typeof doc.formData === 'string' ? doc.formData : JSON.stringify(doc.formData)) : 
+      {};
+    
+    // Generar HTML con los datos del formulario
+    const formDataHtml = Object.entries(formData)
+      .map(([key, value]) => `
+        <div style="margin-bottom: 15px;">
+          <strong style="display: block; margin-bottom: 5px; color: #555;">${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</strong>
+          <div style="padding: 8px; background-color: #f9f9f9; border-radius: 4px; border: 1px solid #eee;">${value}</div>
+        </div>
+      `)
+      .join('');
+    
+    return `
+      <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: right; margin-bottom: 20px; color: #666; font-size: 14px;">
+          <div>Ref: ${doc.id}</div>
+          <div>Fecha: ${new Date(doc.createdAt || '').toLocaleDateString()}</div>
+        </div>
+        
+        <h1 style="color: #333; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 25px;">${doc.title}</h1>
+        
+        <div style="margin: 30px 0; padding: 20px; border: 1px solid #eee; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+          <h2 style="color: #444; font-size: 18px; margin-bottom: 20px;">Información del Documento</h2>
+          ${formDataHtml || '<p style="color: #666;">No hay datos disponibles para este documento.</p>'}
+        </div>
+        
+        <div style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <p style="font-size: 14px; color: #666; margin-bottom: 5px;">Estado: <strong style="color: #333;">${doc.status}</strong></p>
+            ${doc.certifierId ? '<p style="font-size: 14px; color: #666;">Certificado por un notario autorizado.</p>' : ''}
+          </div>
+          
+          ${doc.signatureData ? `
+          <div style="border: 1px dashed #ccc; padding: 10px; text-align: center;">
+            <p style="font-size: 12px; color: #666; margin-bottom: 5px;">Firmado electrónicamente el</p>
+            <p style="font-size: 14px; color: #333;">${new Date(doc.updatedAt || '').toLocaleDateString()}</p>
+          </div>
+          ` : ''}
+        </div>
+        
+        <div style="margin-top: 40px; text-align: center;">
+          <p style="font-size: 12px; color: #999;">Este documento es una representación digital del original.</p>
+          <p style="font-size: 12px; color: #999;">Generado por Vecinos NotaryPro el ${new Date().toLocaleDateString()}</p>
+        </div>
+      </div>
+    `;
+  };
 
   const signDocumentMutation = useMutation({
     mutationFn: async (signatureData: string) => {
