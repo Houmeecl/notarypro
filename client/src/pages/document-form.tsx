@@ -17,6 +17,20 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import DocumentNavbar from "@/components/layout/DocumentNavbar";
 import { useAuth } from "@/hooks/use-auth";
 
+// Definir tipos para el esquema de formulario
+type FormSchemaProperty = {
+  type: string;
+  title: string;
+  format?: string;
+  multiline?: boolean;
+  placeholder?: string;
+  description?: string;
+  minimum?: number;
+  maximum?: number;
+  minLength?: number;
+  maxLength?: number;
+};
+
 export default function DocumentFormPage() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
@@ -25,17 +39,8 @@ export default function DocumentFormPage() {
   const [formSchema, setFormSchema] = useState<any>(null);
   const { user, isLoading: authLoading } = useAuth();
 
-  // Redirigir a la página de autenticación si el usuario no está autenticado
-  useEffect(() => {
-    if (!authLoading && !user) {
-      toast({
-        title: "Inicio de sesión requerido",
-        description: "Debes iniciar sesión para crear documentos",
-        variant: "destructive",
-      });
-      setLocation("/auth");
-    }
-  }, [authLoading, user, setLocation, toast]);
+  // Ya no necesitamos este useEffect de redirección aquí porque
+  // el ProtectedRoute ya maneja la redirección automáticamente
 
   const { data: template, isLoading: templateLoading, error } = useQuery<DocumentTemplate>({
     queryKey: ['/api/document-templates', templateId],
@@ -62,43 +67,57 @@ export default function DocumentFormPage() {
   const generateZodSchema = () => {
     if (!formSchema) return z.object({});
 
-    const schemaObject: { [key: string]: any } = {};
+    // Definir el tipo para el objeto de propiedades del formulario
+    type FormSchemaProperty = {
+      type: string;
+      title: string;
+      format?: string;
+      multiline?: boolean;
+      placeholder?: string;
+      description?: string;
+      minimum?: number;
+      maximum?: number;
+      minLength?: number;
+      maxLength?: number;
+    };
+
+    const schemaObject: Record<string, z.ZodTypeAny> = {};
     
-    // Recorrer las propiedades del formSchema
-    for (const [key, value] of Object.entries(formSchema.properties)) {
-      const property = value as any;
-      
-      // Determinar el tipo de validación según el tipo de propiedad
-      let fieldSchema: any = z.string();
-      
-      if (property.type === "number") {
-        fieldSchema = z.number();
-        // Si hay mensajes de error personalizados, agregar
-        if (property.minimum !== undefined) {
-          fieldSchema = fieldSchema.min(property.minimum, `Debe ser mayor o igual a ${property.minimum}`);
-        }
-        if (property.maximum !== undefined) {
-          fieldSchema = fieldSchema.max(property.maximum, `Debe ser menor o igual a ${property.maximum}`);
-        }
-      } else if (property.type === "string") {
-        if (property.format === "date") {
-          fieldSchema = z.string();
-        } else if (property.format === "email") {
-          fieldSchema = z.string().email("Correo electrónico inválido");
-        } else {
-          fieldSchema = z.string();
-          if (property.minLength !== undefined) {
-            fieldSchema = fieldSchema.min(property.minLength, `Debe tener al menos ${property.minLength} caracteres`);
+    // Recorrer las propiedades del formSchema con tipado seguro
+    if (formSchema.properties && typeof formSchema.properties === 'object') {
+      Object.entries(formSchema.properties as Record<string, FormSchemaProperty>).forEach(([key, property]) => {
+        // Determinar el tipo de validación según el tipo de propiedad
+        let fieldSchema: z.ZodTypeAny = z.string();
+        
+        if (property.type === "number") {
+          fieldSchema = z.number();
+          // Si hay mensajes de error personalizados, agregar
+          if (property.minimum !== undefined) {
+            fieldSchema = fieldSchema.min(property.minimum, `Debe ser mayor o igual a ${property.minimum}`);
           }
-          if (property.maxLength !== undefined) {
-            fieldSchema = fieldSchema.max(property.maxLength, `Debe tener como máximo ${property.maxLength} caracteres`);
+          if (property.maximum !== undefined) {
+            fieldSchema = fieldSchema.max(property.maximum, `Debe ser menor o igual a ${property.maximum}`);
+          }
+        } else if (property.type === "string") {
+          if (property.format === "date") {
+            fieldSchema = z.string();
+          } else if (property.format === "email") {
+            fieldSchema = z.string().email("Correo electrónico inválido");
+          } else {
+            fieldSchema = z.string();
+            if (property.minLength !== undefined) {
+              fieldSchema = fieldSchema.min(property.minLength, `Debe tener al menos ${property.minLength} caracteres`);
+            }
+            if (property.maxLength !== undefined) {
+              fieldSchema = fieldSchema.max(property.maxLength, `Debe tener como máximo ${property.maxLength} caracteres`);
+            }
           }
         }
-      }
-      
-      // Si el campo es requerido, lo hacemos obligatorio
-      const isRequired = formSchema.required && formSchema.required.includes(key);
-      schemaObject[key] = isRequired ? fieldSchema : fieldSchema.optional();
+        
+        // Si el campo es requerido, lo hacemos obligatorio
+        const isRequired = formSchema.required && Array.isArray(formSchema.required) && formSchema.required.includes(key);
+        schemaObject[key] = isRequired ? fieldSchema : fieldSchema.optional();
+      });
     }
     
     return z.object(schemaObject);
@@ -106,7 +125,8 @@ export default function DocumentFormPage() {
 
   const zodSchema = generateZodSchema();
   
-  const form = useForm<z.infer<typeof zodSchema>>({
+  // Utilizamos tipado genérico para evitar problemas con never
+  const form = useForm({
     resolver: zodResolver(zodSchema),
     defaultValues: {},
   });
@@ -187,7 +207,7 @@ export default function DocumentFormPage() {
               <CardContent>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    {formSchema && Object.entries(formSchema.properties).map(([key, value]: [string, any]) => (
+                    {formSchema && Object.entries(formSchema.properties as Record<string, any>).map(([key, value]) => (
                       <FormField
                         key={key}
                         control={form.control}
