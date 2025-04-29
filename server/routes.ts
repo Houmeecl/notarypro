@@ -148,11 +148,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
 
   // Document routes
-  app.post("/api/documents", isAuthenticated, async (req, res) => {
+  app.post("/api/documents", async (req, res) => {
     try {
+      // Si el usuario está autenticado, usamos su ID, de lo contrario usamos un ID genérico para invitados
+      const userId = req.isAuthenticated() ? req.user.id : 1; // Usuario invitado (guest user id = 1)
+      
       const validatedData = insertDocumentSchema.parse({
         ...req.body,
-        userId: req.user.id,
+        userId: userId,
       });
 
       const document = await storage.createDocument(validatedData);
@@ -238,7 +241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/documents/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/documents/:id", async (req, res) => {
     try {
       const documentId = parseInt(req.params.id);
       const document = await storage.getDocument(documentId);
@@ -247,14 +250,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Document not found" });
       }
       
-      // Only the document owner, certifiers, or admins can access the document
-      if (document.userId !== req.user.id && req.user.role !== "certifier" && req.user.role !== "admin") {
-        return res.status(403).json({ message: "Forbidden" });
+      // Si el usuario está autenticado, aplicamos restricciones de acceso
+      if (req.isAuthenticated()) {
+        const user = req.user as any; // Esto es necesario por el error de TypeScript
+        // Solo el propietario del documento, certificadores o administradores pueden acceder al documento
+        if (document.userId !== user.id && user.role !== "certifier" && user.role !== "admin") {
+          return res.status(403).json({ message: "Forbidden" });
+        }
       }
+      // Si el usuario no está autenticado, permitimos acceso público al documento
       
       res.status(200).json(document);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ message: (error as Error).message });
     }
   });
   
@@ -406,7 +414,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
   
   // Obtener vista previa HTML renderizada del documento
-  app.get("/api/documents/:id/preview", isAuthenticated, async (req, res) => {
+  app.get("/api/documents/:id/preview", async (req, res) => {
     try {
       const documentId = parseInt(req.params.id);
       const document = await storage.getDocument(documentId);
@@ -415,10 +423,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Document not found" });
       }
       
-      // Verificar que el usuario tenga acceso al documento
-      if (document.userId !== req.user.id && req.user.role !== "admin" && req.user.role !== "certifier" && document.certifierId !== req.user.id) {
-        return res.status(403).json({ message: "Forbidden" });
+      // Si el usuario está autenticado, verificamos el acceso; si no, permitimos acceso público
+      if (req.isAuthenticated()) {
+        const user = req.user as any; // Esto es necesario por el error de TypeScript
+        // Verificar que el usuario tenga acceso al documento
+        if (document.userId !== user.id && user.role !== "admin" && user.role !== "certifier" && document.certifierId !== user.id) {
+          return res.status(403).json({ message: "Forbidden" });
+        }
       }
+      // Si no está autenticado, permitimos acceso
       
       // Obtener la plantilla del documento
       const template = await storage.getDocumentTemplate(document.templateId);
@@ -785,7 +798,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Signature routes
-  app.post("/api/documents/:id/sign", isAuthenticated, async (req, res) => {
+  app.post("/api/documents/:id/sign", async (req, res) => {
     try {
       const documentId = parseInt(req.params.id);
       const document = await storage.getDocument(documentId);
@@ -794,13 +807,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Document not found" });
       }
       
-      // Only the document owner can sign or the certifier if it's a certified document
-      if (document.userId !== req.user.id && document.certifierId !== req.user.id) {
-        return res.status(403).json({ message: "Forbidden" });
+      // Si el usuario está autenticado, verificamos permisos
+      let isAdmin = false;
+      if (req.isAuthenticated()) {
+        const user = req.user as any; // Necesario por los errores de TypeScript
+        // Solo el propietario puede firmar o el certificador si es un documento certificado
+        if (document.userId !== user.id && document.certifierId !== user.id) {
+          return res.status(403).json({ message: "Forbidden" });
+        }
+        
+        // Los administradores pueden usar firmas avanzadas sin validación previa y sin pago
+        isAdmin = user.role === 'admin';
+      } else {
+        // Para invitados, verificamos que el documento pertenezca a un invitado (userId = 1)
+        if (document.userId !== 1) {
+          return res.status(403).json({ message: "Forbidden" });
+        }
       }
-      
-      // Los administradores pueden usar firmas avanzadas sin validación previa y sin pago
-      const isAdmin = req.user.role === 'admin';
       
       // Para firmas avanzadas, el documento debe estar validado (a menos que sea administrador)
       if (req.body.type === "advanced" && document.status !== "validated" && !isAdmin) {
@@ -817,7 +840,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Si no hay datos de firma en el request body, generarlos
       if (!signatureData) {
-        signatureData = generateSignatureData(req.user.id, documentId, verificationCode);
+        // Si el usuario está autenticado, usamos su ID, si no, usamos el ID de invitado (1)
+        const userId = req.isAuthenticated() ? (req.user as any).id : 1;
+        signatureData = generateSignatureData(userId, documentId, verificationCode);
       }
       
       // Actualizar el documento con el código de verificación y datos de firma
