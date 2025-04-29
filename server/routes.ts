@@ -47,6 +47,7 @@ import { microInteractionsRouter } from "./micro-interactions-routes";
 import { verifyDocument } from "./services/gamification-service";
 import { ronRouter } from "./ron-routes";
 import { webappRouter } from "./partners/webapp-routes";
+import { translationRouter } from "./translation-routes";
 
 // Ensure these directories exist
 const uploadsDir = path.join(process.cwd(), "uploads");
