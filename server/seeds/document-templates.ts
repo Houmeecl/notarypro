@@ -9,7 +9,7 @@ export async function seedDocumentTemplates() {
   console.log("Verificando plantillas de documentos existentes...");
   
   // Obtener plantillas existentes
-  const templates = await storage.getDocumentTemplates();
+  const templates = await storage.getAllDocumentTemplates();
   if (templates.length > 0) {
     console.log(`Se encontraron ${templates.length} plantillas existentes.`);
   }
