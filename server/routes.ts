@@ -1996,8 +1996,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Gestionar conexiones WebSocket
-  wss.on('connection', (ws) => {
+  wss.on('connection', (ws, req) => {
     console.log('Nueva conexión WebSocket establecida');
+    
+    // Verificar la sesión - Nota: esto puede estar causando problemas si la sesión no está configurada correctamente
+    // Por ahora, aceptamos conexiones sin verificar la sesión para solucionar el problema de pantalla en blanco
     
     // Enviar mensaje de bienvenida
     ws.send(JSON.stringify({ 

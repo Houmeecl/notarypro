@@ -11,56 +11,68 @@ class WebSocketService {
    * Inicializa la conexión WebSocket
    */
   public connect() {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      console.log("WebSocket ya está conectado");
+      return;
+    }
+    
     if (this.socket) {
       this.disconnect();
     }
 
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
-    
-    this.socket = new WebSocket(wsUrl);
-
-    this.socket.onopen = () => {
-      console.log("Conexión WebSocket establecida");
-      this.notifyListeners("connection", { status: "connected" });
+    try {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const wsUrl = `${protocol}//${window.location.host}/ws`;
       
-      // Limpiar cualquier timeout de reconexión
-      if (this.reconnectTimeout) {
-        clearTimeout(this.reconnectTimeout);
-        this.reconnectTimeout = null;
-      }
-    };
+      console.log("Intentando conectar a WebSocket:", wsUrl);
+      this.socket = new WebSocket(wsUrl);
 
-    this.socket.onmessage = (event) => {
-      try {
-        // Asegurarse de que estamos trabajando con una cadena
-        const dataString = typeof event.data === 'string' 
-          ? event.data 
-          : new TextDecoder().decode(event.data as ArrayBuffer);
+      this.socket.onopen = () => {
+        console.log("Conexión WebSocket establecida exitosamente");
+        this.notifyListeners("connection", { status: "connected" });
         
-        const data = JSON.parse(dataString);
-        if (data && data.type) {
-          this.notifyListeners(data.type, data);
+        // Limpiar cualquier timeout de reconexión
+        if (this.reconnectTimeout) {
+          clearTimeout(this.reconnectTimeout);
+          this.reconnectTimeout = null;
         }
-      } catch (error) {
-        console.error("Error al procesar mensaje WebSocket:", error);
-      }
-    };
+      };
+    } catch (error) {
+      console.error("Error al crear conexión WebSocket:", error);
+      // Intentar reconectar después de un tiempo
+      this.scheduleReconnect();
+    }
 
-    this.socket.onclose = () => {
-      console.log("Conexión WebSocket cerrada");
-      this.notifyListeners("disconnect", { status: "disconnected" });
-      
-      // Intentar reconectar después de 5 segundos
-      this.reconnectTimeout = setTimeout(() => {
-        this.connect();
-      }, 5000);
-    };
+    if (this.socket) {
+      this.socket.onmessage = (event) => {
+        try {
+          // Asegurarse de que estamos trabajando con una cadena
+          const dataString = typeof event.data === 'string' 
+            ? event.data 
+            : new TextDecoder().decode(event.data as ArrayBuffer);
+          
+          const data = JSON.parse(dataString);
+          if (data && data.type) {
+            this.notifyListeners(data.type, data);
+          }
+        } catch (error) {
+          console.error("Error al procesar mensaje WebSocket:", error);
+        }
+      };
 
-    this.socket.onerror = (error) => {
-      console.error("Error en la conexión WebSocket:", error);
-      this.notifyListeners("error", { error });
-    };
+      this.socket.onclose = () => {
+        console.log("Conexión WebSocket cerrada");
+        this.notifyListeners("disconnect", { status: "disconnected" });
+        
+        // Intentar reconectar después de 5 segundos
+        this.scheduleReconnect(5000);
+      };
+
+      this.socket.onerror = (error) => {
+        console.error("Error en la conexión WebSocket:", error);
+        this.notifyListeners("error", { error });
+      };
+    }
   }
 
   /**
@@ -82,14 +94,16 @@ class WebSocketService {
    * Envía un mensaje al servidor
    */
   public send(type: string, data: any = {}) {
-    if (this.socket && this.socket.readyState === 1) { // 1 = OPEN
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify({
         type,
         ...data
       }));
       return true;
+    } else {
+      console.warn("Intento de enviar mensaje mientras WebSocket no está conectado");
+      return false;
     }
-    return false;
   }
 
   /**
@@ -135,7 +149,22 @@ class WebSocketService {
    * Verifica si la conexión WebSocket está activa
    */
   public isConnected(): boolean {
-    return this.socket !== null && this.socket.readyState === 1; // 1 = OPEN
+    return this.socket !== null && this.socket.readyState === WebSocket.OPEN;
+  }
+  
+  /**
+   * Programa un intento de reconexión
+   */
+  private scheduleReconnect(delay: number = 3000) {
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+    }
+    
+    console.log(`Programando reconexión en ${delay}ms...`);
+    this.reconnectTimeout = setTimeout(() => {
+      console.log("Intentando reconectar...");
+      this.connect();
+    }, delay);
   }
 }
 

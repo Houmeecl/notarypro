@@ -7,28 +7,53 @@ export function useWebSocket() {
   const [status, setStatus] = useState<WebSocketStatus>('disconnected');
   const [lastMessage, setLastMessage] = useState<any>(null);
   const listenersRef = useRef<{[key: string]: (data: any) => void}>({});
+  const connectionAttemptRef = useRef(0);
 
   useEffect(() => {
     // Establece las callbacks para actualizar el estado
-    const onConnect = () => setStatus('connected');
-    const onDisconnect = () => setStatus('disconnected');
-    const onError = () => setStatus('disconnected');
+    const onConnect = (data: any) => {
+      console.log("WebSocket conectado:", data);
+      setStatus('connected');
+      connectionAttemptRef.current = 0; // Resetear contador de intentos cuando conecta
+    };
+    
+    const onDisconnect = () => {
+      console.log("WebSocket desconectado");
+      setStatus('disconnected');
+    };
+    
+    const onError = (error: any) => {
+      console.error("Error de WebSocket:", error);
+      setStatus('disconnected');
+      
+      // Incrementar contador de intentos, pero mantener un máximo
+      connectionAttemptRef.current = Math.min(connectionAttemptRef.current + 1, 5);
+    };
 
     // Registra los listeners
     webSocketService.on('connection', onConnect);
     webSocketService.on('disconnect', onDisconnect);
     webSocketService.on('error', onError);
 
-    // Inicia la conexión
-    webSocketService.connect();
-    setStatus('connecting');
+    // Iniciar la conexión solo si no está ya conectado
+    if (!webSocketService.isConnected()) {
+      console.log("Iniciando conexión WebSocket desde hook...");
+      webSocketService.connect();
+      setStatus('connecting');
+    } else {
+      console.log("WebSocket ya conectado");
+      setStatus('connected');
+    }
 
     // Limpieza al desmontar
     return () => {
+      console.log("Limpiando listeners WebSocket");
       webSocketService.off('connection', onConnect);
       webSocketService.off('disconnect', onDisconnect);
       webSocketService.off('error', onError);
-      webSocketService.disconnect();
+      
+      // No desconectar automáticamente, ya que otros componentes podrían estar usando la conexión
+      // webSocketService.disconnect();
     };
   }, []);
 
