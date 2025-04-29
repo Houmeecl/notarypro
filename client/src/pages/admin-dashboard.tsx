@@ -275,7 +275,7 @@ export default function AdminDashboard() {
               {/* Configuración y accesos rápidos */}
               <div className="mb-8">
                 <h3 className="text-lg font-medium mb-4">Configuración y servicios</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                   <Link href="/admin/api-integrations">
                     <Card className="hover:shadow-md transition-shadow cursor-pointer">
                       <CardHeader className="pb-2">
@@ -331,6 +331,26 @@ export default function AdminDashboard() {
                         <div className="flex items-center space-x-2">
                           <div className="h-2 w-2 rounded-full bg-green-500"></div>
                           <span className="text-xs">Sistema activo</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                  
+                  <Link href="/admin/test-document-generator">
+                    <Card className="hover:shadow-md transition-shadow cursor-pointer border-red-100 bg-red-50">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-base">Generador de Documentos</CardTitle>
+                          <FileText className="h-5 w-5 text-red-500" />
+                        </div>
+                        <CardDescription>
+                          Cree y firme documentos para pruebas (código 7723)
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center space-x-2">
+                          <div className="h-2 w-2 rounded-full bg-red-500"></div>
+                          <span className="text-xs font-medium text-red-700">Herramienta de administrador</span>
                         </div>
                       </CardContent>
                     </Card>

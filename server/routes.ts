@@ -6,7 +6,6 @@ import multer from "multer";
 import { nanoid } from "nanoid";
 import fs from "fs";
 import path from "path";
-import { generateVerificationCode, generateQRCodeSVG, generateSignatureData } from "@shared/utils/document-utils";
 import { 
   insertDocumentSchema, 
   insertDocumentCategorySchema,
@@ -31,7 +30,7 @@ import {
   insertMessageTemplateSchema,
   insertAutomationRuleSchema
 } from "@shared/schema";
-import { generateVerificationCode, generateQRCodeSVG, generateSignatureData } from "@shared/utils/verification-code";
+import { generateVerificationCode, generateQRCodeSVG, generateSignatureData } from "@shared/utils/document-utils";
 import adminRouter from "./admin/admin-routes";
 import integrationRouter from "./admin/integration-routes";
 import { adminPosRouter } from "./admin/admin-pos-routes";

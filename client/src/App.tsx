@@ -72,6 +72,7 @@ import AdminDashboardPage from "@/pages/admin/dashboard";
 import AdminDocumentsPage from "@/pages/admin/documents";
 import AdminCertifiersPage from "@/pages/admin/certifiers";
 import AdminAIStrategyPage from "@/pages/admin/ai-strategy";
+import TestDocumentGenerator from "@/pages/admin/test-document-generator";
 
 function Router() {
   return (
@@ -214,6 +215,13 @@ function Router() {
       <ProtectedRoute 
         path="/admin/ai-strategy" 
         component={AdminAIStrategyPage} 
+        allowedRoles={["admin"]} 
+      />
+      
+      {/* Admin Test Document Generator */}
+      <ProtectedRoute 
+        path="/admin/test-document-generator" 
+        component={TestDocumentGenerator} 
         allowedRoles={["admin"]} 
       />
       
