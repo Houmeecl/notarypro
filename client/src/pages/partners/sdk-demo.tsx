@@ -1049,8 +1049,8 @@ documento: {...}           // Datos completos del documento`}
                       Aplicación Android completa que incluye el SDK integrado.
                       Ideal para socios sin conocimientos técnicos.
                     </p>
-                    <Button variant="outline" className="w-full" asChild>
-                      <a href="/downloads/vecinos-pos-app.apk" download="VecinosPOS.apk">
+                    <Button variant="outline" className="w-full">
+                      <a href="/downloads/vecinos-pos-app.apk" download="VecinosPOS.apk" style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
                         <Download className="mr-2 h-4 w-4" />
                         Descargar APK
                       </a>
