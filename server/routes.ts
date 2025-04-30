@@ -1421,6 +1421,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get user by ID
+  app.get("/api/users/:id", isAdmin, async (req, res) => {
+    try {
+      const userId = Number(req.params.id);
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
+      
+      res.status(200).json(user);
+    } catch (error) {
+      console.error("Error obteniendo usuario:", error);
+      res.status(500).json({ message: "Error al obtener usuario" });
+    }
+  });
+  
+  // Update user
+  app.patch("/api/users/:id", isAdmin, async (req, res) => {
+    try {
+      const userId = Number(req.params.id);
+      const userData = req.body;
+      
+      // Validar que el usuario existe
+      const existingUser = await storage.getUser(userId);
+      if (!existingUser) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
+      
+      // Actualizar usuario
+      const updatedUser = await storage.updateUser(userId, userData);
+      
+      // Registrar evento de actualización
+      await createAnalyticsEvent({
+        eventType: "user_updated",
+        userId: req.user.id,
+        metadata: { 
+          targetUserId: userId,
+          updatedFields: Object.keys(userData),
+          roleChange: userData.role !== undefined && userData.role !== existingUser.role
+        }
+      });
+      
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      console.error("Error actualizando usuario:", error);
+      res.status(500).json({ message: "Error al actualizar usuario" });
+    }
+  });
+  
   // Analytics routes
   app.post("/api/analytics/events", isAuthenticated, async (req, res) => {
     try {

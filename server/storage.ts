@@ -1434,6 +1434,20 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(users).where(eq(users.role, role));
   }
   
+  async updateUser(id: number, userData: Partial<User>): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set(userData)
+      .where(eq(users.id, id))
+      .returning();
+    
+    if (!updatedUser) {
+      throw new Error(`User with id ${id} not found`);
+    }
+    
+    return updatedUser;
+  }
+  
   // Document Category operations
   async createDocumentCategory(category: InsertDocumentCategory): Promise<DocumentCategory> {
     const [documentCategory] = await db
