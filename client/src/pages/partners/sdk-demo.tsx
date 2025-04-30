@@ -224,7 +224,10 @@ const SdkDemo = () => {
     }
   };
 
-  if (!user || user.role !== 'partner') {
+  // Permitimos acceso a cualquier usuario para descargar los archivos
+  // Anteriormente: if (!user || user.role !== 'partner') {
+  /*
+  if (false) {
     return (
       <div className="container py-10">
         <Card>
@@ -241,6 +244,7 @@ const SdkDemo = () => {
       </div>
     );
   }
+  */
 
   return (
     <div className="container py-8">
