@@ -6,7 +6,7 @@ import { LoadingSpinner } from "@/lib/route-utils";
 import Sidebar from "@/components/dashboard/Sidebar";
 import DocumentUpload from "@/components/dashboard/DocumentUpload";
 import IdentityVerification from "@/components/dashboard/IdentityVerification";
-import SignatureCanvas from "@/components/dashboard/SignatureCanvas";
+import DocumentSignatureCanvas from "@/components/dashboard/DocumentSignatureCanvas";
 import { Button } from "@/components/ui/button";
 import { 
   Card, 
@@ -252,7 +252,7 @@ export default function DocumentSign() {
                 {/* Sign Document */}
                 <TabsContent value="sign" id="document-sign-section">
                   {document && (
-                    <SignatureCanvas 
+                    <DocumentSignatureCanvas 
                       document={document} 
                       onSignatureComplete={handleSignatureComplete} 
                     />
