@@ -70,11 +70,9 @@ export default function Services() {
                   <span className="text-gray-600 text-sm">Múltiples firmantes</span>
                 </li>
               </ul>
-              <Link href="/service-selection">
-                <a className="text-primary font-medium hover:text-red-700 transition-colors duration-150 inline-flex items-center">
-                  Comenzar ahora
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
+              <Link href="/service-selection" className="text-primary font-medium hover:text-red-700 transition-colors duration-150 inline-flex items-center">
+                Seleccionar documento
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </div>
           </motion.div>
@@ -116,11 +114,9 @@ export default function Services() {
                   <span className="text-gray-600 text-sm">Validez legal completa</span>
                 </li>
               </ul>
-              <Link href="/service-selection">
-                <a className="text-blue-500 font-medium hover:text-blue-700 transition-colors duration-150 inline-flex items-center">
-                  Comenzar ahora
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
+              <Link href="/service-selection" className="text-blue-500 font-medium hover:text-blue-700 transition-colors duration-150 inline-flex items-center">
+                Seleccionar documento
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </div>
           </motion.div>
@@ -162,11 +158,9 @@ export default function Services() {
                   <span className="text-gray-600 text-sm">Acceso al dashboard</span>
                 </li>
               </ul>
-              <Link href="/curso-certificador">
-                <a className="text-green-500 font-medium hover:text-green-700 transition-colors duration-150 inline-flex items-center">
-                  Inscribirme
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
+              <Link href="/curso-certificador" className="text-green-500 font-medium hover:text-green-700 transition-colors duration-150 inline-flex items-center">
+                Inscribirme
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </div>
           </motion.div>
@@ -208,11 +202,9 @@ export default function Services() {
                   <span className="text-gray-600 text-sm">Sin costos adicionales</span>
                 </li>
               </ul>
-              <Link href="/vecinos-express">
-                <a className="text-purple-500 font-medium hover:text-purple-700 transition-colors duration-150 inline-flex items-center">
-                  Unirse al programa
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
+              <Link href="/vecinos-express" className="text-purple-500 font-medium hover:text-purple-700 transition-colors duration-150 inline-flex items-center">
+                Unirse al programa
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </div>
           </motion.div>
@@ -239,11 +231,9 @@ export default function Services() {
                 <p className="text-gray-700 mb-4">
                   Conéctate con un certificador mediante videollamada para validar y firmar documentos a distancia. Evita desplazamientos y ahorra tiempo.
                 </p>
-                <Link href="/ron-login">
-                  <a className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center">
-                    Acceder al sistema RON
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </a>
+                <Link href="/ron-login" className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center">
+                  Acceder al sistema RON
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </div>
             </div>
@@ -268,11 +258,9 @@ export default function Services() {
                 <p className="text-gray-700 mb-4">
                   Plataforma personalizada para la gestión documental de tu empresa. Integración con sistemas existentes, flujos de trabajo y panel de administración.
                 </p>
-                <Link href="/servicios-empresariales">
-                  <a className="text-gray-600 hover:text-gray-800 font-medium inline-flex items-center">
-                    Conocer más
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </a>
+                <Link href="/servicios-empresariales" className="text-gray-600 hover:text-gray-800 font-medium inline-flex items-center">
+                  Conocer más
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </div>
             </div>
