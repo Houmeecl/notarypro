@@ -51,6 +51,8 @@ import RonPlatform from "@/pages/ron-platform";
 import RonSession from "@/pages/ron-session";
 import AyudaLegal from "@/pages/ayuda-legal";
 import IntegracionesDemo from "@/pages/integraciones-demo";
+import DescargarApk from "@/pages/partners/descargar-apk";
+import ConfirmacionDescarga from "@/pages/partners/confirmacion-descarga";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -166,6 +168,7 @@ function Router() {
       <Route path="/partners/webapp-login" component={WebappLogin} />
       <Route path="/partners/webapp-pos" component={WebAppPOS} />
       <Route path="/partners/sdk-demo" component={SdkDemo} />
+      <Route path="/partners/descargar-apk" component={DescargarApk} />
       <ProtectedRoute 
         path="/partners/pos-integration" 
         component={PosIntegrationPage} 

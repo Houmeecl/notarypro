@@ -288,14 +288,7 @@ const SdkDemo = () => {
                   <Button 
                     variant="outline" 
                     className="w-full"
-                    onClick={() => {
-                      const link = document.createElement('a');
-                      link.href = "/downloads/vecinos-pos-app.apk";
-                      link.download = "vecinos-pos-app.apk";
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }}
+                    onClick={() => window.location.href = "/partners/descargar-apk"}
                   >
                     <Download className="mr-2 h-4 w-4" />
                     Descargar APK
@@ -1156,14 +1149,7 @@ documento: {...}           // Datos completos del documento`}
                     <Button 
                       variant="outline" 
                       className="w-full"
-                      onClick={() => {
-                        const link = document.createElement('a');
-                        link.href = "/downloads/vecinos-pos-app.apk";
-                        link.download = "vecinos-pos-app.apk";
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                      }}
+                      onClick={() => window.location.href = "/partners/descargar-apk"}
                     >
                       <Download className="mr-2 h-4 w-4" />
                       Descargar APK
