@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Document } from "@shared/schema";
+import { Document as DocumentType } from "@shared/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -13,8 +13,38 @@ import { CreditCard, CheckCircle, Wallet, AlertCircle, Mail, FileCheck } from "l
 import { useLocation } from "wouter";
 import { Checkbox } from "@/components/ui/checkbox";
 
+// Define una interfaz con los nuevos campos para documentos
+interface DocumentWithEmail {
+  id: number;
+  userId: number;
+  templateId: number;
+  title: string;
+  formData: unknown;
+  status: string;
+  filePath: string | null;
+  pdfPath: string | null;
+  qrCode: string | null;
+  certifierId: number | null;
+  paymentId: string | null;
+  paymentAmount: number | null;
+  paymentStatus: string | null;
+  paymentMethod: string | null;
+  paymentTimestamp: Date | null;
+  signatureData: string | null;
+  signatureTimestamp: Date | null;
+  certifierSignatureData: string | null;
+  certifierSignatureTimestamp: Date | null;
+  rejectionReason: string | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  // Nuevos campos
+  email: string | null;
+  receiveNotifications: boolean | null;
+  sendCopy: boolean | null;
+}
+
 interface DocumentPaymentProps {
-  document: Document;
+  document: DocumentWithEmail;
   signatureType: "simple" | "advanced";
   onPaymentSuccess?: () => void;
 }
