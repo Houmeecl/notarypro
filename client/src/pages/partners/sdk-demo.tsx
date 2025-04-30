@@ -46,10 +46,10 @@ const SdkDemo = () => {
       try {
         const pos = new VecinosPOS({
           id: user.id,
-          nombre: user.businessName || user.fullName || user.username,
-          direccion: user.address || 'No especificada',
-          region: user.region || 'No especificada',
-          comuna: user.comuna || 'No especificada',
+          nombre: user.fullName || user.username,
+          direccion: 'Dirección del socio',
+          region: 'Región Metropolitana',
+          comuna: 'Santiago',
           apiKey: 'demo-api-key-123456'
         });
         
