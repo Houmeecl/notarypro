@@ -120,6 +120,50 @@ export default function AdminDashboard() {
       });
     },
   });
+  
+  // Mutation for updating user role
+  const updateUserRoleMutation = useMutation({
+    mutationFn: async ({ userId, role }: { userId: number, role: string }) => {
+      const res = await apiRequest("PATCH", `/api/users/${userId}`, { role });
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      toast({
+        title: "Rol actualizado",
+        description: `El usuario ha sido actualizado a ${data.role === 'certifier' ? 'Certificador' : data.role}.`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error al actualizar rol",
+        description: "No se pudo actualizar el rol del usuario. Por favor, intente de nuevo.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Mutation for updating user details
+  const updateUserDetailsMutation = useMutation({
+    mutationFn: async ({ userId, userData }: { userId: number, userData: Partial<User> }) => {
+      const res = await apiRequest("PATCH", `/api/users/${userId}`, userData);
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      toast({
+        title: "Usuario actualizado",
+        description: "Los datos del usuario han sido actualizados correctamente.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error al actualizar usuario",
+        description: "No se pudo actualizar los datos del usuario. Por favor, intente de nuevo.",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Fetch users
   const { data: users, isLoading: isUsersLoading } = useQuery<User[]>({
@@ -987,12 +1031,50 @@ export default function AdminDashboard() {
                               <TableCell>{formatDate(user.createdAt)}</TableCell>
                               <TableCell className="text-right">
                                 <div className="flex justify-end gap-2">
-                                  <Button size="sm" variant="outline">
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => {
+                                      // Obtener datos actuales y pedir información actualizada
+                                      const newFullName = prompt(
+                                        `Editar usuario: ${user.fullName}\n\nNombre completo actual: ${user.fullName}\nNuevo nombre completo:`, 
+                                        user.fullName
+                                      );
+                                      
+                                      if (newFullName) {
+                                        const newEmail = prompt(
+                                          `Editar usuario: ${user.fullName}\n\nEmail actual: ${user.email}\nNuevo email:`, 
+                                          user.email
+                                        );
+                                        
+                                        if (newEmail) {
+                                          updateUserDetailsMutation.mutate({
+                                            userId: user.id,
+                                            userData: {
+                                              fullName: newFullName,
+                                              email: newEmail
+                                            }
+                                          });
+                                        }
+                                      }
+                                    }}
+                                  >
                                     <Pencil className="h-4 w-4 mr-1" />
                                     Editar
                                   </Button>
                                   {user.role !== "certifier" && (
-                                    <Button size="sm" variant="outline">
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline"
+                                      onClick={() => {
+                                        if (window.confirm(`¿Está seguro que desea convertir a ${user.fullName} en certificador?`)) {
+                                          updateUserRoleMutation.mutate({
+                                            userId: user.id,
+                                            role: "certifier"
+                                          });
+                                        }
+                                      }}
+                                    >
                                       <Shield className="h-4 w-4 mr-1" />
                                       Hacer Certificador
                                     </Button>

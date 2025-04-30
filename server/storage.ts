@@ -106,6 +106,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, userData: Partial<User>): Promise<User>;
   getUsersByRole(role: string): Promise<User[]>;
   
   // Document Category operations
@@ -355,6 +356,17 @@ export class MemStorage implements IStorage {
     return Array.from(this.users.values()).filter(
       (user) => user.role === role,
     );
+  }
+
+  async updateUser(id: number, userData: Partial<User>): Promise<User> {
+    const user = this.users.get(id);
+    if (!user) {
+      throw new Error(`User with id ${id} not found`);
+    }
+    
+    const updatedUser = { ...user, ...userData };
+    this.users.set(id, updatedUser);
+    return updatedUser;
   }
   
   // Document Category operations
