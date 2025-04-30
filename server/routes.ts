@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { createAnalyticsEvent } from "./db";
-import { handleChatbotQuery, analyzeSentiment, getLegalResponse } from "./services/chatbot";
+import { handleChatbotQuery, analyzeSentiment, getLegalResponse, analyzeDocument } from "./services/chatbot";
 import { generateVideoToken, registerSessionParticipant, getSessionParticipants, endSession } from "./services/video-call";
 import { createContact, updateContact, createDeal, findContactByEmail, logDocumentActivity } from "./services/crm";
 import multer from "multer";
@@ -2416,6 +2416,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error generando respuesta legal:", error);
       res.status(500).json({ message: "Error generando respuesta legal" });
+    }
+  });
+  
+  // Nueva ruta utilizando la API_KEY_NUEVO
+  app.post("/api/chatbot/analyze-document", async (req, res) => {
+    try {
+      const { documentText } = req.body;
+      
+      if (!documentText) {
+        return res.status(400).json({ message: "El texto del documento es requerido" });
+      }
+      
+      const analysis = await analyzeDocument(documentText);
+      res.json(analysis);
+    } catch (error) {
+      console.error("Error analizando documento:", error);
+      res.status(500).json({ message: "Error analizando documento" });
     }
   });
   
