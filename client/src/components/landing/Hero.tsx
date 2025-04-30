@@ -133,7 +133,7 @@ export default function Hero() {
           >
             <div className="relative h-auto w-full rounded-2xl overflow-hidden shadow-2xl border-8 border-white">
               <img
-                src="https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                src="/src/assets/local/Screenshot_20250427-114817.png"
                 alt="Persona utilizando NotaryPro"
                 className="w-full h-auto object-cover"
               />
@@ -183,7 +183,7 @@ export default function Hero() {
             <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300">
               <div className="relative h-48 bg-gradient-to-r from-gray-100 to-gray-50">
                 <img 
-                  src="https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                  src="/src/assets/local/Screenshot_20250427-115006-display-0.png.png" 
                   alt="Pasos para usar NotaryPro" 
                   className="w-full h-full object-cover"
                 />
@@ -210,7 +210,7 @@ export default function Hero() {
             <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300">
               <div className="relative h-48 bg-gradient-to-r from-gray-100 to-gray-50">
                 <img 
-                  src="https://images.unsplash.com/photo-1577412647305-991150c7d163?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                  src="/src/assets/local/Screenshot_20250427-115251-display-0.png.png" 
                   alt="Oficinistas discutiendo implementación" 
                   className="w-full h-full object-cover"
                 />
@@ -237,7 +237,7 @@ export default function Hero() {
             <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300">
               <div className="relative h-48 bg-gradient-to-r from-gray-100 to-gray-50">
                 <img 
-                  src="https://images.unsplash.com/photo-1581955957646-b8c6b58d91f7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                  src="/src/assets/local/Screenshot_20250427-115656-display-0.png.png" 
                   alt="Vecinos en tienda local" 
                   className="w-full h-full object-cover"
                 />
