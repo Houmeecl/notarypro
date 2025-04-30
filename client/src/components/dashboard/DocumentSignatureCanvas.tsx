@@ -273,10 +273,12 @@ export default function DocumentSignatureCanvas({
         </div>
       </CardContent>
       <CardFooter className="flex justify-end">
-        <Button variant="outline" className="mr-2">
-          <Download className="h-4 w-4 mr-2" />
-          Descargar borrador
-        </Button>
+        <a href={`/api/documents/${document.id}/download-draft`} target="_blank" rel="noopener noreferrer">
+          <Button variant="outline" className="mr-2">
+            <Download className="h-4 w-4 mr-2" />
+            Descargar borrador
+          </Button>
+        </a>
       </CardFooter>
     </Card>
   );

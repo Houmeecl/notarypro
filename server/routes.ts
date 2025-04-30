@@ -483,6 +483,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error.message });
     }
   });
+  
+  // Descargar borrador del documento
+  app.get("/api/documents/:id/download-draft", async (req, res) => {
+    try {
+      const documentId = parseInt(req.params.id);
+      const document = await storage.getDocument(documentId);
+      
+      if (!document) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      // Si el documento ya tiene una ruta de PDF, enviar ese archivo
+      if (document.pdfPath) {
+        res.setHeader('Content-Disposition', `attachment; filename="documento-${document.id}.pdf"`);
+        return res.sendFile(document.pdfPath, { root: "." });
+      }
+      
+      // Obtener la plantilla
+      const template = await storage.getDocumentTemplate(document.templateId);
+      
+      if (!template) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      
+      // Obtener los datos del formulario
+      let formData = {};
+      try {
+        formData = document.formData ? 
+          (typeof document.formData === 'string' ? JSON.parse(document.formData) : document.formData) : 
+          {};
+      } catch (e) {
+        console.error("Error parsing form data:", e);
+      }
+      
+      // Formatear los datos según el formulario
+      let formattedData = {};
+      if (template.formSchema) {
+        const schema = typeof template.formSchema === 'string' ? 
+          JSON.parse(template.formSchema) : template.formSchema;
+        
+        for (const [key, value] of Object.entries(formData)) {
+          const propertySchema = schema.properties?.[key];
+          if (propertySchema) {
+            formattedData[propertySchema.title || key] = value;
+          } else {
+            formattedData[key] = value;
+          }
+        }
+      } else {
+        formattedData = formData;
+      }
+      
+      // Generar HTML basado en la plantilla y los datos
+      const html = generateDocumentHtml(document, template, formattedData);
+      
+      // Configurar encabezados para descarga
+      res.setHeader('Content-Type', 'text/html');
+      res.setHeader('Content-Disposition', `attachment; filename="documento-${document.id}-borrador.html"`);
+      
+      res.send(html);
+    } catch (error) {
+      console.error("Error al descargar el borrador del documento:", error);
+      res.status(500).json({ message: "Error generating document draft" });
+    }
+  });
 
   app.patch("/api/documents/:id", async (req, res) => {
     try {
