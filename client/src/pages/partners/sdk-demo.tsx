@@ -224,27 +224,91 @@ const SdkDemo = () => {
     }
   };
 
-  // Permitimos acceso a cualquier usuario para descargar los archivos
-  // Anteriormente: if (!user || user.role !== 'partner') {
-  /*
-  if (false) {
+  // Sección de descarga pública sin restricción
+  // Pero las funciones de demostración necesitan usuario
+  const isDownloadOnly = !user || user.role !== 'partner';
+  
+  // Si el usuario no está autenticado o no es socio, mostrar solo la parte de descarga
+  if (isDownloadOnly) {
     return (
-      <div className="container py-10">
+      <div className="container py-8">
+        <h1 className="text-3xl font-bold mb-8">SDK NotaryPro para Socios Vecinos</h1>
+        
         <Card>
           <CardHeader>
-            <CardTitle>Acceso restringido</CardTitle>
+            <CardTitle>Descargar SDK y Aplicaciones</CardTitle>
             <CardDescription>
-              Esta sección está disponible solo para socios del programa Vecinos NotaryPro Express.
+              Archivos disponibles para su implementación
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <p>Por favor, inicie sesión con una cuenta de socio para acceder a esta sección.</p>
+          <CardContent className="space-y-8">
+            <div className="bg-primary/10 p-4 rounded-md">
+              <p className="mb-4">
+                Estos son los archivos necesarios para implementar el sistema de puntos de servicio Vecinos NotaryPro Express.
+                Para acceder a la demostración interactiva, por favor inicie sesión como socio.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">SDK para Desarrolladores</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm mb-4">
+                    Archivo JavaScript con todas las funciones necesarias para operar
+                    un punto de servicio NotaryPro.
+                  </p>
+                  <Button className="w-full">
+                    <a href="/downloads/vecinos-notarypro-sdk.js" download="vecinos-notarypro-sdk.js" style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
+                      <Download className="mr-2 h-4 w-4" />
+                      Descargar SDK
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Android App (Punto de venta)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm mb-4">
+                    Aplicación Android completa que incluye el SDK integrado.
+                    Ideal para socios sin conocimientos técnicos.
+                  </p>
+                  <Button variant="outline" className="w-full">
+                    <a href="/downloads/vecinos-pos-app.apk" download="VecinosPOS.apk" style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
+                      <Download className="mr-2 h-4 w-4" />
+                      Descargar APK
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Guía de implementación</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm mb-4">
+                    Manual detallado con instrucciones paso a paso para
+                    la implementación y uso del SDK.
+                  </p>
+                  <Button variant="outline" className="w-full">
+                    <a href="/downloads/guia-implementacion-sdk.txt" download="guia-implementacion-sdk.txt" style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
+                      <Clipboard className="mr-2 h-4 w-4" />
+                      Descargar Guía
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           </CardContent>
         </Card>
       </div>
     );
   }
-  */
 
   return (
     <div className="container py-8">

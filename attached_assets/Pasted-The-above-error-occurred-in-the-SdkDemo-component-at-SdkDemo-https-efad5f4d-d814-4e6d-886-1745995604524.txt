@@ -1,0 +1,18 @@
+The above error occurred in the <SdkDemo> component:
+
+    at SdkDemo (https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/src/pages/partners/sdk-demo.tsx:33:20)
+    at Route (https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=c79d283d:323:16)
+    at Switch (https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=c79d283d:379:17)
+    at Router
+    at Provider (https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=c79d283d:38:15)
+    at TooltipProvider (https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=c79d283d:64:5)
+    at V (https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=c79d283d:44:25)
+    at J (https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=c79d283d:42:18)
+    at MicroInteractionProvider (https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/src/hooks/use-micro-interactions.tsx:25:44)
+    at OnboardingProvider (https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/src/hooks/use-onboarding.tsx:130:38)
+    at AuthProvider (https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at QueryClientProvider (https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=c79d283d:2805:3)
+    at App (https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/src/App.tsx?v=6rFiPQo-i_9_zwSY2jaao:691:3)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
