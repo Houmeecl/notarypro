@@ -262,7 +262,12 @@ const SdkDemo = () => {
                   <Button 
                     className="w-full"
                     onClick={() => {
-                      window.location.href = "/downloads/vecinos-notarypro-sdk.js";
+                      const link = document.createElement('a');
+                      link.href = "/downloads/vecinos-notarypro-sdk.js";
+                      link.download = "vecinos-notarypro-sdk.js";
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
                     }}
                   >
                     <Download className="mr-2 h-4 w-4" />
@@ -284,7 +289,12 @@ const SdkDemo = () => {
                     variant="outline" 
                     className="w-full"
                     onClick={() => {
-                      window.location.href = "/downloads/vecinos-pos-app.apk";
+                      const link = document.createElement('a');
+                      link.href = "/downloads/vecinos-pos-app.apk";
+                      link.download = "vecinos-pos-app.apk";
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
                     }}
                   >
                     <Download className="mr-2 h-4 w-4" />
@@ -306,7 +316,12 @@ const SdkDemo = () => {
                     variant="outline" 
                     className="w-full"
                     onClick={() => {
-                      window.location.href = "/downloads/guia-implementacion-sdk.txt";
+                      const link = document.createElement('a');
+                      link.href = "/downloads/guia-implementacion-sdk.txt";
+                      link.download = "guia-implementacion-sdk.txt";
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
                     }}
                   >
                     <Clipboard className="mr-2 h-4 w-4" />
@@ -1089,7 +1104,14 @@ documento: {...}           // Datos completos del documento`}
                   <div className="flex flex-col gap-3">
                     <Button 
                       className="w-full"
-                      onClick={() => window.location.href = "/downloads/vecinos-notarypro-sdk.js"}
+                      onClick={() => {
+                        const link = document.createElement('a');
+                        link.href = "/downloads/vecinos-notarypro-sdk.js";
+                        link.download = "vecinos-notarypro-sdk.js";
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      }}
                     >
                       <Download className="mr-2 h-4 w-4" />
                       Descargar SDK
@@ -1135,7 +1157,12 @@ documento: {...}           // Datos completos del documento`}
                       variant="outline" 
                       className="w-full"
                       onClick={() => {
-                        window.location.href = "/downloads/vecinos-pos-app.apk";
+                        const link = document.createElement('a');
+                        link.href = "/downloads/vecinos-pos-app.apk";
+                        link.download = "vecinos-pos-app.apk";
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
                       }}
                     >
                       <Download className="mr-2 h-4 w-4" />
@@ -1173,7 +1200,12 @@ documento: {...}           // Datos completos del documento`}
                       variant="outline" 
                       className="w-full"
                       onClick={() => {
-                        window.location.href = "/downloads/guia-implementacion-sdk.txt";
+                        const link = document.createElement('a');
+                        link.href = "/downloads/guia-implementacion-sdk.txt";
+                        link.download = "guia-implementacion-sdk.txt";
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
                       }}
                     >
                       <Clipboard className="mr-2 h-4 w-4" />
