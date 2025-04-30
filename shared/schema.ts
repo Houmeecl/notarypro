@@ -24,6 +24,10 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   fullName: text("full_name").notNull(),
   role: text("role").notNull().default("user"), // user, certifier, admin, lawyer, notary, partner
+  businessName: text("business_name"), // For partners
+  address: text("address"),
+  region: text("region"),
+  comuna: text("comuna"), // Community/District
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -33,6 +37,10 @@ export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   fullName: true,
   role: true,
+  businessName: true,
+  address: true,
+  region: true,
+  comuna: true,
 });
 
 // Document Categories

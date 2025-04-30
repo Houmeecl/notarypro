@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
-import { Loader2, Smartphone, Download, Clipboard, Check, QrCode, Copy, ExternalLink } from 'lucide-react';
+import { Loader2, Smartphone, Download, Clipboard, Check, QrCode, Copy, ExternalLink, Clock } from 'lucide-react';
 import { TIPO_DOCUMENTO, METODO_PAGO, VecinosPOS } from '@/lib/partner-android-sdk';
 import { ExplanatoryVideo } from '@/components/onboarding/ExplanatoryVideo';
 
@@ -1039,7 +1039,7 @@ documento: {...}           // Datos completos del documento`}
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-base">Android App (Punto de venta)</CardTitle>
@@ -1050,10 +1050,26 @@ documento: {...}           // Datos completos del documento`}
                       Ideal para socios sin conocimientos técnicos.
                     </p>
                     <Button variant="outline" className="w-full" asChild>
-                      <a href="#" target="_blank" rel="noopener noreferrer">
+                      <a href="/downloads/vecinos-pos-app.apk" download="VecinosPOS.apk">
                         <Download className="mr-2 h-4 w-4" />
                         Descargar APK
                       </a>
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">iOS App (Próximamente)</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm mb-4">
+                      Nuestra aplicación para iOS está en desarrollo.
+                      Pronto disponible en App Store.
+                    </p>
+                    <Button variant="outline" className="w-full" disabled>
+                      <Clock className="mr-2 h-4 w-4" />
+                      En desarrollo
                     </Button>
                   </CardContent>
                 </Card>
