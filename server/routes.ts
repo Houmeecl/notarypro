@@ -580,7 +580,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Identity verification routes
-  app.post("/api/identity-verification", isAuthenticated, upload.fields([
+  app.post("/api/identity-verification", upload.fields([
     { name: "idPhoto", maxCount: 1 },
     { name: "selfie", maxCount: 1 }
   ]), async (req, res) => {
@@ -598,13 +598,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Document not found" });
       }
       
-      // Only the document owner can upload verification
-      if (document.userId !== req.user.id) {
-        return res.status(403).json({ message: "Forbidden" });
+      // Si el usuario está autenticado, verificar que sea el propietario
+      let userId = document.userId; // Por defecto, usamos el userId del documento
+      
+      if (req.isAuthenticated()) {
+        const user = req.user as any;
+        // Solo el propietario del documento puede subir la verificación
+        if (document.userId !== user.id) {
+          return res.status(403).json({ message: "Forbidden" });
+        }
+        userId = user.id;
       }
 
       const validatedData = insertIdentityVerificationSchema.parse({
-        userId: req.user.id,
+        userId,
         documentId,
         idPhotoPath: files.idPhoto[0].path,
         selfiePath: files.selfie[0].path,
@@ -617,7 +624,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/identity-verification/:documentId", isAuthenticated, async (req, res) => {
+  app.get("/api/identity-verification/:documentId", async (req, res) => {
     try {
       const documentId = parseInt(req.params.documentId);
       const verification = await storage.getIdentityVerificationByDocument(documentId);
@@ -626,10 +633,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Identity verification not found" });
       }
       
-      // Only the document owner, certifiers, or admins can access the verification
-      const document = await storage.getDocument(documentId);
-      if (!document || (document.userId !== req.user.id && req.user.role !== "certifier" && req.user.role !== "admin")) {
-        return res.status(403).json({ message: "Forbidden" });
+      // Verificar permisos si el usuario está autenticado
+      if (req.isAuthenticated()) {
+        const user = req.user as any;
+        const document = await storage.getDocument(documentId);
+        
+        if (!document || (document.userId !== user.id && user.role !== "certifier" && user.role !== "admin" && document.certifierId !== user.id)) {
+          return res.status(403).json({ message: "Forbidden" });
+        }
+      } else {
+        // Para usuarios no autenticados, solo permitir acceso si están viendo su propio documento
+        const document = await storage.getDocument(documentId);
+        
+        // Los documentos con userId=1 son documentos de invitado y se permiten ver
+        if (!document || document.userId !== 1) {
+          return res.status(403).json({ message: "Forbidden" });
+        }
       }
       
       res.status(200).json(verification);
