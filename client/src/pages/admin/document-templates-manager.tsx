@@ -1,17 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Plus, CheckCircle2, Database } from "lucide-react";
+import { Loader2, Plus, CheckCircle2, Database, Edit, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { seedAllTemplates } from "@/lib/document-template-data";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function DocumentTemplatesManager() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [templates, setTemplates] = useState<any[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [editPriceOpen, setEditPriceOpen] = useState(false);
+  const [priceValue, setPriceValue] = useState<string>("");
+  const [savingPrice, setSavingPrice] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
