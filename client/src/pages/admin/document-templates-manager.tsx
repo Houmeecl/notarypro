@@ -78,6 +78,50 @@ export default function DocumentTemplatesManager() {
     // En futuras versiones: Navegar a un formulario para crear plantillas
     setLocation('/admin/test-document-generator');
   };
+  
+  const handleOpenEditPrice = (template: any) => {
+    setSelectedTemplate(template);
+    setPriceValue(template.price.toString());
+    setEditPriceOpen(true);
+  };
+  
+  const handleSavePrice = async () => {
+    if (!selectedTemplate) return;
+    
+    setSavingPrice(true);
+    try {
+      const newPrice = parseInt(priceValue);
+      if (isNaN(newPrice) || newPrice < 0) {
+        throw new Error('El precio debe ser un número válido mayor o igual a 0');
+      }
+      
+      const response = await apiRequest('PATCH', `/api/document-templates/${selectedTemplate.id}`, {
+        price: newPrice
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Precio actualizado",
+          description: `El precio de ${selectedTemplate.name} ha sido actualizado correctamente.`,
+        });
+        
+        // Actualizar la lista de plantillas
+        fetchTemplates();
+        setEditPriceOpen(false);
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al actualizar el precio');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSavingPrice(false);
+    }
+  };
 
   return (
     <div className="container mx-auto py-10">
@@ -191,7 +235,20 @@ export default function DocumentTemplatesManager() {
                     <div className="text-muted-foreground">Categoría:</div>
                     <div>{template.categoryId}</div>
                     <div className="text-muted-foreground">Precio:</div>
-                    <div>${template.price}</div>
+                    <div className="flex items-center">
+                      ${template.price}
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-6 w-6 p-0 ml-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEditPrice(template);
+                        }}
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                    </div>
                     <div className="text-muted-foreground">Estado:</div>
                     <div>{template.active ? "Activo" : "Inactivo"}</div>
                   </div>
@@ -210,6 +267,62 @@ export default function DocumentTemplatesManager() {
           </div>
         )}
       </div>
+      
+      {/* Modal de edición de precio */}
+      <Dialog open={editPriceOpen} onOpenChange={setEditPriceOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Precio</DialogTitle>
+            <DialogDescription>
+              Actualizar el precio para la plantilla {selectedTemplate?.name}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <label htmlFor="price" className="text-sm font-medium mb-2 block">
+              Precio (en pesos chilenos)
+            </label>
+            <Input
+              id="price"
+              type="number"
+              min="0"
+              value={priceValue}
+              onChange={(e) => setPriceValue(e.target.value)}
+              placeholder="Ej: 10000"
+              className="mb-2"
+            />
+            <p className="text-sm text-muted-foreground">
+              El precio debe ser un número entero y sin decimales.
+            </p>
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setEditPriceOpen(false)}
+              disabled={savingPrice}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleSavePrice}
+              disabled={savingPrice}
+            >
+              {savingPrice ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Guardar
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
