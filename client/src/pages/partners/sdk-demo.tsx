@@ -259,12 +259,15 @@ const SdkDemo = () => {
                     Archivo JavaScript con todas las funciones necesarias para operar
                     un punto de servicio NotaryPro.
                   </p>
-                  <a href="/downloads/vecinos-notarypro-sdk.js" download="vecinos-notarypro-sdk.js" style={{ textDecoration: 'none' }}>
-                    <Button className="w-full">
-                      <Download className="mr-2 h-4 w-4" />
-                      Descargar SDK
-                    </Button>
-                  </a>
+                  <Button 
+                    className="w-full"
+                    onClick={() => {
+                      window.location.href = "/downloads/vecinos-notarypro-sdk.js";
+                    }}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Descargar SDK
+                  </Button>
                 </CardContent>
               </Card>
               
@@ -277,12 +280,16 @@ const SdkDemo = () => {
                     Aplicación Android completa que incluye el SDK integrado.
                     Ideal para socios sin conocimientos técnicos.
                   </p>
-                  <a href="/downloads/vecinos-pos-app.apk" download="VecinosPOS.apk" style={{ textDecoration: 'none' }}>
-                    <Button variant="outline" className="w-full">
-                      <Download className="mr-2 h-4 w-4" />
-                      Descargar APK
-                    </Button>
-                  </a>
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => {
+                      window.location.href = "/downloads/vecinos-pos-app.apk";
+                    }}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Descargar APK
+                  </Button>
                 </CardContent>
               </Card>
               
@@ -295,12 +302,16 @@ const SdkDemo = () => {
                     Manual detallado con instrucciones paso a paso para
                     la implementación y uso del SDK.
                   </p>
-                  <a href="/downloads/guia-implementacion-sdk.txt" download="guia-implementacion-sdk.txt" style={{ textDecoration: 'none' }}>
-                    <Button variant="outline" className="w-full">
-                      <Clipboard className="mr-2 h-4 w-4" />
-                      Descargar Guía
-                    </Button>
-                  </a>
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => {
+                      window.location.href = "/downloads/guia-implementacion-sdk.txt";
+                    }}
+                  >
+                    <Clipboard className="mr-2 h-4 w-4" />
+                    Descargar Guía
+                  </Button>
                 </CardContent>
               </Card>
             </div>
@@ -1117,12 +1128,16 @@ documento: {...}           // Datos completos del documento`}
                       Aplicación Android completa que incluye el SDK integrado.
                       Ideal para socios sin conocimientos técnicos.
                     </p>
-                    <a href="/downloads/vecinos-pos-app.apk" download="VecinosPOS.apk" style={{ textDecoration: 'none' }}>
-                      <Button variant="outline" className="w-full">
-                        <Download className="mr-2 h-4 w-4" />
-                        Descargar APK
-                      </Button>
-                    </a>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => {
+                        window.location.href = "/downloads/vecinos-pos-app.apk";
+                      }}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Descargar APK
+                    </Button>
                   </CardContent>
                 </Card>
 
@@ -1151,12 +1166,16 @@ documento: {...}           // Datos completos del documento`}
                       Manual detallado con instrucciones paso a paso para
                       la implementación y uso del SDK.
                     </p>
-                    <a href="/downloads/guia-implementacion-sdk.txt" download="guia-implementacion-sdk.txt" style={{ textDecoration: 'none' }}>
-                      <Button variant="outline" className="w-full">
-                        <Clipboard className="mr-2 h-4 w-4" />
-                        Descargar Guía
-                      </Button>
-                    </a>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => {
+                        window.location.href = "/downloads/guia-implementacion-sdk.txt";
+                      }}
+                    >
+                      <Clipboard className="mr-2 h-4 w-4" />
+                      Descargar Guía
+                    </Button>
                   </CardContent>
                 </Card>
               </div>
