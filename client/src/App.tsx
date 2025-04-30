@@ -164,6 +164,7 @@ function Router() {
       <Route path="/partners/password-generator" component={PasswordGenerator} />
       <Route path="/partners/webapp-login" component={WebappLogin} />
       <Route path="/partners/webapp-pos" component={WebAppPOS} />
+      <Route path="/partners/sdk-demo" component={SdkDemo} />
       <ProtectedRoute 
         path="/partners/pos-integration" 
         component={PosIntegrationPage} 
