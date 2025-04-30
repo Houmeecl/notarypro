@@ -89,6 +89,11 @@ export const documents = pgTable("documents", {
   paymentId: text("payment_id"),
   paymentAmount: integer("payment_amount"),
   paymentStatus: text("payment_status"),
+  paymentMethod: text("payment_method"),
+  paymentTimestamp: timestamp("payment_timestamp"),
+  email: text("email"), // Email para envío del documento
+  receiveNotifications: boolean("receive_notifications").default(false),
+  sendCopy: boolean("send_copy").default(false),
   signatureData: text("signature_data"),
   signatureTimestamp: timestamp("signature_timestamp"),
   certifierSignatureData: text("certifier_signature_data"),

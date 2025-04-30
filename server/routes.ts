@@ -190,7 +190,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/documents/:id/payment", async (req, res) => {
     try {
       const documentId = parseInt(req.params.id);
-      const { paymentMethod, signatureType } = req.body;
+      const { 
+        paymentMethod, 
+        signatureType, 
+        email, 
+        receiveNotifications, 
+        sendCopy 
+      } = req.body;
+      
+      // Validar email
+      if (!email || !email.includes('@')) {
+        return res.status(400).json({ 
+          message: "Se requiere un correo electrónico válido" 
+        });
+      }
       
       const document = await storage.getDocument(documentId);
       if (!document) {
@@ -203,13 +216,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generar ID de pago único
       const paymentId = `PAY-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
       
-      // Actualizar el documento con la información de pago
+      // Actualizar el documento con la información de pago y correo
       const updatedDocument = await storage.updateDocument(documentId, {
         paymentStatus: "completed",
         paymentAmount,
         paymentId,
         paymentMethod,
-        paymentTimestamp: new Date()
+        paymentTimestamp: new Date(),
+        email,
+        receiveNotifications: !!receiveNotifications,
+        sendCopy: !!sendCopy
       });
       
       // Registrar evento de pago
@@ -220,9 +236,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metadata: { 
           paymentAmount, 
           paymentMethod, 
-          signatureType 
+          signatureType,
+          email,
+          receiveNotifications,
+          sendCopy
         }
       });
+      
+      // Enviar correo de confirmación de pago (simulado)
+      console.log(`Enviando correo de confirmación de pago a ${email}`);
       
       // Determinar siguiente paso basado en el tipo de firma
       const nextStep = signatureType === "advanced" ? "identity-verification" : "sign";
