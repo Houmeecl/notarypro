@@ -50,6 +50,7 @@ import RonLoginPage from "@/pages/ron-login";
 import RonPlatform from "@/pages/ron-platform";
 import RonSession from "@/pages/ron-session";
 import AyudaLegal from "@/pages/ayuda-legal";
+import IntegracionesDemo from "@/pages/integraciones-demo";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -277,6 +278,9 @@ function Router() {
         component={AyudaLegal} 
         allowedRoles={["lawyer", "certifier", "admin"]} 
       />
+      
+      {/* Integraciones Demo */}
+      <Route path="/integraciones-demo" component={IntegracionesDemo} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
