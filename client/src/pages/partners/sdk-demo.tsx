@@ -1087,11 +1087,12 @@ documento: {...}           // Datos completos del documento`}
                   </div>
                   
                   <div className="flex flex-col gap-3">
-                    <Button className="w-full">
-                      <a href="/downloads/vecinos-notarypro-sdk.js" download="vecinos-notarypro-sdk.js" style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
-                        <Download className="mr-2 h-4 w-4" />
-                        Descargar SDK
-                      </a>
+                    <Button 
+                      className="w-full"
+                      onClick={() => window.location.href = "/downloads/vecinos-notarypro-sdk.js"}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Descargar SDK
                     </Button>
                     
                     <Button variant="outline" className="w-full" onClick={copiarSdk}>
@@ -1108,11 +1109,13 @@ documento: {...}           // Datos completos del documento`}
                       )}
                     </Button>
                     
-                    <Button variant="outline" className="w-full" asChild>
-                      <a href="https://github.com/cerfidoc/vecinos-sdk/issues" target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="mr-2 h-4 w-4" />
-                        Reportar problemas
-                      </a>
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      onClick={() => window.open("https://github.com/cerfidoc/vecinos-sdk/issues", "_blank", "noopener,noreferrer")}
+                    >
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      Reportar problemas
                     </Button>
                   </div>
                 </div>
@@ -1185,7 +1188,13 @@ documento: {...}           // Datos completos del documento`}
                 <p className="text-sm">
                   Ofrecemos soporte técnico completo para la implementación del SDK.
                   Contacte a nuestro equipo de soporte técnico a través del correo
-                  <a href="mailto:soporte@cerfidoc.cl" className="text-primary font-medium ml-1">soporte@cerfidoc.cl</a>
+                  <button 
+                    onClick={() => window.location.href = "mailto:soporte@cerfidoc.cl"} 
+                    className="text-primary font-medium ml-1 bg-transparent border-none p-0 cursor-pointer"
+                    style={{ textDecoration: 'underline' }}
+                  >
+                    soporte@cerfidoc.cl
+                  </button>
                 </p>
               </div>
             </CardContent>
