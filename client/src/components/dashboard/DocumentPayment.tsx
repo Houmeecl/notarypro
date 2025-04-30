@@ -9,8 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { CreditCard, CheckCircle, Wallet, AlertCircle } from "lucide-react";
+import { CreditCard, CheckCircle, Wallet, AlertCircle, Mail, FileCheck } from "lucide-react";
 import { useLocation } from "wouter";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface DocumentPaymentProps {
   document: Document;
@@ -24,6 +25,9 @@ export default function DocumentPayment({ document, signatureType, onPaymentSucc
   const [cardHolderName, setCardHolderName] = useState<string>("");
   const [expirationDate, setExpirationDate] = useState<string>("");
   const [cvv, setCvv] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [receiveNotifications, setReceiveNotifications] = useState<boolean>(true);
+  const [sendCopy, setSendCopy] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   
   const { toast } = useToast();
@@ -42,7 +46,10 @@ export default function DocumentPayment({ document, signatureType, onPaymentSucc
         cardHolderName,
         expirationDate,
         cvv,
-        signatureType
+        signatureType,
+        email,
+        receiveNotifications,
+        sendCopy
       });
       return await res.json();
     },
@@ -77,6 +84,16 @@ export default function DocumentPayment({ document, signatureType, onPaymentSucc
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validar correo electrónico
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      toast({
+        title: "Correo electrónico inválido",
+        description: "Por favor ingrese un correo electrónico válido para recibir su documento.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (paymentMethod === "creditcard") {
       // Validar datos de tarjeta de crédito
       if (!cardNumber || !cardHolderName || !expirationDate || !cvv) {
@@ -102,6 +119,8 @@ export default function DocumentPayment({ document, signatureType, onPaymentSucc
     setIsSubmitting(true);
     try {
       await paymentMutation.mutateAsync();
+    } catch (error) {
+      console.error("Error en el pago:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -130,11 +149,29 @@ export default function DocumentPayment({ document, signatureType, onPaymentSucc
               <span className="text-sm text-gray-600">Monto:</span>
               <span className="font-medium">${document.paymentAmount || 0} CLP</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between mb-2">
               <span className="text-sm text-gray-600">Estado:</span>
               <span className="text-green-600 font-medium">Completado</span>
             </div>
+            {document.email && (
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Enviado a:</span>
+                <span className="font-medium">{document.email}</span>
+              </div>
+            )}
           </div>
+          
+          {document.email && (
+            <div className="mt-4 bg-blue-50 p-3 rounded-md border border-blue-100 flex items-start">
+              <FileCheck className="h-5 w-5 text-blue-500 mr-2 mt-0.5" />
+              <div>
+                <p className="text-sm text-blue-700 font-medium">Documento enviado por correo</p>
+                <p className="text-xs text-blue-600">
+                  Una copia del documento ha sido enviada a su correo electrónico. Revise su bandeja de entrada.
+                </p>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     );
@@ -262,6 +299,58 @@ export default function DocumentPayment({ document, signatureType, onPaymentSucc
           
           <Separator className="my-6" />
           
+          <div className="space-y-4 mb-6">
+            <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
+              <h4 className="text-sm font-medium flex items-center text-blue-700 mb-2">
+                <Mail className="h-4 w-4 mr-2" />
+                Recibir documento por correo electrónico
+              </h4>
+              
+              <div className="mb-4">
+                <Label htmlFor="email" className="text-sm">Correo electrónico</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="ejemplo@correo.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-1"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="sendCopy" 
+                    checked={sendCopy}
+                    onCheckedChange={(checked) => setSendCopy(checked === true)}
+                  />
+                  <Label
+                    htmlFor="sendCopy"
+                    className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Enviar una copia del documento firmado
+                  </Label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="receiveNotifications" 
+                    checked={receiveNotifications}
+                    onCheckedChange={(checked) => setReceiveNotifications(checked === true)}
+                  />
+                  <Label
+                    htmlFor="receiveNotifications"
+                    className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Recibir actualizaciones sobre el proceso de firma
+                  </Label>
+                </div>
+              </div>
+            </div>
+          </div>
+          
           <div className="text-sm text-gray-500 mb-6">
             <p className="mb-2"><strong>Nota:</strong> Este es un pago simulado para efectos de demostración. No se realizará ningún cargo real a su tarjeta.</p>
             <p>Al hacer clic en "Pagar", acepta nuestros términos y condiciones de servicio.</p>
@@ -270,7 +359,7 @@ export default function DocumentPayment({ document, signatureType, onPaymentSucc
           <Button
             type="submit"
             className="w-full"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !email}
           >
             {isSubmitting ? "Procesando..." : `Pagar $${paymentAmount} CLP`}
           </Button>
