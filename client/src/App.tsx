@@ -69,6 +69,7 @@ import AndroidSdkTest from "@/pages/partners/android-sdk-test";
 import PasswordGenerator from "@/pages/partners/password-generator";
 import WebappLogin from "@/pages/partners/webapp-login";
 import WebAppPOS from "@/pages/partners/webapp-pos";
+import SdkDemo from "@/pages/partners/sdk-demo";
 
 // Admin pages
 import PosManagementPage from "@/pages/admin/pos-management";
