@@ -1008,8 +1008,8 @@ documento: {...}           // Datos completos del documento`}
                   </div>
                   
                   <div className="flex flex-col gap-3">
-                    <Button className="w-full" asChild>
-                      <a href="/assets/vecinos-notarypro-sdk-dist.js" download="vecinos-notarypro-sdk.js">
+                    <Button className="w-full">
+                      <a href="/downloads/vecinos-notarypro-sdk.js" download="vecinos-notarypro-sdk.js" style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
                         <Download className="mr-2 h-4 w-4" />
                         Descargar SDK
                       </a>
@@ -1083,10 +1083,10 @@ documento: {...}           // Datos completos del documento`}
                       Manual detallado con instrucciones paso a paso para
                       la implementación y uso del SDK.
                     </p>
-                    <Button variant="outline" className="w-full" asChild>
-                      <a href="#" target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" className="w-full">
+                      <a href="/downloads/guia-implementacion-sdk.txt" download="guia-implementacion-sdk.txt" style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
                         <Clipboard className="mr-2 h-4 w-4" />
-                        Descargar PDF
+                        Descargar Guía
                       </a>
                     </Button>
                   </CardContent>
