@@ -259,12 +259,12 @@ const SdkDemo = () => {
                     Archivo JavaScript con todas las funciones necesarias para operar
                     un punto de servicio NotaryPro.
                   </p>
-                  <Button className="w-full">
-                    <a href="/downloads/vecinos-notarypro-sdk.js" download="vecinos-notarypro-sdk.js" style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
+                  <a href="/downloads/vecinos-notarypro-sdk.js" download="vecinos-notarypro-sdk.js" style={{ textDecoration: 'none' }}>
+                    <Button className="w-full">
                       <Download className="mr-2 h-4 w-4" />
                       Descargar SDK
-                    </a>
-                  </Button>
+                    </Button>
+                  </a>
                 </CardContent>
               </Card>
               
@@ -277,12 +277,12 @@ const SdkDemo = () => {
                     Aplicación Android completa que incluye el SDK integrado.
                     Ideal para socios sin conocimientos técnicos.
                   </p>
-                  <Button variant="outline" className="w-full">
-                    <a href="/downloads/vecinos-pos-app.apk" download="VecinosPOS.apk" style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
+                  <a href="/downloads/vecinos-pos-app.apk" download="VecinosPOS.apk" style={{ textDecoration: 'none' }}>
+                    <Button variant="outline" className="w-full">
                       <Download className="mr-2 h-4 w-4" />
                       Descargar APK
-                    </a>
-                  </Button>
+                    </Button>
+                  </a>
                 </CardContent>
               </Card>
               
@@ -295,12 +295,12 @@ const SdkDemo = () => {
                     Manual detallado con instrucciones paso a paso para
                     la implementación y uso del SDK.
                   </p>
-                  <Button variant="outline" className="w-full">
-                    <a href="/downloads/guia-implementacion-sdk.txt" download="guia-implementacion-sdk.txt" style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
+                  <a href="/downloads/guia-implementacion-sdk.txt" download="guia-implementacion-sdk.txt" style={{ textDecoration: 'none' }}>
+                    <Button variant="outline" className="w-full">
                       <Clipboard className="mr-2 h-4 w-4" />
                       Descargar Guía
-                    </a>
-                  </Button>
+                    </Button>
+                  </a>
                 </CardContent>
               </Card>
             </div>
@@ -1117,12 +1117,12 @@ documento: {...}           // Datos completos del documento`}
                       Aplicación Android completa que incluye el SDK integrado.
                       Ideal para socios sin conocimientos técnicos.
                     </p>
-                    <Button variant="outline" className="w-full">
-                      <a href="/downloads/vecinos-pos-app.apk" download="VecinosPOS.apk" style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
+                    <a href="/downloads/vecinos-pos-app.apk" download="VecinosPOS.apk" style={{ textDecoration: 'none' }}>
+                      <Button variant="outline" className="w-full">
                         <Download className="mr-2 h-4 w-4" />
                         Descargar APK
-                      </a>
-                    </Button>
+                      </Button>
+                    </a>
                   </CardContent>
                 </Card>
 
@@ -1151,12 +1151,12 @@ documento: {...}           // Datos completos del documento`}
                       Manual detallado con instrucciones paso a paso para
                       la implementación y uso del SDK.
                     </p>
-                    <Button variant="outline" className="w-full">
-                      <a href="/downloads/guia-implementacion-sdk.txt" download="guia-implementacion-sdk.txt" style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
+                    <a href="/downloads/guia-implementacion-sdk.txt" download="guia-implementacion-sdk.txt" style={{ textDecoration: 'none' }}>
+                      <Button variant="outline" className="w-full">
                         <Clipboard className="mr-2 h-4 w-4" />
                         Descargar Guía
-                      </a>
-                    </Button>
+                      </Button>
+                    </a>
                   </CardContent>
                 </Card>
               </div>
