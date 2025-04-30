@@ -183,6 +183,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Ruta para procesar pagos de documentos
+  app.post("/api/documents/:id/payment", async (req, res) => {
+    try {
+      const documentId = parseInt(req.params.id);
+      const { paymentMethod, signatureType } = req.body;
+      
+      const document = await storage.getDocument(documentId);
+      if (!document) {
+        return res.status(404).json({ message: "Documento no encontrado" });
+      }
+      
+      // Determinar monto basado en el tipo de firma
+      const paymentAmount = signatureType === "advanced" ? 5000 : 1500;
+      
+      // Generar ID de pago único
+      const paymentId = `PAY-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      
+      // Actualizar el documento con la información de pago
+      const updatedDocument = await storage.updateDocument(documentId, {
+        paymentStatus: "completed",
+        paymentAmount,
+        paymentId,
+        paymentMethod,
+        paymentTimestamp: new Date()
+      });
+      
+      // Registrar evento de pago
+      await createAnalyticsEvent({
+        eventType: "document_payment",
+        userId: document.userId,
+        documentId: document.id,
+        metadata: { 
+          paymentAmount, 
+          paymentMethod, 
+          signatureType 
+        }
+      });
+      
+      // Determinar siguiente paso basado en el tipo de firma
+      const nextStep = signatureType === "advanced" ? "identity-verification" : "sign";
+      
+      res.status(200).json({ 
+        success: true, 
+        paymentId,
+        nextStep,
+        message: "Pago procesado correctamente" 
+      });
+    } catch (error) {
+      console.error("Error procesando pago:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Error procesando pago" });
+    }
+  });
+  
   // Ruta para que los administradores creen documentos directamente desde plantillas
   app.post("/api/admin/documents/create-from-template", isAdmin, async (req, res) => {
     try {

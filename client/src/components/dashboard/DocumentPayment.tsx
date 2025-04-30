@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { CreditCard, CheckCircle, Wallet, AlertCircle } from "lucide-react";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 
 interface DocumentPaymentProps {
   document: Document;
@@ -28,7 +28,7 @@ export default function DocumentPayment({ document, signatureType, onPaymentSucc
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   
   // Definir precio basado en el tipo de firma
   const paymentAmount = signatureType === "advanced" ? 5000 : 1500;
@@ -56,9 +56,9 @@ export default function DocumentPayment({ document, signatureType, onPaymentSucc
       
       // Navegar a la siguiente pantalla basada en el tipo de firma
       if (data.nextStep === "identity-verification") {
-        navigate(`/document-verification/${document.id}`);
+        setLocation(`/document-verification/${document.id}`);
       } else {
-        navigate(`/document-sign/${document.id}`);
+        setLocation(`/document-sign/${document.id}`);
       }
       
       if (onPaymentSuccess) {
