@@ -274,8 +274,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
-      // Enviar correo de confirmación de pago (simulado)
-      console.log(`Enviando correo de confirmación de pago a ${email}`);
+      // Enviar correo de confirmación de pago
+      try {
+        const { emailService } = await import('./services/email-service');
+        
+        // Obtener información del usuario si está autenticado
+        let userName = "Usuario";
+        if (req.isAuthenticated() && (req.user as any).fullName) {
+          userName = (req.user as any).fullName;
+        }
+
+        // Enviar confirmación de pago
+        await emailService.sendPaymentConfirmation(
+          email,
+          document.title,
+          document.id,
+          paymentAmount,
+          paymentId,
+          userName
+        );
+        
+        // Si se solicitó enviar una copia del documento y tiene PDF asociado
+        if (sendCopy && document.pdfPath) {
+          // En un entorno real, aquí se leería el archivo PDF y se convertiría a base64
+          // Por ahora, enviamos el correo con un enlace al documento
+          await emailService.sendDocumentCopy(
+            email,
+            document.title,
+            document.id,
+            undefined, // pdfBase64
+            `https://cerfidoc.cl/document-view/${document.id}`
+          );
+        }
+      } catch (emailError) {
+        console.error("Error enviando correo de confirmación:", emailError);
+        // No interrumpimos el flujo principal si falla el envío de correo
+      }
       
       // Determinar siguiente paso basado en el tipo de firma
       const nextStep = signatureType === "advanced" ? "identity-verification" : "sign";
@@ -663,6 +697,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const documentId = parseInt(req.params.id);
       const document = await storage.getDocument(documentId);
+      const updates = req.body;
       
       if (!document) {
         return res.status(404).json({ message: "Document not found" });
@@ -682,10 +717,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const updatedDocument = await storage.updateDocument(documentId, req.body);
+      const updatedDocument = await storage.updateDocument(documentId, updates);
+      
+      // Enviar notificación por correo si cambió el estado y tenemos email registrado
+      if (updates.status && document.status !== updates.status && document.email && document.receiveNotifications) {
+        try {
+          const { emailService } = await import('./services/email-service');
+          await emailService.sendDocumentStatusUpdate(
+            document.email,
+            document.title,
+            document.id,
+            updates.status
+          );
+          console.log(`Notificación de cambio de estado enviada a ${document.email}`);
+        } catch (emailError) {
+          console.error("Error enviando notificación de estado:", emailError);
+          // No interrumpimos el flujo principal si falla el envío
+        }
+      }
+      
       res.status(200).json(updatedDocument);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ message: error instanceof Error ? error.message : "Error actualizando documento" });
     }
   });
 
