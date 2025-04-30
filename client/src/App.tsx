@@ -53,6 +53,7 @@ import AyudaLegal from "@/pages/ayuda-legal";
 import IntegracionesDemo from "@/pages/integraciones-demo";
 import DescargarApk from "@/pages/partners/descargar-apk";
 import ConfirmacionDescarga from "@/pages/partners/confirmacion-descarga";
+import WebAppPOSAlternativa from "@/pages/partners/webapp-pos-alternativa";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -167,8 +168,10 @@ function Router() {
       <Route path="/partners/password-generator" component={PasswordGenerator} />
       <Route path="/partners/webapp-login" component={WebappLogin} />
       <Route path="/partners/webapp-pos" component={WebAppPOS} />
+      <Route path="/partners/webapp-pos-alternativa" component={WebAppPOSAlternativa} />
       <Route path="/partners/sdk-demo" component={SdkDemo} />
       <Route path="/partners/descargar-apk" component={DescargarApk} />
+      <Route path="/partners/confirmacion-descarga" component={ConfirmacionDescarga} />
       <ProtectedRoute 
         path="/partners/pos-integration" 
         component={PosIntegrationPage} 

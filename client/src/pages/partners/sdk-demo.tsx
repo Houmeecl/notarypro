@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
-import { Loader2, Smartphone, Download, Clipboard, Check, QrCode, Copy, ExternalLink, Clock } from 'lucide-react';
+import { Loader2, Smartphone, Download, Clipboard, Check, QrCode, Copy, ExternalLink, Clock, Globe } from 'lucide-react';
 import { TIPO_DOCUMENTO, METODO_PAGO, VecinosPOS } from '@/lib/partner-android-sdk';
 import { ExplanatoryVideo } from '@/components/onboarding/ExplanatoryVideo';
 
@@ -1157,6 +1157,26 @@ documento: {...}           // Datos completos del documento`}
                   </CardContent>
                 </Card>
 
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Versión Web</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm mb-4">
+                      Utilice nuestra versión web cuando no pueda usar la app Android.
+                      Funciona en cualquier navegador.
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => window.location.href = "/partners/webapp-pos-alternativa"}
+                    >
+                      <Globe className="mr-2 h-4 w-4" />
+                      Abrir versión web
+                    </Button>
+                  </CardContent>
+                </Card>
+                
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-base">iOS App (Próximamente)</CardTitle>
