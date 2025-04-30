@@ -72,11 +72,13 @@ export async function analyzeSentiment(text: string): Promise<{
       response_format: { type: "json_object" },
     });
 
-    const result = JSON.parse(response.choices[0].message.content);
+    // Manejo de contenido potencialmente nulo
+    const content = response.choices[0].message.content || '{"rating": 3, "confidence": 0.5}';
+    const result = JSON.parse(content);
 
     return {
-      rating: Math.max(1, Math.min(5, Math.round(result.rating))),
-      confidence: Math.max(0, Math.min(1, result.confidence)),
+      rating: Math.max(1, Math.min(5, Math.round(result.rating || 3))),
+      confidence: Math.max(0, Math.min(1, result.confidence || 0.5)),
     };
   } catch (error) {
     console.error("Error en análisis de sentimiento:", error);
@@ -122,12 +124,14 @@ export async function getLegalResponse(
       response_format: { type: "json_object" },
     });
 
-    const result = JSON.parse(response.choices[0].message.content);
+    // Manejo de contenido potencialmente nulo
+    const content = response.choices[0].message.content || '{"response": "No hay información disponible.", "references": [], "confidence": 0.5}';
+    const result = JSON.parse(content);
     
     return {
-      response: result.response,
-      references: result.references,
-      confidence: Math.max(0, Math.min(1, result.confidence)),
+      response: result.response || "No hay información disponible.",
+      references: result.references || [],
+      confidence: Math.max(0, Math.min(1, result.confidence || 0.5)),
     };
   } catch (error) {
     console.error("Error en respuesta legal:", error);

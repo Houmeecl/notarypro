@@ -3,6 +3,9 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { createAnalyticsEvent } from "./db";
+import { handleChatbotQuery, analyzeSentiment, getLegalResponse } from "./services/chatbot";
+import { generateVideoToken, registerSessionParticipant, getSessionParticipants, endSession } from "./services/video-call";
+import { createContact, updateContact, createDeal, findContactByEmail, logDocumentActivity } from "./services/crm";
 import multer from "multer";
 import { nanoid } from "nanoid";
 import fs from "fs";
@@ -2378,6 +2381,164 @@ export async function registerRoutes(app: Express): Promise<Server> {
     ws.on('close', () => {
       console.log('Conexión WebSocket cerrada');
     });
+  });
+  
+  // =========== NUEVAS INTEGRACIONES ===========
+  
+  // ===== CHATBOT (OpenAI) =====
+  app.post("/api/chatbot/message", async (req, res) => {
+    try {
+      const { message, documentContext } = req.body;
+      const response = await handleChatbotQuery(message, documentContext);
+      res.json({ response });
+    } catch (error) {
+      console.error("Error en el chatbot:", error);
+      res.status(500).json({ message: "Error en el servicio de chatbot" });
+    }
+  });
+  
+  app.post("/api/chatbot/sentiment", isAuthenticated, async (req, res) => {
+    try {
+      const { text } = req.body;
+      const sentiment = await analyzeSentiment(text);
+      res.json(sentiment);
+    } catch (error) {
+      console.error("Error analizando sentimiento:", error);
+      res.status(500).json({ message: "Error analizando sentimiento" });
+    }
+  });
+  
+  app.post("/api/chatbot/legal-response", async (req, res) => {
+    try {
+      const { query, documentContext } = req.body;
+      const legalResponse = await getLegalResponse(query, documentContext);
+      res.json(legalResponse);
+    } catch (error) {
+      console.error("Error generando respuesta legal:", error);
+      res.status(500).json({ message: "Error generando respuesta legal" });
+    }
+  });
+  
+  // ===== VIDEO LLAMADAS (Agora) =====
+  app.post("/api/video-call/token", isAuthenticated, async (req, res) => {
+    try {
+      const { sessionId } = req.body;
+      const userId = req.user.id.toString();
+      
+      const tokenData = generateVideoToken(
+        `session-${sessionId}`,
+        userId
+      );
+      
+      // Registrar evento de inicio de sesión de video
+      await createAnalyticsEvent({
+        eventType: "video_call_started",
+        userId: req.user.id,
+        videoCallId: parseInt(sessionId)
+      });
+      
+      res.json(tokenData);
+    } catch (error) {
+      console.error("Error generando token de video:", error);
+      res.status(500).json({ message: "Error al iniciar la videollamada" });
+    }
+  });
+  
+  app.post("/api/video-call/participant", isAuthenticated, async (req, res) => {
+    try {
+      const { channelName, userName, role } = req.body;
+      
+      const result = registerSessionParticipant(channelName, {
+        userId: req.user.id,
+        userName,
+        role,
+        joinTime: new Date()
+      });
+      
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error registrando participante:", error);
+      res.status(500).json({ message: "Error al registrar participante" });
+    }
+  });
+  
+  app.get("/api/video-call/participants/:channelName", isAuthenticated, async (req, res) => {
+    try {
+      const { channelName } = req.params;
+      const participants = getSessionParticipants(channelName);
+      res.status(200).json(participants);
+    } catch (error) {
+      console.error("Error obteniendo participantes:", error);
+      res.status(500).json({ message: "Error al obtener participantes" });
+    }
+  });
+  
+  app.post("/api/video-call/end-session", isAuthenticated, async (req, res) => {
+    try {
+      const { channelName } = req.body;
+      const result = endSession(channelName);
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error finalizando sesión:", error);
+      res.status(500).json({ message: "Error al finalizar sesión" });
+    }
+  });
+  
+  // ===== CRM (HubSpot) =====
+  app.post("/api/crm/contacts", isAdmin, async (req, res) => {
+    try {
+      const contactData = req.body;
+      const contact = await createContact(contactData);
+      res.status(201).json(contact);
+    } catch (error) {
+      console.error("Error CRM:", error);
+      res.status(500).json({ message: "Error en integración con CRM" });
+    }
+  });
+  
+  app.patch("/api/crm/contacts/:id", isAdmin, async (req, res) => {
+    try {
+      const hubspotId = req.params.id;
+      const contactData = req.body;
+      const contact = await updateContact(hubspotId, contactData);
+      res.status(200).json(contact);
+    } catch (error) {
+      console.error("Error CRM:", error);
+      res.status(500).json({ message: "Error en integración con CRM" });
+    }
+  });
+  
+  app.post("/api/crm/deals", isAdmin, async (req, res) => {
+    try {
+      const dealData = req.body;
+      const deal = await createDeal(dealData);
+      res.status(201).json(deal);
+    } catch (error) {
+      console.error("Error CRM:", error);
+      res.status(500).json({ message: "Error en integración con CRM" });
+    }
+  });
+  
+  app.post("/api/crm/find-contact", isAdmin, async (req, res) => {
+    try {
+      const { email } = req.body;
+      const contact = await findContactByEmail(email);
+      res.status(200).json(contact || { exists: false });
+    } catch (error) {
+      console.error("Error CRM:", error);
+      res.status(500).json({ message: "Error en integración con CRM" });
+    }
+  });
+  
+  app.post("/api/crm/document-activity", isAuthenticated, async (req, res) => {
+    try {
+      const { contactId, documentTitle, action } = req.body;
+      const result = await logDocumentActivity(contactId, documentTitle, action);
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error CRM:", error);
+      res.status(500).json({ message: "Error en integración con CRM" });
+    }
   });
   
   return httpServer;
