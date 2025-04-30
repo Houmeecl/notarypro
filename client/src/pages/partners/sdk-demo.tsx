@@ -1166,14 +1166,24 @@ documento: {...}           // Datos completos del documento`}
                       Utilice nuestra versión web cuando no pueda usar la app Android.
                       Funciona en cualquier navegador.
                     </p>
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => window.location.href = "/partners/webapp-pos-alternativa"}
-                    >
-                      <Globe className="mr-2 h-4 w-4" />
-                      Abrir versión web
-                    </Button>
+                    <div className="space-y-2">
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => window.location.href = "/partners/webapp-pos-buttons"}
+                      >
+                        <Globe className="mr-2 h-4 w-4" />
+                        Versión con botones grandes
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => window.location.href = "/partners/webapp-pos-alternativa"}
+                      >
+                        <Globe className="mr-2 h-4 w-4" />
+                        Versión con pestañas
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
                 
