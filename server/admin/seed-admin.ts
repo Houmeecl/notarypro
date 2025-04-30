@@ -24,7 +24,14 @@ export async function createSuperAdmin() {
     const fullName = 'Edward Admin';
     
     // Verificar si el usuario ya existe
-    const existingUser = await db.select()
+    const existingUser = await db.select({
+        id: users.id,
+        username: users.username,
+        password: users.password,
+        email: users.email,
+        fullName: users.fullName,
+        role: users.role
+      })
       .from(users)
       .where(eq(users.username, username))
       .limit(1);
@@ -54,7 +61,13 @@ export async function createSuperAdmin() {
         fullName,
         role: 'admin'
       })
-      .returning();
+      .returning({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        fullName: users.fullName,
+        role: users.role
+      });
     
     console.log(`Administrador ${username} creado con ID: ${admin.id}`);
   } catch (error) {
@@ -68,12 +81,19 @@ export async function createSuperAdmin() {
 export async function createSebaAdmin() {
   try {
     const username = 'Sebadmin';
-    const password = 'adminseba';
+    const password = 'admin123'; // Cambiado para que coincida con lo que se documentó
     const email = 'seba@notarypro.cl';
     const fullName = 'Sebastian Admin';
     
     // Verificar si el usuario ya existe
-    const existingUser = await db.select()
+    const existingUser = await db.select({
+        id: users.id,
+        username: users.username,
+        password: users.password,
+        email: users.email,
+        fullName: users.fullName,
+        role: users.role
+      })
       .from(users)
       .where(eq(users.username, username))
       .limit(1);
@@ -103,7 +123,13 @@ export async function createSebaAdmin() {
         fullName,
         role: 'admin'
       })
-      .returning();
+      .returning({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        fullName: users.fullName,
+        role: users.role
+      });
     
     console.log(`Administrador ${username} creado con ID: ${admin.id}`);
   } catch (error) {
