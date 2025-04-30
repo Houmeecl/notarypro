@@ -48,6 +48,9 @@ export default function Header() {
             <Link href="/vecinos-express" className="text-secondary hover:text-primary font-medium text-sm transition duration-150">
               Vecinos Express
             </Link>
+            <Link href="/integraciones-demo" className="text-secondary hover:text-primary font-medium text-sm transition duration-150">
+              Demo Integraciones
+            </Link>
             
             {user ? (
               <Link href={user.role === "certifier" ? "/certifier-dashboard" : (user.role === "admin" ? "/admin-dashboard" : "/user-dashboard")}>
@@ -117,6 +120,13 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Vecinos Express
+              </Link>
+              <Link 
+                href="/integraciones-demo"
+                className="block px-3 py-2 text-base font-medium text-secondary hover:text-primary hover:bg-light rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Demo Integraciones
               </Link>
               
               {user ? (
