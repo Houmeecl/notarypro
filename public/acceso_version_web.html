@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceso Directo - Vecinos POS</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 600px;
+      padding: 40px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h1 {
+      color: #EC1C24;
+      margin-bottom: 20px;
+    }
+    p {
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+    .button {
+      display: inline-block;
+      background-color: #EC1C24;
+      color: white;
+      padding: 15px 30px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+      margin: 10px;
+      transition: background-color 0.2s;
+    }
+    .button:hover {
+      background-color: #d21920;
+    }
+    .button.secondary {
+      background-color: #333333;
+    }
+    .button.secondary:hover {
+      background-color: #222222;
+    }
+    .logo {
+      width: 180px;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="/logo.png" alt="Vecinos POS Logo" class="logo">
+    <h1>Acceso a Vecinos POS Web</h1>
+    <p>Bienvenido al punto de acceso directo de la versión web de Vecinos POS. Esta versión funciona directamente en su navegador sin necesidad de instalar ninguna aplicación.</p>
+    
+    <p>Por favor, elija una de las siguientes opciones:</p>
+    
+    <a href="/partners/webapp-pos-buttons" class="button">Abrir Versión con Botones Grandes</a>
+    <br>
+    <a href="/partners/webapp-pos-alternativa" class="button secondary">Abrir Versión Alternativa</a>
+  </div>
+  
+  <script>
+    // Redirección automática después de 2 segundos a la versión con botones grandes
+    setTimeout(() => {
+      window.location.href = "/partners/webapp-pos-buttons";
+    }, 2000);
+  </script>
+</body>
+</html>
