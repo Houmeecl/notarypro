@@ -956,6 +956,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Document payment routes
+  app.post("/api/documents/:id/payment", async (req, res) => {
+    try {
+      const documentId = parseInt(req.params.id);
+      const document = await storage.getDocument(documentId);
+      
+      if (!document) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      // Si el usuario está autenticado, verificamos permisos
+      if (req.isAuthenticated()) {
+        const user = req.user as any;
+        // Solo el propietario del documento puede pagar
+        if (document.userId !== user.id && user.role !== "admin") {
+          return res.status(403).json({ message: "Forbidden" });
+        }
+      } else {
+        // Para invitados, verificamos que el documento pertenezca a un invitado (userId = 1)
+        if (document.userId !== 1) {
+          return res.status(403).json({ message: "Forbidden" });
+        }
+      }
+      
+      // Validamos que el documento esté en estado correcto para pago
+      if (document.status !== "pending_payment" && document.status !== "draft") {
+        return res.status(400).json({ 
+          message: "El documento no está pendiente de pago o ya ha sido pagado" 
+        });
+      }
+      
+      // Validamos los datos de pago
+      const { paymentMethod, cardNumber, cardHolderName, expirationDate, cvv } = req.body;
+      
+      if (!paymentMethod) {
+        return res.status(400).json({ message: "Método de pago es requerido" });
+      }
+      
+      // En un entorno de producción, aquí integraríamos con un servicio de pagos
+      // Para esta implementación, simularemos un pago exitoso
+      const paymentId = "PAY-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+      
+      // Decidimos el monto basado en el tipo de documento (avanzado o simple)
+      const isAdvanced = req.body.signatureType === "advanced";
+      const paymentAmount = isAdvanced ? 5000 : 1500; // 5000 para avanzada, 1500 para simple
+      
+      // Actualizamos el documento con la información de pago
+      const updatedDocument = await storage.updateDocument(documentId, {
+        paymentId,
+        paymentAmount,
+        paymentStatus: "completed",
+        status: isAdvanced ? "pending" : "validated" // Si es simple, está listo para firmar, si es avanzada, necesita verificación
+      });
+      
+      // Creamos un evento de análisis para el pago
+      try {
+        await createAnalyticsEvent({
+          userId: req.isAuthenticated() ? (req.user as any).id : 1,
+          eventType: "document_payment",
+          eventData: {
+            documentId,
+            documentTitle: document.title,
+            paymentAmount,
+            paymentMethod,
+            signatureType: isAdvanced ? "advanced" : "simple"
+          }
+        });
+      } catch (error) {
+        console.error("Error creating analytics event:", error);
+      }
+      
+      res.status(200).json({
+        success: true,
+        message: "Pago procesado correctamente",
+        document: updatedDocument,
+        paymentId,
+        paymentAmount,
+        nextStep: isAdvanced ? "identity-verification" : "signature"
+      });
+    } catch (error) {
+      console.error("Error processing payment:", error);
+      res.status(500).json({ message: "Error processing payment", error: error.message });
+    }
+  });
+  
   // Verificación de documentos por código
   app.get("/api/verificar-documento/:code", async (req, res) => {
     try {

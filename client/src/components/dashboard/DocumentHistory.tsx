@@ -1,15 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
 import { Document, User } from "@shared/schema";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileHistory, EditIcon, UserCheck, FileSignature, CheckCircle, User as UserIcon, AlertCircle } from "lucide-react";
+import { History, EditIcon, UserCheck, FileSignature, CheckCircle, User as UserIcon, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface DocumentHistoryProps {
   document: Document;
 }
 
+// Interfaz para el objeto de verificación de identidad
+interface IdentityVerification {
+  id: number;
+  documentId: number;
+  userId: number;
+  status: 'pending' | 'approved' | 'rejected';
+  notes?: string;
+  createdAt: Date;
+  updatedAt?: Date;
+}
+
 // Formato para las fechas
-const formatDate = (dateString?: Date) => {
+const formatDate = (dateString?: Date | null) => {
   if (!dateString) return "";
   const date = new Date(dateString);
   return date.toLocaleString('es-ES', {
@@ -35,7 +46,7 @@ export default function DocumentHistory({ document }: DocumentHistoryProps) {
   });
 
   // Fetch de la verificación de identidad (si existe)
-  const { data: verification, isLoading: isVerificationLoading } = useQuery({
+  const { data: verification, isLoading: isVerificationLoading } = useQuery<IdentityVerification>({
     queryKey: [`/api/identity-verification/${document.id}`],
     enabled: !!document.id,
   });
@@ -111,7 +122,7 @@ export default function DocumentHistory({ document }: DocumentHistoryProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center">
-          <FileHistory className="h-5 w-5 text-primary mr-2" />
+          <History className="h-5 w-5 text-primary mr-2" />
           Historial del Documento
         </CardTitle>
         <CardDescription>
