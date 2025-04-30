@@ -15,19 +15,19 @@ export default function Footer() {
               />
             </Link>
             <p className="text-gray-600 mb-4">
-              Plataforma líder en firma y certificación digital notarial para profesionales jurídicos y empresas en Chile, en cumplimiento con la Ley 19.799.
+              Plataforma líder en firma y certificación digital de documentos para profesionales jurídicos y empresas en Chile, en cumplimiento con la Ley 19.799 sobre documentos electrónicos.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors duration-150">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-600 transition-colors duration-150">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors duration-150">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors duration-150">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors duration-150">
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-700 transition-colors duration-150">
                 <Linkedin className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors duration-150">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-pink-600 transition-colors duration-150">
                 <Instagram className="h-5 w-5" />
               </a>
             </div>
@@ -37,29 +37,29 @@ export default function Footer() {
             <h3 className="text-lg font-semibold text-secondary mb-4">Servicios</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">
-                  Firma Electrónica Simple
-                </a>
+                <Link href="/document-templates" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                  Documentos y Plantillas
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">
-                  Firma Electrónica Avanzada
-                </a>
+                <Link href="/document-categories" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                  Categorías de Documentos
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">
-                  Certificación Digital
-                </a>
+                <Link href="/certificacion-por-video" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                  Certificación por Video
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">
-                  Cursos de Certificación
-                </a>
+                <Link href="/curso-certificador" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                  Curso de Certificador
+                </Link>
               </li>
               <li>
-                <a href="/servicios-empresariales" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                <Link href="/servicios-empresariales" className="text-gray-600 hover:text-primary transition-colors duration-150">
                   Soluciones Empresariales
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -68,29 +68,29 @@ export default function Footer() {
             <h3 className="text-lg font-semibold text-secondary mb-4">Empresa</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">
-                  Sobre Nosotros
-                </a>
+                <Link href="/quienes-somos" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                  Quiénes Somos
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">
-                  Blog
-                </a>
+                <Link href="/comunicado-prensa-redaccion-documentos" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                  Comunicados de Prensa
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">
-                  Empleo
-                </a>
+                <Link href="/unete-al-equipo" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                  Únete al Equipo
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">
-                  Prensa
-                </a>
+                <Link href="/partners/sdk-demo" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                  Programa de Partners
+                </Link>
               </li>
               <li>
-                <a href="#contacto" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                <Link href="/#contacto" className="text-gray-600 hover:text-primary transition-colors duration-150">
                   Contacto
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -99,19 +99,19 @@ export default function Footer() {
             <h3 className="text-lg font-semibold text-secondary mb-4">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <a href="/aviso-legal" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                <Link href="/aviso-legal" className="text-gray-600 hover:text-primary transition-colors duration-150">
                   Aviso Legal
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">
-                  Política de Privacidad
-                </a>
+                <Link href="/ayuda-legal" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                  Ayuda Legal
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">
-                  Política de Cookies
-                </a>
+                <Link href="/verificar-documento" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                  Verificar Documento
+                </Link>
               </li>
               <li>
                 <a href="https://www.bcn.cl/leychile/navegar?idNorma=196640" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-primary transition-colors duration-150">
@@ -119,9 +119,9 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors duration-150">
-                  Certificaciones
-                </a>
+                <Link href="/ron-login" className="text-gray-600 hover:text-primary transition-colors duration-150">
+                  Plataforma RON
+                </Link>
               </li>
             </ul>
           </div>
@@ -131,12 +131,18 @@ export default function Footer() {
           <p className="text-gray-500 text-sm">
             &copy; {new Date().getFullYear()} NotaryPro Chile. Todos los derechos reservados.
           </p>
-          <div className="mt-4 md:mt-0">
-            <img
-              src="https://via.placeholder.com/300x50?text=Logotipos+de+Certificaciones"
-              alt="Certificaciones"
-              className="h-10"
-            />
+          <div className="mt-4 md:mt-0 flex items-center space-x-4">
+            <div className="flex items-center bg-gray-100 px-3 py-1 rounded">
+              <img
+                src="/src/assets/local/logo12582620.png"
+                alt="Certificación Chile"
+                className="h-8"
+              />
+              <span className="ml-2 text-sm text-gray-600 font-medium">Certificado por Ley 19.799</span>
+            </div>
+            <div className="bg-gray-100 px-3 py-1 rounded">
+              <span className="text-sm text-gray-600 font-medium">Seguridad ISO 27001</span>
+            </div>
           </div>
         </div>
       </div>
