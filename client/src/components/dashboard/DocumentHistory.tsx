@@ -154,7 +154,7 @@ export default function DocumentHistory({ document }: DocumentHistoryProps) {
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-medium text-gray-900">{event.title}</h4>
-                    <span className="text-xs text-gray-500">{formatDate(event.timestamp)}</span>
+                    <span className="text-xs text-gray-500">{formatDate(event.timestamp as Date)}</span>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">{event.description}</p>
                   <div className="flex items-center text-xs text-gray-500">

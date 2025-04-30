@@ -7,6 +7,8 @@ import Sidebar from "@/components/dashboard/Sidebar";
 import DocumentUpload from "@/components/dashboard/DocumentUpload";
 import IdentityVerification from "@/components/dashboard/IdentityVerification";
 import DocumentSignatureCanvas from "@/components/dashboard/DocumentSignatureCanvas";
+import DocumentPayment from "@/components/dashboard/DocumentPayment";
+import DocumentHistory from "@/components/dashboard/DocumentHistory";
 import { Button } from "@/components/ui/button";
 import { 
   Card, 

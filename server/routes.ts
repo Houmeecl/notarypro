@@ -2,6 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
+import { createAnalyticsEvent } from "./db";
 import multer from "multer";
 import { nanoid } from "nanoid";
 import fs from "fs";
