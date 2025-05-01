@@ -7,6 +7,7 @@ import Sidebar from "@/components/dashboard/Sidebar";
 import DocumentUpload from "@/components/dashboard/DocumentUpload";
 import IdentityVerification from "@/components/dashboard/IdentityVerification";
 import DocumentSignatureCanvas from "@/components/dashboard/DocumentSignatureCanvas";
+import DocumentETokenSignature from "@/components/dashboard/DocumentETokenSignature";
 import DocumentPayment from "@/components/dashboard/DocumentPayment";
 import DocumentHistory from "@/components/dashboard/DocumentHistory";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,8 @@ import {
   FileText, 
   AlertCircle, 
   Loader2, 
-  Download
+  Download,
+  ShieldCheck
 } from "lucide-react";
 import { Document, IdentityVerification as IdentityVerificationType } from "@shared/schema";
 
@@ -254,10 +256,57 @@ export default function DocumentSign() {
                 {/* Sign Document */}
                 <TabsContent value="sign" id="document-sign-section">
                   {document && (
-                    <DocumentSignatureCanvas 
-                      document={document} 
-                      onSignatureComplete={handleSignatureComplete} 
-                    />
+                    <div className="space-y-6">
+                      {/* Opciones de firma */}
+                      <Tabs defaultValue="simple" className="w-full">
+                        <TabsList className="grid w-full grid-cols-3">
+                          <TabsTrigger value="simple" className="text-sm">Firma Simple</TabsTrigger>
+                          <TabsTrigger value="advanced" className="text-sm">Firma Avanzada</TabsTrigger>
+                          <TabsTrigger value="etoken" className="text-sm">Firma con eToken</TabsTrigger>
+                        </TabsList>
+                        
+                        {/* Firma Simple (usando el canvas existente) */}
+                        <TabsContent value="simple">
+                          <DocumentSignatureCanvas 
+                            document={document} 
+                            onSignatureComplete={handleSignatureComplete} 
+                          />
+                        </TabsContent>
+
+                        {/* Firma Avanzada - Pendiente de implementación */}
+                        <TabsContent value="advanced">
+                          <Card>
+                            <CardHeader>
+                              <CardTitle className="flex items-center">
+                                <ShieldCheck className="h-5 w-5 text-primary mr-2" />
+                                Firma Electrónica Avanzada
+                              </CardTitle>
+                              <CardDescription>
+                                Firma con estampado de tiempo certificado y validez legal plena
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-6 text-center">
+                                <p className="text-yellow-700 mb-4">
+                                  La firma avanzada está disponible para usuarios con plan premium.
+                                </p>
+                                <Button variant="outline">
+                                  Actualizar a Plan Premium
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </TabsContent>
+
+                        {/* Firma con eToken */}
+                        <TabsContent value="etoken">
+                          <DocumentETokenSignature 
+                            document={document}
+                            onSignatureComplete={handleSignatureComplete}
+                          />
+                        </TabsContent>
+                      </Tabs>
+                    </div>
                   )}
                 </TabsContent>
   
