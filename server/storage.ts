@@ -1788,6 +1788,45 @@ export class DatabaseStorage implements IStorage {
       .where(eq(certificates.certificateNumber, certificateNumber));
     return certificate || undefined;
   }
+
+  // Partner Store operations
+  async getPartnerByStoreCode(storeCode: string): Promise<any | undefined> {
+    try {
+      const [store] = await db
+        .select()
+        .from(partnerStores)
+        .where(eq(partnerStores.storeCode, storeCode));
+      
+      if (!store) return undefined;
+      
+      // Obtener información adicional del dueño
+      const [owner] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, store.ownerId));
+      
+      return {
+        id: store.id,
+        businessName: store.name,
+        address: store.address,
+        storeCode: store.storeCode,
+        ownerName: owner?.fullName || 'Dueño',
+        commissionRate: store.commissionRate,
+        active: store.active,
+        createdAt: store.createdAt
+      };
+    } catch (error) {
+      console.error('Error al buscar tienda por código:', error);
+      return undefined;
+    }
+  }
+
+  async updatePartnerStoreLastLogin(storeId: number): Promise<void> {
+    await db
+      .update(partnerStores)
+      .set({ lastLoginAt: new Date() })
+      .where(eq(partnerStores.id, storeId));
+  }
 }
 
 // Switch from memory storage to database storage

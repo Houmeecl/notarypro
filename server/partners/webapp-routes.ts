@@ -31,8 +31,15 @@ webappRouter.post('/store-login', async (req: Request, res: Response) => {
     const store = await storage.getPartnerByStoreCode(storeCode);
     
     if (!store) {
-      return res.status(404).json({ error: 'Tienda no encontrada' });
+      return res.status(404).json({ error: 'Tienda no encontrada o código incorrecto' });
     }
+    
+    if (!store.active) {
+      return res.status(403).json({ error: 'Esta tienda está desactivada. Contacte al administrador.' });
+    }
+    
+    // Actualizar último inicio de sesión
+    await storage.updatePartnerStoreLastLogin(store.id);
     
     // No enviar la contraseña ni información sensible
     const safeStoreData = {
@@ -44,6 +51,7 @@ webappRouter.post('/store-login', async (req: Request, res: Response) => {
       joinedAt: store.createdAt,
     };
     
+    console.log(`Inicio de sesión exitoso: Tienda ${store.businessName} (ID: ${store.id})`);
     return res.status(200).json(safeStoreData);
   } catch (error) {
     console.error('Error en login de tienda:', error);
