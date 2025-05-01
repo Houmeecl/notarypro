@@ -154,6 +154,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registrar rutas de la webapp para socios (alternativa a la app Android)
   app.use('/api/partners', webappRouter);
   
+  // Registrar rutas de la API móvil para la APK
+  app.use('/api/mobile', mobileApiRouter);
+  
   // Registrar rutas de traducción
   app.use('/api/translation', translationRouter);
   
