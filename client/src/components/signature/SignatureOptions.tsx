@@ -171,40 +171,40 @@ export function SignatureOptions({
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-blue-50 border border-blue-100 rounded-lg p-6">
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-blue-100 rounded-full">
-                    <Pen className="h-6 w-6 text-blue-600" />
+                  <div className="p-3 bg-gray-100 rounded-full">
+                    <Pen className="h-6 w-6 text-gray-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-blue-900 mb-2">Firma Electrónica Simple</h3>
-                    <p className="text-blue-700 mb-4">
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Firma Electrónica Simple</h3>
+                    <p className="text-gray-700 mb-4">
                       Este tipo de firma otorga validez legal a su documento según la Ley 19.799, pero con un
                       nivel de seguridad estándar.
                     </p>
                     
                     <div className="space-y-2 mb-4">
                       <div className="flex items-start">
-                        <div className="bg-blue-100 p-1 rounded-full mr-2 mt-0.5">
-                          <div className="w-2 h-2 bg-blue-600 rounded-full" />
+                        <div className="bg-gray-100 p-1 rounded-full mr-2 mt-0.5">
+                          <div className="w-2 h-2 bg-primary rounded-full" />
                         </div>
-                        <span className="text-sm text-blue-800">
+                        <span className="text-sm text-gray-700">
                           Validez legal para documentos privados
                         </span>
                       </div>
                       <div className="flex items-start">
-                        <div className="bg-blue-100 p-1 rounded-full mr-2 mt-0.5">
-                          <div className="w-2 h-2 bg-blue-600 rounded-full" />
+                        <div className="bg-gray-100 p-1 rounded-full mr-2 mt-0.5">
+                          <div className="w-2 h-2 bg-primary rounded-full" />
                         </div>
-                        <span className="text-sm text-blue-800">
+                        <span className="text-sm text-gray-700">
                           Incluye estampado de tiempo y código de verificación
                         </span>
                       </div>
                       <div className="flex items-start">
-                        <div className="bg-blue-100 p-1 rounded-full mr-2 mt-0.5">
-                          <div className="w-2 h-2 bg-blue-600 rounded-full" />
+                        <div className="bg-gray-100 p-1 rounded-full mr-2 mt-0.5">
+                          <div className="w-2 h-2 bg-primary rounded-full" />
                         </div>
-                        <span className="text-sm text-blue-800">
+                        <span className="text-sm text-gray-700">
                           Proceso rápido e instantáneo
                         </span>
                       </div>
@@ -238,13 +238,17 @@ export function SignatureOptions({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-6 text-center">
-                <p className="text-yellow-700 mb-4">
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                <div className="p-3 bg-gray-100 rounded-full mx-auto mb-3 w-fit">
+                  <ShieldCheck className="h-6 w-6 text-gray-600" />
+                </div>
+                <p className="text-gray-700 mb-4">
                   La firma avanzada está disponible para usuarios con plan premium.
                 </p>
                 <Button 
                   variant="outline"
                   onClick={handleSignWithAdvanced}
+                  className="border-primary text-primary hover:bg-primary/5"
                 >
                   Actualizar a Plan Premium
                 </Button>
@@ -266,40 +270,40 @@ export function SignatureOptions({
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-blue-50 border border-blue-100 rounded-lg p-6">
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-blue-100 rounded-full">
-                    <ShieldCheck className="h-6 w-6 text-blue-600" />
+                  <div className="p-3 bg-gray-100 rounded-full">
+                    <Fingerprint className="h-6 w-6 text-gray-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-blue-900 mb-2">Firma Avanzada con Dispositivo</h3>
-                    <p className="text-blue-700 mb-4">
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Firma Avanzada con Dispositivo</h3>
+                    <p className="text-gray-700 mb-4">
                       Utilizando su token o dispositivo criptográfico personal, podrá firmar este documento
                       con la máxima validez legal de acuerdo a la Ley 19.799 de Chile.
                     </p>
                     
                     <div className="space-y-2 mb-4">
                       <div className="flex items-start">
-                        <div className="bg-blue-100 p-1 rounded-full mr-2 mt-0.5">
-                          <div className="w-2 h-2 bg-blue-600 rounded-full" />
+                        <div className="bg-gray-100 p-1 rounded-full mr-2 mt-0.5">
+                          <div className="w-2 h-2 bg-primary rounded-full" />
                         </div>
-                        <span className="text-sm text-blue-800">
+                        <span className="text-sm text-gray-700">
                           Máxima validez legal y probatoria
                         </span>
                       </div>
                       <div className="flex items-start">
-                        <div className="bg-blue-100 p-1 rounded-full mr-2 mt-0.5">
-                          <div className="w-2 h-2 bg-blue-600 rounded-full" />
+                        <div className="bg-gray-100 p-1 rounded-full mr-2 mt-0.5">
+                          <div className="w-2 h-2 bg-primary rounded-full" />
                         </div>
-                        <span className="text-sm text-blue-800">
+                        <span className="text-sm text-gray-700">
                           Utiliza su certificado digital personal
                         </span>
                       </div>
                       <div className="flex items-start">
-                        <div className="bg-blue-100 p-1 rounded-full mr-2 mt-0.5">
-                          <div className="w-2 h-2 bg-blue-600 rounded-full" />
+                        <div className="bg-gray-100 p-1 rounded-full mr-2 mt-0.5">
+                          <div className="w-2 h-2 bg-primary rounded-full" />
                         </div>
-                        <span className="text-sm text-blue-800">
+                        <span className="text-sm text-gray-700">
                           Requiere su dispositivo token conectado a la computadora
                         </span>
                       </div>
