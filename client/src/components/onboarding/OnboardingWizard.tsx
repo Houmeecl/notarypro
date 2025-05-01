@@ -59,7 +59,7 @@ export function OnboardingWizard({ onComplete, initialStep }: OnboardingWizardPr
           <div className="bg-primary/10 p-4 rounded-md">
             <h4 className="font-medium flex items-center">
               <UserPlus className="h-5 w-5 mr-2 text-primary" />
-              ¡Bienvenido, {user?.fullName}!
+              ¡Bienvenido{user?.fullName ? `, ${user.fullName}` : ''}!
             </h4>
             <p className="text-sm mt-1">
               Este asistente le mostrará cómo usar CerfiDoc de manera efectiva. 
