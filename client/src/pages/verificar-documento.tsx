@@ -24,6 +24,8 @@ interface VerificationResult {
     title: string;
     signatureTimestamp: string;
     signerName: string;
+    pdfAvailable?: boolean;
+    documentId?: number;
   };
 }
 
@@ -251,14 +253,25 @@ export default function VerificarDocumento() {
                         
                         <div className="p-4 rounded-md bg-blue-50 border border-blue-200 flex justify-between items-center">
                           <p className="text-sm text-blue-800">
-                            Este documento ha sido verificado con éxito. Puede descargarlo y conservarlo como un registro oficial.
+                            Este documento ha sido verificado con éxito. 
+                            {result.documentInfo?.pdfAvailable 
+                              ? " Puede descargarlo y conservarlo como un registro oficial con firma avanzada."
+                              : " Este documento no tiene una versión firmada disponible para descargar."}
                           </p>
-                          <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-100">
-                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Descargar Certificado
-                          </Button>
+                          {result.documentInfo?.pdfAvailable && result.documentInfo?.documentId && (
+                            <a 
+                              href={`/api/documents/${result.documentInfo.documentId}/download-pdf`} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                            >
+                              <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-100">
+                                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Descargar PDF
+                              </Button>
+                            </a>
+                          )}
                         </div>
                         
                         {/* Componente de recompensas de verificación */}
