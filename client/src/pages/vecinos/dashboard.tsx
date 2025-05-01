@@ -26,6 +26,7 @@ interface Document {
   type: string;
   clientName: string;
   commission: number;
+  posId?: string; // ID del POS que procesó el documento
 }
 
 interface Transaction {
@@ -46,6 +47,7 @@ interface PartnerInfo {
   commissionRate: number;
   balance: number;
   avatarUrl?: string;
+  posId?: string;
 }
 
 export default function VecinosDashboard() {
@@ -194,8 +196,8 @@ export default function VecinosDashboard() {
               Procesar Documentos
             </Button>
             <Button 
-              variant="ghost" 
-              className="text-gray-600 hover:bg-gray-50 whitespace-nowrap"
+              variant="default" 
+              className="bg-green-600 hover:bg-green-700 text-white whitespace-nowrap"
               onClick={() => window.open("/partners/webapp-pos", "_blank")}
             >
               <Monitor className="h-4 w-4 mr-2" />
@@ -256,9 +258,15 @@ export default function VecinosDashboard() {
                     <Badge variant="outline" className="mr-2">
                       Plan {partnerInfo.plan}
                     </Badge>
-                    <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+                    <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 mr-2">
                       {partnerInfo.commissionRate}% comisión
                     </Badge>
+                    {partnerInfo.posId && (
+                      <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                        <Monitor className="h-3 w-3 mr-1 inline-block" />
+                        POS #{partnerInfo.posId}
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </div>
@@ -367,9 +375,17 @@ export default function VecinosDashboard() {
                       </div>
                     </CardContent>
                     <CardFooter className="bg-gray-50 flex justify-between py-2">
-                      <Badge variant="outline" className="bg-transparent">
-                        {doc.type}
-                      </Badge>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="outline" className="bg-transparent">
+                          {doc.type}
+                        </Badge>
+                        {doc.posId && (
+                          <Badge variant="outline" className="bg-green-50 text-green-800 border-green-200">
+                            <Monitor className="h-3 w-3 mr-1 inline-block" />
+                            POS #{doc.posId}
+                          </Badge>
+                        )}
+                      </div>
                       <Button 
                         variant="ghost" 
                         size="sm" 
