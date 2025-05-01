@@ -52,6 +52,7 @@ import { verifyDocument } from "./services/gamification-service";
 import { ronRouter } from "./ron-routes";
 import { webappRouter } from "./partners/webapp-routes";
 import { translationRouter } from "./translation-routes";
+import mercadoPagoRouter from "./mercadopago-routes";
 
 // Ensure these directories exist
 const uploadsDir = path.join(process.cwd(), "uploads");
@@ -154,6 +155,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Registrar rutas de traducción
   app.use('/api/translation', translationRouter);
+  
+  // Registrar rutas de MercadoPago
+  app.use('/api/mercadopago', mercadoPagoRouter);
 
   // Registrar rutas de APIs de integraciones
   registerAdminApiRoutes(app);

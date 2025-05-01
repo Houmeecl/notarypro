@@ -50,11 +50,18 @@ export async function createPaymentPreference(
   externalReference?: string
 ) {
   try {
+    // Adaptamos el formato de los items al esperado por MercadoPago
+    const formattedItems = items.map(item => ({
+      id: `ITEM-${Date.now()}-${Math.floor(Math.random() * 1000)}`, // Generamos un ID único para cada ítem
+      title: item.title,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      currency_id: item.currency_id || 'CLP', // Default currency for Chile
+      description: item.description || ''
+    }));
+
     const preferenceData = {
-      items: items.map(item => ({
-        ...item,
-        currency_id: item.currency_id || 'CLP', // Default currency for Chile
-      })),
+      items: formattedItems,
       payer,
       back_urls: backUrls,
       external_reference: externalReference,
@@ -124,7 +131,13 @@ export async function processPayment(paymentData: {
   };
 }) {
   try {
-    const result = await payment.create({ body: paymentData });
+    // Adaptamos para convertir issuer_id de string a número cuando sea necesario
+    const formattedPaymentData = {
+      ...paymentData,
+      issuer_id: parseInt(paymentData.issuer_id, 10) || 0 // Convertir a número o usar 0 como valor por defecto
+    };
+
+    const result = await payment.create({ body: formattedPaymentData });
     return result;
   } catch (error) {
     console.error('Error al procesar pago:', error);
