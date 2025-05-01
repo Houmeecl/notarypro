@@ -134,25 +134,25 @@ export function SignatureOptions({
   return (
     <div className="space-y-6">
       <Tabs defaultValue="simple" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-3 mb-6 bg-slate-100">
           <TabsTrigger 
             value="simple" 
             onClick={() => handleMethodSelect("simple")}
-            className="text-sm"
+            className="text-sm data-[state=active]:bg-slate-900 data-[state=active]:text-white"
           >
             Firma Simple
           </TabsTrigger>
           <TabsTrigger 
             value="advanced" 
             onClick={() => handleMethodSelect("advanced")}
-            className="text-sm"
+            className="text-sm data-[state=active]:bg-slate-900 data-[state=active]:text-white"
           >
             Firma Avanzada
           </TabsTrigger>
           <TabsTrigger 
             value="etoken" 
             onClick={() => handleMethodSelect("etoken")}
-            className="text-sm"
+            className="text-sm data-[state=active]:bg-slate-900 data-[state=active]:text-white"
           >
             Firma con eToken
           </TabsTrigger>
@@ -163,7 +163,7 @@ export function SignatureOptions({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Pen className="h-5 w-5 text-gray-600 mr-2" />
+                <Pen className="h-5 w-5 text-slate-600 mr-2" />
                 Firma Electrónica Simple
               </CardTitle>
               <CardDescription>
@@ -260,7 +260,7 @@ export function SignatureOptions({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Fingerprint className="h-5 w-5 text-gray-600 mr-2" />
+                <Fingerprint className="h-5 w-5 text-slate-600 mr-2" />
                 Firma Electrónica Avanzada con Token
               </CardTitle>
               <CardDescription>
@@ -268,30 +268,30 @@ export function SignatureOptions({
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+              <div className="bg-slate-50 border border-slate-200 shadow-sm rounded-lg p-6">
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-gray-100 rounded-full">
-                    <Fingerprint className="h-6 w-6 text-gray-600" />
+                  <div className="p-3 bg-slate-100 rounded-full">
+                    <Fingerprint className="h-6 w-6 text-slate-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Firma Avanzada con Dispositivo</h3>
-                    <p className="text-gray-700 mb-4">
+                    <h3 className="text-lg font-medium text-slate-900 mb-2">Firma Avanzada con Dispositivo</h3>
+                    <p className="text-slate-700 mb-4">
                       Utilizando su token o dispositivo criptográfico personal, podrá firmar este documento
                       con la máxima validez legal de acuerdo a la Ley 19.799 de Chile.
                     </p>
                     
                     <div className="mb-4">
-                      <ul className="space-y-2 text-gray-700">
+                      <ul className="space-y-2 text-slate-700">
                         <li className="flex items-center">
-                          <ShieldCheck className="h-5 w-5 text-gray-500 mr-2" />
+                          <ShieldCheck className="h-5 w-5 text-slate-500 mr-2" />
                           <span className="text-sm">Máxima validez legal y probatoria</span>
                         </li>
                         <li className="flex items-center">
-                          <Fingerprint className="h-5 w-5 text-gray-500 mr-2" />
+                          <Fingerprint className="h-5 w-5 text-slate-500 mr-2" />
                           <span className="text-sm">Utiliza su certificado digital personal</span>
                         </li>
                         <li className="flex items-center">
-                          <Key className="h-5 w-5 text-gray-500 mr-2" />
+                          <Key className="h-5 w-5 text-slate-500 mr-2" />
                           <span className="text-sm">Requiere su dispositivo token conectado</span>
                         </li>
                       </ul>
