@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { 
   FileText, User, CreditCard, Clock, Calendar, 
-  ChevronRight, Download, LogOut, BarChart3 
+  ChevronRight, Download, LogOut, BarChart3,
+  HelpCircle
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -172,6 +173,54 @@ export default function VecinosDashboard() {
         </div>
       </header>
 
+      {/* Menú de navegación */}
+      <nav className="bg-white border-b">
+        <div className="container mx-auto px-4">
+          <div className="flex overflow-x-auto py-3 space-x-4">
+            <Button 
+              variant="ghost" 
+              className="text-blue-600 hover:bg-blue-50"
+              onClick={() => setLocation("/vecinos/dashboard")}
+            >
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Dashboard
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="text-gray-600 hover:bg-gray-50"
+              onClick={() => setLocation("/vecinos/pos-app")}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Procesar Documentos
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="text-gray-600 hover:bg-gray-50"
+              onClick={() => setLocation("/vecinos/retiros")}
+            >
+              <CreditCard className="h-4 w-4 mr-2" />
+              Retiros
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="text-gray-600 hover:bg-gray-50"
+              onClick={() => setLocation("/vecinos/cuenta")}
+            >
+              <User className="h-4 w-4 mr-2" />
+              Mi Cuenta
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="text-gray-600 hover:bg-gray-50"
+              onClick={() => setLocation("/vecinos/soporte")}
+            >
+              <HelpCircle className="h-4 w-4 mr-2" />
+              Soporte
+            </Button>
+          </div>
+        </div>
+      </nav>
+      
       {/* Información del socio */}
       <section className="bg-white border-b">
         <div className="container mx-auto px-4 py-6">
@@ -211,7 +260,11 @@ export default function VecinosDashboard() {
                   <p className="text-sm text-gray-600">Balance disponible</p>
                   <p className="font-bold text-lg">${partnerInfo.balance.toLocaleString('es-CL')}</p>
                 </div>
-                <Button size="sm" className="ml-4 bg-blue-600 hover:bg-blue-700">
+                <Button 
+                  size="sm" 
+                  className="ml-4 bg-blue-600 hover:bg-blue-700"
+                  onClick={() => setLocation("/vecinos/retiros")}
+                >
                   Retirar
                 </Button>
               </div>

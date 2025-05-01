@@ -465,12 +465,22 @@ export default function VecinosRegistro() {
           Volver al inicio
         </Button>
         <Button 
-          onClick={() => setLocation("/partners/descargar-apk")}
+          onClick={() => setLocation("/vecinos/login")}
           className="bg-blue-600 hover:bg-blue-700"
         >
-          Descargar aplicación
+          Ir al login
           <ChevronRight className="h-4 w-4 ml-2" />
         </Button>
+        <div className="mt-4 flex justify-center">
+          <Button 
+            variant="link"
+            onClick={() => setLocation("/partners/descargar-apk")}
+            className="text-blue-600"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Descargar aplicación móvil
+          </Button>
+        </div>
       </div>
     </div>
   );

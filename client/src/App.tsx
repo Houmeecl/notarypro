@@ -182,6 +182,14 @@ function Router() {
         const VecinosDashboard = require("@/pages/vecinos/dashboard").default;
         return <VecinosDashboard />;
       }} />
+      <Route path="/vecinos/cuenta" component={() => {
+        const VecinosCuenta = require("@/pages/vecinos/cuenta").default;
+        return <VecinosCuenta />;
+      }} />
+      <Route path="/vecinos/retiros" component={() => {
+        const VecinosRetiros = require("@/pages/vecinos/retiros").default;
+        return <VecinosRetiros />;
+      }} />
       <Route path="/vecinos/soporte" component={() => {
         const VecinosSoporte = require("@/pages/vecinos/soporte").default;
         return <VecinosSoporte />;
