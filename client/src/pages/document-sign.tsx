@@ -318,8 +318,9 @@ export default function DocumentSign() {
                           ) : (
                             // Contexto regular de NotaryPro
                             <DocumentETokenSignature 
-                              document={document}
-                              onSignatureComplete={handleSignatureComplete}
+                              documentId={document.id}
+                              documentTitle={document.title}
+                              onComplete={handleSignatureComplete}
                             />
                           )}
                         </TabsContent>
