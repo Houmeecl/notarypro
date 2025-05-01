@@ -237,7 +237,7 @@ export default function Hero() {
             <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300">
               <div className="relative h-48 bg-gradient-to-r from-gray-100 to-gray-50">
                 <img 
-                  src="https://images.unsplash.com/photo-1580674285054-bed31e145f59?q=80&w=2070&auto=format&fit=crop"
+                  src="https://images.unsplash.com/photo-1534723452862-4c874018d66d?q=80&w=2070&auto=format&fit=crop"
                   alt="Pequeño comercio de barrio" 
                   className="w-full h-full object-cover"
                 />
