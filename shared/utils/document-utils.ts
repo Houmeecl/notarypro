@@ -137,9 +137,138 @@ export function generateSignatureHTML(signatureData: any, verificationCode: stri
  * @returns Promesa con el buffer del PDF
  */
 export async function generatePDF(documentHTML: string, signatureHTML: string): Promise<Buffer> {
-  // Esta función normalmente usaría una biblioteca como puppeteer o html-pdf
-  // Para este proyecto, dejaríamos esta implementación para más adelante
-  
-  // Placeholder
-  return Buffer.from('PDF placeholder');
+  try {
+    // Importar puppeteer dinámicamente para evitar problemas de inicialización
+    const puppeteer = await import('puppeteer');
+    
+    // Crear el contenido HTML completo combinando el documento y la firma
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Documento firmado</title>
+        <style>
+          body {
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+          }
+          .document-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border: 1px solid #eee;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+          }
+          .timestamp-bar {
+            background-color: #f8f9fa;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            padding: 8px 15px;
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 20px;
+          }
+          .advanced-seal {
+            border: 2px solid #EC1C24;
+            background-color: rgba(236, 28, 36, 0.05);
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+          }
+          .seal-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            color: #EC1C24;
+          }
+          .seal-text {
+            flex: 1;
+          }
+          .seal-text h4 {
+            margin: 0 0 5px 0;
+            color: #EC1C24;
+          }
+          .seal-text p {
+            margin: 0;
+            font-size: 12px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="document-container">
+          <!-- Barra de estampa de tiempo -->
+          <div class="timestamp-bar">
+            Documento generado y firmado a través de NotaryPro · Estampa de tiempo: ${new Date().toLocaleString('es-CL')} · 
+            Firma avanzada según Ley 19.799 sobre documentos electrónicos y firma electrónica
+          </div>
+          
+          <!-- Sello de firma avanzada -->
+          <div class="advanced-seal">
+            <div class="seal-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <div class="seal-text">
+              <h4>Firma Electrónica Avanzada</h4>
+              <p>Este documento ha sido firmado con firma electrónica avanzada según lo establecido en la Ley 19.799 de Chile, 
+              y cuenta con estampa de tiempo certificada y verificable.</p>
+            </div>
+          </div>
+          
+          <!-- Contenido del documento -->
+          ${documentHTML}
+          
+          <!-- Firma digital -->
+          ${signatureHTML}
+        </div>
+      </body>
+      </html>
+    `;
+    
+    // Iniciar un navegador puppeteer
+    const browser = await puppeteer.default.launch({
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+    
+    try {
+      const page = await browser.newPage();
+      
+      // Configurar página para PDF
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+      
+      // Generar PDF con opciones adecuadas
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        margin: {
+          top: '20mm',
+          right: '20mm',
+          bottom: '20mm',
+          left: '20mm'
+        },
+        printBackground: true,
+        displayHeaderFooter: true,
+        headerTemplate: '<div style="width: 100%; font-size: 8px; color: #999; padding: 5px 10px; text-align: center;">NotaryPro - Documento firmado electrónicamente</div>',
+        footerTemplate: '<div style="width: 100%; font-size: 8px; color: #999; padding: 5px 10px; text-align: center;">Página <span class="pageNumber"></span> de <span class="totalPages"></span> - Documento verificable en www.notarypro.cl</div>'
+      });
+      
+      return pdfBuffer;
+    } finally {
+      // Asegurarse de cerrar el navegador aunque haya error
+      await browser.close();
+    }
+  } catch (error) {
+    console.error('Error generando PDF:', error);
+    // En caso de error, devolver un buffer vacío
+    throw new Error(`Error al generar el PDF: ${error.message}`);
+  }
 }
