@@ -1,7 +1,10 @@
 import { Router, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { db } from "./db";
-import { partners, documents, partnerTransactions } from "@shared/schema";
+import { 
+  partners, documents, partnerTransactions, 
+  withdrawalRequests, partnerNotifications 
+} from "@shared/vecinos-schema";
 import { and, eq, like } from "drizzle-orm";
 
 // Crear router para rutas de Vecinos Xpress

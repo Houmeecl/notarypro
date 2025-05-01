@@ -110,9 +110,15 @@ function isAdmin(req: Request, res: Response, next: any) {
   return res.status(403).json({ message: "Forbidden" });
 }
 
+// Importar el router de Vecinos Xpress
+import { vecinosRouter } from "./vecinos-routes";
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // setup authentication routes
   setupAuth(app);
+  
+  // Rutas para Vecinos Xpress
+  app.use("/api/vecinos", vecinosRouter);
   
   // Ruta directa para descargar la APK
   app.get('/descargar-apk-vecinos', (req, res) => {
