@@ -127,7 +127,13 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+        <div className="mt-8 border-t border-gray-200 pt-6">
+          <p className="text-center text-gray-600 mb-4 max-w-3xl mx-auto">
+            NotaryPro permite a cualquier persona firmar documentos legales de forma segura y verificable. Con certificación digital respaldada por la Ley 19.799, nuestros documentos tienen plena validez legal en Chile y en el extranjero mediante apostilla electrónica.
+          </p>
+        </div>
+        
+        <div className="border-t border-gray-200 mt-6 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm">
             &copy; {new Date().getFullYear()} NotaryPro Chile. Todos los derechos reservados.
           </p>
