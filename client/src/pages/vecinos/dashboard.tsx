@@ -259,7 +259,7 @@ export default function VecinosDashboard() {
                       Plan {partnerInfo.plan}
                     </Badge>
                     <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 mr-2">
-                      {partnerInfo.commissionRate}% comisión
+                      Hasta {partnerInfo.commissionRate}% comisión
                     </Badge>
                     {partnerInfo.posId && (
                       <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
@@ -370,7 +370,7 @@ export default function VecinosDashboard() {
                           {formatDate(doc.createdAt)}
                         </div>
                         <div>
-                          Comisión: <span className="font-semibold text-blue-600">${doc.commission.toLocaleString('es-CL')}</span>
+                          Comisión variable: <span className="font-semibold text-blue-600">Hasta 40%</span>
                         </div>
                       </div>
                     </CardContent>
@@ -462,7 +462,7 @@ export default function VecinosDashboard() {
                         </div>
                         <div className="text-right">
                           <p className="font-semibold text-blue-600">
-                            ${transaction.amount.toLocaleString('es-CL')}
+                            Comisión variable
                           </p>
                           <Badge className={getStatusColor(transaction.status)}>
                             {transaction.status}
