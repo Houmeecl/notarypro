@@ -51,6 +51,7 @@ import { microInteractionsRouter } from "./micro-interactions-routes";
 import { verifyDocument } from "./services/gamification-service";
 import { ronRouter } from "./ron-routes";
 import { webappRouter } from "./partners/webapp-routes";
+import { mobileApiRouter } from "./partners/mobile-api";
 import { translationRouter } from "./translation-routes";
 import mercadoPagoRouter from "./mercadopago-routes";
 
