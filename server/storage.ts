@@ -1408,34 +1408,15 @@ export class DatabaseStorage implements IStorage {
 
   // User operations
   async getUser(id: number): Promise<User | undefined> {
-    try {
-      const [user] = await db.select({
-        id: users.id,
-        username: users.username,
-        password: users.password,
-        email: users.email,
-        fullName: users.fullName,
-        role: users.role,
-        // Omitiendo campos nuevos que aún no existen en la base de datos
-        // businessName: users.businessName,
-        // address: users.address,
-        // region: users.region,
-        // comuna: users.comuna
-      }).from(users).where(eq(users.id, id));
-      return user || undefined;
-    } catch (error) {
-      console.error("Error getting user by ID:", error);
-      // Intentar otra vez con menos campos si falló
-      const [user] = await db.select({
-        id: users.id,
-        username: users.username,
-        password: users.password,
-        email: users.email,
-        fullName: users.fullName,
-        role: users.role
-      }).from(users).where(eq(users.id, id));
-      return user || undefined;
-    }
+    const [user] = await db.select({
+      id: users.id,
+      username: users.username,
+      password: users.password,
+      email: users.email,
+      fullName: users.fullName,
+      role: users.role
+    }).from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
@@ -1451,7 +1432,14 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
+    const [user] = await db.select({
+      id: users.id,
+      username: users.username,
+      password: users.password,
+      email: users.email,
+      fullName: users.fullName,
+      role: users.role
+    }).from(users).where(eq(users.email, email));
     return user || undefined;
   }
 
@@ -1464,7 +1452,14 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getUsersByRole(role: string): Promise<User[]> {
-    return await db.select().from(users).where(eq(users.role, role));
+    return await db.select({
+      id: users.id,
+      username: users.username,
+      password: users.password,
+      email: users.email,
+      fullName: users.fullName,
+      role: users.role
+    }).from(users).where(eq(users.role, role));
   }
   
   async updateUser(id: number, userData: Partial<User>): Promise<User> {
