@@ -9,8 +9,8 @@ const DescargarApk = () => {
   const descargarArchivo = () => {
     try {
       const link = document.createElement('a');
-      link.href = "/downloads/vecinos-pos-app.apk";
-      link.download = "vecinos-pos-app.apk";
+      link.href = "/downloads/vecinos-notarypro-pos.apk";
+      link.download = "vecinos-notarypro-pos.apk";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

@@ -291,7 +291,7 @@ const SdkDemo = () => {
                     onClick={() => window.location.href = "/partners/descargar-apk"}
                   >
                     <Download className="mr-2 h-4 w-4" />
-                    Descargar APK
+                    Descargar APK Vecinos v1.2.0
                   </Button>
                 </CardContent>
               </Card>
