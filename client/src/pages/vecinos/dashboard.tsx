@@ -402,22 +402,40 @@ export default function VecinosDashboard() {
             ) : (
               <Card>
                 <CardHeader>
-                  <CardTitle>No hay documentos</CardTitle>
+                  <CardTitle>Aplicación fácil de usar</CardTitle>
                   <CardDescription>
-                    No se encontraron documentos con los criterios de búsqueda actuales.
+                    Nuestra aplicación para socios está diseñada para ser extremadamente intuitiva.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-center text-gray-500">
-                    Intenta con una búsqueda diferente o procesa un nuevo documento.
-                  </p>
+                  <div className="space-y-4">
+                    <div className="flex items-start">
+                      <div className="bg-green-100 text-green-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                        1
+                      </div>
+                      <p>Escanear el documento del cliente</p>
+                    </div>
+                    <div className="flex items-start">
+                      <div className="bg-green-100 text-green-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                        2
+                      </div>
+                      <p>Verificar la identidad mediante huella digital o cédula</p>
+                    </div>
+                    <div className="flex items-start">
+                      <div className="bg-green-100 text-green-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                        3
+                      </div>
+                      <p>Enviar a certificación y cobrar el servicio</p>
+                    </div>
+                  </div>
                 </CardContent>
                 <CardFooter className="flex justify-center">
                   <Button 
-                    onClick={() => setLocation("/document-processor")}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    onClick={() => window.open("/partners/webapp-pos", "_blank")}
+                    className="bg-green-600 hover:bg-green-700"
                   >
-                    Procesar nuevo documento
+                    <Monitor className="h-4 w-4 mr-2" />
+                    Iniciar proceso
                   </Button>
                 </CardFooter>
               </Card>
@@ -482,22 +500,42 @@ export default function VecinosDashboard() {
             ) : (
               <Card>
                 <CardHeader>
-                  <CardTitle>No hay transacciones</CardTitle>
+                  <CardTitle>Ingresos Adicionales</CardTitle>
                   <CardDescription>
-                    Aún no se han registrado transacciones en tu cuenta.
+                    Obtén comisiones por cada servicio de certificación
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-center text-gray-500">
-                    Las transacciones aparecerán aquí una vez que proceses documentos.
+                  <p className="font-medium mb-4">
+                    Obtenga comisiones de hasta el 40% por cada servicio de certificación que se realice en su local, aumentando significativamente sus ingresos mensuales.
                   </p>
+                  <div className="bg-green-50 p-4 rounded-md border border-green-100">
+                    <h4 className="font-semibold text-green-800 mb-2 flex items-center">
+                      <span className="text-red-500 mr-1">$</span> Beneficios para tu negocio
+                    </h4>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-start">
+                        <div className="bg-green-100 text-green-800 rounded-full w-5 h-5 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0 text-xs">✓</div>
+                        <span>Incremento de ingresos sin inversión adicional</span>
+                      </li>
+                      <li className="flex items-start">
+                        <div className="bg-green-100 text-green-800 rounded-full w-5 h-5 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0 text-xs">✓</div>
+                        <span>Mayor tráfico de clientes en tu local</span>
+                      </li>
+                      <li className="flex items-start">
+                        <div className="bg-green-100 text-green-800 rounded-full w-5 h-5 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0 text-xs">✓</div>
+                        <span>Fidelización de nuevos clientes por servicios adicionales</span>
+                      </li>
+                    </ul>
+                  </div>
                 </CardContent>
                 <CardFooter className="flex justify-center">
                   <Button 
-                    onClick={() => setLocation("/document-processor")}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    onClick={() => window.open("/partners/webapp-pos", "_blank")}
+                    className="bg-green-600 hover:bg-green-700"
                   >
-                    Procesar nuevo documento
+                    <Monitor className="h-4 w-4 mr-2" />
+                    Comenzar ahora
                   </Button>
                 </CardFooter>
               </Card>
