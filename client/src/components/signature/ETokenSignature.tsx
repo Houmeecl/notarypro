@@ -229,10 +229,10 @@ export function ETokenSignature({
         {/* Paso 2: Detectar dispositivos */}
         {step === 'device' && (
           <div className="space-y-4">
-            <Alert className="border-green-200 bg-green-50">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <AlertTitle className="text-green-800">Extensión detectada</AlertTitle>
-              <AlertDescription className="text-green-700">
+            <Alert className="border-slate-200 bg-slate-50">
+              <CheckCircle2 className="h-4 w-4 text-slate-600" />
+              <AlertTitle className="text-slate-800">Extensión detectada</AlertTitle>
+              <AlertDescription className="text-slate-700">
                 La extensión para firmas digitales está disponible. Conecte su dispositivo criptográfico si aún no lo ha hecho.
               </AlertDescription>
             </Alert>
@@ -269,10 +269,10 @@ export function ETokenSignature({
         {/* Paso 3: Seleccionar certificado */}
         {step === 'certificate' && (
           <div className="space-y-4">
-            <Alert className="border-green-200 bg-green-50">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <AlertTitle className="text-green-800">Dispositivo detectado</AlertTitle>
-              <AlertDescription className="text-green-700">
+            <Alert className="border-slate-200 bg-slate-50">
+              <CheckCircle2 className="h-4 w-4 text-slate-600" />
+              <AlertTitle className="text-slate-800">Dispositivo detectado</AlertTitle>
+              <AlertDescription className="text-slate-700">
                 {selectedDevice}
               </AlertDescription>
             </Alert>
@@ -323,10 +323,10 @@ export function ETokenSignature({
         {/* Paso 4: Ingresar PIN */}
         {step === 'pin' && (
           <div className="space-y-4">
-            <Alert className="border-green-200 bg-green-50">
-              <ShieldCheck className="h-4 w-4 text-green-600" />
-              <AlertTitle className="text-green-800">Certificado seleccionado</AlertTitle>
-              <AlertDescription className="text-green-700">
+            <Alert className="border-slate-200 bg-slate-50">
+              <ShieldCheck className="h-4 w-4 text-slate-600" />
+              <AlertTitle className="text-slate-800">Certificado seleccionado</AlertTitle>
+              <AlertDescription className="text-slate-700">
                 {certificates.find(c => c.serialNumber === selectedCertificate)?.subject}
               </AlertDescription>
             </Alert>
@@ -334,7 +334,7 @@ export function ETokenSignature({
             <div className="space-y-3">
               <Label htmlFor="token-pin">
                 <div className="flex items-center gap-1.5">
-                  <Key className="h-3.5 w-3.5 text-gray-700" />
+                  <Key className="h-3.5 w-3.5 text-slate-700" />
                   <span>PIN de acceso</span>
                 </div>
               </Label>

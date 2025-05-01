@@ -160,7 +160,7 @@ export function SignatureOptions({
         
         {/* Firma Simple */}
         <TabsContent value="simple">
-          <Card>
+          <Card className="border-slate-200 shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Pen className="h-5 w-5 text-slate-600 mr-2" />
@@ -220,7 +220,7 @@ export function SignatureOptions({
 
         {/* Firma Avanzada */}
         <TabsContent value="advanced">
-          <Card>
+          <Card className="border-slate-200 shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <ShieldCheck className="h-5 w-5 text-slate-600 mr-2" />
@@ -257,7 +257,7 @@ export function SignatureOptions({
 
         {/* Firma con eToken */}
         <TabsContent value="etoken">
-          <Card>
+          <Card className="border-slate-200 shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Fingerprint className="h-5 w-5 text-slate-600 mr-2" />
