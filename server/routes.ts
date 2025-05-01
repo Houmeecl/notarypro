@@ -114,6 +114,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // setup authentication routes
   setupAuth(app);
   
+  // Ruta directa para descargar la APK
+  app.get('/descargar-apk-vecinos', (req, res) => {
+    const filePath = path.join(process.cwd(), 'public', 'downloads', 'vecinos-notarypro-pos.apk');
+    if (fs.existsSync(filePath)) {
+      res.download(filePath, 'vecinos_notarypro_pos_v1.2.0.apk');
+    } else {
+      res.status(404).send('APK no encontrada');
+    }
+  });
+  
   // Registrar rutas de administración
   app.use('/api/admin', adminRouter);
   
