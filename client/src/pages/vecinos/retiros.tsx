@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
@@ -7,8 +8,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { 
   ArrowLeft, ChevronDown, ChevronRight, 
-  CreditCard, AlertCircle, Bank, CheckCircle, 
-  Calendar, DollarSign, Clock, MoreHorizontal, Download
+  CreditCard, AlertCircle, CheckCircle, 
+  Calendar, DollarSign, Clock, MoreHorizontal, Download,
+  Building as Bank
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -678,6 +680,7 @@ export default function VecinosRetiros() {
 }
 
 // Componentes provisionales mientras arreglamos las importaciones
+
 function Accordion({ children, type, collapsible, className }: { children: React.ReactNode, type?: string, collapsible?: boolean, className?: string }) {
   return <div className={className}>{children}</div>;
 }

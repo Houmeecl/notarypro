@@ -7,7 +7,8 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { 
   Store, User, MapPin, Phone, Mail, 
-  CreditCard, CheckCircle2, ChevronRight, ArrowLeft
+  CreditCard, CheckCircle2, ChevronRight, ArrowLeft,
+  Download
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
