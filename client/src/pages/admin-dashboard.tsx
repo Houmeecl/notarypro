@@ -319,7 +319,7 @@ export default function AdminDashboard() {
                   </Badge>
                 </div>
                 <p className="text-gray-500 mt-1">
-                  Bienvenido, {user?.fullName}. Administra todos los aspectos de la plataforma.
+                  Bienvenido{user?.fullName ? `, ${user.fullName}` : ''}. Administra todos los aspectos de la plataforma.
                 </p>
               </div>
               <div className="flex gap-2">

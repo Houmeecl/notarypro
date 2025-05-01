@@ -183,7 +183,7 @@ export default function UserDashboard() {
                   </Badge>
                 </div>
                 <p className="text-gray-500 mt-1">
-                  Bienvenido, {user?.fullName}. Gestiona tus documentos y firma electrónicamente.
+                  Bienvenido{user?.fullName ? `, ${user.fullName}` : ''}. Gestiona tus documentos y firma electrónicamente.
                 </p>
               </div>
               <div className="flex gap-2">
