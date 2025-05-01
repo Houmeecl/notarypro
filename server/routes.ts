@@ -1117,9 +1117,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Para firmas avanzadas, el documento debe estar validado (a menos que sea administrador)
+      // Verificar el tipo de firma (simple, advanced, advanced_token)
       const isAdvancedSignature = req.body.type === "advanced";
-      if (isAdvancedSignature && document.status !== "validated" && !isAdmin) {
+      const isTokenSignature = req.body.type === "advanced_token";
+      
+      // Para firmas avanzadas o con token, el documento debe estar validado (a menos que sea administrador)
+      if ((isAdvancedSignature || isTokenSignature) && document.status !== "validated" && !isAdmin) {
         return res.status(400).json({ message: "Document must be validated for advanced signatures" });
       }
       
@@ -1169,13 +1172,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Determinar el tipo de firma para guardar en el documento
+      let signatureType = "simple";
+      if (isAdvancedSignature) {
+        signatureType = "advanced";
+      } else if (isTokenSignature) {
+        signatureType = "advanced_token";
+      }
+      
       // Actualizar el documento con el código de verificación, datos de firma y ruta del PDF
       const updatedDocument = await storage.updateDocument(documentId, {
         signatureData,
         status: "signed",
         qrCode: verificationCode,
         signatureTimestamp: new Date(),
-        signatureType: isAdvancedSignature ? "advanced" : "simple",
+        signatureType,
         pdfPath: pdfPath || null
       });
       
@@ -1187,7 +1198,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           documentId: documentId,
           metadata: {
             documentTitle: document.title,
-            signatureType: isAdvancedSignature ? "advanced" : "simple",
+            signatureType, // Usamos la variable que ya contiene el tipo correcto
             verificationCode,
             hasPDF: !!pdfPath
           }
