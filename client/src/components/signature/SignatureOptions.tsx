@@ -171,30 +171,30 @@ export function SignatureOptions({
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+              <div className="bg-slate-50 border border-slate-200 shadow-sm rounded-lg p-6">
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-gray-100 rounded-full">
-                    <Pen className="h-6 w-6 text-gray-600" />
+                  <div className="p-3 bg-slate-100 rounded-full">
+                    <Pen className="h-6 w-6 text-slate-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Firma Electrónica Simple</h3>
-                    <p className="text-gray-700 mb-4">
+                    <h3 className="text-lg font-medium text-slate-900 mb-2">Firma Electrónica Simple</h3>
+                    <p className="text-slate-700 mb-4">
                       Este tipo de firma otorga validez legal a su documento según la Ley 19.799, pero con un
                       nivel de seguridad estándar.
                     </p>
                     
                     <div className="mb-4">
-                      <ul className="space-y-2 text-gray-700">
+                      <ul className="space-y-2 text-slate-700">
                         <li className="flex items-center">
-                          <ShieldCheck className="h-5 w-5 text-gray-500 mr-2" />
+                          <ShieldCheck className="h-5 w-5 text-slate-500 mr-2" />
                           <span className="text-sm">Firma digital con validez legal según Ley 19.799</span>
                         </li>
                         <li className="flex items-center">
-                          <Pen className="h-5 w-5 text-gray-500 mr-2" />
+                          <Pen className="h-5 w-5 text-slate-500 mr-2" />
                           <span className="text-sm">Proceso simple y rápido para documentos privados</span>
                         </li>
                         <li className="flex items-center">
-                          <svg className="h-5 w-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <svg className="h-5 w-5 text-slate-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <circle cx="12" cy="12" r="10" />
                             <polyline points="12 6 12 12 16 14" />
                           </svg>
@@ -206,7 +206,7 @@ export function SignatureOptions({
                     <Button 
                       onClick={handleSignWithSimple} 
                       disabled={isLoading}
-                      className="bg-gray-800 hover:bg-gray-700 text-white"
+                      className="bg-slate-900 hover:bg-slate-800 text-white"
                     >
                       <Pen className="mr-2 h-4 w-4" />
                       Firmar documento
@@ -223,7 +223,7 @@ export function SignatureOptions({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <ShieldCheck className="h-5 w-5 text-gray-600 mr-2" />
+                <ShieldCheck className="h-5 w-5 text-slate-600 mr-2" />
                 Firma Electrónica Avanzada
               </CardTitle>
               <CardDescription>
@@ -231,20 +231,20 @@ export function SignatureOptions({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+              <div className="bg-slate-50 border border-slate-200 shadow-sm rounded-lg p-6">
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-gray-100 rounded-full">
-                    <ShieldCheck className="h-6 w-6 text-gray-600" />
+                  <div className="p-3 bg-slate-100 rounded-full">
+                    <ShieldCheck className="h-6 w-6 text-slate-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Servicio Premium</h3>
-                    <p className="text-gray-700 mb-4">
+                    <h3 className="text-lg font-medium text-slate-900 mb-2">Servicio Premium</h3>
+                    <p className="text-slate-700 mb-4">
                       La firma electrónica avanzada está disponible para usuarios con plan premium.
                       Actualice para tener acceso a esta funcionalidad y otras ventajas exclusivas.
                     </p>
                     <Button 
                       onClick={handleSignWithAdvanced}
-                      className="bg-gray-800 hover:bg-gray-700 text-white"
+                      className="bg-slate-900 hover:bg-slate-800 text-white"
                     >
                       Actualizar a Plan Premium
                     </Button>
@@ -299,7 +299,7 @@ export function SignatureOptions({
                     
                     <Button 
                       onClick={handleSignWithEToken} 
-                      className="bg-gray-800 hover:bg-gray-700 text-white"
+                      className="bg-slate-900 hover:bg-slate-800 text-white"
                     >
                       <Fingerprint className="mr-2 h-4 w-4" />
                       Firmar documento
