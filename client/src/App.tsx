@@ -161,6 +161,28 @@ function Router() {
       <Route path="/service-selection" component={ServiceSelectionPage} />
       <Route path="/quienes-somos" component={QuienesSomosPage} />
       
+      {/* Vecinos Xpress Pages */}
+      <Route path="/vecinos" component={() => {
+        const VecinosIndex = require("@/pages/vecinos/index").default;
+        return <VecinosIndex />;
+      }} />
+      <Route path="/vecinos/login" component={() => {
+        const VecinosLogin = require("@/pages/vecinos/login").default;
+        return <VecinosLogin />;
+      }} />
+      <Route path="/vecinos/registro" component={() => {
+        const VecinosRegistro = require("@/pages/vecinos/registro").default;
+        return <VecinosRegistro />;
+      }} />
+      <Route path="/vecinos/pos-app" component={() => {
+        const VecinosPosApp = require("@/pages/vecinos/pos-app").default;
+        return <VecinosPosApp />;
+      }} />
+      <Route path="/vecinos/dashboard" component={() => {
+        const VecinosDashboard = require("@/pages/vecinos/dashboard").default;
+        return <VecinosDashboard />;
+      }} />
+
       {/* Partner pages */}
       <Route path="/partners/public-page" component={PartnersPublicPage} />
       <Route path="/partners/registration-form" component={PartnerRegistrationForm} />
