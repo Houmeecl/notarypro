@@ -163,7 +163,7 @@ export function SignatureOptions({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Pen className="h-5 w-5 text-primary mr-2" />
+                <Pen className="h-5 w-5 text-gray-600 mr-2" />
                 Firma Electrónica Simple
               </CardTitle>
               <CardDescription>
@@ -183,29 +183,20 @@ export function SignatureOptions({
                       nivel de seguridad estándar.
                     </p>
                     
-                    <div className="space-y-2 mb-4">
+                    <div className="space-y-1 mb-4">
                       <div className="flex items-start">
-                        <div className="bg-gray-100 p-1 rounded-full mr-2 mt-0.5">
-                          <div className="w-2 h-2 bg-primary rounded-full" />
-                        </div>
-                        <span className="text-sm text-gray-700">
+                        <span className="text-sm text-gray-700 border-l-2 border-gray-300 pl-2">
                           Validez legal para documentos privados
                         </span>
                       </div>
                       <div className="flex items-start">
-                        <div className="bg-gray-100 p-1 rounded-full mr-2 mt-0.5">
-                          <div className="w-2 h-2 bg-primary rounded-full" />
-                        </div>
-                        <span className="text-sm text-gray-700">
+                        <span className="text-sm text-gray-700 border-l-2 border-gray-300 pl-2">
                           Incluye estampado de tiempo y código de verificación
                         </span>
                       </div>
                       <div className="flex items-start">
-                        <div className="bg-gray-100 p-1 rounded-full mr-2 mt-0.5">
-                          <div className="w-2 h-2 bg-primary rounded-full" />
-                        </div>
-                        <span className="text-sm text-gray-700">
-                          Proceso rápido e instantáneo
+                        <span className="text-sm text-gray-700 border-l-2 border-gray-300 pl-2">
+                          Proceso seguro y eficiente
                         </span>
                       </div>
                     </div>
@@ -213,10 +204,10 @@ export function SignatureOptions({
                     <Button 
                       onClick={handleSignWithSimple} 
                       disabled={isLoading}
-                      className="bg-primary hover:bg-primary/90"
+                      className="bg-gray-800 hover:bg-gray-700 text-white"
                     >
                       <Pen className="mr-2 h-4 w-4" />
-                      Firmar con firma simple
+                      Firmar documento
                     </Button>
                   </div>
                 </div>
@@ -230,7 +221,7 @@ export function SignatureOptions({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <ShieldCheck className="h-5 w-5 text-primary mr-2" />
+                <ShieldCheck className="h-5 w-5 text-gray-600 mr-2" />
                 Firma Electrónica Avanzada
               </CardTitle>
               <CardDescription>
@@ -246,9 +237,8 @@ export function SignatureOptions({
                   La firma avanzada está disponible para usuarios con plan premium.
                 </p>
                 <Button 
-                  variant="outline"
                   onClick={handleSignWithAdvanced}
-                  className="border-primary text-primary hover:bg-primary/5"
+                  className="bg-gray-800 hover:bg-gray-700 text-white"
                 >
                   Actualizar a Plan Premium
                 </Button>
@@ -262,7 +252,7 @@ export function SignatureOptions({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Fingerprint className="h-5 w-5 text-primary mr-2" />
+                <Fingerprint className="h-5 w-5 text-gray-600 mr-2" />
                 Firma Electrónica Avanzada con Token
               </CardTitle>
               <CardDescription>
@@ -282,39 +272,30 @@ export function SignatureOptions({
                       con la máxima validez legal de acuerdo a la Ley 19.799 de Chile.
                     </p>
                     
-                    <div className="space-y-2 mb-4">
+                    <div className="space-y-1 mb-4">
                       <div className="flex items-start">
-                        <div className="bg-gray-100 p-1 rounded-full mr-2 mt-0.5">
-                          <div className="w-2 h-2 bg-primary rounded-full" />
-                        </div>
-                        <span className="text-sm text-gray-700">
+                        <span className="text-sm text-gray-700 border-l-2 border-gray-300 pl-2">
                           Máxima validez legal y probatoria
                         </span>
                       </div>
                       <div className="flex items-start">
-                        <div className="bg-gray-100 p-1 rounded-full mr-2 mt-0.5">
-                          <div className="w-2 h-2 bg-primary rounded-full" />
-                        </div>
-                        <span className="text-sm text-gray-700">
+                        <span className="text-sm text-gray-700 border-l-2 border-gray-300 pl-2">
                           Utiliza su certificado digital personal
                         </span>
                       </div>
                       <div className="flex items-start">
-                        <div className="bg-gray-100 p-1 rounded-full mr-2 mt-0.5">
-                          <div className="w-2 h-2 bg-primary rounded-full" />
-                        </div>
-                        <span className="text-sm text-gray-700">
-                          Requiere su dispositivo token conectado a la computadora
+                        <span className="text-sm text-gray-700 border-l-2 border-gray-300 pl-2">
+                          Requiere su dispositivo token conectado
                         </span>
                       </div>
                     </div>
                     
                     <Button 
                       onClick={handleSignWithEToken} 
-                      className="bg-primary hover:bg-primary/90"
+                      className="bg-gray-800 hover:bg-gray-700 text-white"
                     >
                       <Fingerprint className="mr-2 h-4 w-4" />
-                      Firmar con eToken
+                      Firmar documento
                     </Button>
                   </div>
                 </div>
