@@ -16,6 +16,7 @@ import {
   videoCallSessions, type VideoCallSession, type InsertVideoCallSession,
   analyticsEvents, type AnalyticsEvent, type InsertAnalyticsEvent,
   partners, type Partner, type InsertPartner,
+  partnerStores, type PartnerStore,
   partnerBankDetails, type PartnerBankDetails, type InsertPartnerBankDetails,
   partnerSales, type PartnerSale, type InsertPartnerSale,
   partnerPayments, type PartnerPayment, type InsertPartnerPayment
