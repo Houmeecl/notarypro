@@ -8,6 +8,7 @@ import Contact from "@/components/landing/Contact";
 import CTA from "@/components/landing/CTA";
 import Footer from "@/components/landing/Footer";
 import RonService from "@/components/landing/RonService";
+import ApkDownload from "@/components/landing/ApkDownload";
 
 export default function LandingPage() {
   return (
@@ -17,6 +18,7 @@ export default function LandingPage() {
       <RonService />
       <Services />
       <HowItWorks />
+      <ApkDownload />
       <Pricing />
       <FAQ />
       <Contact />
