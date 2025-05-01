@@ -423,7 +423,7 @@ export function ETokenSignature({
           <Button 
             onClick={handleSignWithPin} 
             disabled={!pin || isLoading || pin.length < 4}
-            className="bg-slate-900 hover:bg-slate-800 text-white"
+            className="bg-zinc-800 hover:bg-zinc-700 text-white"
           >
             <ShieldCheck className="mr-2 h-4 w-4" />
             Firmar documento
