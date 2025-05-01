@@ -298,7 +298,7 @@ export function ETokenSignature({
                   </Select>
                   
                   {selectedCertificate && (
-                    <div className="text-xs space-y-1 mt-2 bg-slate-50 p-2 rounded-md border border-slate-200">
+                    <div className="text-xs space-y-1 mt-2 bg-zinc-50 p-2 rounded-md border border-zinc-200">
                       {certificates
                         .filter(cert => cert.serialNumber === selectedCertificate)
                         .map((cert, index) => (
@@ -312,7 +312,7 @@ export function ETokenSignature({
                   )}
                 </div>
               ) : (
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-zinc-600">
                   No se encontraron certificados en el dispositivo.
                 </p>
               )}
@@ -323,10 +323,10 @@ export function ETokenSignature({
         {/* Paso 4: Ingresar PIN */}
         {step === 'pin' && (
           <div className="space-y-4">
-            <Alert className="border-slate-200 bg-slate-50">
-              <ShieldCheck className="h-4 w-4 text-slate-600" />
-              <AlertTitle className="text-slate-800">Certificado seleccionado</AlertTitle>
-              <AlertDescription className="text-slate-700">
+            <Alert className="border-zinc-200 bg-zinc-50">
+              <ShieldCheck className="h-4 w-4 text-zinc-600" />
+              <AlertTitle className="text-zinc-800">Certificado seleccionado</AlertTitle>
+              <AlertDescription className="text-zinc-700">
                 {certificates.find(c => c.serialNumber === selectedCertificate)?.subject}
               </AlertDescription>
             </Alert>
@@ -334,7 +334,7 @@ export function ETokenSignature({
             <div className="space-y-3">
               <Label htmlFor="token-pin">
                 <div className="flex items-center gap-1.5">
-                  <Key className="h-3.5 w-3.5 text-slate-700" />
+                  <Key className="h-3.5 w-3.5 text-zinc-700" />
                   <span>PIN de acceso</span>
                 </div>
               </Label>
@@ -346,7 +346,7 @@ export function ETokenSignature({
                 onChange={(e) => setPin(e.target.value)}
                 className="font-mono tracking-widest"
               />
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-zinc-500">
                 El PIN no se almacena en nuestros servidores y solo se utiliza para
                 autorizar la operación de firma en su dispositivo.
               </p>
@@ -357,11 +357,11 @@ export function ETokenSignature({
         {/* Paso 5: Procesando firma */}
         {step === 'process' && (
           <div className="py-6 text-center">
-            <div className="w-16 h-16 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-4">
-              <Loader2 className="h-8 w-8 text-slate-700 animate-spin" />
+            <div className="w-16 h-16 mx-auto bg-zinc-100 rounded-full flex items-center justify-center mb-4">
+              <Loader2 className="h-8 w-8 text-zinc-700 animate-spin" />
             </div>
-            <h3 className="text-lg font-medium text-slate-900 mb-2">Firmando documento</h3>
-            <p className="text-slate-600 mb-4">
+            <h3 className="text-lg font-medium text-zinc-900 mb-2">Firmando documento</h3>
+            <p className="text-zinc-600 mb-4">
               El documento está siendo firmado con su certificado digital.
               Por favor, no desconecte su dispositivo.
             </p>
@@ -381,7 +381,7 @@ export function ETokenSignature({
           <Button 
             onClick={checkExtension} 
             disabled={isLoading}
-            className="bg-slate-900 hover:bg-slate-800 text-white"
+            className="bg-zinc-800 hover:bg-zinc-700 text-white"
           >
             {isLoading ? (
               <>
@@ -401,7 +401,7 @@ export function ETokenSignature({
           <Button 
             onClick={detectDevices}
             disabled={isLoading}
-            className="bg-slate-900 hover:bg-slate-800 text-white"
+            className="bg-zinc-800 hover:bg-zinc-700 text-white"
           >
             <Fingerprint className="mr-2 h-4 w-4" />
             Detectar dispositivos
@@ -412,7 +412,7 @@ export function ETokenSignature({
           <Button 
             onClick={loadCertificates}
             disabled={isLoading}
-            className="bg-slate-900 hover:bg-slate-800 text-white"
+            className="bg-zinc-800 hover:bg-zinc-700 text-white"
           >
             <ShieldCheck className="mr-2 h-4 w-4" />
             Cargar certificados
