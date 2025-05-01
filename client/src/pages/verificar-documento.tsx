@@ -229,7 +229,20 @@ export default function VerificarDocumento() {
                           </AlertDescription>
                         </Alert>
 
-                        <div className="bg-gray-50 p-5 rounded-md border">
+                        <div className="bg-gray-50 p-5 rounded-md border relative overflow-hidden">
+                          <div className="absolute -right-8 -top-8 opacity-5 transform rotate-12">
+                            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" 
+                                stroke="#000000" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </div>
+
+                          <div className="absolute bottom-3 right-3">
+                            <div className="text-xs text-gray-400 font-semibold tracking-wider transform -rotate-6">
+                              VERIFICADO
+                            </div>
+                          </div>
+
                           <h3 className="font-medium mb-4 text-gray-800 text-base">Información del Documento</h3>
                           <ul className="space-y-3">
                             <li className="flex items-start border-b border-gray-100 pb-2">
@@ -240,12 +253,19 @@ export default function VerificarDocumento() {
                               <span className="font-medium w-32 text-gray-700">Firmado por:</span>
                               <span className="flex-1 text-gray-900">{result.documentInfo?.signerName}</span>
                             </li>
-                            <li className="flex items-start">
+                            <li className="flex items-start border-b border-gray-100 pb-2">
                               <span className="font-medium w-32 text-gray-700">Fecha de firma:</span>
                               <span className="flex-1 text-gray-900">
                                 {result.documentInfo?.signatureTimestamp 
                                   ? formatDate(result.documentInfo.signatureTimestamp)
                                   : "No disponible"}
+                              </span>
+                            </li>
+                            <li className="flex items-start">
+                              <span className="font-medium w-32 text-gray-700">Estado:</span>
+                              <span className="flex-1 text-green-600 font-medium flex items-center">
+                                <CheckCircle className="h-4 w-4 mr-1" />
+                                Verificado y válido
                               </span>
                             </li>
                           </ul>
@@ -264,11 +284,15 @@ export default function VerificarDocumento() {
                               target="_blank" 
                               rel="noopener noreferrer"
                             >
-                              <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-100">
+                              <Button 
+                                className="bg-blue-600 hover:bg-blue-700 text-white relative overflow-hidden group"
+                                size="sm"
+                              >
+                                <div className="absolute inset-0 w-3 bg-blue-700 transform -skew-x-[20deg] -translate-x-full group-hover:animate-shine" />
                                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                Descargar PDF
+                                Descargar PDF Firmado
                               </Button>
                             </a>
                           )}
