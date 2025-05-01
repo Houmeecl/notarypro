@@ -150,8 +150,9 @@ export function DocumentETokenSignature({
             </p>
             <Button 
               onClick={handleDownloadPdf}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-green-600 hover:bg-green-700 relative overflow-hidden group"
             >
+              <div className="absolute inset-0 w-3 bg-green-700 transform -skew-x-[20deg] -translate-x-full group-hover:animate-shine" />
               <Download className="mr-2 h-4 w-4" />
               Descargar documento firmado
             </Button>

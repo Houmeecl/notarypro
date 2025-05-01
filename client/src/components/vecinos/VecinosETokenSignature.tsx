@@ -166,8 +166,18 @@ export function VecinosETokenSignature({
             </h3>
             
             {error && (
-              <div className="text-red-500 mb-4">
-                {error}
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 mb-4">
+                <div className="flex items-start">
+                  <AlertCircle className="h-5 w-5 text-red-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium">{error}</p>
+                    <ul className="list-disc list-inside text-sm mt-2 text-red-700 space-y-1">
+                      <li>Verifique que su dispositivo esté correctamente conectado</li>
+                      <li>Asegúrese de que los drivers del eToken estén instalados</li>
+                      <li>Confirme que la extensión del navegador esté activa</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             )}
             
@@ -217,16 +227,30 @@ export function VecinosETokenSignature({
 
             <div>
               <Label htmlFor="pin">PIN de acceso</Label>
-              <Input 
-                id="pin" 
-                type="password" 
-                value={pin} 
-                onChange={(e) => setPin(e.target.value)}
-                placeholder="Ingrese su PIN"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                PIN para desbloquear su eToken y realizar la firma
-              </p>
+              <div className="relative">
+                <Input 
+                  id="pin" 
+                  type="password" 
+                  value={pin} 
+                  onChange={(e) => setPin(e.target.value)}
+                  placeholder="Ingrese su PIN"
+                  className={pin && pin.length < 4 ? "border-red-300 pr-10" : ""}
+                />
+                {pin && pin.length < 4 && (
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <AlertCircle className="h-4 w-4 text-red-500" />
+                  </div>
+                )}
+              </div>
+              {pin && pin.length < 4 ? (
+                <p className="text-xs text-red-500 mt-1">
+                  El PIN debe tener al menos 4 caracteres
+                </p>
+              ) : (
+                <p className="text-xs text-gray-500 mt-1">
+                  PIN para desbloquear su eToken y realizar la firma
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -242,12 +266,44 @@ export function VecinosETokenSignature({
         )}
 
         {step === 'complete' && (
-          <div className="text-center py-6">
-            <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-green-600" />
-            <h3 className="text-lg font-medium mb-2">¡Firma completada!</h3>
-            <p className="text-gray-600">
-              El documento ha sido firmado exitosamente con su certificado digital.
-            </p>
+          <div className="py-6">
+            <div className="text-center mb-6">
+              <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-green-600" />
+              <h3 className="text-lg font-medium mb-2">¡Firma completada!</h3>
+              <p className="text-gray-600 mb-4">
+                El documento ha sido firmado exitosamente con su certificado digital.
+              </p>
+            </div>
+            
+            <div className="bg-green-50 border border-green-100 rounded-lg p-4">
+              <h4 className="font-medium text-green-800 mb-2">Detalles de la firma</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-start">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 mr-2 flex-shrink-0" />
+                  <span className="text-green-700">
+                    Certificado: {selectedCertificate ? selectedCertificate.substring(0, 8) + '...' : ''}
+                  </span>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 mr-2 flex-shrink-0" />
+                  <span className="text-green-700">
+                    Fecha: {new Date().toLocaleString('es-CL')}
+                  </span>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 mr-2 flex-shrink-0" />
+                  <span className="text-green-700">
+                    Autoridad: {selectedProvider}
+                  </span>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 mr-2 flex-shrink-0" />
+                  <span className="text-green-700">
+                    Documento ID: {documentId}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </CardContent>
