@@ -55,6 +55,7 @@ import DescargarApk from "@/pages/partners/descargar-apk";
 import ConfirmacionDescarga from "@/pages/partners/confirmacion-descarga";
 import WebAppPOSAlternativa from "@/pages/partners/webapp-pos-alternativa";
 import WebAppPOSButtons from "@/pages/partners/webapp-pos-buttons";
+import PaymentDemo from "@/pages/payment-demo";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -329,6 +330,32 @@ function Router() {
       
       {/* Integraciones Demo */}
       <Route path="/integraciones-demo" component={IntegracionesDemo} />
+      
+      {/* Demostración de Pagos con MercadoPago */}
+      <Route path="/payment-demo" component={PaymentDemo} />
+      
+      {/* Páginas de retorno para MercadoPago */}
+      <Route path="/payment-success" component={() => {
+        // Redireccionar a la página de demo con parámetros
+        window.location.replace("/payment-demo" + window.location.search);
+        return <div className="min-h-screen flex items-center justify-center">
+          <p className="text-xl">Redireccionando...</p>
+        </div>;
+      }} />
+      <Route path="/payment-failure" component={() => {
+        // Redireccionar a la página de demo con parámetros
+        window.location.replace("/payment-demo" + window.location.search);
+        return <div className="min-h-screen flex items-center justify-center">
+          <p className="text-xl">Redireccionando...</p>
+        </div>;
+      }} />
+      <Route path="/payment-pending" component={() => {
+        // Redireccionar a la página de demo con parámetros
+        window.location.replace("/payment-demo" + window.location.search);
+        return <div className="min-h-screen flex items-center justify-center">
+          <p className="text-xl">Redireccionando...</p>
+        </div>;
+      }} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
