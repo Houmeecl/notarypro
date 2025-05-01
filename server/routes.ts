@@ -34,7 +34,14 @@ import {
   insertMessageTemplateSchema,
   insertAutomationRuleSchema
 } from "@shared/schema";
-import { generateVerificationCode, generateQRCodeSVG, generateSignatureData } from "@shared/utils/document-utils";
+import { 
+  generateVerificationCode, 
+  generateQRCodeSVG, 
+  generateSignatureData, 
+  renderDocumentHTML,
+  generateSignatureHTML,
+  generatePDF
+} from "@shared/utils/document-utils";
 import adminRouter from "./admin/admin-routes";
 import integrationRouter from "./admin/integration-routes";
 import { adminPosRouter } from "./admin/admin-pos-routes";
@@ -1093,15 +1100,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Si el usuario está autenticado, verificamos permisos
       let isAdmin = false;
+      let currentUser = null;
       if (req.isAuthenticated()) {
-        const user = req.user as any; // Necesario por los errores de TypeScript
+        currentUser = req.user as any; // Necesario por los errores de TypeScript
         // Solo el propietario puede firmar o el certificador si es un documento certificado
-        if (document.userId !== user.id && document.certifierId !== user.id) {
+        if (document.userId !== currentUser.id && document.certifierId !== currentUser.id) {
           return res.status(403).json({ message: "Forbidden" });
         }
         
         // Los administradores pueden usar firmas avanzadas sin validación previa y sin pago
-        isAdmin = user.role === 'admin';
+        isAdmin = currentUser.role === 'admin';
       } else {
         // Para invitados, verificamos que el documento pertenezca a un invitado (userId = 1)
         if (document.userId !== 1) {
@@ -1110,7 +1118,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Para firmas avanzadas, el documento debe estar validado (a menos que sea administrador)
-      if (req.body.type === "advanced" && document.status !== "validated" && !isAdmin) {
+      const isAdvancedSignature = req.body.type === "advanced";
+      if (isAdvancedSignature && document.status !== "validated" && !isAdmin) {
         return res.status(400).json({ message: "Document must be validated for advanced signatures" });
       }
       
@@ -1125,20 +1134,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Si no hay datos de firma en el request body, generarlos
       if (!signatureData) {
         // Si el usuario está autenticado, usamos su ID, si no, usamos el ID de invitado (1)
-        const userId = req.isAuthenticated() ? (req.user as any).id : 1;
+        const userId = req.isAuthenticated() ? currentUser.id : 1;
         signatureData = generateSignatureData(userId, documentId, verificationCode);
       }
       
-      // Actualizar el documento con el código de verificación y datos de firma
+      // Obtener plantilla del documento si existe
+      let documentHTML = '';
+      let pdfPath = '';
+      
+      if (document.templateId) {
+        const template = await storage.getDocumentTemplate(document.templateId);
+        if (template) {
+          // Renderizar HTML del documento con los datos del formulario
+          documentHTML = renderDocumentHTML(document.formData, template.htmlContent);
+          
+          // Generar HTML de la firma con los datos y el código QR
+          const signatureHTML = generateSignatureHTML(signatureData, verificationCode, qrCodeSvg);
+          
+          // Generar PDF del documento firmado
+          const pdfBuffer = await generatePDF(documentHTML, signatureHTML);
+          
+          // Guardar el PDF en el sistema de archivos
+          // Crear directorio si no existe
+          if (!fs.existsSync(path.join(uploadsDir, 'signed_documents'))) {
+            fs.mkdirSync(path.join(uploadsDir, 'signed_documents'), { recursive: true });
+          }
+          
+          // Generar nombre de archivo único
+          pdfPath = path.join('signed_documents', `doc_${documentId}_${Date.now()}.pdf`);
+          const fullPdfPath = path.join(uploadsDir, pdfPath);
+          
+          // Escribir archivo PDF
+          fs.writeFileSync(fullPdfPath, pdfBuffer);
+        }
+      }
+      
+      // Actualizar el documento con el código de verificación, datos de firma y ruta del PDF
       const updatedDocument = await storage.updateDocument(documentId, {
         signatureData,
         status: "signed",
         qrCode: verificationCode,
-        signatureTimestamp: new Date()
+        signatureTimestamp: new Date(),
+        signatureType: isAdvancedSignature ? "advanced" : "simple",
+        pdfPath: pdfPath || null
       });
       
-      res.status(200).json(updatedDocument);
+      // Registrar evento analítico de firma
+      try {
+        await createAnalyticsEvent({
+          eventType: "document_signed",
+          userId: currentUser ? currentUser.id : 1,
+          documentId: documentId,
+          metadata: {
+            documentTitle: document.title,
+            signatureType: isAdvancedSignature ? "advanced" : "simple",
+            verificationCode,
+            hasPDF: !!pdfPath
+          }
+        });
+      } catch (analyticsError) {
+        console.error("Error registrando evento analítico:", analyticsError);
+      }
+      
+      res.status(200).json({
+        ...updatedDocument,
+        pdfAvailable: !!pdfPath
+      });
     } catch (error) {
+      console.error("Error al firmar documento:", error);
       res.status(500).json({ message: error.message });
     }
   });
@@ -1178,7 +1241,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         documentInfo: {
           title: document.title,
           signatureTimestamp: document.signatureTimestamp,
-          signerName: user?.fullName || "Usuario desconocido"
+          signerName: user?.fullName || "Usuario desconocido",
+          pdfAvailable: !!document.pdfPath,
+          documentId: document.id
         }
       });
     } catch (error) {
@@ -1186,6 +1251,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
         verified: false,
         message: "Error en la verificación. Por favor, intente nuevamente."
       });
+    }
+  });
+  
+  // Descarga de PDF firmado
+  app.get("/api/documents/:id/download-pdf", async (req, res) => {
+    try {
+      const documentId = parseInt(req.params.id);
+      const document = await storage.getDocument(documentId);
+      
+      if (!document) {
+        return res.status(404).json({ message: "Documento no encontrado" });
+      }
+      
+      // Si el documento no tiene PDF asociado
+      if (!document.pdfPath) {
+        return res.status(404).json({ message: "Este documento no tiene un PDF firmado disponible" });
+      }
+      
+      // Para documentos públicos o si el usuario está autenticado y es el propietario/certificador
+      let isAuthorized = false;
+      if (req.isAuthenticated()) {
+        const user = req.user as any;
+        isAuthorized = document.userId === user.id || 
+                       document.certifierId === user.id || 
+                       user.role === 'admin';
+      } else {
+        // Permitir descarga pública solo si el documento tiene un código de verificación
+        isAuthorized = !!document.qrCode;
+      }
+      
+      if (!isAuthorized) {
+        return res.status(403).json({ message: "No tiene permiso para descargar este documento" });
+      }
+      
+      // Ruta completa al archivo PDF
+      const pdfPath = path.join(uploadsDir, document.pdfPath);
+      
+      // Verificar que el archivo exista
+      if (!fs.existsSync(pdfPath)) {
+        return res.status(404).json({ message: "El archivo PDF no se encuentra en el servidor" });
+      }
+      
+      // Generar nombre de archivo para la descarga
+      const fileName = `${document.title.replace(/\s+/g, '_')}_firmado.pdf`;
+      
+      // Configurar los headers para descarga
+      res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+      res.setHeader('Content-Type', 'application/pdf');
+      
+      // Enviar el archivo
+      const fileStream = fs.createReadStream(pdfPath);
+      fileStream.pipe(res);
+      
+      // Registrar evento analítico de descarga
+      try {
+        if (req.isAuthenticated()) {
+          await createAnalyticsEvent({
+            eventType: "document_downloaded",
+            userId: (req.user as any).id,
+            documentId: documentId,
+            metadata: {
+              documentTitle: document.title,
+            }
+          });
+        }
+      } catch (analyticsError) {
+        console.error("Error registrando evento analítico de descarga:", analyticsError);
+      }
+      
+    } catch (error) {
+      console.error("Error al descargar PDF:", error);
+      res.status(500).json({ message: "Error al descargar el documento" });
     }
   });
 

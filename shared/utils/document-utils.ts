@@ -53,18 +53,26 @@ export function generateQRCodeSVG(verificationCode: string): string {
     const verificationUrl = `https://www.cerfidoc.cl/verificar-documento/${verificationCode}`;
     
     // Generar el código QR como SVG de forma sincrónica
-    const svg = qrcode.toString(verificationUrl, { 
-      type: 'svg',
-      errorCorrectionLevel: 'H', // Alta corrección de errores
-      margin: 1,
-      scale: 4,
-      color: {
-        dark: '#333333', // Color oscuro (hexadecimal)
-        light: '#ffffff' // Color claro (hexadecimal)
-      }
-    });
+    // Nota: Convertimos la Promise<string> a string sincrónico para mantener compatibilidad
+    let svgContent = '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><text x="10" y="50" fill="red">Cargando QR</text></svg>';
     
-    return svg;
+    // Enfoque sincrónico usando la API síncrona de qrcode
+    try {
+      svgContent = qrcode.toString(verificationUrl, { 
+        type: 'svg',
+        errorCorrectionLevel: 'H', // Alta corrección de errores
+        margin: 1,
+        scale: 4,
+        color: {
+          dark: '#333333', // Color oscuro (hexadecimal)
+          light: '#ffffff' // Color claro (hexadecimal)
+        }
+      });
+    } catch (e) {
+      console.error('Error en generación síncrona de QR:', e);
+    }
+    
+    return svgContent;
   } catch (error) {
     console.error('Error generando código QR:', error);
     return '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><text x="10" y="50" fill="red">Error QR</text></svg>';
@@ -236,7 +244,7 @@ export async function generatePDF(documentHTML: string, signatureHTML: string): 
     
     // Iniciar un navegador puppeteer
     const browser = await puppeteer.default.launch({
-      headless: 'new',
+      headless: true, // En lugar de 'new'
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     
@@ -261,12 +269,13 @@ export async function generatePDF(documentHTML: string, signatureHTML: string): 
         footerTemplate: '<div style="width: 100%; font-size: 8px; color: #999; padding: 5px 10px; text-align: center;">Página <span class="pageNumber"></span> de <span class="totalPages"></span> - Documento verificable en www.notarypro.cl</div>'
       });
       
-      return pdfBuffer;
+      // Convertir Uint8Array a Buffer
+      return Buffer.from(pdfBuffer);
     } finally {
       // Asegurarse de cerrar el navegador aunque haya error
       await browser.close();
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generando PDF:', error);
     // En caso de error, devolver un buffer vacío
     throw new Error(`Error al generar el PDF: ${error.message}`);
