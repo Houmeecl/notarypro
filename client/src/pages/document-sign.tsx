@@ -7,7 +7,8 @@ import Sidebar from "@/components/dashboard/Sidebar";
 import DocumentUpload from "@/components/dashboard/DocumentUpload";
 import IdentityVerification from "@/components/dashboard/IdentityVerification";
 import DocumentSignatureCanvas from "@/components/dashboard/DocumentSignatureCanvas";
-import DocumentETokenSignature from "@/components/dashboard/DocumentETokenSignature";
+import { DocumentETokenSignature } from "@/components/dashboard/DocumentETokenSignature";
+import { VecinosETokenSignature } from "@/components/vecinos/VecinosETokenSignature";
 import DocumentPayment from "@/components/dashboard/DocumentPayment";
 import DocumentHistory from "@/components/dashboard/DocumentHistory";
 import { Button } from "@/components/ui/button";
@@ -300,10 +301,27 @@ export default function DocumentSign() {
 
                         {/* Firma con eToken */}
                         <TabsContent value="etoken">
-                          <DocumentETokenSignature 
-                            document={document}
-                            onSignatureComplete={handleSignatureComplete}
-                          />
+                          {/* Determinar si estamos en contexto Vecinos o NotaryPro */}
+                          {location.includes('/vecinos') ? (
+                            // Contexto de Vecinos Xpress
+                            <VecinosETokenSignature 
+                              documentId={document.id.toString()}
+                              documentHash={document.id.toString()} // Usamos el ID como hash temporal
+                              onSigningComplete={(signatureData) => {
+                                // Procesar y guardar la firma
+                                // En un caso real, aquí se enviaría al backend
+                                console.log("Documento firmado en Vecinos:", signatureData);
+                                handleSignatureComplete();
+                              }}
+                              onCancel={() => setActiveTab("upload")}
+                            />
+                          ) : (
+                            // Contexto regular de NotaryPro
+                            <DocumentETokenSignature 
+                              document={document}
+                              onSignatureComplete={handleSignatureComplete}
+                            />
+                          )}
                         </TabsContent>
                       </Tabs>
                     </div>

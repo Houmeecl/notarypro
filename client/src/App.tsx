@@ -13,7 +13,7 @@ import { MicroInteractionProvider } from "@/hooks/use-micro-interactions";
 import { MicroInteractionDisplay } from "@/components/micro-interactions/MicroInteractionDisplay";
 import { ProtectedRoute } from "./lib/protected-route";
 import { webSocketService } from "./lib/websocket";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { WebSocketDebugger } from "@/components/utils/WebSocketDebugger";
 import { Loader2 } from "lucide-react";
 
@@ -364,16 +364,57 @@ function Router() {
 }
 
 function App() {
+  // Estado para controlar si ha habido un error de carga
+  const [loadingFailed, setLoadingFailed] = useState(false);
+
   // Iniciar la conexión WebSocket cuando se monta el componente
   useEffect(() => {
-    // Iniciar la conexión WebSocket
-    webSocketService.connect();
+    // Iniciar la conexión WebSocket, pero no bloquear la aplicación si falla
+    try {
+      webSocketService.connect();
+    } catch (error) {
+      console.error("Error al iniciar WebSocket, continuando sin él:", error);
+    }
+
+    // Configurar un timeout para verificar si la aplicación carga
+    const timeoutId = setTimeout(() => {
+      // Este código nunca debería ejecutarse si la aplicación carga normalmente
+      const appRoot = document.getElementById("root");
+      if (appRoot && appRoot.children.length <= 1) {
+        console.log("Detectado posible fallo de carga, intentando recuperar...");
+        setLoadingFailed(true);
+      }
+    }, 5000);
 
     // Limpiar conexión cuando se desmonta
     return () => {
-      webSocketService.disconnect();
+      clearTimeout(timeoutId);
+      try {
+        webSocketService.disconnect();
+      } catch (error) {
+        console.error("Error al desconectar WebSocket:", error);
+      }
     };
   }, []);
+
+  // Si detectamos un problema de carga, mostrar una interfaz alternativa
+  if (loadingFailed) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <h1 className="text-2xl font-bold mb-4">Problemas de conectividad</h1>
+        <p className="text-gray-700 mb-6 text-center max-w-md">
+          Estamos experimentando problemas para establecer algunas conexiones. 
+          La aplicación funcionará con características limitadas.
+        </p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Reiniciar aplicación
+        </button>
+      </div>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -386,7 +427,8 @@ function App() {
                 <MicroInteractionDisplay />
                 <OnboardingPopup />
                 <HelpButton />
-                <WebSocketDebugger />
+                {/* WebSocketDebugger desactivado temporalmente mientras resolvemos problemas */}
+                {/* <WebSocketDebugger /> */}
                 <Router />
               </TooltipProvider>
             </ThemeProvider>

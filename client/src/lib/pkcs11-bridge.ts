@@ -46,6 +46,76 @@ export interface SignatureResult {
   algorithm: string;
 }
 
+// Eliminado para evitar duplicados - usaremos la implementación posterior
+
+/**
+ * Lista los certificados disponibles en el token
+ * @param provider Proveedor del token
+ * @returns Lista de certificados disponibles
+ */
+export async function listAvailableCertificates(provider: TokenProvider): Promise<CertificateInfo[]> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Simulación: en un entorno real, obtendríamos los certificados del token
+      const certificates: CertificateInfo[] = [
+        {
+          serialNumber: "123456789",
+          subject: "Juan Pérez - RUT: 12.345.678-9",
+          issuer: `${provider.toUpperCase()} Certification Authority`,
+          validFrom: new Date(2023, 0, 1),
+          validTo: new Date(2025, 0, 1),
+          provider
+        },
+        {
+          serialNumber: "987654321",
+          subject: "María González - RUT: 98.765.432-1",
+          issuer: `${provider.toUpperCase()} Certification Authority`,
+          validFrom: new Date(2022, 0, 1),
+          validTo: new Date(2024, 0, 1),
+          provider
+        }
+      ];
+      resolve(certificates);
+    }, 800);
+  });
+}
+
+/**
+ * Firma un documento utilizando un certificado específico
+ * @param provider Proveedor del token
+ * @param certificateSerialNumber Número de serie del certificado
+ * @param data Datos a firmar (generalmente el hash del documento)
+ * @param pin PIN para desbloquear el token
+ * @returns Resultado de la firma
+ */
+export async function signWithCertificate(
+  provider: TokenProvider, 
+  certificateSerialNumber: string, 
+  data: string, 
+  pin: string
+): Promise<SignatureResult> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      // Simular verificación del PIN
+      if (pin.length < 4) {
+        reject(new Error("PIN inválido. Debe tener al menos 4 caracteres."));
+        return;
+      }
+      
+      // Simular firma exitosa
+      const result: SignatureResult = {
+        signature: `${data}_${Date.now()}_signed_by_${provider}`,
+        certificate: `CERT_${certificateSerialNumber}`,
+        timestamp: new Date().toISOString(),
+        provider,
+        algorithm: "SHA256withRSA"
+      };
+      
+      resolve(result);
+    }, 1500);
+  });
+}
+
 /**
  * Comprueba si hay extensión de firma electrónica instalada
  * @returns Promise<boolean> true si la extensión está disponible
