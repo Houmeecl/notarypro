@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, Pen, Fingerprint } from "lucide-react";
+import { ShieldCheck, Pen, Fingerprint, Key } from "lucide-react";
 import { ETokenSignature } from "./ETokenSignature";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -183,22 +183,24 @@ export function SignatureOptions({
                       nivel de seguridad estándar.
                     </p>
                     
-                    <div className="space-y-1 mb-4">
-                      <div className="flex items-start">
-                        <span className="text-sm text-gray-700 border-l-2 border-gray-300 pl-2">
-                          Validez legal para documentos privados
-                        </span>
-                      </div>
-                      <div className="flex items-start">
-                        <span className="text-sm text-gray-700 border-l-2 border-gray-300 pl-2">
-                          Incluye estampado de tiempo y código de verificación
-                        </span>
-                      </div>
-                      <div className="flex items-start">
-                        <span className="text-sm text-gray-700 border-l-2 border-gray-300 pl-2">
-                          Proceso seguro y eficiente
-                        </span>
-                      </div>
+                    <div className="mb-4">
+                      <ul className="space-y-2 text-gray-700">
+                        <li className="flex items-center">
+                          <ShieldCheck className="h-5 w-5 text-gray-500 mr-2" />
+                          <span className="text-sm">Firma digital con validez legal según Ley 19.799</span>
+                        </li>
+                        <li className="flex items-center">
+                          <Pen className="h-5 w-5 text-gray-500 mr-2" />
+                          <span className="text-sm">Proceso simple y rápido para documentos privados</span>
+                        </li>
+                        <li className="flex items-center">
+                          <svg className="h-5 w-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                          </svg>
+                          <span className="text-sm">Incluye estampado de tiempo y verificación</span>
+                        </li>
+                      </ul>
                     </div>
                     
                     <Button 
@@ -229,19 +231,25 @@ export function SignatureOptions({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-                <div className="p-3 bg-gray-100 rounded-full mx-auto mb-3 w-fit">
-                  <ShieldCheck className="h-6 w-6 text-gray-600" />
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-gray-100 rounded-full">
+                    <ShieldCheck className="h-6 w-6 text-gray-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Servicio Premium</h3>
+                    <p className="text-gray-700 mb-4">
+                      La firma electrónica avanzada está disponible para usuarios con plan premium.
+                      Actualice para tener acceso a esta funcionalidad y otras ventajas exclusivas.
+                    </p>
+                    <Button 
+                      onClick={handleSignWithAdvanced}
+                      className="bg-gray-800 hover:bg-gray-700 text-white"
+                    >
+                      Actualizar a Plan Premium
+                    </Button>
+                  </div>
                 </div>
-                <p className="text-gray-700 mb-4">
-                  La firma avanzada está disponible para usuarios con plan premium.
-                </p>
-                <Button 
-                  onClick={handleSignWithAdvanced}
-                  className="bg-gray-800 hover:bg-gray-700 text-white"
-                >
-                  Actualizar a Plan Premium
-                </Button>
               </div>
             </CardContent>
           </Card>
@@ -272,22 +280,21 @@ export function SignatureOptions({
                       con la máxima validez legal de acuerdo a la Ley 19.799 de Chile.
                     </p>
                     
-                    <div className="space-y-1 mb-4">
-                      <div className="flex items-start">
-                        <span className="text-sm text-gray-700 border-l-2 border-gray-300 pl-2">
-                          Máxima validez legal y probatoria
-                        </span>
-                      </div>
-                      <div className="flex items-start">
-                        <span className="text-sm text-gray-700 border-l-2 border-gray-300 pl-2">
-                          Utiliza su certificado digital personal
-                        </span>
-                      </div>
-                      <div className="flex items-start">
-                        <span className="text-sm text-gray-700 border-l-2 border-gray-300 pl-2">
-                          Requiere su dispositivo token conectado
-                        </span>
-                      </div>
+                    <div className="mb-4">
+                      <ul className="space-y-2 text-gray-700">
+                        <li className="flex items-center">
+                          <ShieldCheck className="h-5 w-5 text-gray-500 mr-2" />
+                          <span className="text-sm">Máxima validez legal y probatoria</span>
+                        </li>
+                        <li className="flex items-center">
+                          <Fingerprint className="h-5 w-5 text-gray-500 mr-2" />
+                          <span className="text-sm">Utiliza su certificado digital personal</span>
+                        </li>
+                        <li className="flex items-center">
+                          <Key className="h-5 w-5 text-gray-500 mr-2" />
+                          <span className="text-sm">Requiere su dispositivo token conectado</span>
+                        </li>
+                      </ul>
                     </div>
                     
                     <Button 
