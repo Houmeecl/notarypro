@@ -5,7 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { 
   FileText, User, CreditCard, Clock, Calendar, 
   ChevronRight, Download, LogOut, BarChart3,
-  HelpCircle
+  HelpCircle, Monitor
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -192,6 +192,14 @@ export default function VecinosDashboard() {
             >
               <FileText className="h-4 w-4 mr-2" />
               Procesar Documentos
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="text-gray-600 hover:bg-gray-50 whitespace-nowrap"
+              onClick={() => window.open("/partners/webapp-pos", "_blank")}
+            >
+              <Monitor className="h-4 w-4 mr-2" />
+              Abrir POS Web
             </Button>
             <Button 
               variant="ghost" 
