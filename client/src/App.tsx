@@ -333,6 +333,9 @@ function Router() {
       {/* Integraciones Demo */}
       <Route path="/integraciones-demo" component={IntegracionesDemo} />
       
+      {/* Demostración de Validación de Identidad */}
+      <Route path="/verificacion-identidad-demo" component={VerificacionIdentidadDemo} />
+      
       {/* Demostración de Pagos con MercadoPago */}
       <Route path="/payment-demo" component={PaymentDemo} />
       
