@@ -158,6 +158,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Servir documento de ejemplo verificable
+  app.get('/documento-ejemplo-verificacion.html', (req, res) => {
+    const filePath = path.join(process.cwd(), 'public', 'documento-ejemplo-verificacion.html');
+    if (fs.existsSync(filePath)) {
+      res.sendFile(filePath);
+    } else {
+      res.status(404).send('Documento de ejemplo no encontrado');
+    }
+  });
+  
   // Registrar rutas de administración
   app.use('/api/admin', adminRouter);
   
