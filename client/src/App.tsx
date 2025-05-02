@@ -57,6 +57,7 @@ import WebAppPOSAlternativa from "@/pages/partners/webapp-pos-alternativa";
 import WebAppPOSButtons from "@/pages/partners/webapp-pos-buttons";
 import PaymentDemo from "@/pages/payment-demo";
 import DocumentoEjemplo from "@/pages/documento-ejemplo";
+import VerificacionIdentidadDemo from "@/pages/verificacion-identidad-demo";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
