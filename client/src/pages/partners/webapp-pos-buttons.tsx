@@ -83,8 +83,27 @@ const WebAppPOSButtons = () => {
 
   const handleSeleccionarPago = (tipo: string) => {
     setMetodoPago(tipo);
+    
+    // Si el método de pago es tarjeta, mostrar pantalla de pago con tarjeta
+    if (tipo === 'tarjeta') {
+      setStep('tarjeta');
+    } else {
+      // Para otros métodos de pago, continuar directamente al comprobante
+      setProcesoCompletado(true);
+      setStep('comprobante');
+    }
+  };
+  
+  // Procesar el pago con tarjeta
+  const procesarPagoTarjeta = () => {
     setProcesoCompletado(true);
     setStep('comprobante');
+    
+    toast({
+      title: "Pago procesado",
+      description: "El pago con tarjeta ha sido procesado correctamente",
+      variant: "default",
+    });
   };
 
   const reiniciarProceso = () => {
