@@ -855,7 +855,7 @@ const WebAppPOSButtons = () => {
         
         return (
           <div className="space-y-6">
-            {/* Animación de éxito con confeti visual */}
+            {/* Animación de éxito con confeti visual estilo NotaryPro */}
             <div className="text-center mb-6 relative">
               <div className="absolute inset-0 flex justify-center">
                 <div className="relative w-32 h-32">
@@ -863,9 +863,9 @@ const WebAppPOSButtons = () => {
                   {[...Array(20)].map((_, i) => (
                     <div
                       key={i}
-                      className={`absolute rounded-full w-2 h-2 opacity-70 animate-ping`}
+                      className={`absolute rounded-md w-2 h-2 opacity-70 animate-ping`}
                       style={{
-                        backgroundColor: ['#34D399', '#60A5FA', '#F59E0B', '#EC4899'][i % 4],
+                        backgroundColor: ['#2563EB', '#3B82F6', '#1E40AF', '#93C5FD'][i % 4],
                         top: `${Math.random() * 100}%`,
                         left: `${Math.random() * 100}%`,
                         animationDuration: `${1 + Math.random() * 3}s`,
@@ -877,27 +877,27 @@ const WebAppPOSButtons = () => {
               </div>
               
               <div className="relative w-24 h-24 mx-auto mb-4">
-                <div className="absolute inset-0 bg-green-100 rounded-full animate-pulse opacity-40"></div>
-                <div className="absolute inset-3 bg-green-200 rounded-full animate-pulse opacity-60 delay-100"></div>
+                <div className="absolute inset-0 bg-blue-100 rounded-md animate-pulse opacity-40"></div>
+                <div className="absolute inset-3 bg-blue-200 rounded-md animate-pulse opacity-60 delay-100"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <CheckCircle2 className="h-14 w-14 text-green-500" />
+                  <CheckCircle2 className="h-14 w-14 text-blue-600" />
                 </div>
               </div>
-              <h2 className="text-2xl font-bold text-green-700">¡Operación exitosa!</h2>
-              <p className="text-gray-600 max-w-md mx-auto">El documento ha sido procesado y enviado al correo del cliente</p>
+              <h2 className="text-2xl font-bold text-zinc-800">¡Operación exitosa!</h2>
+              <p className="text-zinc-600 max-w-md mx-auto">El documento ha sido procesado y enviado al correo del cliente</p>
             </div>
             
             <div className="max-w-md mx-auto">
-              {/* Ticket estilo comprobante de compra */}
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 relative mb-8">
+              {/* Ticket estilo comprobante NotaryPro */}
+              <div className="bg-white rounded-md shadow-lg overflow-hidden border border-zinc-300 relative mb-8">
                 {/* Borde superior estilo ticket */}
-                <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-green-500 to-green-400"></div>
+                <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-blue-600 to-blue-500"></div>
                 
                 {/* Cabecera del ticket */}
-                <div className="pt-6 pb-4 px-6 text-center border-b border-dashed border-gray-200">
-                  <div className="font-bold text-xl text-gray-800 mb-1">VECINOS XPRESS</div>
-                  <div className="text-sm text-gray-600">Comprobante de Documento Digital</div>
-                  <div className="mt-2 inline-block bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">
+                <div className="pt-6 pb-4 px-6 text-center border-b border-dashed border-zinc-200">
+                  <div className="font-bold text-xl text-zinc-800 mb-1">NOTARYPRO</div>
+                  <div className="text-sm text-zinc-600">Comprobante de Documento Digital</div>
+                  <div className="mt-2 inline-block bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-md">
                     PAGO APROBADO
                   </div>
                 </div>
@@ -907,119 +907,121 @@ const WebAppPOSButtons = () => {
                   {/* Datos del documento y transacción */}
                   <div className="mb-4">
                     <div className="flex items-center mb-3">
-                      <div className="p-1.5 bg-green-100 rounded mr-3">
-                        {docFinal?.id === 'contrato' && <div className="text-xl">📄</div>}
-                        {docFinal?.id === 'declaracion' && <div className="text-xl">📝</div>}
-                        {docFinal?.id === 'autorizacion' && <div className="text-xl">✅</div>}
-                        {docFinal?.id === 'finiquito' && <div className="text-xl">📋</div>}
-                        {docFinal?.id === 'compraventa' && <div className="text-xl">🔄</div>}
-                        {docFinal?.id === 'arriendo' && <div className="text-xl">🏠</div>}
+                      <div className="p-2 bg-zinc-800 rounded-md mr-3 shadow-sm">
+                        {docFinal?.id === 'contrato' && <FileText className="h-5 w-5 text-blue-400" />}
+                        {docFinal?.id === 'declaracion' && <ClipboardList className="h-5 w-5 text-blue-400" />}
+                        {docFinal?.id === 'autorizacion' && <CheckSquare className="h-5 w-5 text-blue-400" />}
+                        {docFinal?.id === 'finiquito' && <FileCheck className="h-5 w-5 text-blue-400" />}
+                        {docFinal?.id === 'compraventa' && <RefreshCw className="h-5 w-5 text-blue-400" />}
+                        {docFinal?.id === 'arriendo' && <Home className="h-5 w-5 text-blue-400" />}
                       </div>
-                      <h3 className="font-bold text-lg">{docFinal?.nombre}</h3>
+                      <h3 className="font-bold text-lg text-zinc-800">{docFinal?.nombre}</h3>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-3 text-sm mb-4">
-                      <div className="bg-gray-50 p-3 rounded">
-                        <div className="text-xs text-gray-500 mb-1">Cliente</div>
-                        <div className="font-medium">{clienteInfo.nombre}</div>
+                      <div className="bg-zinc-100 p-3 rounded-md border border-zinc-200">
+                        <div className="text-xs text-zinc-500 mb-1">Cliente</div>
+                        <div className="font-medium text-zinc-800">{clienteInfo.nombre}</div>
                       </div>
-                      <div className="bg-gray-50 p-3 rounded">
-                        <div className="text-xs text-gray-500 mb-1">RUT</div>
-                        <div className="font-medium">{clienteInfo.rut}</div>
+                      <div className="bg-zinc-100 p-3 rounded-md border border-zinc-200">
+                        <div className="text-xs text-zinc-500 mb-1">RUT</div>
+                        <div className="font-medium text-zinc-800">{clienteInfo.rut}</div>
                       </div>
                     </div>
                     
-                    <div className="space-y-2 border-t border-gray-100 pt-3">
+                    <div className="space-y-2 border-t border-zinc-200 pt-3">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Código:</span>
-                        <span className="font-medium font-mono">{codigoComprobante}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Fecha:</span>
-                        <span className="font-medium">{new Date().toLocaleDateString()}</span>
+                        <span className="text-zinc-600">Código:</span>
+                        <span className="font-medium font-mono text-blue-600">{codigoComprobante}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Hora:</span>
-                        <span className="font-medium">{new Date().toLocaleTimeString()}</span>
+                        <span className="text-zinc-600">Fecha:</span>
+                        <span className="font-medium text-zinc-800">{new Date().toLocaleDateString()}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Método de pago:</span>
-                        <span className="font-medium">{metodoPago === 'tarjeta' ? 'Tarjeta' : metodoPago.toUpperCase()}</span>
+                        <span className="text-zinc-600">Hora:</span>
+                        <span className="font-medium text-zinc-800">{new Date().toLocaleTimeString()}</span>
                       </div>
-                      <div className="flex justify-between text-sm font-bold pt-2 mt-2 border-t border-gray-100">
-                        <span>Total pagado:</span>
-                        <span className="text-green-600">${docFinal?.precio}</span>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-zinc-600">Método de pago:</span>
+                        <span className="font-medium text-zinc-800">{metodoPago === 'tarjeta' ? 'Tarjeta' : metodoPago.toUpperCase()}</span>
                       </div>
-                      <div className="flex justify-between text-xs bg-yellow-50 p-2 rounded mt-1">
-                        <span className="text-yellow-800">Su comisión:</span>
-                        <span className="font-bold text-yellow-800">${Math.round((docFinal?.precio || 0) * 0.15)}</span>
+                      <div className="flex justify-between text-sm font-bold pt-2 mt-2 border-t border-zinc-200">
+                        <span className="text-zinc-800">Total pagado:</span>
+                        <span className="text-blue-600">${docFinal?.precio}</span>
+                      </div>
+                      <div className="flex justify-between text-xs bg-zinc-800 p-2 rounded-md mt-1 text-zinc-100">
+                        <span>Su comisión:</span>
+                        <span className="font-bold text-blue-400">${Math.round((docFinal?.precio || 0) * 0.15)}</span>
                       </div>
                     </div>
                   </div>
                   
-                  {/* QR code placeholder */}
-                  <div className="flex flex-col items-center mt-4 mb-2 pt-3 border-t border-dashed border-gray-200">
-                    <div className="w-24 h-24 bg-gray-200 rounded-lg mb-2 flex items-center justify-center text-gray-400">
-                      QR Code
+                  {/* QR code placeholder estilo NotaryPro */}
+                  <div className="flex flex-col items-center mt-4 mb-2 pt-3 border-t border-dashed border-zinc-300">
+                    <div className="relative">
+                      <div className="w-24 h-24 bg-zinc-100 rounded-md mb-2 flex items-center justify-center text-zinc-600 border border-zinc-300 overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100"></div>
+                        <div className="relative z-10">QR Code</div>
+                      </div>
+                      <div className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-md">
+                        Verificado
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-500 text-center">
+                    <div className="text-xs text-zinc-600 text-center">
                       Escanee para verificar la autenticidad del documento
                     </div>
                   </div>
                   
-                  {/* Botones de acción modernos */}
+                  {/* Botones de acción estilo NotaryPro */}
                   <div className="grid grid-cols-2 gap-3 mt-6">
-                    {/* Botón de impresión con efecto de glassmorphism */}
+                    {/* Botón de impresión */}
                     <button 
                       onClick={imprimirComprobante}
-                      className="relative group overflow-hidden rounded-xl p-0 border-0 bg-transparent"
+                      className="relative group overflow-hidden rounded-md p-0 border-0 bg-transparent"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-green-400/20 to-green-600/20 rounded-xl"></div>
-                      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-xl border border-green-200 group-hover:bg-white/60 transition-all duration-300"></div>
-                      <div className="relative flex items-center justify-center py-2.5 px-3">
-                        <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-green-500 opacity-0 group-hover:opacity-20 blur-sm rounded-xl transition-opacity duration-300"></div>
-                        <div className="mr-1.5 w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 group-hover:bg-green-200 transition-colors">
-                          <Printer className="h-4 w-4 text-green-700" />
+                      <div className="absolute -inset-0.5 bg-gradient-to-r from-zinc-700 to-zinc-800 rounded-md opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                      <div className="relative flex items-center justify-center py-2.5 px-3 bg-zinc-100 rounded-md shadow-sm group-hover:shadow-md transition-shadow">
+                        <div className="mr-1.5 w-8 h-8 rounded-md bg-zinc-800 flex items-center justify-center flex-shrink-0">
+                          <Printer className="h-4 w-4 text-blue-400" />
                         </div>
-                        <span className="font-medium text-green-800">Imprimir</span>
+                        <span className="font-medium text-zinc-800">Imprimir</span>
                       </div>
                     </button>
                     
-                    {/* Botón de vista previa con efecto de glassmorphism */}
+                    {/* Botón de vista previa */}
                     <button 
                       onClick={() => setShowPreview(true)}
-                      className="relative group overflow-hidden rounded-xl p-0 border-0 bg-transparent"
+                      className="relative group overflow-hidden rounded-md p-0 border-0 bg-transparent"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-xl"></div>
-                      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-xl border border-blue-200 group-hover:bg-white/60 transition-all duration-300"></div>
-                      <div className="relative flex items-center justify-center py-2.5 px-3">
-                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-blue-500 opacity-0 group-hover:opacity-20 blur-sm rounded-xl transition-opacity duration-300"></div>
-                        <div className="mr-1.5 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
-                          <FileText className="h-4 w-4 text-blue-700" />
+                      <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-blue-700 rounded-md opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                      <div className="relative flex items-center justify-center py-2.5 px-3 bg-zinc-100 rounded-md shadow-sm group-hover:shadow-md transition-shadow">
+                        <div className="mr-1.5 w-8 h-8 rounded-md bg-blue-600 flex items-center justify-center flex-shrink-0">
+                          <FileText className="h-4 w-4 text-white" />
                         </div>
-                        <span className="font-medium text-blue-800">Ver documento</span>
+                        <span className="font-medium text-zinc-800">Ver documento</span>
                       </div>
                     </button>
                   </div>
                 </div>
                 
-                {/* Pie del ticket con estilo mejorado */}
-                <div className="py-3 px-6 bg-gradient-to-r from-gray-50 to-gray-100 text-center text-xs text-gray-500 border-t border-dashed border-gray-200">
-                  <p className="font-medium">Gracias por usar Vecinos NotaryPro Xpress</p>
+                {/* Pie del ticket estilo NotaryPro */}
+                <div className="py-3 px-6 bg-gradient-to-r from-zinc-100 to-zinc-50 text-center text-xs text-zinc-600 border-t border-dashed border-zinc-300">
+                  <p className="font-medium">Gracias por usar NotaryPro</p>
                   <div className="flex items-center justify-center mt-2">
-                    <div className="h-0.5 w-10 bg-gray-200 rounded-full mr-2"></div>
-                    <p className="text-gray-600">Documento verificable en <span className="text-blue-600 font-medium">www.tuu.cl/verificar</span></p>
-                    <div className="h-0.5 w-10 bg-gray-200 rounded-full ml-2"></div>
+                    <div className="h-0.5 w-10 bg-zinc-300 rounded-full mr-2"></div>
+                    <p className="text-zinc-700">Documento verificable en <span className="text-blue-600 font-medium">www.tuu.cl/verificar</span></p>
+                    <div className="h-0.5 w-10 bg-zinc-300 rounded-full ml-2"></div>
                   </div>
                 </div>
                 
-                {/* Borde inferior estilo ticket */}
-                <div className="absolute bottom-0 left-0 right-0 h-3 bg-gradient-to-r from-green-400 to-green-500"></div>
+                {/* Borde inferior estilo ticket NotaryPro */}
+                <div className="absolute bottom-0 left-0 right-0 h-3 bg-gradient-to-r from-blue-600 to-blue-500"></div>
               </div>
               
-              {/* Botones de navegación modernos */}
+              {/* Botones de navegación estilo NotaryPro */}
               <div className="flex justify-between mt-6">
-                {/* Botón nuevo cliente con efecto de brillo */}
+                {/* Botón nuevo cliente */}
                 <button 
                   onClick={() => {
                     setIdentityVerified(false);
@@ -1027,32 +1029,24 @@ const WebAppPOSButtons = () => {
                     setSignatureImage('');
                     setStep('inicio');
                   }}
-                  className="relative group overflow-hidden rounded-xl bg-transparent p-0 border-0"
+                  className="relative group overflow-hidden rounded-md p-0 border-0 bg-transparent"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl opacity-80 group-hover:opacity-100 transition-opacity"></div>
-                  <div className="relative flex items-center px-4 py-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-all">
-                    <div className="absolute -inset-px bg-gradient-to-r from-gray-100 to-gray-50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="relative z-10 flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center mr-2 group-hover:bg-blue-100 transition-colors">
-                        <RefreshCw className="h-3.5 w-3.5 text-gray-600 group-hover:text-blue-600 transition-colors" />
-                      </div>
-                      <span className="font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Nuevo cliente</span>
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-zinc-700 to-zinc-800 rounded-md opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative flex items-center px-4 py-2 bg-zinc-100 rounded-md shadow-sm group-hover:shadow-md transition-shadow">
+                    <div className="mr-2 w-6 h-6 rounded-md bg-zinc-800 flex items-center justify-center">
+                      <RefreshCw className="h-3.5 w-3.5 text-blue-400" />
                     </div>
+                    <span className="font-medium text-zinc-800">Nuevo cliente</span>
                   </div>
                 </button>
                 
-                {/* Botón finalizar con efecto 3D */}
+                {/* Botón finalizar */}
                 <button 
                   onClick={() => setProcesoCompletado(true)}
                   className="relative group"
                 >
-                  <div className="absolute -inset-0.5 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl blur opacity-75 group-hover:opacity-100 transition-all duration-300"></div>
-                  <div className="relative flex items-center px-5 py-2.5 bg-gradient-to-br from-green-500 to-green-600 rounded-xl text-white font-medium shadow-lg group-hover:shadow-green-500/50 transition-all duration-300 overflow-hidden">
-                    <div className="absolute inset-0 flex justify-center">
-                      <div className="w-12 h-32 bg-white/10 rotate-12 transform translate-x-12 -translate-y-2 group-hover:translate-x-40 transition-all duration-1000 ease-out"></div>
-                    </div>
-                    <div className="absolute top-0 right-0 h-2 w-full bg-gradient-to-l from-white/20 to-transparent"></div>
-                    <div className="absolute bottom-0 left-0 h-2 w-full bg-gradient-to-r from-white/20 to-transparent"></div>
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-blue-700 rounded-md blur opacity-75 group-hover:opacity-100 transition-all duration-300"></div>
+                  <div className="relative flex items-center px-5 py-2.5 bg-blue-600 rounded-md text-white font-medium shadow-lg group-hover:shadow-blue-500/50 transition-all duration-300 overflow-hidden">
                     <div className="relative flex items-center">
                       <Check className="mr-2 h-5 w-5" />
                       <span>Finalizar trámite</span>
