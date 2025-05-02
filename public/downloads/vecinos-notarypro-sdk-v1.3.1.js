@@ -82,7 +82,7 @@
       }
       
       this.config = config;
-      this.apiUrl = "https://api.tuu.cl";
+      this.apiUrl = "https://api.cerfidoc.cl";
       this.modoOffline = false;
       this.documentosPendientes = [];
       this.clientesPendientes = [];
