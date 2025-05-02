@@ -56,6 +56,7 @@ import ConfirmacionDescarga from "@/pages/partners/confirmacion-descarga";
 import WebAppPOSAlternativa from "@/pages/partners/webapp-pos-alternativa";
 import WebAppPOSButtons from "@/pages/partners/webapp-pos-buttons";
 import PaymentDemo from "@/pages/payment-demo";
+import DocumentoEjemplo from "@/pages/documento-ejemplo";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -356,6 +357,9 @@ function Router() {
           <p className="text-xl">Redireccionando...</p>
         </div>;
       }} />
+      
+      {/* Documento Ejemplo */}
+      <Route path="/documento-ejemplo" component={DocumentoEjemplo} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
