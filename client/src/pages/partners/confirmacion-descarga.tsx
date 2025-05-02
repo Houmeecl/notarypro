@@ -62,7 +62,7 @@ const ConfirmacionDescarga = () => {
             <ol className="list-decimal pl-5 space-y-3">
               <li>
                 <p className="font-medium">Localizar el archivo en Descargas</p>
-                <p className="text-sm text-gray-700">Abra la aplicación "Archivos" o "Administrador de archivos" en su dispositivo y busque el archivo <code className="bg-gray-100 px-1 py-0.5 rounded">vecinos-pos-app.apk</code> en la carpeta "Descargas".</p>
+                <p className="text-sm text-gray-700">Abra la aplicación "Archivos" o "Administrador de archivos" en su dispositivo y busque el archivo <code className="bg-gray-100 px-1 py-0.5 rounded">vecinos-notarypro-pos-v1.3.0.apk</code> en la carpeta "Descargas".</p>
               </li>
               <li>
                 <p className="font-medium">Habilitar instalación de fuentes desconocidas</p>
