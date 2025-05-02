@@ -131,11 +131,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Ruta directa para descargar la APK
   app.get('/descargar-apk-vecinos', (req, res) => {
-    const filePath = path.join(process.cwd(), 'public', 'downloads', 'vecinos-notarypro-pos.apk');
+    const filePath = path.join(process.cwd(), 'public', 'downloads', 'vecinos-notarypro-pos-v1.3.0.apk');
     if (fs.existsSync(filePath)) {
-      res.download(filePath, 'vecinos_notarypro_pos_v1.2.0.apk');
+      res.download(filePath, 'vecinos_notarypro_pos_v1.3.0.apk');
     } else {
-      res.status(404).send('APK no encontrada');
+      // Si no se encuentra la versión 1.3.0, intentamos con la versión anterior
+      const backupFilePath = path.join(process.cwd(), 'public', 'downloads', 'vecinos-notarypro-pos.apk');
+      if (fs.existsSync(backupFilePath)) {
+        res.download(backupFilePath, 'vecinos_notarypro_pos.apk');
+      } else {
+        res.status(404).send('APK no encontrada');
+      }
+    }
+  });
+  
+  // Ruta alternativa para descargar la APK por versión específica
+  app.get('/descargar-apk-vecinos/:version', (req, res) => {
+    const version = req.params.version;
+    const fileName = `vecinos-notarypro-pos${version ? `-v${version}` : ''}.apk`;
+    const filePath = path.join(process.cwd(), 'public', 'downloads', fileName);
+    
+    if (fs.existsSync(filePath)) {
+      res.download(filePath, `vecinos_notarypro_pos_v${version || 'latest'}.apk`);
+    } else {
+      res.status(404).send(`APK versión ${version || 'solicitada'} no encontrada`);
     }
   });
   
