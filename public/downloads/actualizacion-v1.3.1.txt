@@ -19,6 +19,10 @@ CAMBIOS IMPORTANTES:
    - Las URLs del servicio ahora utilizan el dominio tuu.cl en lugar de cerfidoc.cl
    - Los códigos QR de verificación ahora redirigen a tuu.cl/verificar
 
+3. DOCUMENTACIÓN AMPLIADA
+   - Acceda a documentación detallada y ejemplos adicionales en:
+     https://developers.tuu.cl/docs/getting-started
+
 INSTRUCCIONES DE ACTUALIZACIÓN:
 ------------------------------
 1. Para la aplicación web: No es necesario realizar ninguna acción, la actualización

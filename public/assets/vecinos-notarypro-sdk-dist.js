@@ -19,6 +19,11 @@
  * ACTUALIZACIÓN v1.3.1:
  * - A partir de esta versión, SOLO se acepta pago con tarjeta.
  * - Los métodos de pago en efectivo y transferencia ya no están disponibles.
+ * - Las URLs del servicio ahora utilizan el dominio tuu.cl
+ * 
+ * DOCUMENTACIÓN COMPLETA:
+ * Para consultar la documentación detallada, ejemplos adicionales y buenas prácticas,
+ * visite: https://developers.tuu.cl/docs/getting-started
  * 
  * Este SDK está diseñado para ser fácil de usar, incluso sin experiencia previa
  * en programación. Sigue los ejemplos para procesar documentos rápidamente.
