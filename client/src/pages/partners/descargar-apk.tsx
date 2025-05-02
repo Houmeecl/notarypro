@@ -9,8 +9,8 @@ const DescargarApk = () => {
   const descargarArchivo = () => {
     try {
       const link = document.createElement('a');
-      link.href = "/downloads/vecinos-notarypro-pos-v1.3.0.apk";
-      link.download = "vecinos-notarypro-pos-v1.3.0.apk";
+      link.href = "/downloads/vecinos-notarypro-pos-v1.3.1.apk";
+      link.download = "vecinos-notarypro-pos-v1.3.1.apk";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -30,7 +30,15 @@ const DescargarApk = () => {
   return (
     <div className="container py-8 max-w-3xl mx-auto">
       <div className="bg-white p-8 rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold mb-4">Descarga de la App Vecinos POS</h1>
+        <h1 className="text-3xl font-bold mb-4">Descarga de la App Vecinos POS v1.3.1</h1>
+        
+        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+          <h3 className="font-semibold text-amber-800">Nueva versión disponible</h3>
+          <p className="text-amber-700">
+            Esta versión incluye una actualización importante: ahora solo se aceptan pagos con tarjeta.
+            Asegúrese de actualizar su aplicación para mantener la compatibilidad con los servicios.
+          </p>
+        </div>
         
         <div className="mb-8 p-4 border border-primary/20 bg-primary/5 rounded-md">
           <p className="mb-4">
@@ -43,7 +51,7 @@ const DescargarApk = () => {
             onClick={descargarArchivo}
           >
             <Download className="mr-2 h-5 w-5" />
-            Descargar APK
+            Descargar APK v1.3.1
           </Button>
         </div>
         

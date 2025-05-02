@@ -49,11 +49,10 @@
   /**
    * MÉTODOS DE PAGO
    * Formas de pago aceptadas para el servicio
+   * Nota: A partir de la versión 1.3.0, solo se acepta pago con tarjeta
    */
   const METODO_PAGO = {
-    EFECTIVO: 'efectivo',
-    TARJETA: 'tarjeta',
-    TRANSFERENCIA: 'transferencia'
+    TARJETA: 'tarjeta'
   };
 
   /**
@@ -488,6 +487,11 @@
       // Validar datos mínimos
       if (!clienteId || !documento.tipo || !documento.titulo || !documento.monto || !documento.metodoPago) {
         throw new Error('Datos de documento incompletos. Verifique tipo, título, monto y método de pago.');
+      }
+      
+      // Validar que el método de pago sea tarjeta
+      if (documento.metodoPago !== METODO_PAGO.TARJETA) {
+        throw new Error('Método de pago no válido. Solo se aceptan pagos con tarjeta.');
       }
       
       // Modo offline: guardar localmente
