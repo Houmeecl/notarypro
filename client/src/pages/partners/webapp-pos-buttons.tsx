@@ -423,39 +423,121 @@ const WebAppPOSButtons = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <UserPlus className="h-16 w-16 text-primary mx-auto mb-4" />
-              <h2 className="text-2xl font-bold">Registrar Cliente</h2>
-              <p className="text-gray-500">Ingrese los datos del cliente</p>
+              {/* Icono con animación suave */}
+              <div className="relative w-24 h-24 mx-auto mb-4">
+                <div className="absolute inset-0 bg-blue-100 rounded-full animate-pulse opacity-50"></div>
+                <div className="absolute inset-2 bg-blue-200 rounded-full animate-pulse opacity-70 delay-75"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <UserPlus className="h-12 w-12 text-primary" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-blue-800">Registrar Cliente</h2>
+              <p className="text-gray-500 max-w-md mx-auto">Complete los campos a continuación o escanee un código QR para autocompletar</p>
             </div>
             
             <div className="space-y-4 max-w-md mx-auto">
-              <div className="p-4 bg-white rounded-lg shadow-sm">
-                <Label htmlFor="nombre" className="text-base font-medium">Nombre completo</Label>
-                <Input id="nombre" placeholder="Ej: Juan Pérez González" className="mt-1 text-lg p-6" />
+              {/* Formulario con indicadores visuales */}
+              <div className="grid grid-cols-12 gap-4">
+                {/* Nombre con icono */}
+                <div className="col-span-12 bg-white rounded-xl shadow-md border border-blue-100 overflow-hidden transition-all hover:shadow-lg">
+                  <div className="flex">
+                    <div className="bg-blue-50 p-4 flex items-center justify-center border-r border-blue-100">
+                      <div className="text-blue-600 rounded-full p-1">👤</div>
+                    </div>
+                    <div className="flex-1 p-3">
+                      <Label htmlFor="nombre" className="text-sm font-medium text-gray-700">Nombre completo</Label>
+                      <Input 
+                        id="nombre" 
+                        placeholder="Ej: Juan Pérez González" 
+                        className="mt-1 border-0 p-2 text-lg focus:ring-2 focus:ring-blue-500" 
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* RUT con icono */}
+                <div className="col-span-12 sm:col-span-6 bg-white rounded-xl shadow-md border border-blue-100 overflow-hidden transition-all hover:shadow-lg">
+                  <div className="flex">
+                    <div className="bg-blue-50 p-4 flex items-center justify-center border-r border-blue-100">
+                      <div className="text-blue-600 rounded-full p-1">🆔</div>
+                    </div>
+                    <div className="flex-1 p-3">
+                      <Label htmlFor="rut" className="text-sm font-medium text-gray-700">RUT</Label>
+                      <Input 
+                        id="rut" 
+                        placeholder="Ej: 12.345.678-9" 
+                        className="mt-1 border-0 p-2 text-lg focus:ring-2 focus:ring-blue-500" 
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Teléfono con icono */}
+                <div className="col-span-12 sm:col-span-6 bg-white rounded-xl shadow-md border border-blue-100 overflow-hidden transition-all hover:shadow-lg">
+                  <div className="flex">
+                    <div className="bg-blue-50 p-4 flex items-center justify-center border-r border-blue-100">
+                      <div className="text-blue-600 rounded-full p-1">📱</div>
+                    </div>
+                    <div className="flex-1 p-3">
+                      <Label htmlFor="telefono" className="text-sm font-medium text-gray-700">Teléfono</Label>
+                      <Input 
+                        id="telefono" 
+                        placeholder="Ej: +56 9 1234 5678" 
+                        className="mt-1 border-0 p-2 text-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Email con icono */}
+                <div className="col-span-12 bg-white rounded-xl shadow-md border border-blue-100 overflow-hidden transition-all hover:shadow-lg">
+                  <div className="flex">
+                    <div className="bg-blue-50 p-4 flex items-center justify-center border-r border-blue-100">
+                      <div className="text-blue-600 rounded-full p-1">✉️</div>
+                    </div>
+                    <div className="flex-1 p-3">
+                      <Label htmlFor="email" className="text-sm font-medium text-gray-700">Correo electrónico</Label>
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        placeholder="Ej: juan@ejemplo.cl" 
+                        className="mt-1 border-0 p-2 text-lg focus:ring-2 focus:ring-blue-500" 
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
               
-              <div className="p-4 bg-white rounded-lg shadow-sm">
-                <Label htmlFor="rut" className="text-base font-medium">RUT</Label>
-                <Input id="rut" placeholder="Ej: 12.345.678-9" className="mt-1 text-lg p-6" />
+              {/* Opciones rápidas */}
+              <div className="grid grid-cols-3 gap-2 mt-2">
+                <Button variant="outline" className="p-2 h-auto text-xs flex flex-col items-center">
+                  <div className="bg-yellow-100 rounded-full p-1 mb-1">📷</div>
+                  <span>Escanear CI</span>
+                </Button>
+                <Button variant="outline" className="p-2 h-auto text-xs flex flex-col items-center">
+                  <div className="bg-green-100 rounded-full p-1 mb-1">🔄</div>
+                  <span>Cliente habitual</span>
+                </Button>
+                <Button variant="outline" className="p-2 h-auto text-xs flex flex-col items-center">
+                  <div className="bg-red-100 rounded-full p-1 mb-1">🧹</div>
+                  <span>Limpiar datos</span>
+                </Button>
               </div>
               
-              <div className="p-4 bg-white rounded-lg shadow-sm">
-                <Label htmlFor="email" className="text-base font-medium">Correo electrónico</Label>
-                <Input id="email" type="email" placeholder="Ej: juan@ejemplo.cl" className="mt-1 text-lg p-6" />
-              </div>
-              
-              <div className="p-4 bg-white rounded-lg shadow-sm">
-                <Label htmlFor="telefono" className="text-base font-medium">Teléfono</Label>
-                <Input id="telefono" placeholder="Ej: +56 9 1234 5678" className="mt-1 text-lg p-6" />
-              </div>
-              
+              {/* Botón continuar con efecto */}
               <Button 
-                size="lg" 
-                className="w-full p-8 text-xl mt-6 flex justify-between items-center"
                 onClick={handleRegistrarCliente}
+                className="w-full p-4 mt-6 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-xl shadow-lg transition-all duration-200 hover:shadow-blue-200 hover:shadow-xl group"
               >
-                <span>Continuar</span>
-                <ChevronRight className="h-6 w-6" />
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center">
+                    <div className="bg-white bg-opacity-20 p-2 rounded-lg mr-3">
+                      <UserPlus className="h-5 w-5 text-white" />
+                    </div>
+                    <span className="text-xl font-bold">Registrar Cliente</span>
+                  </div>
+                  <ChevronRight className="h-6 w-6 transition-transform group-hover:translate-x-1" />
+                </div>
               </Button>
             </div>
           </div>
@@ -465,37 +547,109 @@ const WebAppPOSButtons = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <FileText className="h-16 w-16 text-primary mx-auto mb-4" />
-              <h2 className="text-2xl font-bold">Seleccionar Documento</h2>
-              <p className="text-gray-500">Toque uno de los documentos disponibles</p>
+              {/* Icono animado de documentos */}
+              <div className="relative w-24 h-24 mx-auto mb-4">
+                <div className="absolute inset-0 bg-yellow-100 rounded-full animate-pulse opacity-50"></div>
+                <div className="absolute inset-2 bg-yellow-200 rounded-full animate-pulse opacity-70 delay-100"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <FileText className="h-12 w-12 text-yellow-600" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-yellow-700">Seleccionar Documento</h2>
+              <p className="text-gray-500 max-w-md mx-auto">Elija el tipo de documento que necesita procesar</p>
+              
+              {/* Barra de búsqueda rápida */}
+              <div className="mt-4 max-w-md mx-auto relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <Input 
+                  type="text"
+                  placeholder="Buscar documento..."
+                  className="pl-10 bg-white shadow-sm focus:ring-2 focus:ring-yellow-500"
+                />
+              </div>
             </div>
             
-            <div className="grid gap-4 max-w-md mx-auto">
-              {documentosDisponibles.map((doc) => (
-                <Button
-                  key={doc.id}
-                  variant="outline"
-                  className="p-6 h-auto flex justify-between items-center text-left"
-                  onClick={() => handleSeleccionarDocumento(doc.id)}
-                >
-                  <div>
-                    <p className="text-lg font-medium">{doc.nombre}</p>
-                    <p className="text-sm text-gray-500">Código: {doc.id}</p>
+            {/* Grid de documentos con categorías */}
+            <div className="max-w-3xl mx-auto">
+              {/* Categorías de documentos */}
+              <div className="flex overflow-x-auto pb-2 mb-4 scrollbar-hide gap-2">
+                <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border border-blue-200 shadow-sm">
+                  Todos
+                </div>
+                <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border border-gray-200 shadow-sm">
+                  Contratos
+                </div>
+                <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border border-gray-200 shadow-sm">
+                  Declaraciones
+                </div>
+                <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border border-gray-200 shadow-sm">
+                  Autorizaciones
+                </div>
+                <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border border-gray-200 shadow-sm">
+                  Laborales
+                </div>
+              </div>
+              
+              {/* Documentos en formato tarjeta interactiva */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {documentosDisponibles.map((doc) => (
+                  <div 
+                    key={doc.id}
+                    onClick={() => handleSeleccionarDocumento(doc.id)}
+                    className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg border border-gray-200 cursor-pointer transition-all duration-200 transform hover:scale-105 hover:border-yellow-300 group"
+                  >
+                    <div className="p-1 bg-gradient-to-r from-yellow-400 to-yellow-300">
+                      <div className="h-1"></div>
+                    </div>
+                    <div className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center">
+                          <div className="p-2 bg-yellow-100 rounded-lg mr-3">
+                            {doc.id === 'contrato' && <div className="text-xl">📄</div>}
+                            {doc.id === 'declaracion' && <div className="text-xl">📝</div>}
+                            {doc.id === 'autorizacion' && <div className="text-xl">✅</div>}
+                            {doc.id === 'finiquito' && <div className="text-xl">📋</div>}
+                            {doc.id === 'compraventa' && <div className="text-xl">🔄</div>}
+                            {doc.id === 'arriendo' && <div className="text-xl">🏠</div>}
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-lg text-gray-800">{doc.nombre}</h3>
+                            <div className="text-xs text-gray-500 mt-1">COD: {doc.id.toUpperCase()}</div>
+                          </div>
+                        </div>
+                        <div className="bg-yellow-500 text-white font-bold rounded-full py-1 px-3 text-sm">
+                          ${doc.precio}
+                        </div>
+                      </div>
+                      
+                      <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
+                        <div className="flex items-center">
+                          <div className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded flex items-center">
+                            <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mr-1"></div>
+                            Comisión: ${Math.round(doc.precio * 0.15)}
+                          </div>
+                        </div>
+                        
+                        <div className="text-gray-400 group-hover:text-yellow-500 transition-colors">
+                          <ChevronRight className="h-5 w-5" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xl font-bold">${doc.precio}</p>
-                    <p className="text-xs text-primary">Comisión: ${Math.round(doc.precio * 0.15)}</p>
-                  </div>
-                </Button>
-              ))}
+                ))}
+              </div>
               
               <Button 
-                variant="ghost" 
-                className="mt-4" 
+                variant="outline"
+                className="mt-6 border-2 border-gray-300 hover:bg-gray-100 transition-colors" 
                 onClick={() => setStep('inicio')}
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Volver
+                Volver a datos del cliente
               </Button>
             </div>
           </div>
@@ -507,51 +661,135 @@ const WebAppPOSButtons = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <CreditCard className="h-16 w-16 text-primary mx-auto mb-4" />
-              <h2 className="text-2xl font-bold">Procesar Pago</h2>
-              <p className="text-gray-500">Seleccione el método de pago</p>
+              {/* Icono animado de pagos */}
+              <div className="relative w-24 h-24 mx-auto mb-4">
+                <div className="absolute inset-0 bg-green-100 rounded-full animate-pulse opacity-50"></div>
+                <div className="absolute inset-2 bg-green-200 rounded-full animate-pulse opacity-70 delay-150"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <CreditCard className="h-12 w-12 text-green-600" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-green-700">Procesar Pago</h2>
+              <p className="text-gray-500 max-w-md mx-auto">El pago se procesará de forma segura</p>
             </div>
             
             <div className="max-w-md mx-auto">
-              <div className="p-6 bg-gray-50 rounded-lg mb-6">
-                <h3 className="text-lg font-medium mb-4">Resumen del documento</h3>
-                <div className="flex justify-between mb-2">
-                  <span>Documento:</span>
-                  <span className="font-medium">{documentoSeleccionado?.nombre}</span>
+              {/* Tarjeta de resumen con estilo de factura */}
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 mb-6 overflow-hidden">
+                <div className="bg-green-600 p-3 text-white">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-bold">Resumen del Pedido</h3>
+                    <div className="bg-white text-green-600 px-2 py-1 rounded-full text-xs font-bold">
+                      VECINOS XPRESS
+                    </div>
+                  </div>
                 </div>
-                <div className="flex justify-between mb-2">
-                  <span>Precio:</span>
-                  <span className="font-medium">${documentoSeleccionado?.precio}</span>
-                </div>
-                <div className="flex justify-between border-t pt-2 mt-2">
-                  <span>Su comisión:</span>
-                  <span className="font-medium text-primary">${Math.round((documentoSeleccionado?.precio || 0) * 0.15)}</span>
+                
+                <div className="p-4">
+                  <div className="border-b border-gray-100 pb-3 mb-3">
+                    <div className="flex items-center mb-4">
+                      <div className="p-1.5 bg-green-100 rounded mr-3">
+                        {documentoSeleccionado?.id === 'contrato' && <div className="text-xl">📄</div>}
+                        {documentoSeleccionado?.id === 'declaracion' && <div className="text-xl">📝</div>}
+                        {documentoSeleccionado?.id === 'autorizacion' && <div className="text-xl">✅</div>}
+                        {documentoSeleccionado?.id === 'finiquito' && <div className="text-xl">📋</div>}
+                        {documentoSeleccionado?.id === 'compraventa' && <div className="text-xl">🔄</div>}
+                        {documentoSeleccionado?.id === 'arriendo' && <div className="text-xl">🏠</div>}
+                      </div>
+                      <div>
+                        <h4 className="font-bold">{documentoSeleccionado?.nombre}</h4>
+                        <p className="text-xs text-gray-500">Código: {documentoSeleccionado?.id.toUpperCase()}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="ml-2 pl-6 border-l-2 border-green-100">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-gray-600">Cliente:</span>
+                        <span className="font-medium">{clienteInfo.nombre}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">RUT:</span>
+                        <span className="font-medium">{clienteInfo.rut}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Subtotal:</span>
+                      <span className="font-medium">${documentoSeleccionado?.precio}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">IVA (19%):</span>
+                      <span className="font-medium">Incluido</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-lg border-t border-gray-200 pt-2 mt-2">
+                      <span>Total:</span>
+                      <span className="text-green-600">${documentoSeleccionado?.precio}</span>
+                    </div>
+                    
+                    <div className="flex justify-between text-xs bg-yellow-50 p-2 rounded mt-3">
+                      <span className="text-yellow-800">Su comisión:</span>
+                      <span className="font-bold text-yellow-800">${Math.round((documentoSeleccionado?.precio || 0) * 0.15)}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
               
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium mb-2">Método de pago</h3>
-                
-                <Button 
-                  size="lg"
-                  className="w-full p-8 text-xl flex justify-between items-center"
-                  onClick={() => handleSeleccionarPago('tarjeta')}
-                >
-                  <div className="flex items-center">
-                    <CreditCard className="mr-3 h-6 w-6" />
-                    <span>PAGO CON TARJETA</span>
+              {/* Métodos de pago */}
+              <div className="bg-white rounded-xl shadow-md p-4 border border-gray-200">
+                <h3 className="text-lg font-bold mb-4 flex items-center">
+                  <div className="p-1.5 bg-blue-100 rounded-full mr-2">
+                    <svg className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
                   </div>
-                  <ChevronRight className="h-6 w-6" />
-                </Button>
+                  Método de pago
+                </h3>
                 
-                <Button 
-                  variant="ghost" 
-                  className="mt-4" 
-                  onClick={() => setStep('documentos')}
+                {/* Método de pago con tarjeta */}
+                <div 
+                  onClick={() => handleSeleccionarPago('tarjeta')}
+                  className="border-2 border-blue-200 hover:border-blue-500 rounded-xl p-4 mb-3 cursor-pointer transition-all duration-200 bg-blue-50 hover:bg-blue-100 group"
                 >
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Volver
-                </Button>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="bg-white p-2 rounded-lg shadow-sm mr-3">
+                        <CreditCard className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-blue-800">Tarjeta de Crédito/Débito</p>
+                        <p className="text-xs text-blue-600">Pago seguro con encriptación</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center text-blue-600">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity mr-2 text-xs font-bold">
+                        SELECCIONAR
+                      </div>
+                      <ChevronRight className="h-5 w-5 transform group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Navegación */}
+                <div className="flex justify-between mt-6">
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center border-2 border-gray-300 hover:bg-gray-100 transition-colors" 
+                    onClick={() => setStep('documentos')}
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Volver
+                  </Button>
+                  
+                  <Button
+                    className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
+                    onClick={() => handleSeleccionarPago('tarjeta')}
+                  >
+                    Procesar Pago
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -559,65 +797,159 @@ const WebAppPOSButtons = () => {
         
       case 'comprobante':
         const docFinal = documentosDisponibles.find(d => d.id === tipoDocumento);
+        const codigoComprobante = `VEC-${Math.floor(100000 + Math.random() * 900000)}`;
         
         return (
           <div className="space-y-6">
-            <div className="text-center mb-6">
-              <CheckCircle2 className="h-20 w-20 text-green-500 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold">¡Pago procesado con éxito!</h2>
-              <p className="text-gray-500">Documento registrado y enviado al cliente</p>
-            </div>
-            
-            <div className="max-w-md mx-auto">
-              <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                <h3 className="text-xl font-medium text-center mb-4">Comprobante de pago</h3>
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Código:</span>
-                    <span className="font-medium">VEC-{Math.floor(100000 + Math.random() * 900000)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Documento:</span>
-                    <span className="font-medium">{docFinal?.nombre}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Monto:</span>
-                    <span className="font-medium">${docFinal?.precio}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Método pago:</span>
-                    <span className="font-medium">{metodoPago.toUpperCase()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Fecha y hora:</span>
-                    <span className="font-medium">{new Date().toLocaleString()}</span>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col space-y-3">
-                  <Button 
-                    className="w-full flex justify-center items-center"
-                    onClick={imprimirComprobante}
-                  >
-                    <Printer className="mr-2 h-5 w-5" />
-                    Imprimir comprobante
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="w-full flex justify-center items-center"
-                    onClick={() => setShowPreview(true)}
-                  >
-                    <FileText className="mr-2 h-5 w-5" />
-                    Ver documento
-                  </Button>
+            {/* Animación de éxito con confeti visual */}
+            <div className="text-center mb-6 relative">
+              <div className="absolute inset-0 flex justify-center">
+                <div className="relative w-32 h-32">
+                  {/* Círculos animados que simulan un confeti simple */}
+                  {[...Array(20)].map((_, i) => (
+                    <div
+                      key={i}
+                      className={`absolute rounded-full w-2 h-2 opacity-70 animate-ping`}
+                      style={{
+                        backgroundColor: ['#34D399', '#60A5FA', '#F59E0B', '#EC4899'][i % 4],
+                        top: `${Math.random() * 100}%`,
+                        left: `${Math.random() * 100}%`,
+                        animationDuration: `${1 + Math.random() * 3}s`,
+                        animationDelay: `${Math.random() * 0.5}s`
+                      }}
+                    />
+                  ))}
                 </div>
               </div>
               
+              <div className="relative w-24 h-24 mx-auto mb-4">
+                <div className="absolute inset-0 bg-green-100 rounded-full animate-pulse opacity-40"></div>
+                <div className="absolute inset-3 bg-green-200 rounded-full animate-pulse opacity-60 delay-100"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <CheckCircle2 className="h-14 w-14 text-green-500" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-green-700">¡Operación exitosa!</h2>
+              <p className="text-gray-600 max-w-md mx-auto">El documento ha sido procesado y enviado al correo del cliente</p>
+            </div>
+            
+            <div className="max-w-md mx-auto">
+              {/* Ticket estilo comprobante de compra */}
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 relative mb-8">
+                {/* Borde superior estilo ticket */}
+                <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-green-500 to-green-400"></div>
+                
+                {/* Cabecera del ticket */}
+                <div className="pt-6 pb-4 px-6 text-center border-b border-dashed border-gray-200">
+                  <div className="font-bold text-xl text-gray-800 mb-1">VECINOS XPRESS</div>
+                  <div className="text-sm text-gray-600">Comprobante de Documento Digital</div>
+                  <div className="mt-2 inline-block bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">
+                    PAGO APROBADO
+                  </div>
+                </div>
+                
+                {/* Contenido del ticket */}
+                <div className="px-6 py-4">
+                  {/* Datos del documento y transacción */}
+                  <div className="mb-4">
+                    <div className="flex items-center mb-3">
+                      <div className="p-1.5 bg-green-100 rounded mr-3">
+                        {docFinal?.id === 'contrato' && <div className="text-xl">📄</div>}
+                        {docFinal?.id === 'declaracion' && <div className="text-xl">📝</div>}
+                        {docFinal?.id === 'autorizacion' && <div className="text-xl">✅</div>}
+                        {docFinal?.id === 'finiquito' && <div className="text-xl">📋</div>}
+                        {docFinal?.id === 'compraventa' && <div className="text-xl">🔄</div>}
+                        {docFinal?.id === 'arriendo' && <div className="text-xl">🏠</div>}
+                      </div>
+                      <h3 className="font-bold text-lg">{docFinal?.nombre}</h3>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                      <div className="bg-gray-50 p-3 rounded">
+                        <div className="text-xs text-gray-500 mb-1">Cliente</div>
+                        <div className="font-medium">{clienteInfo.nombre}</div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded">
+                        <div className="text-xs text-gray-500 mb-1">RUT</div>
+                        <div className="font-medium">{clienteInfo.rut}</div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2 border-t border-gray-100 pt-3">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Código:</span>
+                        <span className="font-medium font-mono">{codigoComprobante}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Fecha:</span>
+                        <span className="font-medium">{new Date().toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Hora:</span>
+                        <span className="font-medium">{new Date().toLocaleTimeString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Método de pago:</span>
+                        <span className="font-medium">{metodoPago === 'tarjeta' ? 'Tarjeta' : metodoPago.toUpperCase()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm font-bold pt-2 mt-2 border-t border-gray-100">
+                        <span>Total pagado:</span>
+                        <span className="text-green-600">${docFinal?.precio}</span>
+                      </div>
+                      <div className="flex justify-between text-xs bg-yellow-50 p-2 rounded mt-1">
+                        <span className="text-yellow-800">Su comisión:</span>
+                        <span className="font-bold text-yellow-800">${Math.round((docFinal?.precio || 0) * 0.15)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* QR code placeholder */}
+                  <div className="flex flex-col items-center mt-4 mb-2 pt-3 border-t border-dashed border-gray-200">
+                    <div className="w-24 h-24 bg-gray-200 rounded-lg mb-2 flex items-center justify-center text-gray-400">
+                      QR Code
+                    </div>
+                    <div className="text-xs text-gray-500 text-center">
+                      Escanee para verificar la autenticidad del documento
+                    </div>
+                  </div>
+                  
+                  {/* Botones de acción */}
+                  <div className="grid grid-cols-2 gap-3 mt-6">
+                    <Button 
+                      variant="outline"
+                      className="flex items-center justify-center border-green-200 text-green-700 hover:bg-green-50"
+                      onClick={imprimirComprobante}
+                    >
+                      <Printer className="mr-2 h-4 w-4" />
+                      Imprimir
+                    </Button>
+                    
+                    <Button 
+                      variant="outline"
+                      className="flex items-center justify-center border-blue-200 text-blue-700 hover:bg-blue-50"
+                      onClick={() => setShowPreview(true)}
+                    >
+                      <FileText className="mr-2 h-4 w-4" />
+                      Ver documento
+                    </Button>
+                  </div>
+                </div>
+                
+                {/* Pie del ticket */}
+                <div className="py-3 px-6 bg-gray-50 text-center text-xs text-gray-500 border-t border-dashed border-gray-200">
+                  <p>Gracias por usar Vecinos NotaryPro Xpress</p>
+                  <p className="mt-1">Documento verificable en www.tuu.cl/verificar</p>
+                </div>
+                
+                {/* Borde inferior estilo ticket */}
+                <div className="absolute bottom-0 left-0 right-0 h-3 bg-gradient-to-r from-green-400 to-green-500"></div>
+              </div>
+              
+              {/* Botones de navegación */}
               <div className="flex justify-between">
                 <Button 
-                  variant="ghost" 
-                  className="flex items-center"
+                  variant="outline"
+                  className="border-2 border-gray-300 hover:bg-gray-100 flex items-center"
                   onClick={() => {
                     setIdentityVerified(false);
                     setPhotoTaken(false);
@@ -630,11 +962,11 @@ const WebAppPOSButtons = () => {
                 </Button>
                 
                 <Button 
-                  variant="default"
+                  className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
                   onClick={() => setProcesoCompletado(true)}
                 >
-                  <Download className="mr-2 h-4 w-4" />
-                  Finalizar
+                  <Check className="mr-2 h-4 w-4" />
+                  Finalizar trámite
                 </Button>
               </div>
             </div>
@@ -648,20 +980,52 @@ const WebAppPOSButtons = () => {
 
   return (
     <div className="bg-zinc-100 min-h-screen">
-      {/* Header estilo almacén */}
-      <div className="bg-yellow-500 text-black shadow-lg border-b-4 border-yellow-600">
-        <div className="container mx-auto py-3 px-4">
+      {/* Header estilo almacén con elementos gráficos mejorados */}
+      <div className="bg-gradient-to-r from-yellow-500 to-yellow-400 text-black shadow-lg border-b-4 border-yellow-600">
+        <div className="container mx-auto py-4 px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="bg-white p-1.5 rounded-md shadow-md border border-yellow-600">
-                <h1 className="text-xl font-extrabold">VECINOS <span className="text-blue-600">XPRESS</span></h1>
+              <div className="bg-white p-2 rounded-md shadow-md border-2 border-yellow-600 relative overflow-hidden">
+                {/* Estilo gráfico tipo etiqueta de precio */}
+                <div className="absolute -right-8 -top-8 w-16 h-16 bg-red-600 rotate-45"></div>
+                <h1 className="text-xl font-black relative z-10">
+                  VECINOS <span className="text-blue-600">XPRESS</span>
+                </h1>
+                <div className="h-1 w-3/4 bg-gradient-to-r from-blue-500 to-green-500 mt-1"></div>
               </div>
-              <div className="ml-3 bg-red-600 text-white px-2 py-0.5 text-xs font-bold rounded">SISTEMA POS v1.3.1</div>
+              <div className="ml-3 bg-red-600 text-white px-3 py-1 text-xs font-bold rounded-full flex items-center border-2 border-white shadow-sm">
+                <div className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></div>
+                SISTEMA POS v1.3.1
+              </div>
             </div>
             
-            <div className="text-right bg-white px-3 py-1 rounded-md shadow border border-yellow-600">
-              <p className="text-sm font-bold">ALMACÉN DON PEDRO</p>
-              <p className="text-xs bg-blue-600 text-white px-1 rounded inline-block">LOCAL-XP125</p>
+            <div className="relative">
+              {/* Estilo tarjeta identificativa comercio */}
+              <div className="text-right bg-white px-4 py-2 rounded-lg shadow-lg border-2 border-yellow-600 relative overflow-hidden">
+                {/* Patrón gráfico en el fondo */}
+                <div className="absolute inset-0 opacity-5">
+                  <div className="grid grid-cols-10 grid-rows-5 gap-1 h-full">
+                    {Array(50).fill(0).map((_, i) => (
+                      <div key={i} className="bg-blue-600 rounded-sm"></div>
+                    ))}
+                  </div>
+                </div>
+                <p className="text-sm font-black relative z-10">ALMACÉN DON PEDRO</p>
+                <div className="flex items-center justify-end mt-1">
+                  <div className="flex items-center bg-green-100 px-2 py-0.5 rounded-full border border-green-300 mr-1">
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></div>
+                    <span className="text-xs text-green-800 font-medium">ACTIVO</span>
+                  </div>
+                  <div className="bg-blue-600 text-white px-2 py-0.5 text-xs font-bold rounded-full border border-blue-300 shadow-sm">
+                    LOCAL-XP125
+                  </div>
+                </div>
+              </div>
+              
+              {/* Etiqueta colgante estilo almacén */}
+              <div className="absolute -right-2 -top-3 w-8 h-10 bg-red-500 rounded-t-lg flex justify-center items-center shadow-md transform rotate-12">
+                <div className="w-2 h-2 rounded-full bg-white border border-red-600"></div>
+              </div>
             </div>
           </div>
         </div>
