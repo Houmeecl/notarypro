@@ -54,6 +54,13 @@ const WebAppPOSButtons = () => {
   ];
 
   const handleRegistrarCliente = () => {
+    // Guardar información del cliente en el estado
+    setClienteInfo({
+      nombre: (document.getElementById('nombre') as HTMLInputElement)?.value || 'Juan Pérez González',
+      rut: (document.getElementById('rut') as HTMLInputElement)?.value || '12.345.678-9',
+      email: (document.getElementById('email') as HTMLInputElement)?.value || 'juan@ejemplo.cl',
+      telefono: (document.getElementById('telefono') as HTMLInputElement)?.value || '+56 9 1234 5678'
+    });
     setStep('documentos');
   };
 
@@ -132,19 +139,19 @@ const WebAppPOSButtons = () => {
               <div class="section-title">Datos del Cliente</div>
               <div class="field">
                 <div class="field-label">Nombre:</div>
-                <div>${document.getElementById('nombre')?.value || 'Juan Pérez González'}</div>
+                <div>${clienteInfo.nombre}</div>
               </div>
               <div class="field">
                 <div class="field-label">RUT:</div>
-                <div>${document.getElementById('rut')?.value || '12.345.678-9'}</div>
+                <div>${clienteInfo.rut}</div>
               </div>
               <div class="field">
                 <div class="field-label">Email:</div>
-                <div>${document.getElementById('email')?.value || 'juan@ejemplo.cl'}</div>
+                <div>${clienteInfo.email}</div>
               </div>
               <div class="field">
                 <div class="field-label">Teléfono:</div>
-                <div>${document.getElementById('telefono')?.value || '+56 9 1234 5678'}</div>
+                <div>${clienteInfo.telefono}</div>
               </div>
             </div>
             
@@ -604,10 +611,20 @@ const WebAppPOSButtons = () => {
                 <Button 
                   size="lg"
                   className="w-full p-6 text-lg flex items-center justify-center"
-                  onClick={reiniciarProceso}
+                  onClick={imprimirComprobante}
                 >
                   <Printer className="mr-2 h-5 w-5" />
                   Imprimir comprobante
+                </Button>
+                
+                <Button 
+                  size="lg"
+                  variant="default"
+                  className="w-full p-6 text-lg flex items-center justify-center"
+                  onClick={mostrarVistaPrevia}
+                >
+                  <FileText className="mr-2 h-5 w-5" />
+                  Ver documento
                 </Button>
                 
                 <Button 
@@ -691,6 +708,375 @@ const WebAppPOSButtons = () => {
           {getPantallaActual()}
         </div>
       </div>
+      
+      {/* Modal para ver vista previa del documento */}
+      {showPreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto">
+            <div className="p-4 border-b flex justify-between items-center sticky top-0 bg-white z-10">
+              <h2 className="text-lg font-bold">Vista previa del documento</h2>
+              <Button variant="ghost" size="icon" onClick={() => setShowPreview(false)}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <div className="p-0 max-h-[70vh] overflow-auto">
+              <iframe 
+                srcDoc={documentPreview}
+                className="w-full h-[70vh]"
+                title="Vista previa del documento"
+              />
+            </div>
+            
+            <div className="p-4 border-t flex justify-between sticky bottom-0 bg-white z-10">
+              <Button variant="outline" onClick={() => setShowPreview(false)}>
+                Cerrar
+              </Button>
+              <div className="space-x-2">
+                <Button variant="outline" onClick={iniciarCamara} disabled={identityVerified}>
+                  <UserCheck className="h-4 w-4 mr-2" />
+                  {identityVerified ? 'Identidad verificada' : 'Verificar identidad'}
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setShowPreview(false);
+                    setStep('firmar');
+                    setTimeout(iniciarFirma, 500);
+                  }}
+                  disabled={!identityVerified}
+                >
+                  <FileSignature className="h-4 w-4 mr-2" />
+                  Firmar documento
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Modal para captura de identidad con cámara */}
+      {showCamera && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-xl">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-lg font-bold">Verificación de identidad</h2>
+              <Button variant="ghost" size="icon" onClick={() => setShowCamera(false)}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <div className="p-6">
+              <p className="mb-4 text-gray-600">
+                Para verificar la identidad del firmante, necesitamos tomar una foto. 
+                Por favor asegúrese de que el rostro sea claramente visible.
+              </p>
+              
+              <div className="bg-gray-100 rounded-lg overflow-hidden mb-4">
+                {!photoTaken ? (
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    className="w-full h-auto"
+                    style={{ maxHeight: '50vh' }}
+                  />
+                ) : (
+                  <canvas
+                    ref={photoRef}
+                    className="w-full h-auto"
+                    style={{ maxHeight: '50vh' }}
+                  />
+                )}
+              </div>
+              
+              <div className="flex justify-between">
+                <Button variant="outline" onClick={() => {
+                  setPhotoTaken(false);
+                  setShowCamera(false);
+                }}>
+                  Cancelar
+                </Button>
+                
+                {!photoTaken ? (
+                  <Button onClick={tomarFoto}>
+                    <Camera className="h-4 w-4 mr-2" />
+                    Tomar foto
+                  </Button>
+                ) : (
+                  <div className="space-x-2">
+                    <Button variant="outline" onClick={() => setPhotoTaken(false)}>
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Volver a tomar
+                    </Button>
+                    <Button onClick={verificarIdentidad}>
+                      <UserCheck className="h-4 w-4 mr-2" />
+                      Verificar
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Panel de firma digital */}
+      {step === 'firmar' && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-lg font-bold">Firma de documento</h2>
+              <Button variant="ghost" size="icon" onClick={() => setStep('comprobante')}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <div className="p-6">
+              <p className="mb-4 text-gray-600">
+                Por favor, firme en el área indicada utilizando el mouse o pantalla táctil.
+              </p>
+              
+              <div className="border-2 border-gray-300 rounded-lg mb-4 bg-gray-50">
+                <canvas
+                  ref={signatureCanvasRef}
+                  width={560}
+                  height={200}
+                  className="w-full h-[200px] touch-none"
+                  onMouseDown={iniciarDibujo}
+                  onMouseMove={dibujar}
+                  onMouseUp={terminarDibujo}
+                  onMouseLeave={terminarDibujo}
+                  onTouchStart={iniciarDibujo}
+                  onTouchMove={dibujar}
+                  onTouchEnd={terminarDibujo}
+                />
+              </div>
+              
+              <div className="flex justify-between">
+                <Button variant="outline" onClick={limpiarFirma}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Limpiar firma
+                </Button>
+                
+                <div className="space-x-2">
+                  <Button variant="secondary" onClick={() => setStep('comprobante')}>
+                    Cancelar
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      if (signatureImage) {
+                        setStep('comprobante');
+                        toast({
+                          title: "Documento firmado",
+                          description: "El documento ha sido firmado correctamente.",
+                          variant: "default",
+                        });
+                        
+                        // Si es administrador o certificador, mostrar panel de certificación
+                        if (certificadorMode) {
+                          mostrarPanelCertificador();
+                        }
+                      } else {
+                        toast({
+                          title: "Firma requerida",
+                          description: "Por favor firme el documento antes de continuar.",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
+                  >
+                    <Check className="h-4 w-4 mr-2" />
+                    Confirmar firma
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Panel de certificador */}
+      {showCertifierPanel && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-lg font-bold">Panel de Certificación</h2>
+              <Button variant="ghost" size="icon" onClick={() => setShowCertifierPanel(false)}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <div className="p-6">
+              <Tabs defaultValue="document" className="w-full">
+                <TabsList className="grid grid-cols-3 mb-4">
+                  <TabsTrigger value="document">Documento</TabsTrigger>
+                  <TabsTrigger value="identity">Identidad</TabsTrigger>
+                  <TabsTrigger value="certification">Certificación</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="document" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Revisión de documento</CardTitle>
+                      <CardDescription>
+                        Verifique el contenido y validez del documento
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="p-4 border rounded-lg bg-gray-50">
+                          <h3 className="font-medium mb-2">Documento</h3>
+                          <p className="text-sm text-gray-600 mb-4">
+                            {documentosDisponibles.find(d => d.id === tipoDocumento)?.nombre}
+                          </p>
+                          
+                          <div className="flex justify-between mb-2">
+                            <span className="text-sm text-gray-600">Firmado por:</span>
+                            <span className="text-sm font-medium">{clienteInfo.nombre}</span>
+                          </div>
+                          
+                          <div className="flex justify-between">
+                            <span className="text-sm text-gray-600">RUT:</span>
+                            <span className="text-sm font-medium">{clienteInfo.rut}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-end space-x-2">
+                          <Button>Ver documento completo</Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="identity" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Verificación de identidad</CardTitle>
+                      <CardDescription>
+                        Confirme la identidad del firmante
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {identityVerified ? (
+                        <div className="p-4 border rounded-lg border-green-200 bg-green-50">
+                          <div className="flex items-center mb-4">
+                            <Check className="h-5 w-5 text-green-500 mr-2" />
+                            <h3 className="font-medium text-green-700">Identidad verificada</h3>
+                          </div>
+                          
+                          <div className="grid md:grid-cols-2 gap-4">
+                            <div className="p-3 bg-white rounded border">
+                              <p className="text-sm font-medium mb-1">Foto de identidad</p>
+                              <div className="aspect-video bg-gray-100 rounded flex items-center justify-center">
+                                {photoTaken ? (
+                                  <canvas
+                                    ref={photoRef}
+                                    className="w-full h-auto object-contain"
+                                  />
+                                ) : (
+                                  <span className="text-xs text-gray-500">No disponible</span>
+                                )}
+                              </div>
+                            </div>
+                            
+                            <div className="p-3 bg-white rounded border">
+                              <p className="text-sm font-medium mb-1">Información verificada</p>
+                              <div className="space-y-2">
+                                <div className="flex justify-between">
+                                  <span className="text-xs text-gray-600">Nombre:</span>
+                                  <span className="text-xs font-medium">{clienteInfo.nombre}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-xs text-gray-600">RUT:</span>
+                                  <span className="text-xs font-medium">{clienteInfo.rut}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-xs text-gray-600">Fecha:</span>
+                                  <span className="text-xs font-medium">{new Date().toLocaleDateString()}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-4 border rounded-lg border-amber-200 bg-amber-50">
+                          <p className="text-amber-700">La identidad del firmante no ha sido verificada.</p>
+                          <Button className="mt-4" onClick={iniciarCamara}>
+                            Verificar ahora
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="certification" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Emitir Certificación</CardTitle>
+                      <CardDescription>
+                        Complete el proceso de certificación del documento
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-6">
+                        <div className="p-4 border rounded-lg bg-gray-50">
+                          <h3 className="font-medium mb-3">Estado de requisitos</h3>
+                          
+                          <div className="space-y-2">
+                            <div className="flex items-center">
+                              <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-2 ${signatureImage ? 'bg-green-500 text-white' : 'bg-gray-300'}`}>
+                                {signatureImage && <Check className="h-3 w-3" />}
+                              </div>
+                              <span className={signatureImage ? 'text-green-700' : 'text-gray-500'}>
+                                Firma del documento
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center">
+                              <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-2 ${identityVerified ? 'bg-green-500 text-white' : 'bg-gray-300'}`}>
+                                {identityVerified && <Check className="h-3 w-3" />}
+                              </div>
+                              <span className={identityVerified ? 'text-green-700' : 'text-gray-500'}>
+                                Verificación de identidad
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center">
+                              <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-2 ${true ? 'bg-green-500 text-white' : 'bg-gray-300'}`}>
+                                <Check className="h-3 w-3" />
+                              </div>
+                              <span className="text-green-700">
+                                Pago procesado
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <Button 
+                          className="w-full"
+                          onClick={() => {
+                            setShowCertifierPanel(false);
+                            toast({
+                              title: "Documento certificado",
+                              description: "El documento ha sido certificado correctamente.",
+                              variant: "default",
+                            });
+                          }}
+                          disabled={!identityVerified || !signatureImage}
+                        >
+                          <Shield className="h-4 w-4 mr-2" />
+                          Certificar y finalizar
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
