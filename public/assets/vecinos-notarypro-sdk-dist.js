@@ -645,10 +645,9 @@
       };
       
       // Mapeo de métodos de pago a nombres legibles
+      // Solo se acepta tarjeta como método de pago
       const metodosPago = {
-        'efectivo': 'Efectivo',
-        'tarjeta': 'Tarjeta',
-        'transferencia': 'Transferencia Bancaria'
+        'tarjeta': 'Tarjeta'
       };
       
       return `<!DOCTYPE html>
