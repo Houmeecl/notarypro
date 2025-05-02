@@ -1,303 +1,180 @@
 /**
- * Módulo de integración con GetAPI.cl para validación de identidad
+ * Cliente para la API de GetAPI.cl
  * 
- * Este módulo proporciona funciones para verificar la identidad de los usuarios
- * utilizando los servicios de GetAPI.cl.
- * 
- * La documentación de referencia completa está disponible en:
- * https://getapi.cl/identity-validation/
+ * Este archivo proporciona utilidades para validar identidad
+ * mediante la API de GetAPI.cl
  */
 
 import axios from 'axios';
 
-const API_KEY = process.env.GETAPI_API_KEY;
-const API_BASE_URL = 'https://api.getapi.cl';
-
-/**
- * Interfaz para los datos de la persona a validar
- */
-export interface PersonData {
-  nombre: string;
-  apellido: string;
-  rut: string;
-  fechaNacimiento?: string; // Formato YYYY-MM-DD
-  numeroCelular?: string;
-  email?: string;
+// Tipos para las opciones de validación
+export interface ValidationOptions {
+  strictMode?: boolean;
+  requiredScore?: number;
+  verifyLivingStatus?: boolean;
 }
 
-/**
- * Respuesta de la verificación de identidad
- */
-export interface IdentityVerificationResponse {
-  status: 'success' | 'error';
-  verified: boolean;
-  score: number; // 0-100
-  details?: {
-    nameMatch?: boolean;
-    lastNameMatch?: boolean;
-    dateOfBirthMatch?: boolean;
-    documentValid?: boolean;
-    livingStatus?: 'alive' | 'deceased' | 'unknown';
-  };
+// Tipos para la respuesta de la API
+export interface ValidationResponse {
+  success: boolean;
+  score?: number;
   message?: string;
-  referenceId?: string;
+  validatedFields?: string[];
+  errors?: string[];
+  data?: any;
 }
 
-/**
- * Opciones de configuración para la verificación
- */
-export interface VerificationOptions {
-  requiredScore?: number; // Puntaje mínimo para aprobar la verificación (0-100)
-  verifyLivingStatus?: boolean; // Verificar si la persona está viva
-  strictMode?: boolean; // Modo estricto para validación
-}
-
-/**
- * Verifica la identidad de una persona utilizando GetAPI.cl
- * 
- * @param person Datos de la persona a verificar
- * @param options Opciones de verificación
- * @returns Respuesta con el resultado de la verificación
- */
-export async function verifyIdentity(
-  person: PersonData,
-  options: VerificationOptions = { requiredScore: 80, verifyLivingStatus: true, strictMode: false }
-): Promise<IdentityVerificationResponse> {
-  try {
-    // Verificar que tenemos la API key configurada
-    if (!API_KEY) {
-      throw new Error('GETAPI_API_KEY no está configurada en las variables de entorno');
-    }
-
-    // Validar el formato del RUT antes de enviar
-    if (!validateRut(person.rut)) {
+// Cliente para validación de identidad
+class GetAPIValidator {
+  private apiBaseUrl: string = '/api/identity';
+  
+  /**
+   * Validación básica de identidad usando RUT y nombre
+   * 
+   * @param rut RUT de la persona a validar
+   * @param nombre Nombre de la persona
+   * @param apellido Apellido de la persona
+   * @param options Opciones adicionales de validación
+   */
+  async validateIdentity(
+    rut: string, 
+    nombre: string, 
+    apellido: string, 
+    options: ValidationOptions = {}
+  ): Promise<ValidationResponse> {
+    try {
+      const response = await axios.post(`${this.apiBaseUrl}/verify`, {
+        rut,
+        nombre,
+        apellido,
+        options: {
+          strictMode: options.strictMode ?? true,
+          requiredScore: options.requiredScore ?? 80,
+          verifyLivingStatus: options.verifyLivingStatus ?? false
+        }
+      });
+      
+      return response.data;
+    } catch (error) {
+      console.error("Error validando identidad:", error);
+      
+      if (axios.isAxiosError(error) && error.response) {
+        return {
+          success: false,
+          message: error.response.data?.message || 'Error en la validación de identidad',
+          errors: [error.response.data?.message || error.message]
+        };
+      }
+      
       return {
-        status: 'error',
-        verified: false,
-        score: 0,
-        message: 'El formato del RUT es inválido'
+        success: false,
+        message: 'Error de conexión con el servicio de validación',
+        errors: [error instanceof Error ? error.message : 'Error desconocido']
       };
     }
-
-    // Preparar el payload para la API
-    const payload = {
-      identity: {
-        name: person.nombre,
-        lastName: person.apellido,
-        rut: formatRut(person.rut), // Aseguramos formato estándar XX.XXX.XXX-X
-        dateOfBirth: person.fechaNacimiento || '',
-        phone: person.numeroCelular || '',
-        email: person.email || ''
-      },
-      options: {
-        strictMode: options.strictMode,
-        requiredScore: options.requiredScore || 80,
-        verifyLivingStatus: options.verifyLivingStatus || true
-      }
-    };
-
-    // Realizar la llamada a la API
-    const response = await axios.post(
-      `${API_BASE_URL}/v1/identity/verify`,
-      payload,
-      {
-        headers: {
-          'Authorization': `Bearer ${API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    // Procesar la respuesta
-    const { data } = response;
-    
-    return {
-      status: 'success',
-      verified: data.verified,
-      score: data.score,
-      details: {
-        nameMatch: data.details?.nameMatch,
-        lastNameMatch: data.details?.lastNameMatch,
-        dateOfBirthMatch: data.details?.dobMatch,
-        documentValid: data.details?.documentValid,
-        livingStatus: data.details?.livingStatus
-      },
-      referenceId: data.referenceId
-    };
-  } catch (error) {
-    console.error('Error al verificar identidad con GetAPI:', error);
-    
-    let errorMessage = 'Error al conectar con el servicio de verificación';
-    
-    if (axios.isAxiosError(error) && error.response) {
-      errorMessage = `Error ${error.response.status}: ${
-        error.response.data?.message || 'Error del servicio de verificación'
-      }`;
-    }
-    
-    return {
-      status: 'error',
-      verified: false,
-      score: 0,
-      message: errorMessage
-    };
   }
-}
-
-/**
- * Verifica una identidad contra una imagen de documento
- * 
- * @param person Datos de la persona a verificar
- * @param documentImage Base64 de la imagen del documento
- * @param selfieImage Base64 de la selfie (opcional)
- * @returns Respuesta con el resultado de la verificación
- */
-export async function verifyIdentityWithDocument(
-  person: PersonData,
-  documentImage: string,
-  selfieImage?: string
-): Promise<IdentityVerificationResponse> {
-  try {
-    // Verificar que tenemos la API key configurada
-    if (!API_KEY) {
-      throw new Error('GETAPI_API_KEY no está configurada en las variables de entorno');
-    }
-
-    // Validar el formato del RUT
-    if (!validateRut(person.rut)) {
+  
+  /**
+   * Validación de identidad con documento
+   * 
+   * @param formData FormData con los datos del documento y la identidad
+   */
+  async validateWithDocument(formData: FormData): Promise<ValidationResponse> {
+    try {
+      const response = await axios.post(`${this.apiBaseUrl}/verify-document`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      return response.data;
+    } catch (error) {
+      console.error("Error validando documento:", error);
+      
+      if (axios.isAxiosError(error) && error.response) {
+        return {
+          success: false,
+          message: error.response.data?.message || 'Error en la validación del documento',
+          errors: [error.response.data?.message || error.message]
+        };
+      }
+      
       return {
-        status: 'error',
-        verified: false,
-        score: 0,
-        message: 'El formato del RUT es inválido'
+        success: false,
+        message: 'Error de conexión con el servicio de validación',
+        errors: [error instanceof Error ? error.message : 'Error desconocido']
       };
     }
-
-    // Preparar el payload para la API
-    const payload = {
-      identity: {
-        name: person.nombre,
-        lastName: person.apellido,
-        rut: formatRut(person.rut),
-        dateOfBirth: person.fechaNacimiento || '',
-        phone: person.numeroCelular || '',
-        email: person.email || ''
-      },
-      document: {
-        image: documentImage
-      },
-      ...(selfieImage && { selfie: { image: selfieImage } })
-    };
-
-    // Realizar la llamada a la API
-    const response = await axios.post(
-      `${API_BASE_URL}/v1/identity/verify-document`,
-      payload,
-      {
-        headers: {
-          'Authorization': `Bearer ${API_KEY}`,
-          'Content-Type': 'application/json'
-        }
+  }
+  
+  /**
+   * Extracción de información desde un documento
+   * 
+   * @param documentImage Imagen del documento en formato Base64 o Blob
+   */
+  async extractDocumentInfo(documentImage: Blob | string): Promise<ValidationResponse> {
+    try {
+      const formData = new FormData();
+      
+      if (typeof documentImage === 'string') {
+        // Convertir base64 a Blob
+        const response = await fetch(documentImage);
+        const blob = await response.blob();
+        formData.append('documentImage', blob, 'document.jpg');
+      } else {
+        formData.append('documentImage', documentImage, 'document.jpg');
       }
-    );
-
-    // Procesar la respuesta
-    const { data } = response;
-    
-    return {
-      status: 'success',
-      verified: data.verified,
-      score: data.score,
-      details: {
-        nameMatch: data.details?.nameMatch,
-        lastNameMatch: data.details?.lastNameMatch,
-        dateOfBirthMatch: data.details?.dobMatch,
-        documentValid: data.details?.documentValid
-      },
-      referenceId: data.referenceId
-    };
-  } catch (error) {
-    console.error('Error al verificar identidad con documento en GetAPI:', error);
-    
-    let errorMessage = 'Error al conectar con el servicio de verificación';
-    
-    if (axios.isAxiosError(error) && error.response) {
-      errorMessage = `Error ${error.response.status}: ${
-        error.response.data?.message || 'Error del servicio de verificación'
-      }`;
-    }
-    
-    return {
-      status: 'error',
-      verified: false,
-      score: 0,
-      message: errorMessage
-    };
-  }
-}
-
-/**
- * Valida el formato del RUT chileno
- * 
- * @param rut RUT a validar
- * @returns true si el RUT es válido
- */
-export function validateRut(rut: string): boolean {
-  // Eliminar puntos y guiones
-  const cleanRut = rut.replace(/\./g, '').replace('-', '');
-  
-  // Verificar longitud mínima
-  if (cleanRut.length < 2) return false;
-  
-  // Separar cuerpo y dígito verificador
-  const body = cleanRut.slice(0, -1);
-  const dv = cleanRut.slice(-1).toUpperCase();
-  
-  // Verificar que el cuerpo sean solo números
-  if (!/^\d+$/.test(body)) return false;
-  
-  // Calcular dígito verificador
-  let sum = 0;
-  let multiplier = 2;
-  
-  for (let i = body.length - 1; i >= 0; i--) {
-    sum += parseInt(body.charAt(i)) * multiplier;
-    multiplier = multiplier === 7 ? 2 : multiplier + 1;
-  }
-  
-  const expectedDV = 11 - (sum % 11);
-  const calculatedDV = expectedDV === 11 ? '0' : expectedDV === 10 ? 'K' : expectedDV.toString();
-  
-  return dv === calculatedDV;
-}
-
-/**
- * Formatea un RUT al formato estándar XX.XXX.XXX-X
- * 
- * @param rut RUT a formatear
- * @returns RUT formateado
- */
-export function formatRut(rut: string): string {
-  // Eliminar puntos y guiones
-  let cleanRut = rut.replace(/\./g, '').replace('-', '');
-  
-  // Separar cuerpo y dígito verificador
-  const body = cleanRut.slice(0, -1);
-  const dv = cleanRut.slice(-1).toUpperCase();
-  
-  // Formatear el cuerpo con puntos
-  let formattedBody = '';
-  let count = 0;
-  
-  for (let i = body.length - 1; i >= 0; i--) {
-    count++;
-    formattedBody = body.charAt(i) + formattedBody;
-    if (count === 3 && i !== 0) {
-      formattedBody = '.' + formattedBody;
-      count = 0;
+      
+      const response = await axios.post(`${this.apiBaseUrl}/extract-document`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      return response.data;
+    } catch (error) {
+      console.error("Error extrayendo información del documento:", error);
+      
+      if (axios.isAxiosError(error) && error.response) {
+        return {
+          success: false,
+          message: error.response.data?.message || 'Error al extraer información del documento',
+          errors: [error.response.data?.message || error.message]
+        };
+      }
+      
+      return {
+        success: false,
+        message: 'Error de conexión con el servicio de extracción',
+        errors: [error instanceof Error ? error.message : 'Error desconocido']
+      };
     }
   }
   
-  // Retornar RUT formateado
-  return `${formattedBody}-${dv}`;
+  /**
+   * Formatear un RUT en formato estándar XX.XXX.XXX-X
+   * 
+   * @param rut RUT a formatear
+   */
+  formatRut(rut: string): string {
+    // Eliminar puntos y guiones
+    let value = rut.replace(/\./g, '').replace(/-/g, '').trim().toLowerCase();
+    
+    // Verificar si tiene dígito verificador
+    if (value.length <= 1) {
+      return value;
+    }
+    
+    // Extraer dígito verificador
+    const dv = value.substring(value.length - 1);
+    const rutBody = value.substring(0, value.length - 1);
+    
+    // Aplicar formato a la parte numérica
+    let formatted = rutBody.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    
+    // Retornar con formato XX.XXX.XXX-X
+    return `${formatted}-${dv}`;
+  }
 }
+
+export const getAPIValidator = new GetAPIValidator();

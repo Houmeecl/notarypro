@@ -13,7 +13,7 @@ import { MicroInteractionProvider } from "@/hooks/use-micro-interactions";
 import { MicroInteractionDisplay } from "@/components/micro-interactions/MicroInteractionDisplay";
 import { ProtectedRoute } from "./lib/protected-route";
 import { webSocketService } from "./lib/websocket";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { WebSocketDebugger } from "@/components/utils/WebSocketDebugger";
 import { Loader2 } from "lucide-react";
 
