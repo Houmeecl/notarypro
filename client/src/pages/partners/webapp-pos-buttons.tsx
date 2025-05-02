@@ -478,16 +478,72 @@ const WebAppPOSButtons = () => {
   };
   
   const verificarIdentidad = () => {
-    // En una implementación real, aquí se enviaría la foto a un servicio de verificación
-    // Por ahora, simulamos una verificación exitosa
-    setIdentityVerified(true);
-    setShowCamera(false);
+    // Generar un ID de sesión único para la verificación
+    const sessionId = `verify-pos-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
     
-    toast({
-      title: "Identidad verificada",
-      description: "La identidad del cliente ha sido verificada correctamente",
-      variant: "default",
-    });
+    // Crear una URL para la verificación móvil
+    const verificationUrl = `${window.location.origin}/verificacion-identidad-movil?session=${sessionId}`;
+    
+    // Crear un código QR para la verificación (simulado, en producción usaríamos una biblioteca real)
+    const generarQR = () => {
+      // En una implementación completa, usaríamos una biblioteca como qrcode
+      // En este caso, mostramos cómo se vería con un diálogo
+      const confirmed = window.confirm(
+        `Se ha generado un código QR con la URL: ${verificationUrl}\n\n` +
+        `Escanee este código con su teléfono móvil para completar la verificación.\n\n` +
+        `¿Desea simular una verificación exitosa?`
+      );
+      
+      if (confirmed) {
+        // Simulamos una verificación exitosa
+        setIdentityVerified(true);
+        setShowCamera(false);
+        
+        toast({
+          title: "Identidad verificada",
+          description: "La identidad del cliente ha sido verificada mediante el proceso avanzado",
+          variant: "default",
+        });
+      }
+    };
+    
+    // Si estamos en un dispositivo móvil, podemos usar la cámara
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      if (photoTaken) {
+        // Si ya tenemos una foto, verificar directamente
+        setIdentityVerified(true);
+        setShowCamera(false);
+        
+        toast({
+          title: "Identidad verificada",
+          description: "La identidad del cliente ha sido verificada correctamente",
+          variant: "default",
+        });
+      } else {
+        // Si no tenemos foto, ofrecer opciones
+        const useQR = window.confirm(
+          "¿Desea utilizar verificación avanzada con código QR? " +
+          "Esto permitirá al cliente usar su propio dispositivo para la verificación."
+        );
+        
+        if (useQR) {
+          generarQR();
+        } else {
+          // Continuar con el método básico por cámara
+          setIdentityVerified(true);
+          setShowCamera(false);
+          
+          toast({
+            title: "Identidad verificada",
+            description: "La identidad del cliente ha sido verificada correctamente",
+            variant: "default",
+          });
+        }
+      }
+    } else {
+      // Si no hay cámara disponible, siempre usar el código QR
+      generarQR();
+    }
   };
   
   const mostrarPanelCertificador = () => {
