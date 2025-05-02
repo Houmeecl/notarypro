@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { 
   Check, ArrowLeft, CheckCircle2, Printer, UserPlus, FileText, 
   CreditCard, ChevronRight, FileSignature, UserCheck, Shield, 
-  Camera, RefreshCw, Download, X
+  Camera, RefreshCw, Download, X, Fingerprint
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -1053,21 +1053,83 @@ const WebAppPOSButtons = () => {
                           </div>
                         </div>
                         
-                        <Button 
-                          className="w-full"
-                          onClick={() => {
-                            setShowCertifierPanel(false);
-                            toast({
-                              title: "Documento certificado",
-                              description: "El documento ha sido certificado correctamente.",
-                              variant: "default",
-                            });
-                          }}
-                          disabled={!identityVerified || !signatureImage}
-                        >
-                          <Shield className="h-4 w-4 mr-2" />
-                          Certificar y finalizar
-                        </Button>
+                        <div className="border rounded-lg p-4 bg-blue-50">
+                          <h3 className="font-medium mb-3 flex items-center">
+                            <Fingerprint className="h-5 w-5 mr-2 text-blue-600" />
+                            Firma electrónica avanzada de certificador
+                          </h3>
+                          <p className="text-sm text-gray-600 mb-4">
+                            Como certificador, debe agregar su firma electrónica avanzada para validar este documento
+                            con pleno valor legal según la Ley 19.799.
+                          </p>
+                          
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="bg-white p-3 border rounded">
+                                <p className="text-xs font-medium mb-1">Dispositivo</p>
+                                <p className="text-sm">eToken SafeNet 5110</p>
+                              </div>
+                              <div className="bg-white p-3 border rounded">
+                                <p className="text-xs font-medium mb-1">Certificado</p>
+                                <p className="text-sm truncate">Certificador NotaryPro</p>
+                              </div>
+                            </div>
+                            
+                            <div className="bg-white p-3 border rounded">
+                              <Label htmlFor="pin" className="text-xs font-medium">PIN de acceso</Label>
+                              <Input 
+                                id="pin" 
+                                type="password" 
+                                className="mt-1" 
+                                placeholder="Ingrese el PIN de su eToken" 
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-col gap-2">
+                          <Button 
+                            variant="default"
+                            className="w-full"
+                            onClick={() => {
+                              toast({
+                                title: "Firmando con eToken",
+                                description: "Procesando firma avanzada del certificador...",
+                              });
+                              
+                              // Simulamos el tiempo que tomaría firmar con eToken
+                              setTimeout(() => {
+                                setShowCertifierPanel(false);
+                                toast({
+                                  title: "Documento certificado",
+                                  description: "El documento ha sido certificado con firma electrónica avanzada.",
+                                  variant: "default",
+                                });
+                              }, 2000);
+                            }}
+                            disabled={!identityVerified || !signatureImage}
+                          >
+                            <Fingerprint className="h-4 w-4 mr-2" />
+                            Firmar con eToken y certificar
+                          </Button>
+                          
+                          <Button 
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => {
+                              setShowCertifierPanel(false);
+                              toast({
+                                title: "Documento certificado",
+                                description: "El documento ha sido certificado correctamente.",
+                                variant: "default",
+                              });
+                            }}
+                            disabled={!identityVerified || !signatureImage}
+                          >
+                            <Shield className="h-4 w-4 mr-2" />
+                            Certificar con firma simple
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
