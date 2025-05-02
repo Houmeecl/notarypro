@@ -28,6 +28,11 @@ const WebAppPOSButtons = () => {
   const [currentSignerIndex, setCurrentSignerIndex] = useState(0); // 0 = primer firmante, 1 = segundo firmante
   const [signatureImages, setSignatureImages] = useState<string[]>(['', '']);
   const [secondSignerVerified, setSecondSignerVerified] = useState(false);
+  const [firmantes, setFirmantes] = useState<Array<{
+    nombre: string;
+    rut: string;
+    relacion: string;
+  }>>([]);
   const { toast } = useToast();
   
   // Referencias para el canvas de firma
@@ -50,12 +55,7 @@ const WebAppPOSButtons = () => {
     telefono: ''
   });
   
-  // Estado para almacenar firmantes adicionales
-  const [firmantes, setFirmantes] = useState<Array<{
-    nombre: string;
-    rut: string;
-    relacion: string;
-  }>>([]);
+  // Este estado ya está declarado arriba y causa conflictos
   
   const documentosDisponibles = [
     { id: "doc1", nombre: "Declaración Jurada Simple", precio: 3500 },
