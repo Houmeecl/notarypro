@@ -1,6 +1,6 @@
 /**
  * ===============================================================
- * Vecinos NotaryPro Express - SDK para Puntos de Servicio v1.0
+ * Vecinos NotaryPro Express - SDK para Puntos de Servicio v1.3.1
  * ===============================================================
  * 
  * GUÍA DE INSTALACIÓN:
@@ -15,6 +15,10 @@
  * webView.getSettings().setJavaScriptEnabled(true);
  * webView.loadUrl("file:///android_asset/js/vecinos-notarypro-sdk.js");
  * ```
+ * 
+ * ACTUALIZACIÓN v1.3.1:
+ * - A partir de esta versión, SOLO se acepta pago con tarjeta.
+ * - Los métodos de pago en efectivo y transferencia ya no están disponibles.
  * 
  * Este SDK está diseñado para ser fácil de usar, incluso sin experiencia previa
  * en programación. Sigue los ejemplos para procesar documentos rápidamente.

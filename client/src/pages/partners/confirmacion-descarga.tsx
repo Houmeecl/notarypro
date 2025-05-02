@@ -31,13 +31,26 @@ const ConfirmacionDescarga = () => {
         <h1 className="text-3xl font-bold mb-4">¡Descarga iniciada!</h1>
         
         <div className="mb-8 p-6 border border-green-200 bg-green-50 rounded-md">
-          <p className="mb-4 text-lg">
+          <p className="mb-2 text-lg">
             Su archivo está siendo descargado. Por favor, revise la carpeta de descargas de su dispositivo.
           </p>
           
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-sm text-gray-600 mb-2">
             Si la descarga no inició automáticamente, puede hacer clic en el botón a continuación para intentar nuevamente.
           </p>
+          
+          <div className="mb-4 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
+            <p className="text-sm text-amber-700">
+              <strong>¡Importante!</strong> Esta versión solo acepta pagos con tarjeta. 
+              <a 
+                href="/downloads/actualizacion-v1.3.1.txt" 
+                target="_blank" 
+                className="text-blue-600 hover:underline ml-1"
+              >
+                Ver notas de actualización
+              </a>
+            </p>
+          </div>
           
           <Button 
             size="lg" 
