@@ -23,6 +23,11 @@ const WebAppPOSButtons = () => {
   const [showCertifierPanel, setShowCertifierPanel] = useState(false);
   const [signatureImage, setSignatureImage] = useState('');
   const [certificadorMode, setCertificadorMode] = useState(false);
+  
+  // Estado para múltiples firmantes
+  const [currentSignerIndex, setCurrentSignerIndex] = useState(0); // 0 = primer firmante, 1 = segundo firmante
+  const [signatureImages, setSignatureImages] = useState<string[]>(['', '']);
+  const [secondSignerVerified, setSecondSignerVerified] = useState(false);
   const { toast } = useToast();
   
   // Referencias para el canvas de firma
@@ -327,7 +332,13 @@ const WebAppPOSButtons = () => {
     
     // Guardar la imagen de la firma
     if (signatureCanvasRef.current) {
-      setSignatureImage(signatureCanvasRef.current.toDataURL());
+      const imageData = signatureCanvasRef.current.toDataURL();
+      setSignatureImage(imageData);
+      
+      // Guardar la firma en el array según el firmante actual
+      const newSignatureImages = [...signatureImages];
+      newSignatureImages[currentSignerIndex] = imageData;
+      setSignatureImages(newSignatureImages);
     }
   };
   
@@ -341,7 +352,57 @@ const WebAppPOSButtons = () => {
       signatureCanvasRef.current.height
     );
     
+    // Limpiar solo la firma del firmante actual
     setSignatureImage('');
+    const newSignatureImages = [...signatureImages];
+    newSignatureImages[currentSignerIndex] = '';
+    setSignatureImages(newSignatureImages);
+  };
+  
+  // Cambiar entre los firmantes
+  const cambiarFirmante = () => {
+    const documentoSeleccionado = documentosDisponibles.find(d => d.id === tipoDocumento);
+    if (!documentoSeleccionado) return;
+    
+    // Solo permitir cambiar firmante si es un documento con múltiples firmantes
+    const requiereMultiplesFirmantes = documentoSeleccionado.id === "doc3" || documentoSeleccionado.id === "doc4";
+    if (!requiereMultiplesFirmantes || firmantes.length === 0) return;
+    
+    // Cambiar al siguiente firmante
+    setCurrentSignerIndex(currentSignerIndex === 0 ? 1 : 0);
+    
+    // Restaurar el canvas con la firma del nuevo firmante seleccionado (si existe)
+    if (signatureCanvasRef.current && signatureCtxRef.current) {
+      // Limpiar el canvas
+      signatureCtxRef.current.clearRect(
+        0, 
+        0, 
+        signatureCanvasRef.current.width, 
+        signatureCanvasRef.current.height
+      );
+      
+      // Mostrar la firma existente del firmante seleccionado (si existe)
+      const nextIndex = currentSignerIndex === 0 ? 1 : 0;
+      if (signatureImages[nextIndex]) {
+        const img = new Image();
+        img.onload = () => {
+          if (signatureCtxRef.current && signatureCanvasRef.current) {
+            signatureCtxRef.current.drawImage(img, 0, 0);
+          }
+        };
+        img.src = signatureImages[nextIndex];
+      }
+      
+      // Actualizar la imagen de firma mostrada
+      setSignatureImage(signatureImages[nextIndex] || '');
+    }
+    
+    // Mostrar mensaje al usuario
+    const nuevoFirmante = currentSignerIndex === 0 ? firmantes[0].nombre : clienteInfo.nombre;
+    toast({
+      title: "Cambio de firmante",
+      description: `Ahora firmará: ${nuevoFirmante}`,
+    });
   };
   
   // Funciones para verificación de identidad
