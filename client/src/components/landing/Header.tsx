@@ -48,6 +48,12 @@ export default function Header() {
             <Link href="/vecinos-express" className="text-secondary hover:text-primary font-medium text-sm transition duration-150">
               Vecinos Express
             </Link>
+            <Link href="/partners/webapp-pos-buttons" className="text-secondary hover:text-primary font-medium text-sm transition duration-150">
+              Vecinos POS
+            </Link>
+            <Link href="/vecinos" className="text-secondary hover:text-primary font-medium text-sm transition duration-150">
+              Vecinos Web
+            </Link>
             <Link href="/integraciones-demo" className="text-secondary hover:text-primary font-medium text-sm transition duration-150">
               Demo Integraciones
             </Link>
@@ -123,6 +129,20 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Vecinos Express
+              </Link>
+              <Link 
+                href="/partners/webapp-pos-buttons"
+                className="block px-3 py-2 text-base font-medium text-secondary hover:text-primary hover:bg-light rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Vecinos POS
+              </Link>
+              <Link 
+                href="/vecinos"
+                className="block px-3 py-2 text-base font-medium text-secondary hover:text-primary hover:bg-light rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Vecinos Web
               </Link>
               <Link 
                 href="/integraciones-demo"
