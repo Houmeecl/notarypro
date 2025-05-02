@@ -524,21 +524,31 @@ const WebAppPOSButtons = () => {
                 </Button>
               </div>
               
-              {/* Botón continuar con efecto */}
-              <Button 
+              {/* Botón con diseño moderno y animación */}
+              <button 
                 onClick={handleRegistrarCliente}
-                className="w-full p-4 mt-6 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-xl shadow-lg transition-all duration-200 hover:shadow-blue-200 hover:shadow-xl group"
+                className="w-full mt-6 p-0 bg-transparent border-0 relative group"
               >
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center">
-                    <div className="bg-white bg-opacity-20 p-2 rounded-lg mr-3">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl blur-md opacity-70 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative flex items-center justify-between w-full p-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-purple-600 text-white rounded-xl shadow-lg transition-all duration-300 hover:shadow-blue-200/50 hover:shadow-xl overflow-hidden">
+                  <div className="absolute right-0 w-32 h-32 bg-white/10 rounded-full -translate-x-12 -translate-y-12 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform duration-500"></div>
+                  <div className="absolute left-0 w-16 h-16 bg-white/10 rounded-full translate-x-3 translate-y-6 group-hover:translate-y-12 transition-transform duration-500"></div>
+                  
+                  <div className="flex items-center relative z-10">
+                    <div className="bg-white bg-opacity-20 p-2 rounded-xl mr-3 shadow-inner">
                       <UserPlus className="h-5 w-5 text-white" />
                     </div>
                     <span className="text-xl font-bold">Registrar Cliente</span>
                   </div>
-                  <ChevronRight className="h-6 w-6 transition-transform group-hover:translate-x-1" />
+                  
+                  <div className="relative z-10 flex items-center space-x-1">
+                    <span className="text-xs font-medium text-blue-100 opacity-0 group-hover:opacity-100 transition-opacity">CONTINUAR</span>
+                    <div className="p-1 rounded-full bg-white/20">
+                      <ChevronRight className="h-6 w-6 transform transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </div>
                 </div>
-              </Button>
+              </button>
             </div>
           </div>
         );
@@ -747,48 +757,90 @@ const WebAppPOSButtons = () => {
                   Método de pago
                 </h3>
                 
-                {/* Método de pago con tarjeta */}
+                {/* Métodos de pago con tarjeta - diseño moderno */}
                 <div 
                   onClick={() => handleSeleccionarPago('tarjeta')}
-                  className="border-2 border-blue-200 hover:border-blue-500 rounded-xl p-4 mb-3 cursor-pointer transition-all duration-200 bg-blue-50 hover:bg-blue-100 group"
+                  className="relative bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-0.5 mb-3 cursor-pointer overflow-hidden group"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="bg-white p-2 rounded-lg shadow-sm mr-3">
-                        <CreditCard className="h-6 w-6 text-blue-600" />
+                  {/* Borde animado */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
+                  
+                  {/* Contenido */}
+                  <div className="relative bg-white rounded-xl p-4 z-10">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 mr-4">
+                          {/* Círculo con tarjeta animada */}
+                          <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg group-hover:shadow-blue-300/50 transition-shadow">
+                            <div className="absolute inset-1 rounded-full bg-white flex items-center justify-center group-hover:scale-90 transition-transform duration-300">
+                              <CreditCard className="h-7 w-7 text-blue-600" />
+                            </div>
+                            <div className="absolute inset-0 rounded-full border-4 border-blue-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <p className="font-bold text-blue-800 text-lg">Tarjeta de Crédito/Débito</p>
+                          <div className="flex items-center mt-1">
+                            <div className="flex mr-2 space-x-1">
+                              <div className="h-5 w-8 rounded bg-gradient-to-r from-yellow-400 to-yellow-500 shadow-sm"></div>
+                              <div className="h-5 w-8 rounded bg-gradient-to-r from-red-500 to-red-600 shadow-sm"></div>
+                              <div className="h-5 w-8 rounded bg-gradient-to-r from-blue-500 to-blue-600 shadow-sm"></div>
+                            </div>
+                            <p className="text-xs text-blue-600 font-medium">Pago seguro con encriptación SSL</p>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-bold text-blue-800">Tarjeta de Crédito/Débito</p>
-                        <p className="text-xs text-blue-600">Pago seguro con encriptación</p>
+                      
+                      <div className="flex flex-col items-center">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 border-2 border-transparent group-hover:border-blue-500 transition-colors">
+                          <ChevronRight className="h-5 w-5 transform group-hover:translate-x-0.5 transition-transform" />
+                        </div>
+                        <div className="mt-1 text-xs font-bold text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                          SELECCIONAR
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center text-blue-600">
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity mr-2 text-xs font-bold">
-                        SELECCIONAR
+                    
+                    {/* Información de seguridad */}
+                    <div className="mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500 flex items-center group-hover:text-blue-600 transition-colors">
+                      <div className="w-4 h-4 mr-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
                       </div>
-                      <ChevronRight className="h-5 w-5 transform group-hover:translate-x-1 transition-transform" />
+                      Tu información está protegida con los más altos estándares de seguridad
                     </div>
                   </div>
                 </div>
                 
-                {/* Navegación */}
+                {/* Navegación moderna */}
                 <div className="flex justify-between mt-6">
-                  <Button 
-                    variant="outline" 
-                    className="flex items-center border-2 border-gray-300 hover:bg-gray-100 transition-colors" 
+                  {/* Botón volver con efecto */}
+                  <button 
                     onClick={() => setStep('documentos')}
+                    className="relative group overflow-hidden rounded-xl border-0 p-0 bg-transparent"
                   >
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Volver
-                  </Button>
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative flex items-center px-4 py-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
+                      <ArrowLeft className="mr-2 h-4 w-4 text-gray-600" />
+                      <span className="font-medium text-gray-700">Volver</span>
+                    </div>
+                  </button>
                   
-                  <Button
-                    className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
+                  {/* Botón principal con efecto neomorfismo */}
+                  <button
                     onClick={() => handleSeleccionarPago('tarjeta')}
+                    className="relative group"
                   >
-                    Procesar Pago
-                    <ChevronRight className="ml-2 h-4 w-4" />
-                  </Button>
+                    <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl blur opacity-70 group-hover:opacity-100 transition-all duration-300"></div>
+                    <div className="relative flex items-center px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 rounded-xl text-white font-medium shadow-lg group-hover:shadow-green-500/50 transition-all duration-300">
+                      <span className="mr-2">Procesar Pago</span>
+                      <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                        <ChevronRight className="h-4 w-4 transform group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </div>
+                  </button>
                 </div>
               </div>
             </div>
@@ -913,61 +965,98 @@ const WebAppPOSButtons = () => {
                     </div>
                   </div>
                   
-                  {/* Botones de acción */}
+                  {/* Botones de acción modernos */}
                   <div className="grid grid-cols-2 gap-3 mt-6">
-                    <Button 
-                      variant="outline"
-                      className="flex items-center justify-center border-green-200 text-green-700 hover:bg-green-50"
+                    {/* Botón de impresión con efecto de glassmorphism */}
+                    <button 
                       onClick={imprimirComprobante}
+                      className="relative group overflow-hidden rounded-xl p-0 border-0 bg-transparent"
                     >
-                      <Printer className="mr-2 h-4 w-4" />
-                      Imprimir
-                    </Button>
+                      <div className="absolute inset-0 bg-gradient-to-br from-green-400/20 to-green-600/20 rounded-xl"></div>
+                      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-xl border border-green-200 group-hover:bg-white/60 transition-all duration-300"></div>
+                      <div className="relative flex items-center justify-center py-2.5 px-3">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-green-500 opacity-0 group-hover:opacity-20 blur-sm rounded-xl transition-opacity duration-300"></div>
+                        <div className="mr-1.5 w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 group-hover:bg-green-200 transition-colors">
+                          <Printer className="h-4 w-4 text-green-700" />
+                        </div>
+                        <span className="font-medium text-green-800">Imprimir</span>
+                      </div>
+                    </button>
                     
-                    <Button 
-                      variant="outline"
-                      className="flex items-center justify-center border-blue-200 text-blue-700 hover:bg-blue-50"
+                    {/* Botón de vista previa con efecto de glassmorphism */}
+                    <button 
                       onClick={() => setShowPreview(true)}
+                      className="relative group overflow-hidden rounded-xl p-0 border-0 bg-transparent"
                     >
-                      <FileText className="mr-2 h-4 w-4" />
-                      Ver documento
-                    </Button>
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-xl"></div>
+                      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-xl border border-blue-200 group-hover:bg-white/60 transition-all duration-300"></div>
+                      <div className="relative flex items-center justify-center py-2.5 px-3">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-blue-500 opacity-0 group-hover:opacity-20 blur-sm rounded-xl transition-opacity duration-300"></div>
+                        <div className="mr-1.5 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+                          <FileText className="h-4 w-4 text-blue-700" />
+                        </div>
+                        <span className="font-medium text-blue-800">Ver documento</span>
+                      </div>
+                    </button>
                   </div>
                 </div>
                 
-                {/* Pie del ticket */}
-                <div className="py-3 px-6 bg-gray-50 text-center text-xs text-gray-500 border-t border-dashed border-gray-200">
-                  <p>Gracias por usar Vecinos NotaryPro Xpress</p>
-                  <p className="mt-1">Documento verificable en www.tuu.cl/verificar</p>
+                {/* Pie del ticket con estilo mejorado */}
+                <div className="py-3 px-6 bg-gradient-to-r from-gray-50 to-gray-100 text-center text-xs text-gray-500 border-t border-dashed border-gray-200">
+                  <p className="font-medium">Gracias por usar Vecinos NotaryPro Xpress</p>
+                  <div className="flex items-center justify-center mt-2">
+                    <div className="h-0.5 w-10 bg-gray-200 rounded-full mr-2"></div>
+                    <p className="text-gray-600">Documento verificable en <span className="text-blue-600 font-medium">www.tuu.cl/verificar</span></p>
+                    <div className="h-0.5 w-10 bg-gray-200 rounded-full ml-2"></div>
+                  </div>
                 </div>
                 
                 {/* Borde inferior estilo ticket */}
                 <div className="absolute bottom-0 left-0 right-0 h-3 bg-gradient-to-r from-green-400 to-green-500"></div>
               </div>
               
-              {/* Botones de navegación */}
-              <div className="flex justify-between">
-                <Button 
-                  variant="outline"
-                  className="border-2 border-gray-300 hover:bg-gray-100 flex items-center"
+              {/* Botones de navegación modernos */}
+              <div className="flex justify-between mt-6">
+                {/* Botón nuevo cliente con efecto de brillo */}
+                <button 
                   onClick={() => {
                     setIdentityVerified(false);
                     setPhotoTaken(false);
                     setSignatureImage('');
                     setStep('inicio');
                   }}
+                  className="relative group overflow-hidden rounded-xl bg-transparent p-0 border-0"
                 >
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Nuevo cliente
-                </Button>
+                  <div className="absolute inset-0 bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl opacity-80 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative flex items-center px-4 py-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-all">
+                    <div className="absolute -inset-px bg-gradient-to-r from-gray-100 to-gray-50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative z-10 flex items-center">
+                      <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center mr-2 group-hover:bg-blue-100 transition-colors">
+                        <RefreshCw className="h-3.5 w-3.5 text-gray-600 group-hover:text-blue-600 transition-colors" />
+                      </div>
+                      <span className="font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Nuevo cliente</span>
+                    </div>
+                  </div>
+                </button>
                 
-                <Button 
-                  className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
+                {/* Botón finalizar con efecto 3D */}
+                <button 
                   onClick={() => setProcesoCompletado(true)}
+                  className="relative group"
                 >
-                  <Check className="mr-2 h-4 w-4" />
-                  Finalizar trámite
-                </Button>
+                  <div className="absolute -inset-0.5 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl blur opacity-75 group-hover:opacity-100 transition-all duration-300"></div>
+                  <div className="relative flex items-center px-5 py-2.5 bg-gradient-to-br from-green-500 to-green-600 rounded-xl text-white font-medium shadow-lg group-hover:shadow-green-500/50 transition-all duration-300 overflow-hidden">
+                    <div className="absolute inset-0 flex justify-center">
+                      <div className="w-12 h-32 bg-white/10 rotate-12 transform translate-x-12 -translate-y-2 group-hover:translate-x-40 transition-all duration-1000 ease-out"></div>
+                    </div>
+                    <div className="absolute top-0 right-0 h-2 w-full bg-gradient-to-l from-white/20 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 h-2 w-full bg-gradient-to-r from-white/20 to-transparent"></div>
+                    <div className="relative flex items-center">
+                      <Check className="mr-2 h-5 w-5" />
+                      <span>Finalizar trámite</span>
+                    </div>
+                  </div>
+                </button>
               </div>
             </div>
           </div>
