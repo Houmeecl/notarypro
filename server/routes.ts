@@ -61,6 +61,7 @@ import { webappRouter } from "./partners/webapp-routes";
 import { mobileApiRouter } from "./partners/mobile-api";
 import { translationRouter } from "./translation-routes";
 import mercadoPagoRouter from "./mercadopago-routes";
+import { getApiRouter } from "./getapi-routes";
 
 // Ensure these directories exist
 const uploadsDir = path.join(process.cwd(), "uploads");
@@ -198,6 +199,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Registrar rutas de MercadoPago
   app.use('/api/mercadopago', mercadoPagoRouter);
+  
+  // Registrar rutas de validación de identidad con GetAPI
+  app.use('/api/identity', getApiRouter);
 
   // Registrar rutas de APIs de integraciones
   registerAdminApiRoutes(app);
