@@ -5,8 +5,8 @@ export default function ApkDownload() {
   const descargarApk = () => {
     try {
       const link = document.createElement('a');
-      link.href = "/downloads/vecinos-notarypro-pos.apk";
-      link.download = "vecinos-notarypro-pos.apk";
+      link.href = "/downloads/vecinos-notarypro-pos-v1.3.0.apk";
+      link.download = "vecinos-notarypro-pos-v1.3.0.apk";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -30,7 +30,7 @@ export default function ApkDownload() {
             </p>
             <Button size="lg" onClick={descargarApk} className="gap-2">
               <Download className="h-5 w-5" />
-              Descargar APK Vecinos v1.2.0
+              Descargar APK Vecinos v1.3.0
             </Button>
           </div>
           
