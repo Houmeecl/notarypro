@@ -16,7 +16,7 @@ const WebAppPOSButtons = () => {
   const [, setLocation] = useLocation();
   const [step, setStep] = useState('inicio');
   const [tipoDocumento, setTipoDocumento] = useState('');
-  const [metodoPago, setMetodoPago] = useState('');
+  const [metodoPago, setMetodoPago] = useState('tarjeta');
   const [procesoCompletado, setProcesoCompletado] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [identityVerified, setIdentityVerified] = useState(false);
@@ -108,7 +108,7 @@ const WebAppPOSButtons = () => {
 
   const reiniciarProceso = () => {
     setTipoDocumento('');
-    setMetodoPago('');
+    setMetodoPago('tarjeta');
     setProcesoCompletado(false);
     setStep('inicio');
     setShowPreview(false);
@@ -118,6 +118,10 @@ const WebAppPOSButtons = () => {
     setPhotoTaken(false);
     setShowCamera(false);
     setDocumentPreview('');
+    // Reiniciar también las firmas múltiples
+    setSignatureImages(['', '']);
+    setCurrentSignerIndex(0);
+    setFirmantes([]);
   };
   
   // Función para mostrar la vista previa del documento
@@ -679,29 +683,12 @@ const WebAppPOSButtons = () => {
                 <Button 
                   size="lg"
                   className="w-full p-8 text-xl flex justify-between items-center"
-                  onClick={() => handleSeleccionarPago('efectivo')}
-                >
-                  <span>EFECTIVO</span>
-                  <ChevronRight className="h-6 w-6" />
-                </Button>
-                
-                <Button 
-                  size="lg"
-                  variant="outline"
-                  className="w-full p-8 text-xl flex justify-between items-center"
                   onClick={() => handleSeleccionarPago('tarjeta')}
                 >
-                  <span>TARJETA</span>
-                  <ChevronRight className="h-6 w-6" />
-                </Button>
-                
-                <Button 
-                  size="lg"
-                  variant="outline"
-                  className="w-full p-8 text-xl flex justify-between items-center"
-                  onClick={() => handleSeleccionarPago('transferencia')}
-                >
-                  <span>TRANSFERENCIA</span>
+                  <div className="flex items-center">
+                    <CreditCard className="mr-3 h-6 w-6" />
+                    <span>PAGO CON TARJETA</span>
+                  </div>
                   <ChevronRight className="h-6 w-6" />
                 </Button>
                 
