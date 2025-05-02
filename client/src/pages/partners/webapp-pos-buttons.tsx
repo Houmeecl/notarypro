@@ -45,6 +45,13 @@ const WebAppPOSButtons = () => {
     telefono: ''
   });
   
+  // Estado para almacenar firmantes adicionales
+  const [firmantes, setFirmantes] = useState<Array<{
+    nombre: string;
+    rut: string;
+    relacion: string;
+  }>>([]);
+  
   const documentosDisponibles = [
     { id: "doc1", nombre: "Declaración Jurada Simple", precio: 3500 },
     { id: "doc2", nombre: "Poder Especial", precio: 4500 },
@@ -94,6 +101,22 @@ const WebAppPOSButtons = () => {
     const documentoSeleccionado = documentosDisponibles.find(d => d.id === tipoDocumento);
     if (!documentoSeleccionado) return;
     
+    // Determinar si es un documento que necesita múltiples firmantes
+    const requiereMultiplesFirmantes = documentoSeleccionado.id === "doc3" || documentoSeleccionado.id === "doc4"; // Arriendo o Compraventa
+    
+    // Si no hay firmantes adicionales y el documento lo requiere, añadir un firmante por defecto
+    if (requiereMultiplesFirmantes && firmantes.length === 0) {
+      // Añadir un segundo firmante de ejemplo para estos documentos
+      setFirmantes([{
+        nombre: "Ana Gómez Soto",
+        rut: "15.456.789-0",
+        relacion: documentoSeleccionado.id === "doc3" ? "Arrendador" : "Vendedor"
+      }]);
+    }
+    
+    // Obtener el segundo firmante si existe
+    const segundoFirmante = firmantes.length > 0 ? firmantes[0] : null;
+    
     // Construir HTML de vista previa
     const previewHTML = `
       <html>
@@ -108,8 +131,11 @@ const WebAppPOSButtons = () => {
             .section-title { font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
             .field { display: flex; margin-bottom: 10px; }
             .field-label { font-weight: bold; width: 200px; }
-            .signature-area { margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px; }
+            .signature-area { margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
             .signature-box { border: 1px dashed #ccc; height: 100px; display: flex; align-items: center; justify-content: center; margin-top: 10px; }
+            .multi-signature { display: flex; gap: 20px; flex-wrap: wrap; }
+            .signature-item { flex: 1; min-width: 250px; }
+            .highlight { background-color: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 3px solid #4a90e2; }
           </style>
         </head>
         <body>
@@ -136,37 +162,85 @@ const WebAppPOSButtons = () => {
             </div>
             
             <div class="section">
-              <div class="section-title">Datos del Cliente</div>
-              <div class="field">
-                <div class="field-label">Nombre:</div>
-                <div>${clienteInfo.nombre}</div>
+              <div class="section-title">Participantes del Documento</div>
+              <div class="highlight">
+                <div class="field">
+                  <div class="field-label">Nombre:</div>
+                  <div>${clienteInfo.nombre}</div>
+                </div>
+                <div class="field">
+                  <div class="field-label">RUT:</div>
+                  <div>${clienteInfo.rut}</div>
+                </div>
+                <div class="field">
+                  <div class="field-label">Email:</div>
+                  <div>${clienteInfo.email}</div>
+                </div>
+                <div class="field">
+                  <div class="field-label">Teléfono:</div>
+                  <div>${clienteInfo.telefono}</div>
+                </div>
+                <div class="field">
+                  <div class="field-label">Rol:</div>
+                  <div>${requiereMultiplesFirmantes ? (documentoSeleccionado.id === "doc3" ? "Arrendatario" : "Comprador") : "Firmante"}</div>
+                </div>
               </div>
-              <div class="field">
-                <div class="field-label">RUT:</div>
-                <div>${clienteInfo.rut}</div>
+              
+              ${segundoFirmante ? `
+              <div class="highlight" style="margin-top: 15px;">
+                <div class="field">
+                  <div class="field-label">Nombre:</div>
+                  <div>${segundoFirmante.nombre}</div>
+                </div>
+                <div class="field">
+                  <div class="field-label">RUT:</div>
+                  <div>${segundoFirmante.rut}</div>
+                </div>
+                <div class="field">
+                  <div class="field-label">Rol:</div>
+                  <div>${segundoFirmante.relacion}</div>
+                </div>
               </div>
-              <div class="field">
-                <div class="field-label">Email:</div>
-                <div>${clienteInfo.email}</div>
-              </div>
-              <div class="field">
-                <div class="field-label">Teléfono:</div>
-                <div>${clienteInfo.telefono}</div>
-              </div>
+              ` : ''}
             </div>
             
             <div class="section">
               <div class="section-title">Contenido del Documento</div>
-              <p>Este ${documentoSeleccionado.nombre} se genera de conformidad con las leyes de la República de Chile y tiene plena validez legal.</p>
-              <p>El firmante declara bajo juramento que toda la información proporcionada es verídica y que asume plena responsabilidad por el contenido de este documento.</p>
+              ${documentoSeleccionado.id === "doc3" ? `
+                <p>Este Contrato de Arriendo se celebra entre <strong>${firmantes.length > 0 ? firmantes[0].nombre : 'la parte arrendadora'}</strong> como Arrendador y <strong>${clienteInfo.nombre}</strong> como Arrendatario.</p>
+                <p>Ambas partes acuerdan que la propiedad será arrendada por un período establecido, sujeto a las condiciones detalladas en este contrato.</p>
+              ` : documentoSeleccionado.id === "doc4" ? `
+                <p>Este Contrato de Compraventa se celebra entre <strong>${firmantes.length > 0 ? firmantes[0].nombre : 'la parte vendedora'}</strong> como Vendedor y <strong>${clienteInfo.nombre}</strong> como Comprador.</p>
+                <p>Ambas partes acuerdan la transferencia de propiedad objeto de este contrato por el precio acordado, sujeto a las condiciones aquí detalladas.</p>
+              ` : `
+                <p>Este ${documentoSeleccionado.nombre} se genera de conformidad con las leyes de la República de Chile y tiene plena validez legal.</p>
+                <p>El firmante declara bajo juramento que toda la información proporcionada es verídica y que asume plena responsabilidad por el contenido de este documento.</p>
+              `}
               <p>El presente documento se firma en Santiago de Chile, con fecha ${new Date().toLocaleDateString()}.</p>
             </div>
             
             <div class="signature-area">
               <div class="section-title">Área de Firma</div>
-              <div class="signature-box">
-                <p>Zona para firma digital</p>
-              </div>
+              ${segundoFirmante ? `
+                <div class="multi-signature">
+                  <div class="signature-item">
+                    <p><strong>${clienteInfo.nombre}</strong><br/>${requiereMultiplesFirmantes ? (documentoSeleccionado.id === "doc3" ? "Arrendatario" : "Comprador") : "Firmante"}</p>
+                    <div class="signature-box">
+                      <p>Firma digital pendiente</p>
+                    </div>
+                  </div>
+                  <div class="signature-item">
+                    <p><strong>${segundoFirmante.nombre}</strong><br/>${segundoFirmante.relacion}</p>
+                    <div class="signature-box">
+                      <p>Firma digital pendiente</p>
+                    </div>
+                  </div>
+                </div>
+              ` : `
+                <div class="signature-box">
+                  <p>Zona para firma digital</p>
+                </div>
+              `}
             </div>
           </div>
         </body>
