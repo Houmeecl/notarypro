@@ -624,7 +624,7 @@
       // Para la demo, simplemente retornamos la URL del recibo
       
       const reciboUrl = `data:text/html;charset=utf-8,${encodeURIComponent(reciboHtml)}`;
-      const codigoQR = `https://cerfidoc.cl/verificar/${codigoVerificacion}`;
+      const codigoQR = `https://tuu.cl/verificar/${codigoVerificacion}`;
       
       console.log('✓ Recibo generado correctamente');
       
@@ -809,7 +809,7 @@
   <div class="verification">
     <div class="verification-text">Para verificar la autenticidad de este documento:</div>
     <div class="verification-code">${codigoVerificacion}</div>
-    <div class="verification-url">Visite: cerfidoc.cl/verificar</div>
+    <div class="verification-url">Visite: tuu.cl/verificar</div>
   </div>
   
   <div class="footer">

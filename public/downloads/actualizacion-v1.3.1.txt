@@ -1,25 +1,41 @@
-# Actualizaciones en Vecinos NotaryPro POS v1.3.1
+=====================================================
+ACTUALIZACIÓN v1.3.1 - VECINOS NOTARYPRO EXPRESS
+=====================================================
 
-## Cambios importantes
+Fecha: Mayo 2, 2025
 
-A partir de la versión 1.3.1, la aplicación Vecinos NotaryPro POS ha sido actualizada para cumplir con nuevos requisitos de seguridad y procesamiento de pagos:
+Estimado Partner de Vecinos NotaryPro Express:
 
-### Método de pago único: Tarjeta
+Hemos lanzado una actualización importante del SDK y la aplicación POS que contiene los siguientes cambios:
 
-- Solo se aceptarán pagos con tarjeta, eliminando las opciones de efectivo y transferencia bancaria.
-- Cualquier intento de procesar un documento con otro método de pago generará un error.
-- Los recibos han sido actualizados para reflejar esta política.
+CAMBIOS IMPORTANTES:
+-------------------
+1. SOLO SE ACEPTA PAGO CON TARJETA
+   - A partir de esta versión, SOLO se acepta pago con tarjeta de crédito/débito
+   - Los métodos de pago en efectivo y transferencia ya no están disponibles
+   - Todos los recibos mostrarán "Tarjeta" como método de pago
 
-## Instrucciones de actualización
+2. CAMBIO DE DOMINIO
+   - Las URLs del servicio ahora utilizan el dominio tuu.cl en lugar de cerfidoc.cl
+   - Los códigos QR de verificación ahora redirigen a tuu.cl/verificar
 
-1. Desinstale la versión anterior de la aplicación.
-2. Instale la nueva versión 1.3.1 descargada desde el portal de socios.
-3. No es necesario realizar ninguna configuración adicional, la aplicación funcionará automáticamente con la nueva política de pagos.
+INSTRUCCIONES DE ACTUALIZACIÓN:
+------------------------------
+1. Para la aplicación web: No es necesario realizar ninguna acción, la actualización
+   se aplicará automáticamente la próxima vez que inicies sesión.
 
-## Soporte técnico
+2. Para la aplicación Android:
+   - Descarga la nueva versión desde: tuu.cl/partners/descargar-apk
+   - Desinstala la versión anterior antes de instalar la nueva
+   - Instala el archivo APK descargado en tu dispositivo Android
+   - Inicia sesión con tus credenciales habituales
 
-Si tiene alguna pregunta o necesita asistencia con la actualización, comuníquese con nuestro equipo de soporte:
+Si tienes alguna pregunta o enfrentas problemas durante la actualización,
+por favor contacta al equipo de soporte:
 
-- Correo electrónico: soporte@cerfidoc.cl
-- Teléfono: +56 2 XXXX XXXX
-- Horario de atención: Lunes a viernes de 9:00 a 18:00 hrs.
+Email: soporte@tuu.cl
+Teléfono: +56 9 5555 1234
+WhatsApp: +56 9 5555 1234
+
+Atentamente,
+El equipo de NotaryPro
