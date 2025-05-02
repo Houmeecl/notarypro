@@ -783,6 +783,306 @@ const WebAppPOSButtons = () => {
           </div>
         );
         
+      case 'preview':
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <FileText className="h-16 w-16 text-primary mx-auto mb-4" />
+              <h2 className="text-2xl font-bold">Previsualización</h2>
+              <p className="text-gray-500">Verifique el documento antes de continuar</p>
+            </div>
+            
+            <div className="max-w-md mx-auto">
+              <div className="space-y-4">
+                <Button variant="outline" onClick={iniciarCamara} disabled={identityVerified}>
+                  <UserCheck className="h-4 w-4 mr-2" />
+                  {identityVerified ? 'Identidad verificada' : 'Verificar identidad'}
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setShowPreview(false);
+                    setStep('firmar');
+                  }}
+                  disabled={!identityVerified}
+                >
+                  <FileSignature className="h-4 w-4 mr-2" />
+                  Firmar documento
+                </Button>
+              </div>
+              
+              <Button 
+                variant="ghost" 
+                className="w-full mt-4" 
+                onClick={() => {
+                  setShowPreview(false);
+                  setStep('pago');
+                }}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Volver
+              </Button>
+            </div>
+          </div>
+        );
+      
+      case 'firmar':
+        // Determinar si es un documento que necesita múltiples firmantes
+        const docRequiereMultiplesFirmantes = tipoDocumento === "doc3" || tipoDocumento === "doc4"; // Arriendo o Compraventa
+        const segundoFirmante = firmantes.length > 0 ? firmantes[0] : null;
+        const nombreFirmanteActual = currentSignerIndex === 0 ? clienteInfo.nombre : (segundoFirmante?.nombre || '');
+        const rolFirmanteActual = currentSignerIndex === 0 
+          ? (docRequiereMultiplesFirmantes ? (tipoDocumento === "doc3" ? "Arrendatario" : "Comprador") : "Firmante")
+          : (segundoFirmante?.relacion || '');
+          
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <FileSignature className="h-16 w-16 text-primary mx-auto mb-4" />
+              <h2 className="text-2xl font-bold">Firma Digital</h2>
+              
+              {docRequiereMultiplesFirmantes && segundoFirmante ? (
+                <div className="bg-blue-50 p-3 rounded-lg mb-3">
+                  <p className="text-blue-800 font-medium">
+                    Firmante actual: <span className="font-bold">{nombreFirmanteActual}</span>
+                    <span className="text-sm ml-2">({rolFirmanteActual})</span>
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    {currentSignerIndex === 0 ? "Primer firmante" : "Segundo firmante"} de 2
+                  </p>
+                </div>
+              ) : (
+                <p className="text-gray-500">Firme en el área indicada</p>
+              )}
+            </div>
+            
+            <div className="max-w-md mx-auto">
+              <div 
+                className="border-2 border-dashed border-gray-300 rounded-lg p-2 bg-white"
+                style={{ touchAction: 'none' }}
+              >
+                <canvas
+                  ref={signatureCanvasRef}
+                  width={600}
+                  height={200}
+                  className="w-full h-52 rounded cursor-crosshair touch-none"
+                  onMouseDown={iniciarDibujo}
+                  onMouseMove={dibujar}
+                  onMouseUp={terminarDibujo}
+                  onMouseLeave={terminarDibujo}
+                  onTouchStart={iniciarDibujo}
+                  onTouchMove={dibujar}
+                  onTouchEnd={terminarDibujo}
+                />
+              </div>
+              
+              <div className="flex flex-wrap gap-2 justify-between mt-4">
+                <Button variant="outline" onClick={limpiarFirma}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Limpiar
+                </Button>
+                
+                {docRequiereMultiplesFirmantes && segundoFirmante && (
+                  <Button 
+                    variant="outline" 
+                    onClick={cambiarFirmante}
+                    className="bg-gray-50"
+                  >
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Cambiar firmante
+                  </Button>
+                )}
+                
+                <Button 
+                  onClick={() => {
+                    // Si es el primer firmante de un documento con múltiples firmantes y aún no hay
+                    // firma del segundo firmante, cambiar al segundo firmante automáticamente
+                    if (docRequiereMultiplesFirmantes && segundoFirmante && 
+                        currentSignerIndex === 0 && !signatureImages[1]) {
+                      cambiarFirmante();
+                      toast({
+                        title: "Continúe con el segundo firmante",
+                        description: `Ahora debe firmar: ${segundoFirmante.nombre}`,
+                      });
+                    } else {
+                      // Si ya están todas las firmas o es un documento de un solo firmante, pasar a certificar
+                      setStep('certificar');
+                    }
+                  }}
+                  disabled={!signatureImage}
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  {docRequiereMultiplesFirmantes && segundoFirmante && currentSignerIndex === 0 && !signatureImages[1] 
+                    ? "Siguiente firmante" 
+                    : "Continuar"}
+                </Button>
+              </div>
+              
+              <Button 
+                variant="ghost" 
+                className="w-full mt-4" 
+                onClick={() => {
+                  setShowPreview(true);
+                  setStep('preview');
+                }}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Volver
+              </Button>
+            </div>
+          </div>
+        );
+        
+      case 'certificar':
+        // Determinar si el documento tiene múltiples firmantes
+        const requiereMultiplesFirmantes = tipoDocumento === "doc3" || tipoDocumento === "doc4";
+        const haySegundoFirmante = firmantes.length > 0;
+        
+        // Verificar si todas las firmas necesarias están completas
+        const firmasPendientes = requiereMultiplesFirmantes && haySegundoFirmante 
+          ? (!signatureImages[0] || !signatureImages[1]) 
+          : !signatureImages[0];
+          
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <Shield className="h-16 w-16 text-primary mx-auto mb-4" />
+              <h2 className="text-2xl font-bold">Certificación</h2>
+              <p className="text-gray-500">Certifique el documento para completar el proceso</p>
+            </div>
+            
+            <div className="max-w-md mx-auto">
+              <div className="p-4 rounded-lg border space-y-4">
+                <h3 className="font-medium text-lg">Estado del documento</h3>
+                
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-2 ${identityVerified ? 'bg-green-500 text-white' : 'bg-gray-300'}`}>
+                      {identityVerified && <Check className="h-3 w-3" />}
+                    </div>
+                    <span className={identityVerified ? 'text-green-700' : 'text-gray-500'}>
+                      Verificación de identidad
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-2 ${signatureImages[0] ? 'bg-green-500 text-white' : 'bg-gray-300'}`}>
+                      {signatureImages[0] && <Check className="h-3 w-3" />}
+                    </div>
+                    <span className={signatureImages[0] ? 'text-green-700' : 'text-gray-500'}>
+                      Firma principal: {clienteInfo.nombre}
+                    </span>
+                  </div>
+                  
+                  {requiereMultiplesFirmantes && haySegundoFirmante && (
+                    <div className="flex items-center">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-2 ${signatureImages[1] ? 'bg-green-500 text-white' : 'bg-gray-300'}`}>
+                        {signatureImages[1] && <Check className="h-3 w-3" />}
+                      </div>
+                      <span className={signatureImages[1] ? 'text-green-700' : 'text-gray-500'}>
+                        Segunda firma: {firmantes[0].nombre}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                
+                {firmasPendientes ? (
+                  <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200 mb-4">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 mr-3 flex-shrink-0 text-yellow-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-medium text-yellow-800">Firmas pendientes</p>
+                        <p className="text-sm text-yellow-700">
+                          {requiereMultiplesFirmantes
+                            ? "Este documento requiere la firma de ambas partes antes de certificar."
+                            : "Se requiere la firma del cliente antes de certificar."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 bg-green-50 rounded-lg border border-green-200 mb-4">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 mr-3 flex-shrink-0 text-green-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-medium text-green-800">Documento listo</p>
+                        <p className="text-sm text-green-700">
+                          El documento contiene todas las firmas requeridas y está listo para certificar.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="space-y-2">
+                  {certificadorMode ? (
+                    <>
+                      <Button 
+                        className="w-full" 
+                        onClick={mostrarPanelCertificador}
+                        disabled={firmasPendientes}
+                      >
+                        <Fingerprint className="h-4 w-4 mr-2" />
+                        Firma con eToken y certificar 
+                      </Button>
+                      
+                      <Button 
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => {
+                          toast({
+                            title: "Documento certificado",
+                            description: "El documento ha sido certificado y enviado al cliente",
+                          });
+                          setStep('comprobante');
+                        }}
+                        disabled={firmasPendientes}
+                      >
+                        <Shield className="h-4 w-4 mr-2" />
+                        Certificar con firma simple
+                      </Button>
+                    </>
+                  ) : (
+                    <Button 
+                      className="w-full bg-primary text-white" 
+                      onClick={() => {
+                        setCertificadorMode(true);
+                        toast({
+                          title: "Modo certificador activado",
+                          description: "Por favor realice la certificación del documento",
+                        });
+                      }}
+                    >
+                      <UserCheck className="h-4 w-4 mr-2" />
+                      Solicitar certificación
+                    </Button>
+                  )}
+                </div>
+              </div>
+              
+              {!certificadorMode && (
+                <Button 
+                  variant="ghost" 
+                  className="w-full mt-4" 
+                  onClick={() => {
+                    setStep('firmar');
+                  }}
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Volver a firmar
+                </Button>
+              )}
+            </div>
+          </div>
+        );
+        
       default:
         return null;
     }
