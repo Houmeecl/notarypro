@@ -19,7 +19,13 @@ CAMBIOS IMPORTANTES:
    - Las URLs del servicio ahora utilizan el dominio tuu.cl en lugar de cerfidoc.cl
    - Los códigos QR de verificación ahora redirigen a tuu.cl/verificar
 
-3. DOCUMENTACIÓN AMPLIADA
+3. INTEGRACIÓN DE PAGO INTER-APP
+   - Ahora es posible integrar con aplicaciones de pago externas
+   - Implementación simplificada a través de URI schemes
+   - Documentación específica: https://developers.tuu.cl/docs/integración-de-aplicaciones-de-pago-inter-app
+   - Ejemplo de implementación incluido en la descarga (ejemplo-integracion-pago-interapp.js)
+
+4. DOCUMENTACIÓN AMPLIADA
    - Acceda a documentación detallada y ejemplos adicionales en:
      https://developers.tuu.cl/docs/getting-started
 

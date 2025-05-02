@@ -20,13 +20,19 @@
  * - A partir de esta versión, SOLO se acepta pago con tarjeta.
  * - Los métodos de pago en efectivo y transferencia ya no están disponibles.
  * - Las URLs del servicio ahora utilizan el dominio tuu.cl
+ * - Compatible con integración de aplicaciones de pago inter-app
  * 
  * DOCUMENTACIÓN COMPLETA:
- * Para consultar la documentación detallada, ejemplos adicionales y buenas prácticas,
- * visite: https://developers.tuu.cl/docs/getting-started
+ * - Guía general: https://developers.tuu.cl/docs/getting-started
+ * - Integración de pagos: https://developers.tuu.cl/docs/integración-de-aplicaciones-de-pago-inter-app
  * 
  * Este SDK está diseñado para ser fácil de usar, incluso sin experiencia previa
  * en programación. Sigue los ejemplos para procesar documentos rápidamente.
+ * 
+ * NOTA SOBRE PAGOS:
+ * Este SDK ahora soporta integración con aplicaciones de pago externas.
+ * Consulta la documentación específica para implementar la funcionalidad
+ * de pago mediante aplicaciones de terceros.
  */
 
 (function(global) {
