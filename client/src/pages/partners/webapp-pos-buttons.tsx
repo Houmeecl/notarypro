@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { 
   Check, ArrowLeft, CheckCircle2, Printer, UserPlus, FileText, 
   CreditCard, ChevronRight, FileSignature, UserCheck, Shield, 
-  Camera, RefreshCw, Download, X, Fingerprint
+  Camera, RefreshCw, Download, X, Fingerprint, ClipboardList,
+  CheckSquare, FileCheck, Home
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -524,26 +525,26 @@ const WebAppPOSButtons = () => {
                 </Button>
               </div>
               
-              {/* Botón con diseño moderno y animación */}
+              {/* Botón NotaryPro con diseño moderno */}
               <button 
                 onClick={handleRegistrarCliente}
                 className="w-full mt-6 p-0 bg-transparent border-0 relative group"
               >
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl blur-md opacity-70 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative flex items-center justify-between w-full p-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-purple-600 text-white rounded-xl shadow-lg transition-all duration-300 hover:shadow-blue-200/50 hover:shadow-xl overflow-hidden">
-                  <div className="absolute right-0 w-32 h-32 bg-white/10 rounded-full -translate-x-12 -translate-y-12 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform duration-500"></div>
-                  <div className="absolute left-0 w-16 h-16 bg-white/10 rounded-full translate-x-3 translate-y-6 group-hover:translate-y-12 transition-transform duration-500"></div>
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-zinc-800 rounded-xl blur-md opacity-70 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative flex items-center justify-between w-full p-4 bg-gradient-to-r from-zinc-800 to-zinc-900 hover:from-blue-600 hover:to-blue-800 text-white rounded-xl shadow-lg transition-all duration-300 hover:shadow-blue-900/50 hover:shadow-xl overflow-hidden">
+                  <div className="absolute right-0 w-32 h-32 bg-blue-500/10 rounded-full -translate-x-12 -translate-y-12 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform duration-500"></div>
+                  <div className="absolute left-0 w-16 h-16 bg-blue-600/10 rounded-full translate-x-3 translate-y-6 group-hover:translate-y-12 transition-transform duration-500"></div>
                   
                   <div className="flex items-center relative z-10">
-                    <div className="bg-white bg-opacity-20 p-2 rounded-xl mr-3 shadow-inner">
+                    <div className="bg-blue-600 p-2 rounded-md mr-3 shadow-md">
                       <UserPlus className="h-5 w-5 text-white" />
                     </div>
-                    <span className="text-xl font-bold">Registrar Cliente</span>
+                    <span className="text-xl font-bold tracking-tight">Registrar Cliente</span>
                   </div>
                   
                   <div className="relative z-10 flex items-center space-x-1">
-                    <span className="text-xs font-medium text-blue-100 opacity-0 group-hover:opacity-100 transition-opacity">CONTINUAR</span>
-                    <div className="p-1 rounded-full bg-white/20">
+                    <span className="text-xs font-medium text-zinc-300 opacity-0 group-hover:opacity-100 transition-opacity">CONTINUAR</span>
+                    <div className="p-1 rounded-md bg-blue-600">
                       <ChevronRight className="h-6 w-6 transform transition-transform group-hover:translate-x-1" />
                     </div>
                   </div>
@@ -557,94 +558,94 @@ const WebAppPOSButtons = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              {/* Icono animado de documentos */}
+              {/* Icono animado de documentos estilo NotaryPro */}
               <div className="relative w-24 h-24 mx-auto mb-4">
-                <div className="absolute inset-0 bg-yellow-100 rounded-full animate-pulse opacity-50"></div>
-                <div className="absolute inset-2 bg-yellow-200 rounded-full animate-pulse opacity-70 delay-100"></div>
+                <div className="absolute inset-0 bg-blue-100 rounded-md animate-pulse opacity-50"></div>
+                <div className="absolute inset-2 bg-blue-200 rounded-md animate-pulse opacity-70 delay-100"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <FileText className="h-12 w-12 text-yellow-600" />
+                  <FileText className="h-12 w-12 text-blue-600" />
                 </div>
               </div>
-              <h2 className="text-2xl font-bold text-yellow-700">Seleccionar Documento</h2>
-              <p className="text-gray-500 max-w-md mx-auto">Elija el tipo de documento que necesita procesar</p>
+              <h2 className="text-2xl font-bold text-zinc-800">Seleccionar Documento</h2>
+              <p className="text-zinc-500 max-w-md mx-auto">Elija el tipo de documento que necesita procesar</p>
               
-              {/* Barra de búsqueda rápida */}
+              {/* Barra de búsqueda rápida estilo NotaryPro */}
               <div className="mt-4 max-w-md mx-auto relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-5 w-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
                 <Input 
                   type="text"
                   placeholder="Buscar documento..."
-                  className="pl-10 bg-white shadow-sm focus:ring-2 focus:ring-yellow-500"
+                  className="pl-10 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 border-zinc-300"
                 />
               </div>
             </div>
             
-            {/* Grid de documentos con categorías */}
+            {/* Grid de documentos con categorías estilo NotaryPro */}
             <div className="max-w-3xl mx-auto">
               {/* Categorías de documentos */}
               <div className="flex overflow-x-auto pb-2 mb-4 scrollbar-hide gap-2">
-                <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border border-blue-200 shadow-sm">
+                <div className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap border border-blue-700 shadow-sm">
                   Todos
                 </div>
-                <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border border-gray-200 shadow-sm">
+                <div className="bg-zinc-800 text-zinc-100 px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap border border-zinc-700 shadow-sm">
                   Contratos
                 </div>
-                <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border border-gray-200 shadow-sm">
+                <div className="bg-zinc-800 text-zinc-100 px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap border border-zinc-700 shadow-sm">
                   Declaraciones
                 </div>
-                <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border border-gray-200 shadow-sm">
+                <div className="bg-zinc-800 text-zinc-100 px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap border border-zinc-700 shadow-sm">
                   Autorizaciones
                 </div>
-                <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border border-gray-200 shadow-sm">
+                <div className="bg-zinc-800 text-zinc-100 px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap border border-zinc-700 shadow-sm">
                   Laborales
                 </div>
               </div>
               
-              {/* Documentos en formato tarjeta interactiva */}
+              {/* Documentos en formato tarjeta interactiva con estilo NotaryPro */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {documentosDisponibles.map((doc) => (
                   <div 
                     key={doc.id}
                     onClick={() => handleSeleccionarDocumento(doc.id)}
-                    className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg border border-gray-200 cursor-pointer transition-all duration-200 transform hover:scale-105 hover:border-yellow-300 group"
+                    className="bg-white rounded-md overflow-hidden shadow-md hover:shadow-lg border border-zinc-300 cursor-pointer transition-all duration-200 transform hover:scale-105 hover:border-blue-500 group"
                   >
-                    <div className="p-1 bg-gradient-to-r from-yellow-400 to-yellow-300">
+                    <div className="p-1 bg-gradient-to-r from-blue-600 to-blue-500">
                       <div className="h-1"></div>
                     </div>
                     <div className="p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center">
-                          <div className="p-2 bg-yellow-100 rounded-lg mr-3">
-                            {doc.id === 'contrato' && <div className="text-xl">📄</div>}
-                            {doc.id === 'declaracion' && <div className="text-xl">📝</div>}
-                            {doc.id === 'autorizacion' && <div className="text-xl">✅</div>}
-                            {doc.id === 'finiquito' && <div className="text-xl">📋</div>}
-                            {doc.id === 'compraventa' && <div className="text-xl">🔄</div>}
-                            {doc.id === 'arriendo' && <div className="text-xl">🏠</div>}
+                          <div className="p-2 bg-zinc-800 rounded-md mr-3 shadow-sm">
+                            {doc.id === 'contrato' && <FileText className="h-5 w-5 text-blue-400" />}
+                            {doc.id === 'declaracion' && <ClipboardList className="h-5 w-5 text-blue-400" />}
+                            {doc.id === 'autorizacion' && <CheckSquare className="h-5 w-5 text-blue-400" />}
+                            {doc.id === 'finiquito' && <FileCheck className="h-5 w-5 text-blue-400" />}
+                            {doc.id === 'compraventa' && <RefreshCw className="h-5 w-5 text-blue-400" />}
+                            {doc.id === 'arriendo' && <Home className="h-5 w-5 text-blue-400" />}
                           </div>
                           <div>
-                            <h3 className="font-bold text-lg text-gray-800">{doc.nombre}</h3>
-                            <div className="text-xs text-gray-500 mt-1">COD: {doc.id.toUpperCase()}</div>
+                            <h3 className="font-bold text-lg text-zinc-800">{doc.nombre}</h3>
+                            <div className="text-xs text-zinc-500 mt-1">Código: <span className="font-medium text-blue-600">{doc.id.toUpperCase()}</span></div>
                           </div>
                         </div>
-                        <div className="bg-yellow-500 text-white font-bold rounded-full py-1 px-3 text-sm">
+                        <div className="bg-blue-600 text-white font-bold rounded-md py-1 px-3 text-sm shadow-sm">
                           ${doc.precio}
                         </div>
                       </div>
                       
-                      <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
+                      <div className="mt-3 pt-3 border-t border-zinc-200 flex justify-between items-center">
                         <div className="flex items-center">
-                          <div className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded flex items-center">
-                            <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mr-1"></div>
-                            Comisión: ${Math.round(doc.precio * 0.15)}
+                          <div className="text-xs bg-zinc-800 text-zinc-100 px-2 py-1 rounded-md flex items-center shadow-sm">
+                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1"></div>
+                            Comisión: <span className="font-medium text-blue-300 ml-1">${Math.round(doc.precio * 0.15)}</span>
                           </div>
                         </div>
                         
-                        <div className="text-gray-400 group-hover:text-yellow-500 transition-colors">
+                        <div className="bg-zinc-100 p-1 rounded-md text-zinc-700 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                           <ChevronRight className="h-5 w-5" />
                         </div>
                       </div>
@@ -653,14 +654,17 @@ const WebAppPOSButtons = () => {
                 ))}
               </div>
               
-              <Button 
-                variant="outline"
-                className="mt-6 border-2 border-gray-300 hover:bg-gray-100 transition-colors" 
+              {/* Botón volver con estilo NotaryPro */}
+              <button 
                 onClick={() => setStep('inicio')}
+                className="mt-6 relative group overflow-hidden rounded-md p-0 bg-transparent border-0"
               >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Volver a datos del cliente
-              </Button>
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-zinc-700 to-zinc-800 rounded-md opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative flex items-center px-4 py-2 bg-zinc-100 rounded-md shadow-sm group-hover:shadow-md transition-shadow">
+                  <ArrowLeft className="mr-2 h-4 w-4 text-zinc-700" />
+                  <span className="font-medium text-zinc-800">Volver a datos del cliente</span>
+                </div>
+              </button>
             </div>
           </div>
         );
@@ -671,88 +675,86 @@ const WebAppPOSButtons = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              {/* Icono animado de pagos */}
+              {/* Icono animado de pagos estilo NotaryPro */}
               <div className="relative w-24 h-24 mx-auto mb-4">
-                <div className="absolute inset-0 bg-green-100 rounded-full animate-pulse opacity-50"></div>
-                <div className="absolute inset-2 bg-green-200 rounded-full animate-pulse opacity-70 delay-150"></div>
+                <div className="absolute inset-0 bg-blue-100 rounded-md animate-pulse opacity-50"></div>
+                <div className="absolute inset-2 bg-blue-200 rounded-md animate-pulse opacity-70 delay-150"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <CreditCard className="h-12 w-12 text-green-600" />
+                  <CreditCard className="h-12 w-12 text-blue-600" />
                 </div>
               </div>
-              <h2 className="text-2xl font-bold text-green-700">Procesar Pago</h2>
-              <p className="text-gray-500 max-w-md mx-auto">El pago se procesará de forma segura</p>
+              <h2 className="text-2xl font-bold text-zinc-800">Procesar Pago</h2>
+              <p className="text-zinc-500 max-w-md mx-auto">El pago se procesará de forma segura</p>
             </div>
             
             <div className="max-w-md mx-auto">
-              {/* Tarjeta de resumen con estilo de factura */}
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 mb-6 overflow-hidden">
-                <div className="bg-green-600 p-3 text-white">
+              {/* Tarjeta de resumen con estilo NotaryPro */}
+              <div className="bg-white rounded-md shadow-lg border border-zinc-300 mb-6 overflow-hidden">
+                <div className="bg-zinc-800 p-3 text-white border-b border-blue-600">
                   <div className="flex justify-between items-center">
                     <h3 className="text-lg font-bold">Resumen del Pedido</h3>
-                    <div className="bg-white text-green-600 px-2 py-1 rounded-full text-xs font-bold">
-                      VECINOS XPRESS
+                    <div className="bg-blue-600 text-white px-2 py-1 rounded-md text-xs font-bold">
+                      NOTARYPRO
                     </div>
                   </div>
                 </div>
                 
                 <div className="p-4">
-                  <div className="border-b border-gray-100 pb-3 mb-3">
+                  <div className="border-b border-zinc-200 pb-3 mb-3">
                     <div className="flex items-center mb-4">
-                      <div className="p-1.5 bg-green-100 rounded mr-3">
-                        {documentoSeleccionado?.id === 'contrato' && <div className="text-xl">📄</div>}
-                        {documentoSeleccionado?.id === 'declaracion' && <div className="text-xl">📝</div>}
-                        {documentoSeleccionado?.id === 'autorizacion' && <div className="text-xl">✅</div>}
-                        {documentoSeleccionado?.id === 'finiquito' && <div className="text-xl">📋</div>}
-                        {documentoSeleccionado?.id === 'compraventa' && <div className="text-xl">🔄</div>}
-                        {documentoSeleccionado?.id === 'arriendo' && <div className="text-xl">🏠</div>}
+                      <div className="p-2 bg-zinc-800 rounded-md mr-3 shadow-sm">
+                        {documentoSeleccionado?.id === 'contrato' && <FileText className="h-5 w-5 text-blue-400" />}
+                        {documentoSeleccionado?.id === 'declaracion' && <ClipboardList className="h-5 w-5 text-blue-400" />}
+                        {documentoSeleccionado?.id === 'autorizacion' && <CheckSquare className="h-5 w-5 text-blue-400" />}
+                        {documentoSeleccionado?.id === 'finiquito' && <FileCheck className="h-5 w-5 text-blue-400" />}
+                        {documentoSeleccionado?.id === 'compraventa' && <RefreshCw className="h-5 w-5 text-blue-400" />}
+                        {documentoSeleccionado?.id === 'arriendo' && <Home className="h-5 w-5 text-blue-400" />}
                       </div>
                       <div>
-                        <h4 className="font-bold">{documentoSeleccionado?.nombre}</h4>
-                        <p className="text-xs text-gray-500">Código: {documentoSeleccionado?.id.toUpperCase()}</p>
+                        <h4 className="font-bold text-zinc-800">{documentoSeleccionado?.nombre}</h4>
+                        <p className="text-xs text-zinc-500">Código: <span className="font-medium text-blue-600">{documentoSeleccionado?.id.toUpperCase()}</span></p>
                       </div>
                     </div>
                     
-                    <div className="ml-2 pl-6 border-l-2 border-green-100">
+                    <div className="ml-2 pl-6 border-l-2 border-blue-100">
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="text-gray-600">Cliente:</span>
-                        <span className="font-medium">{clienteInfo.nombre}</span>
+                        <span className="text-zinc-600">Cliente:</span>
+                        <span className="font-medium text-zinc-800">{clienteInfo.nombre}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">RUT:</span>
-                        <span className="font-medium">{clienteInfo.rut}</span>
+                        <span className="text-zinc-600">RUT:</span>
+                        <span className="font-medium text-zinc-800">{clienteInfo.rut}</span>
                       </div>
                     </div>
                   </div>
                   
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Subtotal:</span>
-                      <span className="font-medium">${documentoSeleccionado?.precio}</span>
+                      <span className="text-zinc-600">Subtotal:</span>
+                      <span className="font-medium text-zinc-800">${documentoSeleccionado?.precio}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">IVA (19%):</span>
-                      <span className="font-medium">Incluido</span>
+                      <span className="text-zinc-600">IVA (19%):</span>
+                      <span className="font-medium text-zinc-800">Incluido</span>
                     </div>
-                    <div className="flex justify-between font-bold text-lg border-t border-gray-200 pt-2 mt-2">
-                      <span>Total:</span>
-                      <span className="text-green-600">${documentoSeleccionado?.precio}</span>
+                    <div className="flex justify-between font-bold text-lg border-t border-zinc-200 pt-2 mt-2">
+                      <span className="text-zinc-800">Total:</span>
+                      <span className="text-blue-600">${documentoSeleccionado?.precio}</span>
                     </div>
                     
-                    <div className="flex justify-between text-xs bg-yellow-50 p-2 rounded mt-3">
-                      <span className="text-yellow-800">Su comisión:</span>
-                      <span className="font-bold text-yellow-800">${Math.round((documentoSeleccionado?.precio || 0) * 0.15)}</span>
+                    <div className="flex justify-between text-xs bg-zinc-800 p-2 rounded-md mt-3 text-zinc-100">
+                      <span>Su comisión:</span>
+                      <span className="font-bold text-blue-400">${Math.round((documentoSeleccionado?.precio || 0) * 0.15)}</span>
                     </div>
                   </div>
                 </div>
               </div>
               
-              {/* Métodos de pago */}
-              <div className="bg-white rounded-xl shadow-md p-4 border border-gray-200">
-                <h3 className="text-lg font-bold mb-4 flex items-center">
-                  <div className="p-1.5 bg-blue-100 rounded-full mr-2">
-                    <svg className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
+              {/* Métodos de pago estilo NotaryPro */}
+              <div className="bg-white rounded-md shadow-md p-4 border border-zinc-300">
+                <h3 className="text-lg font-bold mb-4 flex items-center text-zinc-800">
+                  <div className="p-1.5 bg-blue-600 rounded-md mr-2">
+                    <CreditCard className="h-5 w-5 text-white" />
                   </div>
                   Método de pago
                 </h3>
@@ -814,29 +816,29 @@ const WebAppPOSButtons = () => {
                   </div>
                 </div>
                 
-                {/* Navegación moderna */}
+                {/* Navegación con estilo NotaryPro */}
                 <div className="flex justify-between mt-6">
-                  {/* Botón volver con efecto */}
+                  {/* Botón volver con estilo NotaryPro */}
                   <button 
                     onClick={() => setStep('documentos')}
-                    className="relative group overflow-hidden rounded-xl border-0 p-0 bg-transparent"
+                    className="relative group overflow-hidden rounded-md border-0 p-0 bg-transparent"
                   >
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="relative flex items-center px-4 py-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
-                      <ArrowLeft className="mr-2 h-4 w-4 text-gray-600" />
-                      <span className="font-medium text-gray-700">Volver</span>
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-zinc-700 to-zinc-800 rounded-md opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative flex items-center px-4 py-2 bg-zinc-100 rounded-md shadow-sm group-hover:shadow-md transition-shadow">
+                      <ArrowLeft className="mr-2 h-4 w-4 text-zinc-700" />
+                      <span className="font-medium text-zinc-800">Volver</span>
                     </div>
                   </button>
                   
-                  {/* Botón principal con efecto neomorfismo */}
+                  {/* Botón principal con efecto NotaryPro */}
                   <button
                     onClick={() => handleSeleccionarPago('tarjeta')}
                     className="relative group"
                   >
-                    <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl blur opacity-70 group-hover:opacity-100 transition-all duration-300"></div>
-                    <div className="relative flex items-center px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 rounded-xl text-white font-medium shadow-lg group-hover:shadow-green-500/50 transition-all duration-300">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-md blur opacity-70 group-hover:opacity-100 transition-all duration-300"></div>
+                    <div className="relative flex items-center px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 rounded-md text-white font-medium shadow-lg group-hover:shadow-blue-700/50 transition-all duration-300">
                       <span className="mr-2">Procesar Pago</span>
-                      <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                      <div className="w-6 h-6 rounded-md bg-blue-500 flex items-center justify-center">
                         <ChevronRight className="h-4 w-4 transform group-hover:translate-x-0.5 transition-transform" />
                       </div>
                     </div>
@@ -1069,51 +1071,60 @@ const WebAppPOSButtons = () => {
 
   return (
     <div className="bg-zinc-100 min-h-screen">
-      {/* Header estilo almacén con elementos gráficos mejorados */}
-      <div className="bg-gradient-to-r from-yellow-500 to-yellow-400 text-black shadow-lg border-b-4 border-yellow-600">
+      {/* Header con estilo NotaryPro */}
+      <div className="bg-gradient-to-r from-zinc-800 to-zinc-900 text-white shadow-lg border-b-2 border-zinc-700">
         <div className="container mx-auto py-4 px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="bg-white p-2 rounded-md shadow-md border-2 border-yellow-600 relative overflow-hidden">
-                {/* Estilo gráfico tipo etiqueta de precio */}
-                <div className="absolute -right-8 -top-8 w-16 h-16 bg-red-600 rotate-45"></div>
-                <h1 className="text-xl font-black relative z-10">
-                  VECINOS <span className="text-blue-600">XPRESS</span>
-                </h1>
-                <div className="h-1 w-3/4 bg-gradient-to-r from-blue-500 to-green-500 mt-1"></div>
+              <div className="p-2 relative overflow-hidden">
+                {/* Logo estilo NotaryPro */}
+                <div className="flex items-center">
+                  <div className="bg-zinc-100 p-2 rounded-md shadow-md border border-zinc-300 mr-1">
+                    <h1 className="text-xl font-black text-zinc-900 tracking-tight">
+                      NOTARY<span className="text-blue-600">PRO</span>
+                    </h1>
+                  </div>
+                  <div className="h-8 w-0.5 bg-zinc-600 mx-2"></div>
+                  <div className="bg-zinc-700 p-2 rounded-md shadow-md border border-zinc-600">
+                    <h2 className="text-lg font-bold text-white tracking-tight">
+                      VECINOS <span className="text-blue-400">XPRESS</span>
+                    </h2>
+                  </div>
+                </div>
+                <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-400 mt-2"></div>
               </div>
-              <div className="ml-3 bg-red-600 text-white px-3 py-1 text-xs font-bold rounded-full flex items-center border-2 border-white shadow-sm">
+              <div className="ml-3 bg-blue-600 text-white px-3 py-1 text-xs font-bold rounded-md flex items-center border border-blue-500 shadow-sm">
                 <div className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></div>
                 SISTEMA POS v1.3.1
               </div>
             </div>
             
             <div className="relative">
-              {/* Estilo tarjeta identificativa comercio */}
-              <div className="text-right bg-white px-4 py-2 rounded-lg shadow-lg border-2 border-yellow-600 relative overflow-hidden">
+              {/* Tarjeta identificativa con estilo NotaryPro */}
+              <div className="text-right bg-zinc-800 px-4 py-2 rounded-md shadow-md border border-zinc-700 relative overflow-hidden">
                 {/* Patrón gráfico en el fondo */}
                 <div className="absolute inset-0 opacity-5">
                   <div className="grid grid-cols-10 grid-rows-5 gap-1 h-full">
                     {Array(50).fill(0).map((_, i) => (
-                      <div key={i} className="bg-blue-600 rounded-sm"></div>
+                      <div key={i} className="bg-blue-500 rounded-sm"></div>
                     ))}
                   </div>
                 </div>
-                <p className="text-sm font-black relative z-10">ALMACÉN DON PEDRO</p>
+                <p className="text-sm font-black relative z-10 text-white">ALMACÉN DON PEDRO</p>
                 <div className="flex items-center justify-end mt-1">
-                  <div className="flex items-center bg-green-100 px-2 py-0.5 rounded-full border border-green-300 mr-1">
-                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></div>
-                    <span className="text-xs text-green-800 font-medium">ACTIVO</span>
+                  <div className="flex items-center bg-blue-900 px-2 py-0.5 rounded-md border border-blue-700 mr-1">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1"></div>
+                    <span className="text-xs text-blue-200 font-medium">ACTIVO</span>
                   </div>
-                  <div className="bg-blue-600 text-white px-2 py-0.5 text-xs font-bold rounded-full border border-blue-300 shadow-sm">
+                  <div className="bg-zinc-700 text-white px-2 py-0.5 text-xs font-bold rounded-md border border-zinc-600 shadow-sm">
                     LOCAL-XP125
                   </div>
                 </div>
               </div>
               
-              {/* Etiqueta colgante estilo almacén */}
-              <div className="absolute -right-2 -top-3 w-8 h-10 bg-red-500 rounded-t-lg flex justify-center items-center shadow-md transform rotate-12">
-                <div className="w-2 h-2 rounded-full bg-white border border-red-600"></div>
+              {/* Insignia certificada */}
+              <div className="absolute -right-2 -top-2 bg-blue-600 text-xs text-white font-bold px-1.5 py-0.5 rounded shadow-md">
+                CERTIFICADO
               </div>
             </div>
           </div>
@@ -1134,34 +1145,34 @@ const WebAppPOSButtons = () => {
           </div>
           
           <div className="flex items-center space-x-3">
-            <div className="bg-green-100 border border-green-600 px-3 py-1 rounded-md flex items-center">
-              <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-              <span className="text-sm font-bold text-green-800">SISTEMA ACTIVO</span>
+            <div className="bg-zinc-800 border border-zinc-700 px-3 py-1 rounded-md flex items-center shadow-md">
+              <div className="w-3 h-3 rounded-full bg-blue-500 mr-2 animate-pulse"></div>
+              <span className="text-sm font-bold text-zinc-100">SISTEMA ACTIVO</span>
             </div>
             
-            <div className="bg-blue-100 border border-blue-500 px-3 py-1 rounded-md">
-              <span className="text-sm font-bold text-blue-800">COMISIÓN: $27.500</span>
+            <div className="bg-zinc-800 border border-blue-600 px-3 py-1 rounded-md shadow-md">
+              <span className="text-sm font-bold text-zinc-100">COMISIÓN: <span className="text-blue-400">$27.500</span></span>
             </div>
           </div>
         </div>
         
-        {/* Panel principal con borde reforzado estilo almacén */}
-        <div className="bg-white rounded-lg shadow-lg p-3 mb-6 border-2 border-gray-300">
-          {/* Cabecera estilo etiqueta de supermercado */}
-          <div className="mb-5 bg-yellow-100 rounded-md p-2 border-y-2 border-yellow-400">
+        {/* Panel principal con estilo NotaryPro */}
+        <div className="bg-white rounded-lg shadow-lg p-3 mb-6 border border-zinc-300">
+          {/* Cabecera con estilo NotaryPro */}
+          <div className="mb-5 bg-zinc-800 rounded-md p-3 border-b border-blue-600">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-3">
-                <div className="bg-blue-600 p-1 rounded text-white text-xs font-bold">PROCESO</div>
+                <div className="bg-blue-600 p-1.5 rounded text-white text-xs font-bold shadow-sm">PROCESO</div>
                 <div className="flex items-center space-x-2">
-                  <div className={`rounded-full h-8 w-8 flex items-center justify-center shadow-sm ${step === 'inicio' ? 'bg-yellow-500 text-white font-bold' : 'bg-gray-200'}`}>1</div>
-                  <div className={`rounded-full h-8 w-8 flex items-center justify-center shadow-sm ${step === 'documentos' ? 'bg-yellow-500 text-white font-bold' : 'bg-gray-200'}`}>2</div>
-                  <div className={`rounded-full h-8 w-8 flex items-center justify-center shadow-sm ${step === 'pago' ? 'bg-yellow-500 text-white font-bold' : 'bg-gray-200'}`}>3</div>
-                  <div className={`rounded-full h-8 w-8 flex items-center justify-center shadow-sm ${step === 'comprobante' ? 'bg-yellow-500 text-white font-bold' : 'bg-gray-200'}`}>4</div>
+                  <div className={`rounded-md h-8 w-8 flex items-center justify-center shadow-sm ${step === 'inicio' ? 'bg-blue-600 text-white font-bold' : 'bg-zinc-700 text-zinc-300'}`}>1</div>
+                  <div className={`rounded-md h-8 w-8 flex items-center justify-center shadow-sm ${step === 'documentos' ? 'bg-blue-600 text-white font-bold' : 'bg-zinc-700 text-zinc-300'}`}>2</div>
+                  <div className={`rounded-md h-8 w-8 flex items-center justify-center shadow-sm ${step === 'pago' ? 'bg-blue-600 text-white font-bold' : 'bg-zinc-700 text-zinc-300'}`}>3</div>
+                  <div className={`rounded-md h-8 w-8 flex items-center justify-center shadow-sm ${step === 'comprobante' ? 'bg-blue-600 text-white font-bold' : 'bg-zinc-700 text-zinc-300'}`}>4</div>
                 </div>
               </div>
               
-              <div className="bg-white p-1 border border-gray-300 rounded shadow-sm">
-                <p className="text-sm font-bold text-blue-800">
+              <div className="bg-zinc-700 p-2 border border-zinc-600 rounded shadow-sm">
+                <p className="text-sm font-bold text-white">
                   {step === 'inicio' && 'REGISTRAR CLIENTE'}
                   {step === 'documentos' && 'SELECCIONAR DOCUMENTO'}
                   {step === 'pago' && 'PROCESAR PAGO'}
