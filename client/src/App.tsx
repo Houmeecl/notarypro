@@ -43,7 +43,8 @@ import DocumentVerificationGame from "@/pages/document-verification-game";
 import VideocallInterfaceDemo from "@/pages/videocall-interface-demo";
 import CursoCertificador from "@/pages/curso-certificador";
 // Importamos la versión más nueva/actualizada de VecinosExpress
-import VecinosExpress from "@/pages/vecinos-express-new";
+// Importamos la App web de VecinosExpress 
+import VecinosExpress from "@/pages/vecinos-express";
 import PartnerApplications from "@/pages/admin/partner-applications";
 import ServiceSelectionPage from "@/pages/service-selection";
 import RonVideocall from "@/pages/ron-videocall";
@@ -436,7 +437,8 @@ function Router() {
       <Route path="/partners/android-sdk-test" component={AndroidSdkTest} />
       <Route path="/partners/password-generator" component={PasswordGenerator} />
       <Route path="/partners/webapp-login" component={WebappLogin} />
-      {/* POS Web Oficial (ahora redirecciona al login de Vecinos) */}
+      {/* POS Web Oficial - Verificación con NFC y otros servicios */}
+      <Route path="/partners/webapp-pos-official" component={WebAppPOSOfficial} />
 
       {/* Redirigir todas las versiones anteriores del POS a la versión oficial */}
       <Route path="/partners/webapp-pos" component={() => {
@@ -460,8 +462,7 @@ function Router() {
         return null;
       }} />
 
-      {/* Versión oficial del POS web accessible directamente */}
-      <Route path="/partners/webapp-pos-official" component={WebAppPOSOfficial} />
+      {/* SDK Demo y otras herramientas para partners */}
       <Route path="/partners/sdk-demo" component={SdkDemo} />
       <Route path="/partners/descargar-apk" component={DescargarApk} />
       <Route path="/partners/confirmacion-descarga" component={ConfirmacionDescarga} />
