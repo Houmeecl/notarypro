@@ -796,6 +796,8 @@ const WebAppPOSOfficial = () => {
     setIsReadIDModalOpen(false);
     setReadIDStep(0);
     setValidationProgress(0);
+    setVerificationCode('');
+    setShowVerificationQR(false);
   };
 
   // Renderizar el contenido según el paso actual
@@ -1637,6 +1639,36 @@ const WebAppPOSOfficial = () => {
                   </CardFooter>
                 </Card>
                 
+                {/* Código QR para la verificación móvil */}
+                {showVerificationQR && verificationCode && (
+                  <div className="max-w-xs mx-auto mb-6 bg-white p-4 border border-gray-200 rounded-lg shadow-sm">
+                    <div className="text-center mb-3">
+                      <h3 className="font-bold text-gray-800 text-lg">Verificación Móvil</h3>
+                      <p className="text-sm text-gray-600">
+                        Escanea este código QR con tu dispositivo móvil para completar la verificación
+                      </p>
+                      <div className="bg-indigo-100 text-indigo-800 font-mono font-bold text-lg py-1 px-2 rounded mx-auto my-2 inline-block">
+                        {verificationCode}
+                      </div>
+                    </div>
+                    <div className="flex justify-center">
+                      <div className="border-4 border-indigo-800 rounded-lg p-2 bg-white">
+                        <QRCodeSVG 
+                          value={`${window.location.origin}/verificacion-nfc-fixed?code=${verificationCode}`}
+                          size={150}
+                          bgColor={"#ffffff"}
+                          fgColor={"#2d219b"}
+                          level={"H"}
+                          includeMargin={false}
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-3 text-center">
+                      Este código de verificación expirará en 30 minutos
+                    </p>
+                  </div>
+                )}
+
                 <div className="text-center">
                   <p className="text-gray-600 mb-4">
                     El documento será enviado a un certifier para su validación final.

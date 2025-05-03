@@ -43,6 +43,7 @@ const VerificacionNFC: React.FC = () => {
   const queryParams = new URLSearchParams(location.split('?')[1] || '');
   const sessionParam = queryParams.get('session');
   const modoDemo = queryParams.get('demo') === 'true';
+  const verificationCode = queryParams.get('code');
 
   // Estados para el proceso de verificación
   const [activeStep, setActiveStep] = useState<string>('nfc');
@@ -247,6 +248,13 @@ const VerificacionNFC: React.FC = () => {
             <CardTitle className="text-xl text-[#2d219b]">Verificación de identidad</CardTitle>
             <CardDescription>
               Complete los pasos requeridos para verificar su identidad
+              {verificationCode && (
+                <div className="mt-2 bg-indigo-100 px-2 py-1 rounded text-center">
+                  <span className="font-mono font-semibold text-indigo-800">
+                    Código: {verificationCode}
+                  </span>
+                </div>
+              )}
             </CardDescription>
           </CardHeader>
           
