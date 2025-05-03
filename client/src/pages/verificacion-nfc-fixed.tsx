@@ -301,9 +301,22 @@ const VerificacionNFC: React.FC = () => {
   };
   
   // Renderizado del componente principal
+  // Definir las migas de pan para navegación
+  const breadcrumbItems = [
+    { label: 'Inicio', href: '/' },
+    { label: 'Verificación de Identidad', href: '/verificacion-nfc' },
+  ];
+  
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <div className="max-w-lg mx-auto">
+        {/* Componente de navegación con migas de pan y botón de volver */}
+        <PageNavigation 
+          items={breadcrumbItems} 
+          backTo="/"
+          backLabel="Volver al inicio"
+          className="mb-6"
+        />
         <Card className="shadow-lg">
           <CardHeader className="bg-gradient-to-r from-[#2d219b]/10 to-[#2d219b]/5">
             <CardTitle className="text-xl text-[#2d219b]">Verificación de identidad</CardTitle>

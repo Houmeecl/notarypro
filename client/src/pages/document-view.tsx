@@ -12,6 +12,7 @@ import { apiRequest } from "@/lib/queryClient";
 import DocumentNavbar from "@/components/layout/DocumentNavbar";
 import SignatureCanvas from "@/components/document/SignatureCanvas";
 import TranslationWidget from "@/components/document/TranslationWidget";
+import { PageNavigation } from "@/components/navigation/PageNavigation";
 
 // Definición simple para el componente
 interface Document {
