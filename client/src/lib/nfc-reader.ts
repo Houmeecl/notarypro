@@ -756,3 +756,48 @@ export function formatearRut(rut: string): string {
   
   return rutFormateado + '-' + dv;
 }
+
+/**
+ * Valida si un RUT chileno es válido usando el algoritmo de verificación oficial
+ * @param rut RUT a validar (con o sin formato)
+ * @returns true si el RUT es válido, false en caso contrario
+ */
+export function validarRut(rut: string): boolean {
+  if (!rut || typeof rut !== 'string') return false;
+  
+  // Eliminar puntos y guiones
+  rut = rut.replace(/\./g, '').replace(/-/g, '');
+  
+  // Validar longitud mínima
+  if (rut.length < 2) return false;
+  
+  // Separar cuerpo y dígito verificador
+  const dv = rut.slice(-1).toUpperCase();
+  const rutNumerico = parseInt(rut.slice(0, -1), 10);
+  
+  if (isNaN(rutNumerico)) return false;
+  
+  // Calcular dígito verificador
+  let suma = 0;
+  let multiplo = 2;
+  
+  // Para cada dígito del cuerpo
+  for (let i = rutNumerico.toString().length - 1; i >= 0; i--) {
+    suma += parseInt(rutNumerico.toString().charAt(i)) * multiplo;
+    multiplo = multiplo < 7 ? multiplo + 1 : 2;
+  }
+  
+  const dvEsperado = 11 - (suma % 11);
+  let dvCalculado: string;
+  
+  if (dvEsperado === 11) {
+    dvCalculado = '0';
+  } else if (dvEsperado === 10) {
+    dvCalculado = 'K';
+  } else {
+    dvCalculado = dvEsperado.toString();
+  }
+  
+  // Comparar con el dígito verificador proporcionado
+  return dv === dvCalculado;
+}
