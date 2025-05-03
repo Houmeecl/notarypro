@@ -19,7 +19,7 @@ async function hashPassword(password: string) {
 export async function createSuperAdmin() {
   try {
     const username = 'Edwardadmin';
-    const password = 'Facu800';
+    const password = 'adminq';
     const email = 'admin@notarypro.cl';
     const fullName = 'Edward Admin';
     

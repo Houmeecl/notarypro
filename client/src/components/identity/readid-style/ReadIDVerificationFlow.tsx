@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { 
@@ -50,6 +50,10 @@ export default function ReadIDVerificationFlow({ onComplete, onCancel }: ReadIDV
   const [cardData, setCardData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [selfieBase64, setSelfieBase64] = useState<string | null>(null);
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [similarityScore, setSimilarityScore] = useState<number | null>(null);
+  const webcamRef = useRef<HTMLVideoElement>(null);
   const { toast } = useToast();
   
   // Verificar disponibilidad de NFC
@@ -159,8 +163,75 @@ export default function ReadIDVerificationFlow({ onComplete, onCancel }: ReadIDV
   // Cancelar el proceso
   const handleCancel = () => {
     stopNFCReading();
+    stopCamera();
     if (onCancel) {
       onCancel();
+    }
+  };
+  
+  // Iniciar la cámara para la captura de selfie
+  const startCamera = async () => {
+    try {
+      setIsCameraActive(true);
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: "user" } 
+      });
+      if (webcamRef.current) {
+        webcamRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      console.error("Error al iniciar la cámara:", err);
+      toast({
+        title: "Error de cámara",
+        description: "No se pudo acceder a la cámara. Por favor, conceda permisos de cámara.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  // Detener la cámara
+  const stopCamera = () => {
+    if (webcamRef.current && webcamRef.current.srcObject) {
+      const stream = webcamRef.current.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      tracks.forEach(track => track.stop());
+      webcamRef.current.srcObject = null;
+    }
+    setIsCameraActive(false);
+  };
+  
+  // Capturar foto de la webcam
+  const capturePhoto = () => {
+    if (!webcamRef.current) return;
+    
+    try {
+      const video = webcamRef.current;
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      
+      if (ctx && video.videoWidth > 0) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL("image/jpeg");
+        setSelfieBase64(dataUrl.split(',')[1]);
+        stopCamera();
+        
+        // Simular verificación facial con un puntaje aleatorio entre 70 y 95
+        const score = Math.floor(Math.random() * 25) + 70;
+        setSimilarityScore(score);
+        
+        setTimeout(() => {
+          setCurrentStep('additional_check');
+        }, 1000);
+      }
+    } catch (err) {
+      console.error("Error al capturar foto:", err);
+      toast({
+        title: "Error en la captura",
+        description: "No se pudo tomar la foto. Intente nuevamente.",
+        variant: "destructive",
+      });
     }
   };
 
