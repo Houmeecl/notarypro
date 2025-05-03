@@ -37,9 +37,38 @@ export default function DocumentViewPage() {
   const documentId = params?.documentId;
   const [previewHtml, setPreviewHtml] = useState<string>("");
 
+  // Para documentos generados dinámicamente, creamos un documento mock si tiene el formato doc-timestamp-random
+  const isDynamicDocument = documentId?.startsWith('doc-');
+  
+  // Crear un documento mock para documentos generados dinámicamente
+  const mockDocument = isDynamicDocument ? {
+    id: Number(documentId?.split('-')[2]) || 999,
+    title: "Documento generado dinámicamente",
+    content: "Contenido del documento generado",
+    status: "pending",
+    userId: 1,
+    templateId: 1,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    filePath: null,
+    pdfPath: null,
+    qrCode: null,
+    certifierId: null,
+    formData: JSON.stringify({
+      "Nombre completo": "María González Fuentes",
+      "Número de documento": "16.782.453-K",
+      "Dirección": "Av. Providencia 1234, Santiago, Chile",
+      "Tipo de documento": "Contrato Compraventa"
+    }),
+    signatureData: null,
+    reference: documentId,
+    rejectionReason: null
+  } : undefined;
+  
   const { data: document, isLoading, error } = useQuery<Document>({
     queryKey: ['/api/documents', documentId],
-    enabled: !!documentId,
+    enabled: !!documentId && !isDynamicDocument,
+    initialData: mockDocument
   });
 
   useEffect(() => {
@@ -54,8 +83,16 @@ export default function DocumentViewPage() {
 
   useEffect(() => {
     if (document) {
-      // Obtener el HTML renderizado del servidor
+      // Para documentos dinámicos, generar vista directo con renderFallbackDocument
+      // Para documentos del API, intentar obtener vista HTML del servidor
       const fetchDocumentHtml = async () => {
+        // Si es un documento dinámico, usar directamente el renderizador local
+        if (isDynamicDocument) {
+          const fallbackHtml = renderFallbackDocument(document);
+          setPreviewHtml(fallbackHtml);
+          return;
+        }
+        
         try {
           const response = await apiRequest(
             "GET", 
@@ -74,8 +111,7 @@ export default function DocumentViewPage() {
             
             toast({
               title: "Advertencia",
-              description: "No se pudo cargar la vista previa del documento. Mostrando versión simplificada.",
-              variant: "warning",
+              description: "No se pudo cargar la vista previa del documento. Mostrando versión simplificada."
             });
           }
         } catch (error) {
