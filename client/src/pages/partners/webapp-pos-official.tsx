@@ -1003,6 +1003,31 @@ const WebAppPOSOfficial = () => {
                 <Card className="overflow-hidden transition-all hover:shadow-lg">
                   <CardHeader className="bg-gradient-to-r from-amber-500 to-orange-600 text-white">
                     <CardTitle className="flex items-center gap-2">
+                      <ShieldCheck />
+                      InverID Premium
+                    </CardTitle>
+                    <CardDescription className="text-orange-100">
+                      200 puntos
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <p className="text-gray-600 mb-4">
+                      Verificación avanzada multi-nivel que combina análisis forense, NFC y biometría facial.
+                    </p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button 
+                      className="w-full bg-amber-600 hover:bg-amber-700"
+                      onClick={() => window.open('/verificacion-inverid', '_blank')}
+                    >
+                      Abrir InverID
+                    </Button>
+                  </CardFooter>
+                </Card>
+                
+                <Card className="overflow-hidden transition-all hover:shadow-lg">
+                  <CardHeader className="bg-gradient-to-r from-amber-500 to-orange-600 text-white">
+                    <CardTitle className="flex items-center gap-2">
                       <User />
                       Captura de foto
                     </CardTitle>

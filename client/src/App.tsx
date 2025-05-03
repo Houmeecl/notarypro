@@ -119,6 +119,7 @@ const LazyVecinosAdminUsersManagement = React.lazy(() => import("@/pages/vecinos
 const LazyVecinosCertifierValidation = React.lazy(() => import("@/pages/vecinos/certifier-validation"));
 const LazyVerificacionMovil = React.lazy(() => import("@/pages/verificacion-identidad-movil"));
 const LazyVerificacionREADID = React.lazy(() => import("@/pages/verificacion-identidad-readid"));
+const LazyVerificacionInverID = React.lazy(() => import("@/pages/verificacion-inverid"));
 
 function Router() {
   return (
@@ -486,6 +487,11 @@ function Router() {
       <Route path="/verificacion-identidad-readid" component={() => (
         <Suspense fallback={<LazyLoadingFallback />}>
           <LazyVerificacionREADID />
+        </Suspense>
+      )} />
+      <Route path="/verificacion-inverid" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyVerificacionInverID />
         </Suspense>
       )} />
       
