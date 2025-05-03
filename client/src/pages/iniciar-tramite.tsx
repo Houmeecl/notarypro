@@ -19,7 +19,7 @@ import {
 import { FormLabel } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/hooks/use-auth';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 
 /**
  * Página para iniciar un nuevo trámite con generación de código QR
@@ -115,17 +115,11 @@ export default function IniciarTramitePage() {
             <div className="flex flex-col items-center space-y-4 py-6">
               <h3 className="text-lg font-semibold text-gray-900">Escanea este código QR con tu móvil:</h3>
               <div className="border-2 border-indigo-900 p-4 rounded-lg bg-white">
-                <QRCode 
+                <QRCodeSVG 
                   value={qrData} 
                   size={200} 
                   level="H"
                   includeMargin={true}
-                  imageSettings={{
-                    src: "/logo-mini.png",
-                    excavate: true,
-                    height: 30,
-                    width: 30,
-                  }}
                 />
               </div>
               <div className="text-center mt-4">

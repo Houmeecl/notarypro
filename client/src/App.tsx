@@ -173,6 +173,26 @@ function Router() {
           </Suspense>
         );
       }} />
+      <Route path="/iniciar-tramite" component={() => {
+        const IniciarTramite = React.lazy(() => import("@/pages/iniciar-tramite"));
+        return (
+          <Suspense fallback={<div className="flex items-center justify-center h-screen">
+            <p className="text-xl">Cargando iniciar trámite...</p>
+          </div>}>
+            <IniciarTramite />
+          </Suspense>
+        );
+      }} />
+      <Route path="/verificacion-selfie" component={() => {
+        const VerificacionSelfie = React.lazy(() => import("@/pages/verificacion-selfie"));
+        return (
+          <Suspense fallback={<div className="flex items-center justify-center h-screen">
+            <p className="text-xl">Cargando verificación de identidad...</p>
+          </div>}>
+            <VerificacionSelfie />
+          </Suspense>
+        );
+      }} />
       <Route path="/document-form/:templateId" component={DocumentFormPage} />
       <ProtectedRoute 
         path="/documents" 
@@ -245,6 +265,16 @@ function Router() {
       <Route path="/conversor-presencial-online" component={ConversorPresencialOnline} />
       <Route path="/verificar-documento" component={VerificarDocumento} />
       <Route path="/verificar-documento/:code" component={VerificarDocumento} />
+      <Route path="/verificar/:id" component={() => {
+        const Verificar = React.lazy(() => import("@/pages/verificar"));
+        return (
+          <Suspense fallback={<div className="flex items-center justify-center h-screen">
+            <p className="text-xl">Cargando verificación...</p>
+          </div>}>
+            <Verificar />
+          </Suspense>
+        );
+      }} />
       <Route path="/verification-game" component={DocumentVerificationGame} />
       <Route path="/curso-certificador" component={CursoCertificador} />
       <Route path="/service-selection" component={ServiceSelectionPage} />
