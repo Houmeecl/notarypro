@@ -12,6 +12,17 @@ export default function VecinosXpressLanding() {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       {/* Encabezado */}
       <header className="relative overflow-hidden bg-blue-600 text-white">
+        {/* Botón de inicio de sesión destacado en la esquina superior derecha */}
+        <div className="absolute top-4 right-4 z-20">
+          <Button 
+            size="lg" 
+            className="bg-white text-blue-600 hover:bg-blue-50 font-bold shadow-lg"
+            onClick={() => setLocation("/vecinos/login")}
+          >
+            Iniciar Sesión
+          </Button>
+        </div>
+        
         <div className="container mx-auto px-4 py-8 sm:py-12 flex flex-col md:flex-row items-center justify-between">
           <div className="z-10 mb-8 md:mb-0 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start mb-4">
@@ -295,6 +306,13 @@ export default function VecinosXpressLanding() {
               onClick={() => setLocation("/partners/descargar-apk")}
             >
               Descargar App <Download className="ml-2 h-4 w-4" />
+            </Button>
+            <Button 
+              size="lg" 
+              className="bg-green-500 text-white hover:bg-green-600 font-bold"
+              onClick={() => setLocation("/vecinos/login")}
+            >
+              Acceder a mi cuenta
             </Button>
           </div>
         </div>
