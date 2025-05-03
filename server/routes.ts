@@ -34,6 +34,9 @@ export function registerRoutes(app: Express): Server {
   // Rutas para pagos con MercadoPago
   app.use("/api/payments", mercadoPagoRouter);
   
+  // Rutas para plataforma RON
+  app.use("/api/ron", ronRouter);
+  
   // Ruta para servir archivos estáticos (como los contratos)
   app.use("/docs", express.static(path.join(process.cwd(), "docs")));
 
