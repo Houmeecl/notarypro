@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Mic, MicOff, Video, VideoOff, UserCheck, Shield, MessagesSquare, Share2, Download, Lock, Upload, Mail, Clipboard, UserPlus } from 'lucide-react';
+import { Camera, Mic, MicOff, Video, VideoOff, UserCheck, Shield, MessagesSquare, Share2, Download, Lock, Upload, Mail, Clipboard, UserPlus, Clock, Timer, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -67,6 +67,8 @@ const VideoSession: React.FC<VideoSessionProps> = ({
   ]);
   const [isRecording, setIsRecording] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [sessionTimeLimit, setSessionTimeLimit] = useState(30 * 60); // 30 minutos por defecto
+  const [showTimeLimitWarning, setShowTimeLimitWarning] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
       sender: 'Sistema',
@@ -90,19 +92,61 @@ const VideoSession: React.FC<VideoSessionProps> = ({
   // Estado para el diálogo de compartir documentos
   const [showShareDocumentDialog, setShowShareDocumentDialog] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  
+  // Estado para el diálogo de configuración de tiempo límite
+  const [showTimeLimitDialog, setShowTimeLimitDialog] = useState(false);
+  const [selectedTimeLimit, setSelectedTimeLimit] = useState(sessionTimeLimit / 60); // En minutos
 
-  // Simulador de tiempo transcurrido
+  // Simulador de tiempo transcurrido y control de límite de tiempo
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (isRecording) {
       timer = setInterval(() => {
-        setElapsedTime(prev => prev + 1);
+        setElapsedTime(prev => {
+          const newTime = prev + 1;
+          
+          // Mostrar advertencia cuando queden 5 minutos
+          if (newTime === sessionTimeLimit - 5 * 60) {
+            setShowTimeLimitWarning(true);
+            addSystemMessage(`Aviso: Quedan 5 minutos para alcanzar el tiempo máximo de sesión (${sessionTimeLimit / 60} minutos).`);
+            
+            toast({
+              title: "Tiempo de sesión",
+              description: `Quedan 5 minutos para alcanzar el límite de tiempo de la sesión.`,
+              variant: "destructive",
+            });
+          }
+          
+          // Advertencia final cuando queda 1 minuto
+          if (newTime === sessionTimeLimit - 60) {
+            addSystemMessage('Aviso: Queda 1 minuto para finalizar la sesión por tiempo máximo.');
+            
+            toast({
+              title: "¡Atención!",
+              description: "La sesión finalizará automáticamente en 1 minuto. Complete su actividad actual.",
+              variant: "destructive",
+            });
+          }
+          
+          // Finalizar automáticamente al alcanzar el límite
+          if (newTime >= sessionTimeLimit) {
+            endSession();
+            toast({
+              title: "Sesión finalizada",
+              description: `Se ha alcanzado el tiempo máximo de sesión (${sessionTimeLimit / 60} minutos).`,
+              variant: "default",
+            });
+          }
+          
+          return newTime;
+        });
       }, 1000);
     }
+    
     return () => {
       if (timer) clearInterval(timer);
     };
-  }, [isRecording]);
+  }, [isRecording, sessionTimeLimit]);
 
   // Estado para solicitar permisos explícitamente
   const [permissionsRequested, setPermissionsRequested] = useState(false);
@@ -406,11 +450,37 @@ const VideoSession: React.FC<VideoSessionProps> = ({
           <Badge variant="outline" className="ml-3 bg-blue-500/20 text-blue-200">
             Sesión: {sessionId}
           </Badge>
+          
+          {isRecording && (
+            <Badge 
+              variant="outline" 
+              className={`ml-3 ${
+                elapsedTime > sessionTimeLimit - 5 * 60 
+                ? 'bg-red-500/20 text-red-200 animate-pulse' 
+                : 'bg-yellow-500/20 text-yellow-200'
+              }`}
+            >
+              Tiempo restante: {formatTime(Math.max(0, sessionTimeLimit - elapsedTime))}
+            </Badge>
+          )}
         </div>
         <div className="flex items-center space-x-2">
           <Badge variant="secondary" className="bg-green-500/20 text-green-200">
             Conexión segura
           </Badge>
+          
+          {isCertifier && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowTimeLimitDialog(true)}
+              className="bg-indigo-900/30"
+            >
+              <Clock className="h-4 w-4 mr-2" />
+              Tiempo máximo
+            </Button>
+          )}
+          
           <Button variant="destructive" size="sm" onClick={endSession}>
             Finalizar
           </Button>
