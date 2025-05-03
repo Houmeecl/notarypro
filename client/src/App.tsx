@@ -13,7 +13,7 @@ import { MicroInteractionProvider } from "@/hooks/use-micro-interactions";
 import { MicroInteractionDisplay } from "@/components/micro-interactions/MicroInteractionDisplay";
 import { ProtectedRoute } from "./lib/protected-route";
 import { webSocketService } from "./lib/websocket";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { WebSocketDebugger } from "@/components/utils/WebSocketDebugger";
 import { Loader2 } from "lucide-react";
 
@@ -88,9 +88,17 @@ import AdminAIStrategyPage from "@/pages/admin/ai-strategy";
 import TestDocumentGenerator from "@/pages/admin/test-document-generator";
 import DocumentTemplatesManager from "@/pages/admin/document-templates-manager";
 
+// Componente de carga para React.lazy
+const LazyLoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+  </div>
+);
+
 function Router() {
   return (
-    <Switch>
+    <Suspense fallback={<LazyLoadingFallback />}>
+      <Switch>
       <Route path="/" component={LandingPage} />
       <Route path="/auth" component={AuthPage} />
       
@@ -165,42 +173,15 @@ function Router() {
       <Route path="/quienes-somos" component={QuienesSomosPage} />
       
       {/* Vecinos Xpress Pages */}
-      <Route path="/vecinos" component={() => {
-        const VecinosIndex = require("@/pages/vecinos/index").default;
-        return <VecinosIndex />;
-      }} />
-      <Route path="/vecinos/login" component={() => {
-        const VecinosLogin = require("@/pages/vecinos/login").default;
-        return <VecinosLogin />;
-      }} />
-      <Route path="/vecinos/registro" component={() => {
-        const VecinosRegistro = require("@/pages/vecinos/registro").default;
-        return <VecinosRegistro />;
-      }} />
-      <Route path="/vecinos/pos-app" component={() => {
-        const VecinosPosApp = require("@/pages/vecinos/pos-app").default;
-        return <VecinosPosApp />;
-      }} />
-      <Route path="/vecinos/dashboard" component={() => {
-        const VecinosDashboard = require("@/pages/vecinos/dashboard").default;
-        return <VecinosDashboard />;
-      }} />
-      <Route path="/vecinos/cuenta" component={() => {
-        const VecinosCuenta = require("@/pages/vecinos/cuenta").default;
-        return <VecinosCuenta />;
-      }} />
-      <Route path="/vecinos/retiros" component={() => {
-        const VecinosRetiros = require("@/pages/vecinos/retiros").default;
-        return <VecinosRetiros />;
-      }} />
-      <Route path="/vecinos/soporte" component={() => {
-        const VecinosSoporte = require("@/pages/vecinos/soporte").default;
-        return <VecinosSoporte />;
-      }} />
-      <Route path="/vecinos/faq" component={() => {
-        const VecinosFAQ = require("@/pages/vecinos/faq").default;
-        return <VecinosFAQ />;
-      }} />
+      <Route path="/vecinos" component={React.lazy(() => import("@/pages/vecinos/index"))} />
+      <Route path="/vecinos/login" component={React.lazy(() => import("@/pages/vecinos/login"))} />
+      <Route path="/vecinos/registro" component={React.lazy(() => import("@/pages/vecinos/registro"))} />
+      <Route path="/vecinos/pos-app" component={React.lazy(() => import("@/pages/vecinos/pos-app"))} />
+      <Route path="/vecinos/dashboard" component={React.lazy(() => import("@/pages/vecinos/dashboard"))} />
+      <Route path="/vecinos/cuenta" component={React.lazy(() => import("@/pages/vecinos/cuenta"))} />
+      <Route path="/vecinos/retiros" component={React.lazy(() => import("@/pages/vecinos/retiros"))} />
+      <Route path="/vecinos/soporte" component={React.lazy(() => import("@/pages/vecinos/soporte"))} />
+      <Route path="/vecinos/faq" component={React.lazy(() => import("@/pages/vecinos/faq"))} />
 
       {/* Partner pages */}
       <Route path="/partners/public-page" component={PartnersPublicPage} />
@@ -335,10 +316,7 @@ function Router() {
       
       {/* Validación de Identidad */}
       <Route path="/verificacion-identidad-demo" component={VerificacionIdentidadDemo} />
-      <Route path="/verificacion-identidad-movil" component={() => {
-        const VerificacionMovil = require("@/pages/verificacion-identidad-movil").default;
-        return <VerificacionMovil />;
-      }} />
+      <Route path="/verificacion-identidad-movil" component={React.lazy(() => import("@/pages/verificacion-identidad-movil"))} />
       
       {/* Demostración de Pagos con MercadoPago */}
       <Route path="/payment-demo" component={PaymentDemo} />
@@ -372,6 +350,7 @@ function Router() {
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
+    </Suspense>
   );
 }
 
