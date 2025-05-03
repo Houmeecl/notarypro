@@ -168,21 +168,9 @@ export async function readCedulaChilena(
   if (!readerType) {
     const { available, readerType: detectedType } = await checkNFCAvailability();
     if (!available) {
-      console.log('No se detectó ningún lector NFC disponible, usando datos reales de prueba');
-      
-      // Simular el proceso real de lectura
-      statusCallback(NFCReadStatus.READING, 'Iniciando lectura de cédula...');
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      statusCallback(NFCReadStatus.READING, 'Leyendo datos personales...');
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      statusCallback(NFCReadStatus.READING, 'Verificando firma digital...');
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      statusCallback(NFCReadStatus.READING, 'Procesando información...');
-      
-      // Obtener datos reales de prueba
-      const testData = getRealTestChileanIDData();
-      statusCallback(NFCReadStatus.SUCCESS, 'Lectura exitosa');
-      return testData;
+      console.log('No se detectó ningún lector NFC disponible');
+      statusCallback(NFCReadStatus.ERROR, 'No se detectó ningún lector NFC compatible');
+      throw new Error('No se detectó ningún lector NFC compatible. Verifica que tu dispositivo tenga NFC y esté activado.');
     }
     readerType = detectedType;
   }
@@ -201,34 +189,23 @@ export async function readCedulaChilena(
         cedulaData = await readWithAndroidBridge(statusCallback);
         break;
       default:
-        // Usar datos reales de prueba en lugar de errores
-        console.log('Tipo de lector no soportado, usando datos reales de prueba');
-        statusCallback(NFCReadStatus.READING, 'Utilizando datos reales de prueba...');
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        const testData = getRealTestChileanIDData();
-        statusCallback(NFCReadStatus.SUCCESS, 'Lectura exitosa');
-        return testData;
+        console.log('Tipo de lector no soportado');
+        statusCallback(NFCReadStatus.ERROR, 'Tipo de lector no soportado');
+        throw new Error('Tipo de lector NFC no soportado');
     }
 
     if (cedulaData) {
       statusCallback(NFCReadStatus.SUCCESS, 'Lectura exitosa');
       return cedulaData;
     } else {
-      console.log('No se pudo leer la información de la cédula, usando datos reales de prueba');
-      statusCallback(NFCReadStatus.READING, 'Utilizando datos reales de prueba...');
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      const testData = getRealTestChileanIDData();
-      statusCallback(NFCReadStatus.SUCCESS, 'Lectura exitosa');
-      return testData;
+      console.log('No se pudo leer la información de la cédula');
+      statusCallback(NFCReadStatus.ERROR, 'No se pudo leer la información de la cédula');
+      throw new Error('No se pudo obtener información de la cédula. Intente nuevamente o utilice otro método de verificación.');
     }
   } catch (error) {
     console.log('Error al leer la cédula:', error);
-    console.log('Usando datos reales de prueba como alternativa');
-    statusCallback(NFCReadStatus.READING, 'Utilizando datos reales de prueba...');
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    const testData = getRealTestChileanIDData();
-    statusCallback(NFCReadStatus.SUCCESS, 'Lectura exitosa');
-    return testData;
+    statusCallback(NFCReadStatus.ERROR, error instanceof Error ? error.message : 'Error desconocido al leer la cédula');
+    throw error;
   }
 }
 
