@@ -280,13 +280,108 @@ export const PaymentSystem = () => {
   );
 };
 
+// Componente de ilustración de tienda atendiendo clientes (para la nueva landing page)
+export const StoreServing = () => {
+  const [moveAngle, setMoveAngle] = useState(0);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMoveAngle(prev => (prev + 1) % 360);
+    }, 100);
+    
+    return () => clearInterval(interval);
+  }, []);
+  
+  // Cálculo para el efecto de mecerse suavemente
+  const offsetY = Math.sin(moveAngle * Math.PI / 180) * 2;
+  
+  return (
+    <svg
+      width="300"
+      height="240"
+      viewBox="0 0 300 240"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="mx-auto transition-transform duration-300"
+      style={{ transform: `translateY(${offsetY}px)` }}
+    >
+      {/* Fondo de tienda */}
+      <rect x="50" y="40" width="200" height="150" rx="5" fill="#2d219b" opacity="0.1" />
+      
+      {/* Mostrador */}
+      <rect x="70" y="120" width="160" height="50" rx="5" fill="#2d219b" />
+      <rect x="70" y="140" width="160" height="30" rx="3" fill="#1e1876" />
+      
+      {/* Estantería */}
+      <rect x="60" y="60" width="40" height="60" fill="#4b5563" />
+      <rect x="110" y="60" width="40" height="60" fill="#4b5563" />
+      <rect x="60" y="60" width="40" height="10" fill="#374151" />
+      <rect x="110" y="60" width="40" height="10" fill="#374151" />
+      <rect x="60" y="80" width="40" height="10" fill="#374151" />
+      <rect x="110" y="80" width="40" height="10" fill="#374151" />
+      <rect x="60" y="100" width="40" height="10" fill="#374151" />
+      <rect x="110" y="100" width="40" height="10" fill="#374151" />
+      
+      {/* Productos en estantería */}
+      <rect x="65" y="65" width="10" height="15" fill="#ef4444" />
+      <rect x="80" y="65" width="10" height="15" fill="#3b82f6" />
+      <rect x="115" y="65" width="10" height="15" fill="#10b981" />
+      <rect x="130" y="65" width="10" height="15" fill="#f59e0b" />
+      <rect x="65" y="85" width="10" height="15" fill="#8b5cf6" />
+      <rect x="80" y="85" width="10" height="15" fill="#ec4899" />
+      <rect x="115" y="85" width="10" height="15" fill="#6366f1" />
+      <rect x="130" y="85" width="10" height="15" fill="#f97316" />
+      
+      {/* Terminal POS */}
+      <rect x="190" y="100" width="40" height="20" rx="3" fill="#111827" />
+      <rect x="195" y="105" width="30" height="10" rx="2" fill="#d1d5db" />
+      
+      {/* Letrero VecinoXpress */}
+      <rect x="80" y="40" width="140" height="25" rx="5" fill="#ffffff" />
+      <text x="90" y="58" fontFamily="Arial" fontSize="16" fontWeight="bold" fill="#2d219b">VecinoXpress</text>
+      
+      {/* Persona atendiendo (Socio) */}
+      <circle cx="100" cy="105" r="15" fill="#fbbf24" /> {/* Cabeza */}
+      <rect x="90" y="120" width="20" height="25" fill="#2d219b" /> {/* Torso - Color de VecinoXpress */}
+      <rect x="90" y="120" width="20" height="8" fill="#1e1876" /> {/* Cuello - Color más oscuro */}
+      
+      {/* Brazos */}
+      <rect x="85" y="125" width="5" height="15" rx="2" fill="#2d219b" />
+      <rect x="110" y="125" width="5" height="15" rx="2" fill="#2d219b" />
+      <rect x="110" y="125" width="25" height="5" rx="2" fill="#2d219b" />
+      
+      {/* Cliente */}
+      <circle cx="180" cy="105" r="15" fill="#a78bfa" /> {/* Cabeza */}
+      <rect x="170" y="120" width="20" height="25" fill="#7c3aed" /> {/* Torso */}
+      <rect x="170" y="120" width="20" height="8" fill="#6d28d9" /> {/* Cuello */}
+      
+      {/* Brazos del cliente */}
+      <rect x="165" y="125" width="5" height="15" rx="2" fill="#7c3aed" />
+      <rect x="190" y="125" width="5" height="15" rx="2" fill="#7c3aed" />
+      <rect x="145" y="125" width="20" height="5" rx="2" fill="#7c3aed" />
+      
+      {/* Documento */}
+      <rect x="140" y="115" width="15" height="20" fill="#ffffff" />
+      <line x1="143" y1="120" x2="153" y2="120" stroke="#9ca3af" strokeWidth="1" />
+      <line x1="143" y1="123" x2="153" y2="123" stroke="#9ca3af" strokeWidth="1" />
+      <line x1="143" y1="126" x2="153" y2="126" stroke="#9ca3af" strokeWidth="1" />
+      <line x1="143" y1="129" x2="150" y2="129" stroke="#9ca3af" strokeWidth="1" />
+      
+      {/* Sello/certificación */}
+      <circle cx="150" cy="125" r="8" stroke="#2d219b" strokeWidth="1.5" fill="none" />
+      <path d="M145 125 L149 129 L155 122" stroke="#2d219b" strokeWidth="1.5" />
+    </svg>
+  );
+};
+
 // Componente principal que agrupa todas las ilustraciones
 const VecinosIllustrations = {
   NeighborHelping,
   SellerVisiting,
   SupervisorManaging,
   CertifierReviewing,
-  PaymentSystem
+  PaymentSystem,
+  StoreServing
 };
 
 export default VecinosIllustrations;

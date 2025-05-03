@@ -54,7 +54,7 @@ import VecinosIllustrations from "@/components/vecinos/VecinosIllustrations";
 import { useToast } from "@/hooks/use-toast";
 
 // Importamos el logo
-import vecinosXpressLogo from "../assets/vecino-xpress-logo.svg";
+import vecinosXpressLogo from "@assets/vecino-xpress-logo.svg";
 
 export default function VecinosExpress() {
   const [, setLocation] = useLocation();
@@ -544,7 +544,7 @@ export default function VecinosExpress() {
                   </div>
                 </div>
                 
-                <VecinosIllustrations.StoreServing />
+                <VecinosIllustrations.StoreServing className="w-full h-auto" />
                 
                 <div className="mt-6 flex items-start gap-4">
                   <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-indigo-600/20 text-indigo-300">
@@ -839,7 +839,7 @@ export default function VecinosExpress() {
                     <Play className="h-8 w-8 text-indigo-600 ml-1" />
                   </div>
                 </div>
-                <VecinosIllustrations.StoreServing />
+                <VecinosIllustrations.StoreServing className="w-full h-full object-cover" />
               </div>
             </div>
           </div>
@@ -1459,7 +1459,7 @@ export default function VecinosExpress() {
             <div className="aspect-video bg-gray-100 flex items-center justify-center">
               {/* Aquí iría el video, por ahora usamos la ilustración */}
               <div className="text-center">
-                <VecinosIllustrations.StoreServing />
+                <VecinosIllustrations.StoreServing className="w-64 h-64 mx-auto" />
                 <p className="text-indigo-700 mt-4">Video de demostración no disponible en este momento</p>
               </div>
             </div>
