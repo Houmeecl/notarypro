@@ -1,10 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Check, ArrowLeft, CheckCircle2, Printer, UserPlus, FileText, 
   CreditCard, ChevronRight, FileSignature, UserCheck, Shield, 
   Camera, RefreshCw, Download, X, Fingerprint, ClipboardList,
-  CheckSquare, FileCheck, Home
+  CheckSquare, FileCheck, Home, User, LogOut
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 const WebAppPOSButtons = () => {
   const [, setLocation] = useLocation();
@@ -24,6 +25,8 @@ const WebAppPOSButtons = () => {
   const [showCertifierPanel, setShowCertifierPanel] = useState(false);
   const [signatureImage, setSignatureImage] = useState('');
   const [certificadorMode, setCertificadorMode] = useState(false);
+  const [partnerInfo, setPartnerInfo] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   
   // Estado para múltiples firmantes
   const [currentSignerIndex, setCurrentSignerIndex] = useState(0); // 0 = primer firmante, 1 = segundo firmante
@@ -35,6 +38,60 @@ const WebAppPOSButtons = () => {
     relacion: string;
   }>>([]);
   const { toast } = useToast();
+  
+  // Cargar información del socio al inicio
+  useEffect(() => {
+    const loadPartnerInfo = async () => {
+      try {
+        // Verificar si existe un token en localStorage
+        const token = localStorage.getItem('vecinos_token');
+        
+        if (!token) {
+          toast({
+            title: "No has iniciado sesión",
+            description: "Debes iniciar sesión como socio para acceder",
+            variant: "destructive",
+          });
+          setLocation('/vecinos/login');
+          return;
+        }
+        
+        // Configurar headers con el token JWT
+        const headers = {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        };
+        
+        // Obtener información del socio desde la API
+        const response = await apiRequest('GET', '/api/vecinos/partner-info', null, headers);
+        
+        if (!response.ok) {
+          throw new Error('No se pudo obtener la información del socio');
+        }
+        
+        const data = await response.json();
+        setPartnerInfo(data);
+        
+        toast({
+          title: "Bienvenido al POS Web",
+          description: `${data.store_name} - ${data.address}`,
+        });
+      } catch (error) {
+        console.error('Error al cargar información del socio:', error);
+        toast({
+          title: "Error de autenticación",
+          description: "Por favor inicia sesión nuevamente",
+          variant: "destructive",
+        });
+        // Redirigir al login si hay problemas con el token
+        setLocation('/vecinos/login');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadPartnerInfo();
+  }, []);
   
   // Referencias para el canvas de firma
   const signatureCanvasRef = useRef<HTMLCanvasElement>(null);
