@@ -341,15 +341,10 @@ const READIDVerifier: React.FC<READIDVerifierProps> = ({
                     </Alert>
                   )}
                   
-                  {/* Botón para simulación (solo en desarrollo) */}
-                  <Button 
-                    onClick={simulateSuccess}
-                    variant="outline"
-                    className="text-xs"
-                    size="sm"
-                  >
-                    Simular verificación exitosa
-                  </Button>
+                  {/* Mensaje informativo sobre la implementación real */}
+                  <div className="mt-2 text-xs text-center text-gray-500">
+                    Se utilizará verificación NFC real para leer su cédula de identidad
+                  </div>
                 </div>
                 
                 {error && (
