@@ -173,6 +173,16 @@ function Router() {
           </Suspense>
         );
       }} />
+      <Route path="/document-selection-simple" component={() => {
+        const DocumentSelectionSimple = React.lazy(() => import("@/pages/document-selection-simple"));
+        return (
+          <Suspense fallback={<div className="flex items-center justify-center h-screen">
+            <p className="text-xl">Cargando selección de documentos...</p>
+          </div>}>
+            <DocumentSelectionSimple />
+          </Suspense>
+        );
+      }} />
       <Route path="/iniciar-tramite" component={() => {
         const IniciarTramite = React.lazy(() => import("@/pages/iniciar-tramite"));
         return (

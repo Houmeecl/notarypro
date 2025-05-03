@@ -38,7 +38,7 @@ export default function VerificacionSelfieSimplePage() {
   };
 
   const handleComplete = () => {
-    navigate("/document-selection");
+    navigate("/document-selection-simple");
   };
 
   return (
