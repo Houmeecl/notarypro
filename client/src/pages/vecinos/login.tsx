@@ -57,7 +57,7 @@ export default function VecinosLogin() {
       // Mostrar mensaje de éxito
       toast({
         title: "Inicio de sesión exitoso",
-        description: "Bienvenido a Vecinos Xpress",
+        description: "Bienvenido a ABDHDA#PE",
       });
       
       // Redirigir al dashboard de Vecinos
@@ -82,7 +82,7 @@ export default function VecinosLogin() {
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
           <div className="flex flex-col items-center justify-center">
-            <img src={vecinoLogo} alt="Vecino Xpress Logo" className="h-24 mb-2" />
+            <img src={vecinoLogo} alt="ABDHDA#PE Logo" className="h-24 mb-2" />
             <div className="flex items-center mt-1">
               <CardTitle className="text-2xl font-bold text-[#2d219b]">ABDHDA#PE</CardTitle>
             </div>
@@ -264,10 +264,10 @@ export default function VecinosLogin() {
                   </Button>
                   
                   {/* Ayuda con credenciales de demostración */}
-                  <div className="bg-blue-50 border border-blue-100 rounded-md p-3 mt-4">
-                    <p className="text-sm text-blue-800 font-medium">Credenciales de demostración</p>
+                  <div className="bg-[#f2f1ff] border border-[#d8d4ff] rounded-md p-3 mt-4">
+                    <p className="text-sm text-[#2d219b] font-medium">Credenciales de demostración</p>
                     <div className="grid grid-cols-1 gap-2 mt-2">
-                      <div className="text-sm p-2 bg-white rounded border border-blue-100">
+                      <div className="text-sm p-2 bg-white rounded border border-[#d8d4ff]">
                         <div className="font-medium">Usuario: demopartner</div>
                         <div className="text-gray-500">Contraseña: password123</div>
                         <div className="text-gray-500 mt-1">Tienda: Minimarket El Sol</div>
