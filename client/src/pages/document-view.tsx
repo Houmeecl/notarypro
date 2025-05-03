@@ -1,35 +1,20 @@
-import { useEffect, useState } from "react";
-import { Link, useRoute } from "wouter";
-import { Loader2, ArrowLeft, FileText, Download, Check, X, Pen } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { Link } from "wouter";
+import { ArrowLeft } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useQuery, useMutation } from "@tanstack/react-query";
 import DocumentNavbar from "@/components/layout/DocumentNavbar";
-import TranslationWidget from "@/components/document/TranslationWidget";
-// Importar el componente SignatureCanvas
-import SignatureCanvas from "@/components/dashboard/SignatureCanvas";
 
-// Define una interfaz Document para este componente
+// Definición simple para el componente
 interface Document {
   id: number;
   title: string;
   status: string;
-  createdAt: string | Date;
-  updatedAt: string | Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
   certifierId?: number | null;
   signatureData?: string | null;
-  formData?: string | any;
-  content?: string;
-  userId?: number;
-  templateId?: number;
-  filePath?: string | null;
-  pdfPath?: string | null;
-  qrCode?: string | null;
-  reference?: string | null;
+  formData?: any;
   rejectionReason?: string | null;
 }
 
