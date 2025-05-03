@@ -1,162 +1,87 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Smartphone, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 interface NFCMicroInteractionsProps {
-  status: 'idle' | 'scanning' | 'success' | 'error';
-  message?: string;
+  className?: string;
 }
 
-/**
- * Componente para microinteracciones durante la lectura NFC
- * Muestra diferentes animaciones según el estado: idle, scanning, success, error
- * 
- * Este componente utiliza framer-motion para crear animaciones fluidas
- * que mejoran la experiencia del usuario durante el proceso de verificación NFC.
- * 
- * Compatible con API Web NFC según la especificación de Mozilla:
- * https://developer.mozilla.org/es/docs/Web/API/Web_NFC_API
- */
-const NFCMicroInteractions: React.FC<NFCMicroInteractionsProps> = ({ 
-  status, 
-  message = 'Acerque la cédula al lector NFC' 
-}) => {
-  // Renderizar según el estado
-  switch (status) {
-    case 'scanning':
-      return (
-        <div className="flex flex-col items-center justify-center">
-          <motion.div
-            className="relative w-32 h-32 flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            {/* Ripple effect */}
-            <motion.div
-              className="absolute rounded-full border-4 border-blue-400 opacity-50"
-              initial={{ width: 80, height: 80, opacity: 0.7 }}
-              animate={{ 
-                width: 130, 
-                height: 130, 
-                opacity: 0,
-                borderWidth: 1
-              }}
-              transition={{ 
-                repeat: Infinity, 
-                duration: 1.5, 
-                ease: "easeOut" 
-              }}
-            />
-            <motion.div
-              className="absolute rounded-full border-4 border-blue-500 opacity-50"
-              initial={{ width: 80, height: 80, opacity: 0.7 }}
-              animate={{ 
-                width: 130, 
-                height: 130, 
-                opacity: 0,
-                borderWidth: 1
-              }}
-              transition={{ 
-                repeat: Infinity, 
-                duration: 1.5, 
-                ease: "easeOut",
-                delay: 0.5
-              }}
-            />
-            
-            {/* Card icon */}
-            <motion.div
-              className="bg-blue-100 rounded-lg p-4 z-10"
-              initial={{ scale: 1 }}
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-            >
-              <Smartphone size={40} className="text-blue-600" />
-            </motion.div>
-          </motion.div>
-          
-          <motion.p 
-            className="mt-4 text-sm text-blue-700 font-medium text-center max-w-xs"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            {message}
-          </motion.p>
-          
-          <motion.div 
-            className="mt-3 flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Loader2 className="h-4 w-4 mr-2 text-blue-600 animate-spin" />
-            <span className="text-xs text-blue-600">Escaneando...</span>
-          </motion.div>
-        </div>
-      );
-    
-    case 'success':
-      return (
-        <div className="flex flex-col items-center justify-center">
-          <motion.div
-            className="bg-green-100 rounded-full p-6"
-            initial={{ scale: 0 }}
-            animate={{ scale: [0, 1.2, 1] }}
-            transition={{ duration: 0.5, type: "spring" }}
-          >
-            <CheckCircle size={40} className="text-green-600" />
-          </motion.div>
-          
-          <motion.p 
-            className="mt-4 text-sm text-green-700 font-medium text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            {message || 'Lectura completada con éxito'}
-          </motion.p>
-        </div>
-      );
-    
-    case 'error':
-      return (
-        <div className="flex flex-col items-center justify-center">
-          <motion.div
-            className="bg-red-100 rounded-full p-6"
-            initial={{ scale: 0 }}
-            animate={{ scale: [0, 1.2, 1] }}
-            transition={{ duration: 0.5, type: "spring" }}
-          >
-            <AlertCircle size={40} className="text-red-600" />
-          </motion.div>
-          
-          <motion.p 
-            className="mt-4 text-sm text-red-700 font-medium text-center max-w-xs"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            {message || 'Error en la lectura. Intente nuevamente.'}
-          </motion.p>
-        </div>
-      );
-    
-    case 'idle':
-    default:
-      return (
-        <div className="flex flex-col items-center justify-center">
-          <div className="bg-gray-100 rounded-lg p-4">
-            <Smartphone size={40} className="text-gray-500" />
+const NFCMicroInteractions: React.FC<NFCMicroInteractionsProps> = ({ className = '' }) => {
+  const [animationState, setAnimationState] = useState<number>(0);
+
+  // Efecto para animar el componente
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAnimationState((prev) => (prev + 1) % 4);
+    }, 800);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className={`relative ${className}`}>
+      {/* Dispositivo móvil */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="relative w-24 h-40 bg-gray-800 rounded-xl border-4 border-gray-700 shadow-lg">
+          {/* Pantalla */}
+          <div className="absolute inset-2 bg-[#2d219b] opacity-70 rounded-lg flex items-center justify-center">
+            <div className="text-white text-xs font-bold">NFC</div>
           </div>
           
-          <p className="mt-4 text-sm text-gray-600 text-center">
-            {message || 'Esperando para iniciar la lectura'}
-          </p>
+          {/* Círculos de animación para simular lectura NFC */}
+          <div 
+            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
+              animationState === 0 ? 'opacity-70' : 'opacity-0'
+            }`}
+          >
+            <div className="w-20 h-20 rounded-full border-2 border-white animate-ping opacity-30"></div>
+          </div>
+          <div 
+            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
+              animationState === 1 ? 'opacity-70' : 'opacity-0'
+            }`}
+          >
+            <div className="w-16 h-16 rounded-full border-2 border-white animate-ping opacity-40"></div>
+          </div>
+          <div 
+            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
+              animationState === 2 ? 'opacity-70' : 'opacity-0'
+            }`}
+          >
+            <div className="w-12 h-12 rounded-full border-2 border-white animate-ping opacity-50"></div>
+          </div>
+          <div 
+            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
+              animationState === 3 ? 'opacity-70' : 'opacity-0'
+            }`}
+          >
+            <div className="w-8 h-8 rounded-full border-2 border-white animate-ping opacity-60"></div>
+          </div>
         </div>
-      );
-  }
+      </div>
+      
+      {/* Cédula/Documento con chip NFC */}
+      <div className="absolute right-1/4 bottom-1/3 transform rotate-12">
+        <div className="w-32 h-20 bg-white rounded-md shadow-md border border-gray-300 overflow-hidden relative">
+          {/* Diseño de documento */}
+          <div className="absolute top-0 left-0 w-full h-6 bg-gradient-to-r from-indigo-700 to-indigo-500"></div>
+          <div className="absolute top-8 left-3 w-10 h-12 bg-gradient-to-br from-amber-300 to-amber-100 rounded-sm"></div>
+          <div className="absolute top-10 right-4 w-12 h-2 bg-gray-400 rounded-sm"></div>
+          <div className="absolute top-14 right-4 w-10 h-2 bg-gray-300 rounded-sm"></div>
+          
+          {/* Chip NFC */}
+          <div 
+            className={`absolute bottom-2 left-3 w-8 h-6 bg-gradient-to-br from-amber-500 to-amber-300 rounded-sm transition-all duration-500 ${
+              animationState % 2 === 0 ? 'shadow-md shadow-amber-300' : ''
+            }`}
+          >
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <div className="w-6 h-px bg-amber-700"></div>
+              <div className="w-6 h-px bg-amber-700 mt-1"></div>
+              <div className="w-6 h-px bg-amber-700 mt-1"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default NFCMicroInteractions;

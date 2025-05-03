@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificación de Identidad</title>
+  <style>
+    /* Estilos para la interfaz */
+    body {
+      font-family: Arial, sans-serif;
+    }
+    #qr-scanner, #nfc-reader, #photo-capture {
+      margin: 20px;
+    }
+    video {
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Verificación de Identidad Avanzada</h1>
+
+  <!-- Carga de documento -->
+  <div id="document-upload">
+    <p>Carga la imagen de tu documento:</p>
+    <input type="file" id="document-input" accept="image/*" />
+  </div>
+
+  <!-- NFC -->
+  <div id="nfc-reader">
+    <button id="start-nfc">Leer NFC</button>
+    <p id="nfc-data">Esperando NFC...</p>
+  </div>
+
+  <!-- Captura de foto para biometría facial -->
+  <div id="photo-capture">
+    <p>Captura una foto de tu rostro:</p>
+    <video id="video" autoplay></video>
+    <button id="capture-btn">Capturar Foto</button>
+    <canvas id="photo-preview"></canvas>
+  </div>
+
+  <script>
+    // Función para capturar la foto
+    const videoElement = document.getElementById('video');
+    const captureButton = document.getElementById('capture-btn');
+    const photoPreview = document.getElementById('photo-preview');
+    let stream;
+
+    // Iniciar la cámara
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoElement.srcObject = stream;
+      } catch (error) {
+        console.error('No se pudo acceder a la cámara: ', error);
+      }
+    }
+
+    // Capturar la foto
+    captureButton.addEventListener('click', () => {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = videoElement.videoWidth;
+      canvas.height = videoElement.videoHeight;
+      context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+      const imageUrl = canvas.toDataURL('image/png');
+      
+      // Mostrar la foto capturada
+      const img = new Image();
+      img.src = imageUrl;
+      photoPreview.innerHTML = '';
+      photoPreview.appendChild(img);
+      photoPreview.style.display = 'block';
+
+      // Llamar a la función de biometría facial aquí
+      verifyFace(imageUrl);
+    });
+
+    // Función de Biometría Facial (Utilizando un servicio como Face++ o Azure)
+    async function verifyFace(imageUrl) {
+      const response = await fetch('https://api.faceplusplus.com/recognition', {
+        method: 'POST',
+        body: JSON.stringify({ image_url: imageUrl }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const result = await response.json();
+      // Procesar el resultado de la comparación de rostros
+      console.log('Resultado biometría:', result);
+    }
+
+    // Función para leer NFC
+    const nfcButton = document.getElementById('start-nfc');
+    const nfcDataDisplay = document.getElementById('nfc-data');
+    
+    nfcButton.addEventListener('click', async () => {
+      if ('NFC' in window) {
+        try {
+          const nfc = await navigator.nfc.requestNfc();
+          const nfcTag = await nfc.read();
+          const nfcData = await nfcTag.text();
+          nfcDataDisplay.textContent = `Datos NFC leídos: ${nfcData}`;
+          // Llamar al análisis forense de documentos aquí
+          analyzeDocument(nfcData);
+        } catch (error) {
+          nfcDataDisplay.textContent = 'Error al leer NFC: ' + error.message;
+        }
+      } else {
+        nfcDataDisplay.textContent = 'Web NFC no está disponible en tu navegador.';
+      }
+    });
+
+    // Función para análisis forense de documentos
+    function analyzeDocument(nfcData) {
+      // Cargar la imagen del documento y procesarla
+      const documentInput = document.getElementById('document-input');
+      const documentFile = documentInput.files[0];
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const documentImage = e.target.result;
+        // Llamar a un backend que analice la imagen (puede ser Python, OpenCV, etc.)
+        const analysisResult = await analyzeDocumentForensics(documentImage);
+        console.log('Resultado del análisis forense:', analysisResult);
+      };
+      reader.readAsDataURL(documentFile);
+    }
+
+    // Función para análisis forense (usando OpenCV en el backend, ejemplo en Python)
+    async function analyzeDocumentForensics(documentImage) {
+      // Llamar a tu backend Python/Flask o Django para hacer el análisis forense
+      const response = await fetch('/analyze_document', {
+        method: 'POST',
+        body: JSON.stringify({ image: documentImage }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      return await response.json();
+    }
+
+    // Iniciar la cámara al cargar la página
+    window.addEventListener('load', startCamera);
+  </script>
+</body>
+</html>

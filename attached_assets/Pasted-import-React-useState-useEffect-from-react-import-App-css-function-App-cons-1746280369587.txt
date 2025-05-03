@@ -1,0 +1,119 @@
+import React, { useState, useEffect } from 'react';
+import './App.css';
+
+function App() {
+  const [nfcData, setNfcData] = useState('');
+  const [image, setImage] = useState(null);
+  const [videoStream, setVideoStream] = useState(null);
+  const [capturedPhoto, setCapturedPhoto] = useState(null);
+
+  // Función para leer NFC
+  const handleNfcRead = async () => {
+    if ('NFC' in window) {
+      try {
+        const nfc = await navigator.nfc.requestNfc();
+        const nfcTag = await nfc.read();
+        const nfcData = await nfcTag.text();
+        setNfcData(nfcData);
+      } catch (error) {
+        alert('Error al leer NFC: ' + error.message);
+      }
+    } else {
+      alert('Web NFC no está disponible en este navegador.');
+    }
+  };
+
+  // Función para iniciar la cámara
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      setVideoStream(stream);
+    } catch (err) {
+      console.error('Error al acceder a la cámara: ', err);
+    }
+  };
+
+  // Función para capturar la foto
+  const capturePhoto = () => {
+    const canvas = document.createElement('canvas');
+    const videoElement = document.getElementById('video');
+    const context = canvas.getContext('2d');
+    canvas.width = videoElement.videoWidth;
+    canvas.height = videoElement.videoHeight;
+    context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+    const photoUrl = canvas.toDataURL('image/png');
+    setCapturedPhoto(photoUrl);
+  };
+
+  // Función para hacer la verificación facial (se requiere una API como Face++ o Azure)
+  const verifyFace = async () => {
+    if (!capturedPhoto) return;
+    // Enviar la foto capturada a un servicio de biometría facial como Face++
+    const response = await fetch('https://api.faceplusplus.com/recognition', {
+      method: 'POST',
+      body: JSON.stringify({ image_url: capturedPhoto }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const result = await response.json();
+    console.log('Resultado de la verificación facial:', result);
+  };
+
+  // Función para analizar el documento cargado (Forensics)
+  const analyzeDocument = async (file) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const documentImage = e.target.result;
+      // Enviar el documento a un backend para el análisis forense
+      const analysisResult = await fetch('/api/analyzeDocument', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ documentImage }),
+      });
+      const result = await analysisResult.json();
+      console.log('Análisis forense del documento:', result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  useEffect(() => {
+    startCamera();
+  }, []);
+
+  return (
+    <div className="App">
+      <h1>Verificación de Identidad Avanzada</h1>
+
+      {/* Análisis forense de documentos */}
+      <div>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => analyzeDocument(e.target.files[0])}
+        />
+        <p>Sube tu documento para análisis forense</p>
+      </div>
+
+      {/* Lectura NFC */}
+      <div>
+        <button onClick={handleNfcRead}>Leer NFC</button>
+        <p>Datos NFC leídos: {nfcData}</p>
+      </div>
+
+      {/* Captura de foto para biometría facial */}
+      <div>
+        <video id="video" autoPlay></video>
+        <button onClick={capturePhoto}>Capturar Foto</button>
+        <canvas id="photo-preview" style={{ display: 'none' }}></canvas>
+        {capturedPhoto && (
+          <div>
+            <h3>Foto capturada:</h3>
+            <img src={capturedPhoto} alt="Foto Capturada" />
+            <button onClick={verifyFace}>Verificar rostro</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default App;
