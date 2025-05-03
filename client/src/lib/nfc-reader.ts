@@ -266,7 +266,7 @@ export async function readCedulaChilena(
  */
 async function readWithWebNFC(
   statusCallback: (status: NFCReadStatus, message?: string) => void
-): Promise<CedulaChilenaData | null> {
+): Promise<CedulaChilenaData> {
   if (!isWebNFCAvailable()) {
     throw new Error('Web NFC no está disponible en este dispositivo');
   }
@@ -471,7 +471,7 @@ async function readChileanIDCardWithSerialnumber(serialNumber: string): Promise<
  */
 async function readWithPOSDevice(
   statusCallback: (status: NFCReadStatus, message?: string) => void
-): Promise<CedulaChilenaData | null> {
+): Promise<CedulaChilenaData> {
   statusCallback(NFCReadStatus.READING, 'Conectando con dispositivo POS...');
 
   // Esta función implementa la lectura desde un lector POS
@@ -529,7 +529,7 @@ async function readWithPOSDevice(
  */
 async function readWithAndroidBridge(
   statusCallback: (status: NFCReadStatus, message?: string) => void
-): Promise<CedulaChilenaData | null> {
+): Promise<CedulaChilenaData> {
   if (typeof (window as any).AndroidNFCBridge === 'undefined') {
     throw new Error('El puente de Android para NFC no está disponible');
   }
