@@ -9,7 +9,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -56,7 +56,6 @@ import {
   BadgeDollarSign
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Link } from "wouter";
 
 // Esquema de validación para documentos generales
 const documentSchema = z.object({
@@ -446,7 +445,7 @@ export default function DocumentUpload() {
                     <Button 
                       type="button" 
                       variant="outline" 
-                      onClick={() => navigate("/document-explorer")}
+                      onClick={() => setLocation("/document-explorer")}
                       disabled={isSubmitting}
                     >
                       Cancelar
@@ -654,7 +653,7 @@ export default function DocumentUpload() {
                     <Button 
                       type="button" 
                       variant="outline" 
-                      onClick={() => navigate("/document-explorer")}
+                      onClick={() => setLocation("/document-explorer")}
                       disabled={isSubmitting}
                     >
                       Cancelar

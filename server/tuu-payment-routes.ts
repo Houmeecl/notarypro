@@ -2,17 +2,23 @@
  * Rutas API para la integración con Tuu Payments
  * 
  * Este módulo proporciona endpoints para el procesamiento de pagos
- * utilizando los servicios de Tuu Payments para terminales POS
+ * utilizando los servicios de Tuu Payments para:
+ * - Terminales POS físicos (Sunmi T5810)
+ * - Pasarela web online
+ * - Dispositivos móviles y tablets
  */
 
 import { Router, Request, Response } from "express";
 import axios from "axios";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export const tuuPaymentRouter = Router();
 
-// Constantes para la API de Tuu
+// Configuración de la API de Tuu
 const TUU_API_BASE_URL = "https://api.tuu.cl";
 const TUU_API_VERSION = "v1";
+const TUU_WEB_GATEWAY_URL = "https://checkout.tuu.cl";
 
 /**
  * Iniciar una transacción de pago
@@ -184,10 +190,259 @@ tuuPaymentRouter.post('/webhook', async (req: Request, res: Response) => {
 });
 
 /**
+ * Crear una sesión de pago web (pasarela en línea)
+ * POST /api/tuu-payment/create-web-payment
+ */
+tuuPaymentRouter.post('/create-web-payment', async (req: Request, res: Response) => {
+  try {
+    const { 
+      amount, 
+      currency, 
+      description, 
+      clientName, 
+      clientEmail, 
+      clientRut, 
+      successUrl, 
+      cancelUrl, 
+      metadata 
+    } = req.body;
+    
+    // Validar campos requeridos
+    if (!amount) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Se requiere el campo amount' 
+      });
+    }
+
+    // ID único para esta transacción
+    const clientTransactionId = generateTransactionId();
+    
+    // Crear sesión de pago en la pasarela web de Tuu
+    const response = await axios({
+      method: 'POST',
+      url: `${TUU_API_BASE_URL}/${TUU_API_VERSION}/checkout/sessions`,
+      headers: {
+        'Authorization': `Bearer ${process.env.POS_PAYMENT_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      data: {
+        amount,
+        currency: currency || 'CLP',
+        description: description || 'Pago VecinoXpress',
+        client_name: clientName,
+        client_email: clientEmail,
+        client_rut: clientRut,
+        client_transaction_id: clientTransactionId,
+        success_url: successUrl || `${req.protocol}://${req.get('host')}/payment-success`,
+        cancel_url: cancelUrl || `${req.protocol}://${req.get('host')}/payment-cancel`,
+        metadata: metadata || {}
+      }
+    });
+
+    return res.status(201).json({
+      success: true,
+      data: {
+        ...response.data,
+        checkout_url: `${TUU_WEB_GATEWAY_URL}/${response.data.id}`
+      }
+    });
+  } catch (error: any) {
+    console.error('Error al crear sesión de pago web en Tuu:', error.response?.data || error.message);
+    
+    return res.status(error.response?.status || 500).json({
+      success: false,
+      message: error.response?.data?.message || 'Error al procesar la solicitud de pago web',
+      error: error.response?.data || error.message
+    });
+  }
+});
+
+/**
+ * Crear un enlace de pago (para compartir por correo, WhatsApp, etc.)
+ * POST /api/tuu-payment/create-payment-link
+ */
+tuuPaymentRouter.post('/create-payment-link', async (req: Request, res: Response) => {
+  try {
+    const { 
+      amount, 
+      currency, 
+      description, 
+      expiresAt,
+      metadata
+    } = req.body;
+    
+    if (!amount) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Se requiere el campo amount' 
+      });
+    }
+
+    // Crear enlace de pago en Tuu
+    const response = await axios({
+      method: 'POST',
+      url: `${TUU_API_BASE_URL}/${TUU_API_VERSION}/payment-links`,
+      headers: {
+        'Authorization': `Bearer ${process.env.POS_PAYMENT_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      data: {
+        amount,
+        currency: currency || 'CLP',
+        description: description || 'Pago VecinoXpress',
+        client_transaction_id: generateTransactionId(),
+        expires_at: expiresAt,
+        metadata: metadata || {}
+      }
+    });
+
+    return res.status(201).json({
+      success: true,
+      data: response.data
+    });
+  } catch (error: any) {
+    console.error('Error al crear enlace de pago en Tuu:', error.response?.data || error.message);
+    
+    return res.status(error.response?.status || 500).json({
+      success: false,
+      message: error.response?.data?.message || 'Error al crear enlace de pago',
+      error: error.response?.data || error.message
+    });
+  }
+});
+
+/**
+ * Obtener detalles de una sesión de pago
+ * GET /api/tuu-payment/checkout-session/:id
+ */
+tuuPaymentRouter.get('/checkout-session/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    const response = await axios({
+      method: 'GET',
+      url: `${TUU_API_BASE_URL}/${TUU_API_VERSION}/checkout/sessions/${id}`,
+      headers: {
+        'Authorization': `Bearer ${process.env.POS_PAYMENT_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: response.data
+    });
+  } catch (error: any) {
+    console.error('Error al consultar sesión de pago en Tuu:', error.response?.data || error.message);
+    
+    return res.status(error.response?.status || 500).json({
+      success: false,
+      message: 'Error al consultar la sesión de pago',
+      error: error.response?.data || error.message
+    });
+  }
+});
+
+/**
+ * Procesar un pago móvil (para app o tablets)
+ * POST /api/tuu-payment/mobile-payment
+ */
+tuuPaymentRouter.post('/mobile-payment', async (req: Request, res: Response) => {
+  try {
+    const { 
+      amount, 
+      currency,
+      description,
+      paymentMethod,
+      cardToken,
+      clientName,
+      clientEmail,
+      clientRut,
+      clientPhone,
+      metadata
+    } = req.body;
+    
+    if (!amount || !paymentMethod) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Se requieren los campos amount y paymentMethod' 
+      });
+    }
+
+    // Crear pago móvil en Tuu
+    const response = await axios({
+      method: 'POST',
+      url: `${TUU_API_BASE_URL}/${TUU_API_VERSION}/mobile/payments`,
+      headers: {
+        'Authorization': `Bearer ${process.env.POS_PAYMENT_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      data: {
+        amount,
+        currency: currency || 'CLP',
+        description: description || 'Pago móvil VecinoXpress',
+        payment_method: paymentMethod,
+        card_token: cardToken,
+        client_transaction_id: generateTransactionId(),
+        client_name: clientName,
+        client_email: clientEmail,
+        client_rut: clientRut,
+        client_phone: clientPhone,
+        metadata: metadata || {}
+      }
+    });
+
+    return res.status(201).json({
+      success: true,
+      data: response.data
+    });
+  } catch (error: any) {
+    console.error('Error al procesar pago móvil en Tuu:', error.response?.data || error.message);
+    
+    return res.status(error.response?.status || 500).json({
+      success: false,
+      message: error.response?.data?.message || 'Error al procesar pago móvil',
+      error: error.response?.data || error.message
+    });
+  }
+});
+
+/**
+ * Obtener métodos de pago disponibles
+ * GET /api/tuu-payment/payment-methods
+ */
+tuuPaymentRouter.get('/payment-methods', async (req: Request, res: Response) => {
+  try {
+    const response = await axios({
+      method: 'GET',
+      url: `${TUU_API_BASE_URL}/${TUU_API_VERSION}/payment-methods`,
+      headers: {
+        'Authorization': `Bearer ${process.env.POS_PAYMENT_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: response.data
+    });
+  } catch (error: any) {
+    console.error('Error al obtener métodos de pago de Tuu:', error.response?.data || error.message);
+    
+    return res.status(error.response?.status || 500).json({
+      success: false,
+      message: 'Error al obtener métodos de pago',
+      error: error.response?.data || error.message
+    });
+  }
+});
+
+/**
  * Generar un ID de transacción único
  */
 function generateTransactionId(): string {
   const timestamp = Date.now().toString();
   const random = Math.random().toString(36).substring(2, 10);
-  return `notarypro-${timestamp}-${random}`;
+  return `vecinoxpress-${timestamp}-${random}`;
 }
