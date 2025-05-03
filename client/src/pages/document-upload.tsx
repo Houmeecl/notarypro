@@ -9,7 +9,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -140,7 +140,7 @@ const getDocumentTypeIcon = (documentType: string) => {
 export default function DocumentUpload() {
   const [selectedTab, setSelectedTab] = useState("general");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [, navigate] = useNavigate();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   
   // Consultar categorías de documentos
@@ -198,7 +198,7 @@ export default function DocumentUpload() {
         description: "Tu documento ha sido almacenado en el sistema",
         variant: "default",
       });
-      navigate("/document-explorer");
+      setLocation("/document-explorer");
     },
     onError: (error: Error) => {
       toast({
@@ -232,7 +232,7 @@ export default function DocumentUpload() {
         description: "Tu documento ha sido enviado para certificación",
         variant: "default",
       });
-      navigate("/document-explorer");
+      setLocation("/document-explorer");
     },
     onError: (error: Error) => {
       toast({
