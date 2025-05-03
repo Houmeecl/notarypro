@@ -55,6 +55,7 @@ import DescargarApk from "@/pages/partners/descargar-apk";
 import ConfirmacionDescarga from "@/pages/partners/confirmacion-descarga";
 import WebAppPOSAlternativa from "@/pages/partners/webapp-pos-alternativa";
 import WebAppPOSButtons from "@/pages/partners/webapp-pos-buttons";
+import WebAppPOSNFC from "@/pages/partners/webapp-pos-nfc";
 import PaymentDemo from "@/pages/payment-demo";
 import DocumentoEjemplo from "@/pages/documento-ejemplo";
 import VerificacionIdentidadDemo from "@/pages/verificacion-identidad-demo";
@@ -240,6 +241,7 @@ function Router() {
       <Route path="/partners/webapp-pos" component={WebAppPOS} />
       <Route path="/partners/webapp-pos-alternativa" component={WebAppPOSAlternativa} />
       <Route path="/partners/webapp-pos-buttons" component={WebAppPOSButtons} />
+      <Route path="/partners/webapp-pos-nfc" component={WebAppPOSNFC} />
       <Route path="/partners/sdk-demo" component={SdkDemo} />
       <Route path="/partners/descargar-apk" component={DescargarApk} />
       <Route path="/partners/confirmacion-descarga" component={ConfirmacionDescarga} />
