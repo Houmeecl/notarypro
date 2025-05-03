@@ -24,7 +24,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
   mode = 'simple'
 }) => {
   const { toast } = useToast();
-  const [, navigate] = useLocation();
+  const [, setLocation] = useLocation();
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
   
@@ -34,13 +34,13 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
   // Función para iniciar verificación NFC
   const startNFCVerification = () => {
     // Redireccionar a la página de verificación NFC
-    navigate('/verificacion-nfc-fixed');
+    setLocation('/verificacion-nfc-fixed');
   };
   
   // Función para iniciar verificación con foto de documento
   const startDocumentVerification = () => {
     // Redireccionar a la página de verificación de documento
-    navigate('/verificacion-selfie');
+    setLocation('/verificacion-selfie');
   };
   
   // Función para simular verificación (para fines de demo)

@@ -29,6 +29,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { POS_CONSTANTS, testPOSConfig } from '@/lib/pos-config';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/use-auth';
+import IdentityVerification, { VerificationResult } from '@/components/identity/IdentityVerification';
 
 // Tipo para los items del carrito
 interface CartItem {
@@ -68,6 +69,8 @@ const TestPOSPayment: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'connecting' | 'waiting' | 'processing' | 'success' | 'failure'>('idle');
   const [terminalStatus, setTerminalStatus] = useState<'connected' | 'disconnected' | 'error'>('disconnected');
+  const [isIdentityVerified, setIsIdentityVerified] = useState(false);
+  const [verificationData, setVerificationData] = useState<VerificationResult | null>(null);
   
   // Obtener configuración POS
   const posConfig = testPOSConfig;
