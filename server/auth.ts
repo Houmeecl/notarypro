@@ -29,7 +29,7 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 // Variable para modo de emergencia (bypass de autenticación)
-export const EMERGENCY_MODE = true;
+export const EMERGENCY_MODE = false;
 
 // Simulación de usuario para uso en modo de emergencia
 export const EMERGENCY_USER: SelectUser = {

@@ -1,3 +1,7 @@
+// ARCHIVO DESACTIVADO - VERSIÓN ORIGINAL CON ERRORES
+// USAR EN SU LUGAR verificacion-nfc-fixed.tsx
+
+/*
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { 
@@ -8,6 +12,15 @@ import {
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
+*/
+
+// Archivo desactivado para evitar errores de compilación
+// Este componente es un placeholder para evitar errores al compilar
+const VerificacionNFC = () => {
+  return null;
+};
+
+export default VerificacionNFC;
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";

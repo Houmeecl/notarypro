@@ -119,7 +119,8 @@ const LazyVecinosAdminUsersManagement = React.lazy(() => import("@/pages/vecinos
 const LazyVecinosAdminDocumentManager = React.lazy(() => import("@/pages/vecinos/admin/document-manager"));
 const LazyVecinosCertifierValidation = React.lazy(() => import("@/pages/vecinos/certifier-validation"));
 // Ahora utilizamos la página unificada de verificación
-const LazyVerificacionNFC = React.lazy(() => import("@/pages/verificacion-nfc"));
+// Ahora usamos verificacion-nfc-fixed en lugar del original
+const LazyVerificacionNFC = React.lazy(() => import("@/pages/verificacion-nfc-fixed"));
 
 function Router() {
   return (
@@ -595,8 +596,8 @@ function Router() {
 
       {/* MODO NFC SIMPLIFICADO - usando un solo componente*/}
       <Route path="/verificacion-nfc" component={() => {
-        // Importar dinámicamente el componente nuevo
-        const VerificacionNFC = React.lazy(() => import("@/pages/verificacion-nfc"));
+        // Importar dinámicamente el componente nuevo (versión corregida)
+        const VerificacionNFC = React.lazy(() => import("@/pages/verificacion-nfc-fixed"));
         return (
           <Suspense fallback={<LazyLoadingFallback />}>
             <VerificacionNFC />
@@ -650,6 +651,40 @@ function Router() {
 
       {/* Demostración de Pagos con MercadoPago */}
       <Route path="/payment-demo" component={PaymentDemo} />
+      
+      {/* Nuevos terminales POS para VecinoXpress */}
+      <Route path="/pos" component={() => {
+        const POSMenu = React.lazy(() => import("@/pages/pos-menu"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <POSMenu />
+          </Suspense>
+        );
+      }} />
+      <Route path="/tablet-pos" component={() => {
+        const TabletPOS = React.lazy(() => import("@/pages/tablet-pos-payment"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <TabletPOS />
+          </Suspense>
+        );
+      }} />
+      <Route path="/real-pos" component={() => {
+        const RealPOS = React.lazy(() => import("@/pages/real-pos-payment"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <RealPOS />
+          </Suspense>
+        );
+      }} />
+      <Route path="/test-pos" component={() => {
+        const TestPOS = React.lazy(() => import("@/pages/test-pos-payment"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <TestPOS />
+          </Suspense>
+        );
+      }} />
 
       {/* Páginas de retorno para MercadoPago */}
       <Route path="/payment-success" component={() => {
