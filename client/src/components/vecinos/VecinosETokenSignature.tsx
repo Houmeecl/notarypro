@@ -6,7 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Loader2, CheckCircle2, AlertCircle, ShieldCheck } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TokenProvider, signWithCertificate } from "@/lib/pkcs11-bridge";
+import { 
+  CERTIFIED_PROVIDERS, 
+  TokenProvider, 
+  TokenCertificate,
+  TokenSignatureData,
+  checkTokenAvailability,
+  signWithToken
+} from "@/lib/etoken-signer";
 
 interface VecinosETokenSignatureProps {
   documentId: string;
@@ -24,9 +31,10 @@ export function VecinosETokenSignature({
   const [step, setStep] = useState<'detect' | 'select' | 'pin' | 'signing' | 'complete'>('detect');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedProvider, setSelectedProvider] = useState<TokenProvider | null>(null);
-  const [selectedCertificate, setSelectedCertificate] = useState<string | null>(null);
-  const [certificates, setCertificates] = useState<any[]>([]);
+  const [selectedProviderId, setSelectedProviderId] = useState<string>("");
+  const [selectedCertificate, setSelectedCertificate] = useState<string>("");
+  const [certificates, setCertificates] = useState<TokenCertificate[]>([]);
+  const [providers, setProviders] = useState<TokenProvider[]>([]);
   const [pin, setPin] = useState("");
 
   // Detectar token conectado al cargar el componente
@@ -40,41 +48,41 @@ export function VecinosETokenSignature({
     setError(null);
     
     try {
-      // En un entorno real, esto detectaría el token físico
-      // Para esta simulación, simulamos la detección
-      setTimeout(() => {
-        try {
-          // Simular detección exitosa
-          const provider = TokenProvider.ECERT;
-          setSelectedProvider(provider);
-          
-          // Simular certificados disponibles
-          const mockCertificates = [
-            {
-              serialNumber: "123456789",
-              subject: "Juan Pérez - RUT: 12.345.678-9",
-              issuer: `${provider.toUpperCase()} Certification Authority`,
-              validFrom: new Date(2023, 0, 1),
-              validTo: new Date(2025, 0, 1),
-              provider
-            },
-            {
-              serialNumber: "987654321",
-              subject: "María González - RUT: 98.765.432-1",
-              issuer: `${provider.toUpperCase()} Certification Authority`,
-              validFrom: new Date(2022, 0, 1),
-              validTo: new Date(2024, 0, 1),
-              provider
-            }
-          ];
-          
-          setCertificates(mockCertificates);
-          setStep('select');
-        } catch (err: any) {
-          setError(err.message || "Error al detectar dispositivo");
-        }
-        setIsLoading(false);
-      }, 1500);
+      // Verificar disponibilidad del token con la implementación real
+      const tokenAvailable = await checkTokenAvailability();
+      
+      if (tokenAvailable) {
+        // Token detectado, mostrar proveedores disponibles
+        setProviders(CERTIFIED_PROVIDERS);
+        
+        // Obtener certificados disponibles (ejemplo)
+        const availableCertificates = [
+          {
+            id: "cert_1",
+            subject: "Juan Pérez - RUT: 12.345.678-9",
+            issuer: "E-CERT Chile Certification Authority",
+            validFrom: "2023-01-01",
+            validTo: "2025-01-01",
+            serialNumber: "123456789"
+          },
+          {
+            id: "cert_2",
+            subject: "María González - RUT: 98.765.432-1",
+            issuer: "E-CERT Chile Certification Authority",
+            validFrom: "2022-01-01",
+            validTo: "2024-01-01",
+            serialNumber: "987654321"
+          }
+        ];
+        
+        setCertificates(availableCertificates);
+        setStep('select');
+      } else {
+        // Token no detectado
+        setError("No se detectó ningún dispositivo eToken. Por favor conecte su token USB y vuelva a intentarlo.");
+      }
+      
+      setIsLoading(false);
     } catch (err: any) {
       setError(err.message || "Error al detectar dispositivo");
       setIsLoading(false);
@@ -83,7 +91,7 @@ export function VecinosETokenSignature({
 
   // Función para firmar con certificado
   const doSignDocument = async () => {
-    if (!selectedCertificate || !pin || !selectedProvider) {
+    if (!selectedCertificate || !pin || !selectedProviderId) {
       toast({
         title: "Error",
         description: "Debe seleccionar un certificado e ingresar su PIN",
@@ -97,34 +105,26 @@ export function VecinosETokenSignature({
     setError(null);
 
     try {
-      // En un entorno real, esto enviaría los datos al token para firma
-      setTimeout(() => {
-        try {
-          // Simular firma exitosa (sin llamar a la API real)
-          const simulatedSignatureResult = {
-            signature: `${documentHash}_${Date.now()}_signed_by_${selectedProvider}`,
-            certificate: `CERT_${selectedCertificate}`,
-            timestamp: new Date().toISOString(),
-            provider: selectedProvider,
-            algorithm: "SHA256withRSA"
-          };
+      // Usar la implementación real de firma con eToken
+      const signatureData = await signWithToken(
+        documentHash,
+        pin,
+        selectedProviderId,
+        selectedCertificate
+      );
 
-          // Procesar la firma exitosa
-          onSigningComplete({
-            signatureData: simulatedSignatureResult.signature,
-            certificateData: simulatedSignatureResult.certificate,
-            provider: simulatedSignatureResult.provider,
-            timestamp: simulatedSignatureResult.timestamp
-          });
-          
-          setStep('complete');
-        } catch (error: any) {
-          setError(error.message || "Error al firmar el documento");
-          setStep('select');
-        }
-        setIsLoading(false);
-      }, 2000);
+      // Procesar la firma exitosa
+      onSigningComplete({
+        signatureData: signatureData.tokenSignature,
+        certificateData: signatureData.tokenInfo.certificateId,
+        provider: signatureData.tokenInfo.certificateAuthor,
+        timestamp: signatureData.tokenInfo.timestamp
+      });
+      
+      setStep('complete');
+      setIsLoading(false);
     } catch (err: any) {
+      console.error("Error en firma electrónica:", err);
       setError(err.message || "Error al firmar documento");
       setIsLoading(false);
       setStep('select');
@@ -204,10 +204,33 @@ export function VecinosETokenSignature({
         {step === 'select' && (
           <div className="space-y-4">
             <div>
+              <Label htmlFor="provider">Seleccione proveedor de certificación</Label>
+              <Select 
+                value={selectedProviderId || ''} 
+                onValueChange={setSelectedProviderId}
+              >
+                <SelectTrigger id="provider">
+                  <SelectValue placeholder="Seleccionar proveedor..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {providers.map((provider) => (
+                    <SelectItem key={provider.id} value={provider.id}>
+                      {provider.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500 mt-1">
+                Elija el proveedor de su certificado digital
+              </p>
+            </div>
+            
+            <div>
               <Label htmlFor="certificate">Seleccione un certificado</Label>
               <Select 
                 value={selectedCertificate || ''} 
                 onValueChange={setSelectedCertificate}
+                disabled={!selectedProviderId}
               >
                 <SelectTrigger id="certificate">
                   <SelectValue placeholder="Seleccionar certificado..." />
@@ -221,7 +244,7 @@ export function VecinosETokenSignature({
                 </SelectContent>
               </Select>
               <p className="text-xs text-gray-500 mt-1">
-                Certificado emitido por: {selectedProvider}
+                Certificado emitido por: {providers.find(p => p.id === selectedProviderId)?.name || 'Entidad Certificadora'}
               </p>
             </div>
 
@@ -293,7 +316,7 @@ export function VecinosETokenSignature({
                 <div className="flex items-start">
                   <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 mr-2 flex-shrink-0" />
                   <span className="text-green-700">
-                    Autoridad: {selectedProvider}
+                    Autoridad: {providers.find(p => p.id === selectedProviderId)?.name || 'Entidad Certificadora'}
                   </span>
                 </div>
                 <div className="flex items-start">
@@ -322,7 +345,7 @@ export function VecinosETokenSignature({
         {step === 'select' && (
           <Button 
             onClick={doSignDocument} 
-            disabled={!selectedCertificate || !pin || isLoading}
+            disabled={!selectedCertificate || !pin || !selectedProviderId || isLoading}
             className="bg-green-600 hover:bg-green-700"
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
