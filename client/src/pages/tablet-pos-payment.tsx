@@ -124,20 +124,73 @@ const TabletPOSPayment: React.FC = () => {
     setErrorMessage(null);
     
     try {
-      // Aquí simulamos la transacción
-      // En producción, esto se conectaría a la API real
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Generar un ID de transacción
-      const txId = 'TX-' + Date.now().toString().slice(-6);
-      setTransactionId(txId);
-      setIsCompleted(true);
-      
-      toast({
-        title: 'Pago completado',
-        description: `Transacción ${txId} procesada exitosamente`,
-      });
-      
+      // Si el método de pago es MercadoPago, usar la API
+      if (paymentMethod === 'mercadopago') {
+        // Preparar los items para MercadoPago
+        const mercadoPagoItems = cartItems.map(item => ({
+          title: item.name,
+          quantity: item.quantity,
+          unit_price: item.price,
+          currency_id: 'CLP'
+        }));
+        
+        // Generar identificador único para la transacción
+        const externalReference = `TX-TABLET-${Date.now().toString()}`;
+        
+        // URLs de retorno para procesamiento de pago
+        const backUrls = {
+          success: `${window.location.origin}/tablet-pos?status=success&reference=${externalReference}`,
+          failure: `${window.location.origin}/tablet-pos?status=failure&reference=${externalReference}`,
+          pending: `${window.location.origin}/tablet-pos?status=pending&reference=${externalReference}`
+        };
+        
+        // Crear la preferencia de pago
+        const response = await fetch('/api/mp/create-preference', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            items: mercadoPagoItems,
+            backUrls,
+            externalReference,
+            identification: {
+              type: 'RUT',
+              number: customer.document
+            }
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Error al crear preferencia de pago');
+        }
+        
+        const preference = await response.json();
+        
+        // Guardar la referencia de la transacción
+        setTransactionId(externalReference);
+        
+        // Redirigir al usuario al checkout de MercadoPago
+        if (preference.init_point) {
+          window.location.href = preference.init_point;
+          return; // Terminar ejecución aquí ya que estamos redirigiendo
+        } else {
+          throw new Error('No se recibió URL de pago');
+        }
+      } else {
+        // Para otros métodos de pago, usar la simulación existente
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Generar un ID de transacción
+        const txId = 'TX-' + Date.now().toString().slice(-6);
+        setTransactionId(txId);
+        setIsCompleted(true);
+        
+        toast({
+          title: 'Pago completado',
+          description: `Transacción ${txId} procesada exitosamente`,
+        });
+      }
     } catch (error) {
       console.error('Error procesando el pago:', error);
       setErrorMessage('Error al procesar el pago. Intente nuevamente.');
