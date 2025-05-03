@@ -194,7 +194,7 @@ const NFCMicroInteractions: React.FC<NFCMicroInteractionsProps> = ({
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
               >
-                Identidad verificada correctamente
+                {message || "Identidad verificada correctamente"}
               </motion.p>
             </motion.div>
           )}
@@ -218,7 +218,7 @@ const NFCMicroInteractions: React.FC<NFCMicroInteractionsProps> = ({
               </motion.div>
               
               <h3 className="text-xl font-bold mb-2">Error de lectura</h3>
-              <p className="text-zinc-500">No se pudo leer la cédula, intente nuevamente</p>
+              <p className="text-zinc-500">{message || "No se pudo leer la cédula, intente nuevamente"}</p>
             </motion.div>
           )}
         </AnimatePresence>
