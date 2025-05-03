@@ -12,7 +12,6 @@ import {
   HelpCircle,
   ChevronDown
 } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -44,10 +43,15 @@ export const VecinosAdminLayout = ({
   title = "Dashboard Admin" 
 }: VecinosAdminLayoutProps) => {
   const [location] = useLocation();
-  const { user, logoutMutation } = useAuth();
+  // Datos de usuario simulados para demostración 
+  const mockUser = {
+    username: 'vecinosadmin'
+  };
   
   const handleLogout = () => {
-    logoutMutation.mutate();
+    // No hacemos nada en este momento, solo para demostración
+    console.log('Cerrar sesión clicked');
+    window.location.href = '/vecinos-express';
   };
 
   return (
@@ -178,11 +182,11 @@ export const VecinosAdminLayout = ({
                   <button className="flex items-center space-x-2 focus:outline-none">
                     <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
                       <span className="text-xs font-medium text-gray-600">
-                        {user?.username.charAt(0).toUpperCase()}
+                        {mockUser.username.charAt(0).toUpperCase()}
                       </span>
                     </div>
                     <span className="hidden md:inline-block text-sm font-medium text-gray-700">
-                      {user?.username}
+                      {mockUser.username}
                     </span>
                     <ChevronDown size={16} className="text-gray-400" />
                   </button>
