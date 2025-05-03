@@ -5,7 +5,7 @@ import vecinosRoutes from "./vecinos/vecinos-routes";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import { setupAuth } from "./auth";
+import { setupAuth, hashPassword } from "./auth";
 import { db } from "./db";
 import { users, partners } from "@shared/schema";
 import { documentForensicsRouter } from "./document-forensics-routes";
@@ -98,8 +98,10 @@ async function initializeTestAdmins() {
 
     if (existingEdwardAdmin) {
       console.log("El administrador Edwardadmin ya existe. Actualizando contraseña...");
+      // Hash la contraseña usando la función del módulo de autenticación
+      const hashedPassword = await hashPassword("adminq");
       await db.update(users)
-        .set({ password: "adminq" })
+        .set({ password: hashedPassword })
         .where(eq(users.username, "Edwardadmin"));
       console.log("Contraseña del administrador Edwardadmin actualizada.");
     } else {
@@ -121,14 +123,16 @@ async function initializeTestAdmins() {
 
     if (existingSebAdmin) {
       console.log("El administrador Sebadmin ya existe. Actualizando contraseña...");
+      const hashedPassword = await hashPassword("admin123");
       await db.update(users)
-        .set({ password: "admin123" })
+        .set({ password: hashedPassword })
         .where(eq(users.username, "Sebadmin"));
       console.log("Contraseña del administrador Sebadmin actualizada.");
     } else {
+      const hashedPassword = await hashPassword("admin123");
       await db.insert(users).values({
         username: "Sebadmin",
-        password: "admin123",
+        password: hashedPassword,
         email: "sebadmin@notarypro.cl",
         fullName: "Admin Secundario",
         role: "admin",
@@ -143,9 +147,10 @@ async function initializeTestAdmins() {
     );
 
     if (!existingNfcAdmin) {
+      const hashedPassword = await hashPassword("nfc123");
       await db.insert(users).values({
         username: "nfcadmin",
-        password: "nfc123",
+        password: hashedPassword,
         email: "nfc@notarypro.cl",
         fullName: "Admin NFC",
         role: "admin",
@@ -161,14 +166,16 @@ async function initializeTestAdmins() {
 
     if (existingVecinosAdmin) {
       console.log("El administrador vecinosadmin ya existe. Actualizando contraseña...");
+      const hashedPassword = await hashPassword("vecinos123");
       await db.update(users)
-        .set({ password: "vecinos123", platform: "vecinos" })
+        .set({ password: hashedPassword, platform: "vecinos" })
         .where(eq(users.username, "vecinosadmin"));
       console.log("Contraseña del administrador vecinosadmin actualizada.");
     } else {
+      const hashedPassword = await hashPassword("vecinos123");
       await db.insert(users).values({
         username: "vecinosadmin",
-        password: "vecinos123",
+        password: hashedPassword,
         email: "admin@vecinoxpress.cl",
         fullName: "Admin VecinoXpress",
         role: "admin",
@@ -185,14 +192,16 @@ async function initializeTestAdmins() {
 
     if (existingCustomAdmin) {
       console.log("El administrador miadmin ya existe. Actualizando contraseña...");
+      const hashedPassword = await hashPassword("miadmin123");
       await db.update(users)
-        .set({ password: "miadmin123" })
+        .set({ password: hashedPassword })
         .where(eq(users.username, "miadmin"));
       console.log("Contraseña del administrador miadmin actualizada.");
     } else {
+      const hashedPassword = await hashPassword("miadmin123");
       await db.insert(users).values({
         username: "miadmin",
-        password: "miadmin123",
+        password: hashedPassword,
         email: "miadmin@notarypro.cl",
         fullName: "Mi Administrador",
         role: "admin",
@@ -208,15 +217,17 @@ async function initializeTestAdmins() {
 
     if (existingDemoPartner) {
       console.log("El usuario demopartner ya existe. Actualizando contraseña...");
+      const hashedPassword = await hashPassword("password123");
       await db.update(users)
-        .set({ password: "password123", platform: "vecinos", role: "partner" })
+        .set({ password: hashedPassword, platform: "vecinos", role: "partner" })
         .where(eq(users.username, "demopartner"));
       console.log("Credenciales del usuario demopartner actualizadas.");
     } else {
       // Crear usuario demopartner
+      const hashedPassword = await hashPassword("password123");
       const [newUser] = await db.insert(users).values({
         username: "demopartner",
-        password: "password123",
+        password: hashedPassword,
         email: "demo@vecinoxpress.cl",
         fullName: "Demo Partner",
         role: "partner",
