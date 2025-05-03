@@ -95,35 +95,34 @@ export default function VecinosLayout({
               {isLoggedIn ? (
                 <>
                   <Button 
-                    variant="ghost" 
-                    className="text-white"
+                    variant="outline" 
+                    className="text-gray-700 border-gray-300 hover:bg-gray-100 mr-2"
                     onClick={() => setLocation("/vecinos/cuenta")}
                   >
-                    <User className="h-5 w-5" />
-                    <span className="ml-2 hidden md:inline">Mi Cuenta</span>
+                    <User className="h-5 w-5 mr-1" />
+                    <span className="hidden md:inline">Mi Cuenta</span>
                   </Button>
                   
                   <Button 
-                    variant="ghost" 
-                    className="text-white"
+                    variant="outline" 
+                    className="text-red-600 border-red-200 hover:bg-red-50"
                     onClick={handleLogout}
                   >
-                    <LogOut className="h-5 w-5" />
-                    <span className="ml-2 hidden md:inline">Salir</span>
+                    <LogOut className="h-5 w-5 mr-1" />
+                    <span className="hidden md:inline">Salir</span>
                   </Button>
                 </>
               ) : (
                 <>
                   <Button 
-                    variant="ghost" 
-                    className="text-white"
+                    variant="outline" 
+                    className="text-gray-700 border-gray-300 hover:bg-gray-100 mr-2"
                     onClick={() => setLocation("/vecinos/registro")}
                   >
                     Registro
                   </Button>
                   <Button 
-                    variant="ghost" 
-                    className="text-white bg-green-700"
+                    className="bg-primary hover:bg-red-700 text-white"
                     onClick={() => setLocation("/vecinos/login")}
                   >
                     Acceder
@@ -134,8 +133,8 @@ export default function VecinosLayout({
               {/* Botón de menú móvil */}
               <div className="md:hidden ml-4">
                 <Button 
-                  variant="ghost" 
-                  className="text-white"
+                  variant="outline" 
+                  className="text-gray-700 border-gray-300"
                   onClick={() => setMenuOpen(!menuOpen)}
                 >
                   {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -148,12 +147,12 @@ export default function VecinosLayout({
       
       {/* Menú móvil */}
       {menuOpen && isLoggedIn && showNavigation && (
-        <div className="md:hidden bg-green-800 text-white">
-          <div className="container mx-auto px-4 py-2">
+        <div className="md:hidden bg-white border-b shadow-sm">
+          <div className="container mx-auto px-4 py-3">
             <nav className="flex flex-col space-y-2">
               <Button 
                 variant="ghost" 
-                className="text-white justify-start"
+                className="text-gray-700 hover:text-red-600 hover:bg-red-50 justify-start"
                 onClick={() => {
                   setLocation("/vecinos/dashboard");
                   setMenuOpen(false);
@@ -164,7 +163,7 @@ export default function VecinosLayout({
               </Button>
               <Button 
                 variant="ghost" 
-                className="text-white justify-start"
+                className="text-gray-700 hover:text-red-600 hover:bg-red-50 justify-start"
                 onClick={() => {
                   setLocation("/vecinos/pos-app");
                   setMenuOpen(false);
@@ -175,9 +174,9 @@ export default function VecinosLayout({
               </Button>
               <Button 
                 variant="ghost" 
-                className="text-white justify-start"
+                className="text-gray-700 hover:text-red-600 hover:bg-red-50 justify-start"
                 onClick={() => {
-                  window.open("/partners/webapp-pos-buttons", "_blank");
+                  window.open("/partners/webapp-pos-official", "_blank");
                   setMenuOpen(false);
                 }}
               >
@@ -186,7 +185,7 @@ export default function VecinosLayout({
               </Button>
               <Button 
                 variant="ghost" 
-                className="text-white justify-start"
+                className="text-gray-700 hover:text-red-600 hover:bg-red-50 justify-start"
                 onClick={() => {
                   setLocation("/vecinos/retiros");
                   setMenuOpen(false);
@@ -197,7 +196,7 @@ export default function VecinosLayout({
               </Button>
               <Button 
                 variant="ghost" 
-                className="text-white justify-start"
+                className="text-gray-700 hover:text-red-600 hover:bg-red-50 justify-start"
                 onClick={() => {
                   setLocation("/vecinos/cuenta");
                   setMenuOpen(false);
@@ -208,7 +207,7 @@ export default function VecinosLayout({
               </Button>
               <Button 
                 variant="ghost" 
-                className="text-white justify-start"
+                className="text-gray-700 hover:text-red-600 hover:bg-red-50 justify-start"
                 onClick={() => {
                   setLocation("/vecinos/soporte");
                   setMenuOpen(false);

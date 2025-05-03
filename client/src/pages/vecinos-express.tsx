@@ -385,10 +385,10 @@ export default function VecinosExpress() {
                 </Button>
                 <Button 
                   variant="default"
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                  onClick={() => setLocation('/partners/webapp-pos-official')}
+                  className="bg-primary hover:bg-red-700 text-white"
+                  onClick={() => setLocation('/vecinos/login')}
                 >
-                  Acceder a POS Web
+                  Acceder como Vecino
                 </Button>
               </div>
             </div>
