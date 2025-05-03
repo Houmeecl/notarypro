@@ -240,8 +240,10 @@ tuuPaymentRouter.post('/create-web-payment', async (req: Request, res: Response)
       }
     });
 
+    // Asegurémonos de devolver la URL de redirección en el formato que espera el cliente
     return res.status(201).json({
       success: true,
+      redirectUrl: `${TUU_WEB_GATEWAY_URL}/${response.data.id}`,
       data: {
         ...response.data,
         checkout_url: `${TUU_WEB_GATEWAY_URL}/${response.data.id}`
@@ -393,8 +395,14 @@ tuuPaymentRouter.post('/mobile-payment', async (req: Request, res: Response) => 
       }
     });
 
+    // Formatear la respuesta para incluir paymentUrl si está disponible en la respuesta
+    const paymentUrl = response.data.payment_url || response.data.redirect_url || null;
+    
     return res.status(201).json({
       success: true,
+      paymentUrl,
+      status: response.data.status || 'processing',
+      transactionId: response.data.id || req.body.transactionId,
       data: response.data
     });
   } catch (error: any) {

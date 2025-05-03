@@ -7,31 +7,10 @@
  */
 
 import React, { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { 
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
-import { 
-  CreditCard, 
-  CheckCircle2, 
-  AlertCircle, 
-  Loader2,
-  ExternalLink,
-  RefreshCw,
-} from "lucide-react";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
+import { Card, CardContent } from "@/components/ui/card";
+import { Loader2, Globe, CreditCard, QrCode } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 
 interface TuuWebPaymentProps {
   amount: number;
@@ -59,281 +38,123 @@ export default function TuuWebPayment({
   metadata = {}
 }: TuuWebPaymentProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<"idle" | "loading" | "success" | "error" | "redirecting">("idle");
-  const [paymentSession, setPaymentSession] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
 
-  // Crear una sesión de pago y redirigir a la pasarela de Tuu
-  const handleCreatePayment = async () => {
+  // Crear una sesión de pago web y redirigir
+  const handleCreateWebPayment = async () => {
     setIsLoading(true);
-    setPaymentStatus("loading");
     setError(null);
 
     try {
-      const response = await fetch("/api/tuu-payment/create-web-payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount,
-          description,
-          clientName,
-          clientEmail,
-          clientRut,
-          successUrl,
-          cancelUrl,
-          metadata: {
-            ...metadata,
-            sourceComponent: "TuuWebPayment",
-            timestamp: new Date().toISOString()
-          }
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || "Error al crear la sesión de pago");
+      // Validar monto
+      if (!amount || amount <= 0) {
+        throw new Error("El monto debe ser mayor a 0");
       }
 
-      // Guardar la sesión y cambiar el estado
-      setPaymentSession(data.data);
-      setPaymentStatus("redirecting");
+      // Generar un ID de transacción único
+      const transactionId = `vecinoxpress-web-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-      // Redirigir a la pasarela de pago
-      setTimeout(() => {
-        window.location.href = data.data.checkout_url;
-      }, 1000);
-    } catch (err: any) {
-      console.error("Error al crear sesión de pago:", err);
-      setError(err.message || "Error al procesar el pago");
-      setPaymentStatus("error");
-      
-      toast({
-        title: "Error de pago",
-        description: err.message || "No se pudo iniciar el proceso de pago",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      // Datos de la transacción
+      const paymentData = {
+        transactionId,
+        amount,
+        description,
+        clientName,
+        clientEmail,
+        clientRut,
+        successUrl: successUrl || window.location.origin + "/payment-options?status=success",
+        cancelUrl: cancelUrl || window.location.origin + "/payment-options?status=cancel",
+        metadata: {
+          ...metadata,
+          paymentMethod: "web",
+          platform: "vecinoxpress"
+        }
+      };
 
-  // Verificar el estado de una sesión de pago existente
-  const checkPaymentStatus = async (sessionId: string) => {
-    setIsLoading(true);
-    
-    try {
-      const response = await fetch(`/api/tuu-payment/checkout-session/${sessionId}`);
-      const data = await response.json();
+      // Llamar al endpoint de creación de pasarela web
+      const response = await apiRequest(
+        "POST",
+        "/api/tuu-payment/create-web-payment",
+        paymentData
+      );
 
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || "Error al verificar el estado del pago");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al crear la sesión de pago");
       }
 
-      setPaymentSession(data.data);
-      
-      // Actualizar estado según la respuesta
-      if (data.data.status === "completed" || data.data.status === "succeeded") {
-        setPaymentStatus("success");
-        if (onPaymentSuccess) onPaymentSuccess(data.data);
-        
-        toast({
-          title: "¡Pago exitoso!",
-          description: "Tu pago ha sido procesado correctamente",
-          variant: "default",
-        });
-      } else if (data.data.status === "cancelled" || data.data.status === "failed") {
-        setPaymentStatus("error");
-        if (onPaymentCancel) onPaymentCancel(data.data);
-        
-        toast({
-          title: "Pago no completado",
-          description: "El proceso de pago ha sido cancelado o ha fallado",
-          variant: "destructive",
-        });
+      const responseData = await response.json();
+
+      // Verificar si tenemos una URL de redirección
+      if (responseData.redirectUrl) {
+        // Redireccionar a la pasarela de pago
+        window.location.href = responseData.redirectUrl;
+      } else {
+        throw new Error("No se recibió una URL de redirección válida");
       }
-    } catch (err: any) {
-      console.error("Error al verificar estado de pago:", err);
-      setError(err.message || "Error al verificar el estado del pago");
-      setPaymentStatus("error");
-      
-      toast({
-        title: "Error de verificación",
-        description: err.message || "No se pudo verificar el estado del pago",
-        variant: "destructive",
-      });
+
+    } catch (error: any) {
+      console.error("Error al crear pasarela de pago web:", error);
+      setError(error.message || "Error al procesar el pago");
+      if (onPaymentCancel) {
+        onPaymentCancel({ error: error.message });
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <CreditCard className="mr-2 h-5 w-5 text-indigo-600" />
-          Pago online
-        </CardTitle>
-        <CardDescription>
-          Paga de forma segura utilizando nuestra pasarela de pagos
-        </CardDescription>
-      </CardHeader>
+    <div className="w-full">
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
+          {error}
+        </div>
+      )}
       
-      <CardContent>
-        {paymentStatus === "idle" && (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="amount">Monto a pagar</Label>
-              <div className="relative">
-                <span className="absolute left-3 top-2.5 text-gray-500">$</span>
-                <Input
-                  id="amount"
-                  value={amount.toLocaleString('es-CL')}
-                  className="pl-7"
-                  disabled
-                />
-              </div>
+      <div className="mb-4">
+        <p className="text-gray-600 text-sm mb-2">
+          Al hacer clic en "Pagar" serás redireccionado a la pasarela de pago segura de Tuu Payments 
+          donde podrás completar tu transacción utilizando diversos métodos de pago.
+        </p>
+        
+        <Card className="border border-indigo-100 bg-indigo-50/50 p-2 mb-4">
+          <CardContent className="p-3 grid grid-cols-3 gap-2">
+            <div className="flex flex-col items-center text-center p-2">
+              <CreditCard className="h-6 w-6 mb-1.5 text-indigo-600" />
+              <span className="text-xs text-indigo-700">Tarjetas de Crédito/Débito</span>
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="description">Descripción</Label>
-              <Input
-                id="description"
-                value={description}
-                disabled
-              />
+            <div className="flex flex-col items-center text-center p-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mb-1.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" />
+              </svg>
+              <span className="text-xs text-indigo-700">Transferencia Bancaria</span>
             </div>
-            
-            {clientName && (
-              <div className="space-y-2">
-                <Label htmlFor="clientName">Nombre</Label>
-                <Input
-                  id="clientName"
-                  value={clientName}
-                  disabled
-                />
-              </div>
-            )}
-          </div>
-        )}
-        
-        {paymentStatus === "loading" && (
-          <div className="flex flex-col items-center justify-center py-8">
-            <Loader2 className="h-10 w-10 text-indigo-600 animate-spin mb-4" />
-            <p className="text-center text-gray-600">
-              Preparando tu sesión de pago...
-            </p>
-          </div>
-        )}
-        
-        {paymentStatus === "redirecting" && (
-          <div className="flex flex-col items-center justify-center py-8">
-            <RefreshCw className="h-10 w-10 text-indigo-600 animate-spin mb-4" />
-            <p className="text-center text-gray-600">
-              Redirigiendo a la pasarela de pagos...
-            </p>
-          </div>
-        )}
-        
-        {paymentStatus === "success" && (
-          <Alert className="bg-green-50 border-green-200">
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
-            <AlertTitle className="text-green-800">¡Pago exitoso!</AlertTitle>
-            <AlertDescription className="text-green-700">
-              Tu pago ha sido procesado correctamente.
-              {paymentSession?.transaction_id && (
-                <p className="mt-2 text-sm">
-                  ID de transacción: {paymentSession.transaction_id}
-                </p>
-              )}
-            </AlertDescription>
-          </Alert>
-        )}
-        
-        {paymentStatus === "error" && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error en el pago</AlertTitle>
-            <AlertDescription>
-              {error || "Ha ocurrido un error al procesar tu pago. Por favor, intenta nuevamente."}
-            </AlertDescription>
-          </Alert>
-        )}
-      </CardContent>
+            <div className="flex flex-col items-center text-center p-2">
+              <QrCode className="h-6 w-6 mb-1.5 text-indigo-600" />
+              <span className="text-xs text-indigo-700">Pago QR Códigos</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
       
-      <CardFooter className="flex justify-center">
-        {paymentStatus === "idle" && (
-          <Button 
-            onClick={handleCreatePayment}
-            className="w-full bg-indigo-600 hover:bg-indigo-700"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Procesando...
-              </>
-            ) : (
-              <>
-                <CreditCard className="mr-2 h-4 w-4" />
-                Pagar ${amount.toLocaleString('es-CL')}
-              </>
-            )}
-          </Button>
-        )}
-        
-        {(paymentStatus === "redirecting" || paymentStatus === "loading") && (
-          <Button 
-            disabled 
-            className="w-full"
-          >
+      <Button 
+        onClick={handleCreateWebPayment}
+        disabled={isLoading}
+        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+      >
+        {isLoading ? (
+          <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Procesando pago...
-          </Button>
+            Procesando...
+          </>
+        ) : (
+          <>
+            <Globe className="mr-2 h-4 w-4" />
+            Pagar ${amount.toLocaleString("es-CL")}
+          </>
         )}
-        
-        {paymentStatus === "success" && (
-          <Button 
-            onClick={() => window.location.href = successUrl || "/"}
-            className="w-full bg-green-600 hover:bg-green-700"
-          >
-            <CheckCircle2 className="mr-2 h-4 w-4" />
-            Continuar
-          </Button>
-        )}
-        
-        {paymentStatus === "error" && (
-          <div className="flex w-full gap-2">
-            <Button 
-              onClick={() => setPaymentStatus("idle")}
-              variant="outline"
-              className="w-1/2"
-            >
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleCreatePayment}
-              className="w-1/2 bg-indigo-600 hover:bg-indigo-700"
-            >
-              Reintentar
-            </Button>
-          </div>
-        )}
-        
-        {paymentSession?.id && ["loading", "redirecting"].includes(paymentStatus) && (
-          <Button
-            variant="link"
-            className="mt-2 text-indigo-600"
-            onClick={() => window.open(paymentSession.checkout_url, "_blank")}
-          >
-            <ExternalLink className="mr-1 h-4 w-4" />
-            Abrir en nueva ventana
-          </Button>
-        )}
-      </CardFooter>
-    </Card>
+      </Button>
+    </div>
   );
 }

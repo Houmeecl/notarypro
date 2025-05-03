@@ -7,39 +7,10 @@
  */
 
 import React, { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { 
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { 
-  CreditCard, 
-  CheckCircle2, 
-  AlertCircle, 
-  Loader2,
-  Smartphone,
-  Receipt
-} from "lucide-react";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
+import { Card, CardContent } from "@/components/ui/card";
+import { Loader2, Smartphone, CreditCard, QrCode } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 
 interface TuuMobilePaymentProps {
   amount: number;
@@ -55,7 +26,7 @@ interface TuuMobilePaymentProps {
 
 export default function TuuMobilePayment({
   amount,
-  description = "Pago móvil VecinoXpress",
+  description = "Pago VecinoXpress Móvil",
   clientName,
   clientEmail,
   clientRut,
@@ -65,247 +36,124 @@ export default function TuuMobilePayment({
   metadata = {}
 }: TuuMobilePaymentProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [paymentData, setPaymentData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<string>("credit_card");
-  const [cardToken, setCardToken] = useState<string>("");
-  const { toast } = useToast();
+  const [paymentData, setPaymentData] = useState<any>(null);
+  const [paymentStatus, setPaymentStatus] = useState<"waiting" | "processing" | "completed" | "error">("waiting");
 
-  // Lista de métodos de pago disponibles
-  const paymentMethods = [
-    { id: "credit_card", name: "Tarjeta de Crédito" },
-    { id: "debit_card", name: "Tarjeta de Débito" },
-    { id: "transfer", name: "Transferencia" },
-    { id: "webpay", name: "Webpay" },
-    { id: "onepay", name: "OnePay" }
-  ];
-
-  // Procesar pago móvil
-  const handleProcessPayment = async () => {
+  // Iniciar un pago móvil
+  const handleMobilePayment = async () => {
     setIsLoading(true);
-    setPaymentStatus("loading");
     setError(null);
+    setPaymentStatus("processing");
 
     try {
-      const response = await fetch("/api/tuu-payment/mobile-payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount,
-          description,
-          paymentMethod,
-          cardToken: cardToken || undefined,
-          clientName,
-          clientEmail,
-          clientRut,
-          clientPhone,
-          metadata: {
-            ...metadata,
-            sourceComponent: "TuuMobilePayment",
-            deviceType: "mobile",
-            timestamp: new Date().toISOString()
-          }
-        }),
-      });
+      // Validar monto
+      if (!amount || amount <= 0) {
+        throw new Error("El monto debe ser mayor a 0");
+      }
+
+      // Generar un ID de transacción único
+      const transactionId = `vecinoxpress-mobile-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+      // Datos de la transacción
+      const paymentRequestData = {
+        transactionId,
+        amount,
+        description,
+        clientName,
+        clientEmail,
+        clientRut,
+        clientPhone,
+        metadata: {
+          ...metadata,
+          paymentMethod: "mobile",
+          platform: "vecinoxpress"
+        }
+      };
+
+      // Llamar al endpoint para procesar pagos móviles
+      const response = await apiRequest(
+        "POST",
+        "/api/tuu-payment/mobile-payment",
+        paymentRequestData
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al procesar el pago móvil");
+      }
 
       const data = await response.json();
+      setPaymentData(data);
 
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || "Error al procesar el pago móvil");
+      // Verificar el estado de la transacción
+      if (data.status === "success" || data.status === "completed") {
+        setPaymentStatus("completed");
+        if (onPaymentSuccess) {
+          onPaymentSuccess(data);
+        }
+      } else {
+        // Si tenemos un paymentUrl, lo ofrecemos para continuar el proceso
+        if (data.paymentUrl) {
+          setPaymentData(data);
+        } else {
+          throw new Error("No se recibió información de pago correctamente");
+        }
       }
 
-      // Guardar los datos del pago y actualizar estado
-      setPaymentData(data.data);
-      setPaymentStatus("success");
-      
-      if (onPaymentSuccess) {
-        onPaymentSuccess(data.data);
-      }
-      
-      toast({
-        title: "¡Pago exitoso!",
-        description: "Tu pago ha sido procesado correctamente",
-        variant: "default",
-      });
-    } catch (err: any) {
-      console.error("Error al procesar pago móvil:", err);
-      setError(err.message || "Error al procesar el pago");
+    } catch (error: any) {
+      console.error("Error al procesar pago móvil:", error);
+      setError(error.message || "Error al procesar el pago");
       setPaymentStatus("error");
-      
       if (onPaymentError) {
-        onPaymentError(err);
+        onPaymentError(error);
       }
-      
-      toast({
-        title: "Error de pago",
-        description: err.message || "No se pudo procesar el pago",
-        variant: "destructive",
-      });
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Redireccionar a la URL de pago (si es que hay una)
+  const handleRedirectToPayment = () => {
+    if (paymentData && paymentData.paymentUrl) {
+      window.location.href = paymentData.paymentUrl;
+    }
+  };
+
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <Smartphone className="mr-2 h-5 w-5 text-indigo-600" />
-          Pago Móvil VecinoXpress
-        </CardTitle>
-        <CardDescription>
-          Procesa pagos de forma segura en tu dispositivo móvil o tablet
-        </CardDescription>
-      </CardHeader>
+    <div className="w-full">
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
+          {error}
+        </div>
+      )}
       
-      <CardContent>
-        {paymentStatus === "idle" && (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="amount">Monto a pagar</Label>
-              <div className="relative">
-                <span className="absolute left-3 top-2.5 text-gray-500">$</span>
-                <Input
-                  id="amount"
-                  value={amount.toLocaleString('es-CL')}
-                  className="pl-7"
-                  disabled
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="description">Descripción</Label>
-              <Textarea
-                id="description"
-                value={description}
-                disabled
-                className="resize-none"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="paymentMethod">Método de pago</Label>
-              <Select
-                value={paymentMethod}
-                onValueChange={setPaymentMethod}
-              >
-                <SelectTrigger id="paymentMethod">
-                  <SelectValue placeholder="Selecciona un método de pago" />
-                </SelectTrigger>
-                <SelectContent>
-                  {paymentMethods.map((method) => (
-                    <SelectItem key={method.id} value={method.id}>
-                      {method.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            {(paymentMethod === "credit_card" || paymentMethod === "debit_card") && (
-              <div className="space-y-2">
-                <Label htmlFor="cardToken">Token de tarjeta (opcional)</Label>
-                <Input
-                  id="cardToken"
-                  value={cardToken}
-                  onChange={(e) => setCardToken(e.target.value)}
-                  placeholder="Token de tarjeta seguro"
-                />
-                <p className="text-xs text-gray-500">
-                  El token es generado por el procesador de pagos para proteger los datos de la tarjeta
-                </p>
-              </div>
-            )}
-            
-            {clientName && (
-              <div className="space-y-2">
-                <Label htmlFor="clientName">Nombre</Label>
-                <Input
-                  id="clientName"
-                  value={clientName}
-                  disabled
-                />
-              </div>
-            )}
-            
-            {clientEmail && (
-              <div className="space-y-2">
-                <Label htmlFor="clientEmail">Email</Label>
-                <Input
-                  id="clientEmail"
-                  value={clientEmail}
-                  disabled
-                />
-              </div>
-            )}
-          </div>
-        )}
-        
-        {paymentStatus === "loading" && (
-          <div className="flex flex-col items-center justify-center py-8">
-            <Loader2 className="h-10 w-10 text-indigo-600 animate-spin mb-4" />
-            <p className="text-center text-gray-600">
-              Procesando tu pago...
+      {!paymentData ? (
+        <div>
+          <div className="mb-4">
+            <p className="text-gray-600 text-sm mb-2">
+              Optimizado para procesar pagos en dispositivos móviles y tablets con la plataforma de pago Tuu.
+              Este método ofrece una experiencia fluida y sencilla para aceptar pagos con tarjetas.
             </p>
-          </div>
-        )}
-        
-        {paymentStatus === "success" && (
-          <div>
-            <Alert className="bg-green-50 border-green-200 mb-4">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <AlertTitle className="text-green-800">¡Pago exitoso!</AlertTitle>
-              <AlertDescription className="text-green-700">
-                Tu pago ha sido procesado correctamente.
-              </AlertDescription>
-            </Alert>
             
-            {paymentData && (
-              <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
-                <h4 className="font-medium text-gray-900 mb-2 flex items-center">
-                  <Receipt className="h-4 w-4 mr-1" />
-                  Detalles de la transacción
-                </h4>
-                <div className="space-y-1 text-sm">
-                  {paymentData.transaction_id && (
-                    <p><span className="font-medium">ID:</span> {paymentData.transaction_id}</p>
-                  )}
-                  {paymentData.amount && (
-                    <p><span className="font-medium">Monto:</span> ${parseInt(paymentData.amount).toLocaleString('es-CL')}</p>
-                  )}
-                  {paymentData.payment_method && (
-                    <p><span className="font-medium">Método:</span> {paymentData.payment_method}</p>
-                  )}
-                  {paymentData.created_at && (
-                    <p><span className="font-medium">Fecha:</span> {new Date(paymentData.created_at).toLocaleString('es-CL')}</p>
-                  )}
+            <Card className="border border-indigo-100 bg-indigo-50/50 p-2 mb-4">
+              <CardContent className="p-3 grid grid-cols-2 gap-2">
+                <div className="flex flex-col items-center text-center p-2">
+                  <Smartphone className="h-6 w-6 mb-1.5 text-indigo-600" />
+                  <span className="text-xs text-indigo-700">Optimizado para Móviles</span>
                 </div>
-              </div>
-            )}
+                <div className="flex flex-col items-center text-center p-2">
+                  <CreditCard className="h-6 w-6 mb-1.5 text-indigo-600" />
+                  <span className="text-xs text-indigo-700">Pago con Tarjetas</span>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        )}
-        
-        {paymentStatus === "error" && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error en el pago</AlertTitle>
-            <AlertDescription>
-              {error || "Ha ocurrido un error al procesar tu pago. Por favor, intenta nuevamente."}
-            </AlertDescription>
-          </Alert>
-        )}
-      </CardContent>
-      
-      <CardFooter className="flex justify-center">
-        {paymentStatus === "idle" && (
+          
           <Button 
-            onClick={handleProcessPayment}
-            className="w-full bg-indigo-600 hover:bg-indigo-700"
+            onClick={handleMobilePayment}
             disabled={isLoading}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
           >
             {isLoading ? (
               <>
@@ -314,51 +162,47 @@ export default function TuuMobilePayment({
               </>
             ) : (
               <>
-                <CreditCard className="mr-2 h-4 w-4" />
-                Pagar ${amount.toLocaleString('es-CL')}
+                <Smartphone className="mr-2 h-4 w-4" />
+                Pagar ${amount.toLocaleString("es-CL")}
               </>
             )}
           </Button>
-        )}
-        
-        {paymentStatus === "loading" && (
-          <Button 
-            disabled 
-            className="w-full"
-          >
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Procesando pago...
-          </Button>
-        )}
-        
-        {paymentStatus === "success" && (
-          <Button 
-            onClick={() => window.location.reload()}
-            className="w-full bg-green-600 hover:bg-green-700"
-          >
-            <CheckCircle2 className="mr-2 h-4 w-4" />
-            Continuar
-          </Button>
-        )}
-        
-        {paymentStatus === "error" && (
-          <div className="flex w-full gap-2">
-            <Button 
-              onClick={() => setPaymentStatus("idle")}
-              variant="outline"
-              className="w-1/2"
-            >
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleProcessPayment}
-              className="w-1/2 bg-indigo-600 hover:bg-indigo-700"
-            >
-              Reintentar
-            </Button>
-          </div>
-        )}
-      </CardFooter>
-    </Card>
+        </div>
+      ) : paymentStatus === "completed" ? (
+        <div className="py-3 px-4 bg-green-50 border border-green-200 rounded-md text-green-700 text-sm text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mx-auto mb-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          <p className="font-medium">¡Pago completado exitosamente!</p>
+          <p className="mt-1">El pago ha sido procesado correctamente.</p>
+        </div>
+      ) : (
+        <div className="text-center">
+          {paymentData.paymentUrl && (
+            <>
+              <p className="text-sm text-gray-600 mb-3">
+                Se ha generado un enlace de pago para completar la transacción. 
+                Haz clic en el botón a continuación para continuar con el proceso.
+              </p>
+              <Card className="border border-indigo-100 bg-indigo-50/30 p-4 mb-4">
+                <QrCode className="h-12 w-12 mx-auto mb-3 text-indigo-600" />
+                <p className="text-sm text-indigo-700 font-medium">
+                  ID de Transacción: {paymentData.transactionId || "N/A"}
+                </p>
+                <p className="text-xs text-indigo-600 mt-2">
+                  Monto: ${amount.toLocaleString("es-CL")}
+                </p>
+              </Card>
+              <Button
+                onClick={handleRedirectToPayment}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              >
+                Continuar con el pago
+              </Button>
+            </>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

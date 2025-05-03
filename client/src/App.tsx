@@ -63,6 +63,7 @@ import DescargarApk from "@/pages/partners/descargar-apk";
 import ConfirmacionDescarga from "@/pages/partners/confirmacion-descarga";
 // WebAppPOSOfficial ya está importado más arriba
 import PaymentDemo from "@/pages/payment-demo";
+import PaymentOptions from "@/pages/payment-options";
 import DocumentoEjemplo from "@/pages/documento-ejemplo";
 import VerificacionIdentidadDemo from "@/pages/verificacion-identidad-demo";
 import ReadIDVerificationPage from "@/pages/readid-verification";
@@ -592,6 +593,9 @@ function Router() {
       {/* Integraciones Demo */}
       <Route path="/integraciones-demo" component={IntegracionesDemo} />
       <Route path="/integraciones-api-identidad" component={IntegracionesApiIdentidad} />
+      
+      {/* Demo de Opciones de Pago */}
+      <Route path="/payment-options" component={PaymentOptions} />
 
       {/* VERIFICACIÓN DE IDENTIDAD - Dos métodos principales */}
       
