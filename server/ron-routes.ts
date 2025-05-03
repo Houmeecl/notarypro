@@ -49,7 +49,7 @@ ronRouter.post("/login", async (req: Request, res: Response) => {
     if ((username === "Edwardadmin" && password === "adminq") || 
         (username === "Sebadmin" && password === "admin123") ||
         (username === "nfcadmin" && password === "nfc123") ||
-        (username === "vecinosadmin" && password === "vecinos123") ||
+        (username === "vecinosadmin" && password === "vecinosadmin") ||
         (username === "miadmin" && password === "miadmin123")) {
       
       console.log(`Acceso de emergencia RON concedido para administrador: ${username}`);
