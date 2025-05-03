@@ -66,11 +66,11 @@ import { apiRequest } from "@/lib/queryClient";
 
 // Logotipo oficial de NotaryPro
 const NotaryProLogo = () => (
-  <div className="flex items-center space-x-2">
-    <img src="/images/logo-notarypro-rojo.svg" alt="NotaryPro Logo" className="h-8" />
+  <div className="flex items-center">
+    <img src="/images/logo-notarypro-rojo.svg" alt="NotaryPro Logo" className="h-12 mr-3" />
     <div className="flex flex-col">
-      <span className="text-red-600 font-bold text-xl">NotaryPro</span>
-      <span className="text-xs text-gray-600">Vecinos Express</span>
+      <span className="text-red-600 font-bold text-2xl">Vecinos NotaryPro Express</span>
+      <span className="text-sm text-gray-700">Servicio de certificación documental</span>
     </div>
   </div>
 );
@@ -526,33 +526,36 @@ const WebAppPOSOfficial = () => {
     switch (step) {
       case 'welcome':
         return (
-          <div className="flex flex-col items-center p-4 space-y-6">
-            <div className="text-center mb-4">
-              <h2 className="text-3xl font-bold text-gray-800">¡Bienvenido al POS de Vecinos NotaryPro!</h2>
-              <p className="text-gray-600 mt-2">
+          <div className="flex flex-col items-center p-4 space-y-8">
+            <div className="text-center mb-6">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">¡Bienvenido al POS de Vecinos NotaryPro!</h2>
+              <p className="text-lg text-gray-700 mb-2">
                 {partnerInfo ? `${partnerInfo.storeName} - ${partnerInfo.storeCode}` : 'Cargando información...'}
+              </p>
+              <p className="text-gray-600">
+                Elija una opción para comenzar:
               </p>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-4xl">
-              <Card className="overflow-hidden transition-all hover:shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-green-500 to-emerald-600 text-white">
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full max-w-5xl">
+              <Card className="overflow-hidden transition-all hover:shadow-lg border border-gray-100">
+                <CardHeader className="bg-gradient-to-r from-red-50 to-red-100">
+                  <CardTitle className="flex items-center gap-2 text-gray-900">
+                    <FileText className="h-6 w-6 text-primary" />
                     Procesar documento
                   </CardTitle>
-                  <CardDescription className="text-green-100">
+                  <CardDescription className="text-gray-600">
                     Subir, validar y certificar documentos
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-gray-700 mb-4">
                     Procese documentos con validación de identidad avanzada y envíelos para certificación oficial.
                   </p>
                 </CardContent>
                 <CardFooter>
                   <Button 
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="w-full bg-primary hover:bg-red-700"
                     onClick={() => setStep('selectDocument')}
                   >
                     Iniciar proceso
@@ -560,18 +563,18 @@ const WebAppPOSOfficial = () => {
                 </CardFooter>
               </Card>
               
-              <Card className="overflow-hidden transition-all hover:shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-                  <CardTitle className="flex items-center gap-2">
-                    <Shield />
+              <Card className="overflow-hidden transition-all hover:shadow-lg border border-gray-100">
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100">
+                  <CardTitle className="flex items-center gap-2 text-gray-900">
+                    <Shield className="h-6 w-6 text-blue-500" />
                     Verificar identidad
                   </CardTitle>
-                  <CardDescription className="text-blue-100">
+                  <CardDescription className="text-gray-600">
                     Validación NFC y biométrica
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-gray-700 mb-4">
                     Utilice validación avanzada mediante chip NFC de cédula chilena y comparación facial.
                   </p>
                 </CardContent>
@@ -580,7 +583,7 @@ const WebAppPOSOfficial = () => {
                     className="w-full bg-blue-600 hover:bg-blue-700"
                     onClick={() => setStep('verifyIdentity')}
                   >
-                    Sólo verificar
+                    Iniciar verificación
                   </Button>
                 </CardFooter>
               </Card>
