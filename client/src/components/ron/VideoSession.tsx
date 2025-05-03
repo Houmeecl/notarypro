@@ -104,38 +104,74 @@ const VideoSession: React.FC<VideoSessionProps> = ({
     };
   }, [isRecording]);
 
+  // Estado para solicitar permisos explícitamente
+  const [permissionsRequested, setPermissionsRequested] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+
+  // Solicitar permisos de cámara y audio explícitamente
+  const requestMediaPermissions = async () => {
+    try {
+      // Mostrar un mensaje antes de solicitar permisos
+      toast({
+        title: 'Solicitando permisos',
+        description: 'Autoriza el acceso a tu cámara y micrófono para continuar con la sesión RON.',
+      });
+      
+      // Intentar obtener el stream con un timeout para detectar problemas de permiso
+      const permissionTimeout = setTimeout(() => {
+        setCameraError('Tiempo de espera excedido. Verifica que has permitido el acceso a la cámara y micrófono.');
+      }, 10000); // 10 segundos de timeout
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: true, 
+        audio: true 
+      });
+      
+      clearTimeout(permissionTimeout);
+      
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+      }
+      
+      setLocalStream(stream);
+      setCameraError(null);
+      
+      // Iniciar grabación después de 2 segundos
+      setTimeout(() => {
+        setIsRecording(true);
+        addSystemMessage('La grabación ha comenzado.');
+      }, 2000);
+      
+      return true;
+    } catch (error: any) {
+      console.error('Error accediendo a la cámara:', error);
+      const errorMessage = error.name === 'NotAllowedError' 
+        ? 'Permiso denegado. Por favor, permite el acceso a tu cámara y micrófono en la configuración del navegador.'
+        : error.name === 'NotFoundError'
+        ? 'No se encontró ninguna cámara o micrófono en tu dispositivo.'
+        : error.name === 'NotReadableError'
+        ? 'Tu cámara o micrófono está siendo utilizado por otra aplicación. Cierra otras aplicaciones que puedan estar usando estos dispositivos.'
+        : 'No se pudo acceder a tu cámara o micrófono. Verifica los permisos del navegador.';
+      
+      setCameraError(errorMessage);
+      
+      toast({
+        title: 'Error de acceso a dispositivos',
+        description: errorMessage,
+        variant: 'destructive'
+      });
+      
+      return false;
+    }
+  };
+
   // Iniciar la cámara local al montar el componente
   useEffect(() => {
-    const startCamera = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: true, 
-          audio: true 
-        });
-        
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = stream;
-        }
-        
-        setLocalStream(stream);
-        
-        // Iniciar grabación después de 2 segundos
-        setTimeout(() => {
-          setIsRecording(true);
-          addSystemMessage('La grabación ha comenzado.');
-        }, 2000);
-        
-      } catch (error) {
-        console.error('Error accediendo a la cámara:', error);
-        toast({
-          title: 'Error de cámara',
-          description: 'No se pudo acceder a su cámara o micrófono. Verifique los permisos del navegador.',
-          variant: 'destructive'
-        });
-      }
-    };
-    
-    startCamera();
+    // Solo intentar iniciar la cámara automáticamente en la primera carga
+    if (!permissionsRequested) {
+      setPermissionsRequested(true);
+      requestMediaPermissions();
+    }
     
     return () => {
       // Limpiar la cámara al desmontar
@@ -306,12 +342,64 @@ const VideoSession: React.FC<VideoSessionProps> = ({
     }
   };
 
+  // Si hay un error de cámara, mostramos una interfaz de error con opción de reintentar
+  if (cameraError) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900 text-white p-6">
+        <div className="max-w-md text-center bg-slate-800 p-8 rounded-lg shadow-lg border border-slate-700">
+          <Camera className="h-12 w-12 mx-auto mb-4 text-red-400" />
+          <h2 className="text-xl font-bold mb-4">Error de acceso a dispositivos</h2>
+          <p className="text-slate-300 mb-6">{cameraError}</p>
+          <div className="space-y-4">
+            <Button 
+              variant="default" 
+              className="w-full"
+              onClick={() => {
+                setCameraError(null);
+                requestMediaPermissions();
+              }}
+            >
+              <Camera className="h-4 w-4 mr-2" />
+              Reintentar acceso a cámara
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => {
+                if (onSessionEnd) {
+                  onSessionEnd();
+                } else {
+                  window.location.href = "/ron-platform";
+                }
+              }}
+            >
+              Volver al panel
+            </Button>
+          </div>
+          <div className="mt-6 text-slate-400 text-sm">
+            <p className="mb-2">Consejos para resolver problemas:</p>
+            <ul className="text-left list-disc pl-6 space-y-1">
+              <li>Asegúrate de que tu cámara y micrófono no estén siendo utilizados por otra aplicación</li>
+              <li>Verifica que has concedido permisos al navegador para acceder a estos dispositivos</li>
+              <li>Utiliza un navegador actualizado (Chrome o Firefox recomendados)</li>
+              <li>Reinicia tu navegador y vuelve a intentarlo</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full h-full flex flex-col bg-slate-900 text-white">
       {/* Barra superior con información de la sesión */}
       <div className="bg-slate-800 py-2 px-4 flex justify-between items-center">
         <div className="flex items-center">
-          <VideoOff className={`h-5 w-5 mr-2 ${isRecording ? 'text-red-500 animate-pulse' : 'text-gray-400'}`} />
+          {isRecording ? (
+            <VideoOff className="h-5 w-5 mr-2 text-red-500 animate-pulse" />
+          ) : (
+            <Camera className="h-5 w-5 mr-2 text-blue-400" />
+          )}
           <span className="text-sm font-medium">
             {isRecording ? `Grabando: ${formatTime(elapsedTime)}` : 'Preparando grabación...'}
           </span>
@@ -376,7 +464,7 @@ const VideoSession: React.FC<VideoSessionProps> = ({
           </div>
           
           {/* Controles de video */}
-          <div className="mt-4 flex justify-center space-x-2 py-2">
+          <div className="mt-4 flex flex-wrap justify-center gap-2 py-2">
             <Button
               variant="secondary"
               size="sm"
@@ -403,6 +491,29 @@ const VideoSession: React.FC<VideoSessionProps> = ({
                 <MicOff className="h-4 w-4 mr-2" />
               )}
               {participants[0].audioEnabled ? 'Micrófono ON' : 'Micrófono OFF'}
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                // Detener streams actuales
+                if (localStream) {
+                  localStream.getTracks().forEach(track => track.stop());
+                  setLocalStream(null);
+                }
+                
+                // Solicitar nuevamente permisos
+                requestMediaPermissions();
+                
+                toast({
+                  title: 'Reconectando',
+                  description: 'Intentando restablecer la conexión con la cámara y el micrófono...',
+                });
+              }}
+            >
+              <Camera className="h-4 w-4 mr-2" />
+              Reiniciar dispositivos
             </Button>
             
             {isCertifier && !identityVerified && (

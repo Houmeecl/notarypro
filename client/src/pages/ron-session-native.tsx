@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useRoute } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import VideoSession from "@/components/ron/VideoSession";
-import { Loader2 } from "lucide-react";
+import { Loader2, Video, Camera, Lock, Shield, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function RonSessionNativePage() {
   const [, params] = useRoute("/ron-session-native/:sessionId");
@@ -12,12 +15,22 @@ export default function RonSessionNativePage() {
   const [error, setError] = useState<string | null>(null);
   const [isCertifier, setIsCertifier] = useState(true);
   
+  // Estado para controlar si el usuario ha aceptado iniciar la sesión con video
+  const [sessionAccepted, setSessionAccepted] = useState(false);
+  
   useEffect(() => {
     // Simular carga de datos de sesión
     const loadSession = async () => {
       try {
         // En una implementación real, aquí se cargarían los datos de la sesión
         // y se verificaría si el usuario actual es certificador
+        
+        // Mostrar notificación para solicitar permisos
+        toast({
+          title: "Sesión RON preparada",
+          description: "La sesión está lista para comenzar. Se solicitarán permisos para acceder a la cámara y micrófono.",
+        });
+        
         setLoading(false);
         
         // Determinar si el usuario es certificador basado en la URL o el estado de la app
@@ -73,6 +86,68 @@ export default function RonSessionNativePage() {
             Reintentar
           </button>
         </div>
+      </div>
+    );
+  }
+  
+  // Pantalla para iniciar la sesión con aceptación explícita
+  if (!sessionAccepted) {
+    return (
+      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-slate-900 text-white p-4">
+        <Card className="max-w-md w-full bg-slate-800 border-slate-700">
+          <CardHeader className="border-b border-slate-700">
+            <CardTitle className="flex items-center text-xl">
+              <Video className="h-5 w-5 mr-2 text-primary" />
+              Iniciar Sesión RON
+            </CardTitle>
+          </CardHeader>
+          
+          <CardContent className="pt-6">
+            <div className="space-y-4">
+              <div className="bg-slate-900 rounded-lg p-4 text-center">
+                <Camera className="h-12 w-12 mx-auto mb-3 text-primary" />
+                <h3 className="font-medium mb-2">Se requiere cámara y micrófono</h3>
+                <p className="text-sm text-slate-300">Para continuar, autoriza el acceso a estos dispositivos cuando se te solicite.</p>
+              </div>
+              
+              <div className="space-y-3">
+                <Badge variant="outline" className="w-full justify-start bg-slate-900 py-2 px-3 h-auto">
+                  <Lock className="h-4 w-4 mr-2 text-green-400" />
+                  <span>Sesión encriptada de extremo a extremo</span>
+                </Badge>
+                
+                <Badge variant="outline" className="w-full justify-start bg-slate-900 py-2 px-3 h-auto">
+                  <Shield className="h-4 w-4 mr-2 text-blue-400" />
+                  <span>Cumple con Ley 19.799 para certificaciones electrónicas</span>
+                </Badge>
+                
+                <Badge variant="outline" className="w-full justify-start bg-slate-900 py-2 px-3 h-auto">
+                  <Info className="h-4 w-4 mr-2 text-yellow-400" />
+                  <span>La sesión será grabada con fines de validación legal</span>
+                </Badge>
+              </div>
+            </div>
+          </CardContent>
+          
+          <CardFooter className="flex-col space-y-2 pt-2 pb-4">
+            <Button 
+              className="w-full" 
+              size="lg"
+              onClick={() => setSessionAccepted(true)}
+            >
+              <Camera className="h-4 w-4 mr-2" />
+              Iniciar videollamada
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="w-full" 
+              onClick={() => window.location.href = "/ron-platform"}
+            >
+              Cancelar
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
     );
   }
