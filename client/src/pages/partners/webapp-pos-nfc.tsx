@@ -322,6 +322,15 @@ const WebAppPOSNFC = () => {
   };
   
   // Métodos para la verificación de identidad
+  // Iniciar lectura NFC específicamente
+  const iniciarLecturaNFC = () => {
+    setShowNFCReader(true);
+    toast({
+      title: "Lector NFC activado",
+      description: "Acerque la cédula chilena al lector de su dispositivo",
+    });
+  };
+
   const iniciarCamara = async () => {
     console.log("Iniciando cámara...");
     setShowCamera(true); // Mostrar modal primero
@@ -396,10 +405,6 @@ const WebAppPOSNFC = () => {
   };
   
   // Manejar verificación con NFC
-  const iniciarLecturaNFC = () => {
-    setShowNFCReader(true);
-    setShowCamera(false);
-  };
   
   const handleNFCSuccess = (data: CedulaChilenaData) => {
     setCedulaData(data);
@@ -732,15 +737,50 @@ const WebAppPOSNFC = () => {
                 </div>
               </div>
               
-              <div className="flex justify-between">
-                <Button variant="outline" onClick={verificarIdentidad}>
-                  <UserCheck className="h-4 w-4 mr-2" />
-                  Verificar identidad {nfcAvailable ? '(NFC)' : '(Cámara)'}
-                </Button>
-                <Button onClick={handleRegistrarCliente}>
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Registrar cliente
-                </Button>
+              <div className="space-y-4">
+                {/* Mensaje informativo sobre disponibilidad de NFC */}
+                {nfcAvailable && (
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-md flex items-center">
+                    <div className="mr-3 bg-blue-100 p-2 rounded-full">
+                      <Wallet className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div className="flex-1 text-sm">
+                      <p className="font-medium text-blue-800">Lector NFC disponible</p>
+                      <p className="text-blue-700 text-xs">Puede usar el lector NFC para verificar la cédula chilena</p>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="flex flex-wrap gap-2 sm:justify-between">
+                  {nfcAvailable && (
+                    <Button variant="outline" onClick={iniciarLecturaNFC} className="flex-1 sm:flex-none">
+                      <Wallet className="h-4 w-4 mr-2" />
+                      Verificar con NFC
+                    </Button>
+                  )}
+                  
+                  <Button variant="outline" onClick={verificarIdentidad} className="flex-1 sm:flex-none">
+                    <Camera className="h-4 w-4 mr-2" />
+                    Verificar con cámara
+                  </Button>
+                  
+                  <Button onClick={handleRegistrarCliente} className="w-full sm:w-auto">
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Registrar cliente
+                  </Button>
+                </div>
+                
+                {/* Opción para simulación */}
+                <div className="pt-3 border-t border-dashed border-gray-200">
+                  <Button 
+                    variant="ghost" 
+                    onClick={simularVerificacionExitosa} 
+                    className="w-full text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    <Shield className="h-4 w-4 mr-2" />
+                    Simular verificación exitosa (modo demo)
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -1151,7 +1191,7 @@ const WebAppPOSNFC = () => {
         </div>
       )}
       
-      {/* Modal para lector NFC */}
+      {/* Modal para lector NFC mejorado */}
       {showNFCReader && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-xl overflow-hidden">
@@ -1165,11 +1205,72 @@ const WebAppPOSNFC = () => {
               </Button>
             </div>
             
-            <div className="p-4">
-              <NFCIdentityReader
-                onSuccess={handleNFCSuccess}
-                onCancel={handleNFCCancel}
-              />
+            <div className="p-6">
+              {/* Instrucciones con ilustración */}
+              <div className="mb-6 text-center">
+                <div className="flex justify-center mb-4">
+                  {/* Ilustración visual de cómo colocar la cédula */}
+                  <div className="bg-blue-50 w-[200px] h-[120px] rounded-lg flex items-center justify-center border-2 border-dashed border-blue-200 relative">
+                    <Wallet className="h-12 w-12 text-blue-300" />
+                    <div className="absolute -top-3 right-5 animate-pulse">
+                      <div className="bg-blue-400 p-1 rounded-full">
+                        <Wallet className="h-5 w-5 text-white" />
+                      </div>
+                    </div>
+                    <div className="absolute -bottom-3 left-5 animate-pulse delay-300">
+                      <div className="bg-blue-500 p-1 rounded-full">
+                        <Wallet className="h-5 w-5 text-white" />
+                      </div>
+                    </div>
+                    <div className="absolute -top-3 left-5 animate-pulse delay-150">
+                      <div className="bg-blue-600 p-1 rounded-full">
+                        <Wallet className="h-5 w-5 text-white" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <h3 className="font-bold text-lg mb-2">Acerque su cédula al dispositivo</h3>
+                <p className="text-gray-600 mb-4">
+                  Coloque la cédula chilena (chip electrónico) cerca del lector NFC de su dispositivo.
+                  Manténgala quieta hasta que se complete la lectura.
+                </p>
+              </div>
+              
+              <div className="space-y-4">
+                <NFCIdentityReader
+                  onSuccess={handleNFCSuccess}
+                  onCancel={handleNFCCancel}
+                />
+                
+                {/* Opciones alternativas */}
+                <div className="pt-4 border-t border-gray-200 mt-4">
+                  <div className="flex flex-wrap justify-between gap-2">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setShowNFCReader(false);
+                        iniciarCamara();
+                      }} 
+                      className="flex-1"
+                    >
+                      <Camera className="h-4 w-4 mr-2" />
+                      Usar cámara en su lugar
+                    </Button>
+                    
+                    <Button 
+                      variant="secondary"
+                      onClick={() => {
+                        setShowNFCReader(false);
+                        simularVerificacionExitosa();
+                      }}
+                      className="flex-1"
+                    >
+                      <Shield className="h-4 w-4 mr-2" />
+                      Simular verificación exitosa
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
