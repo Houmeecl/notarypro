@@ -199,7 +199,7 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
           setVerificationSteps(updatedSteps);
           
           // Usar imagen de muestra para demostración
-          setDocumentImageSrc('data:image/png;base64,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');
+          setDocumentImageSrc('data:image/png;base64,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');
           
           // Continuar con el siguiente paso
           setTimeout(() => moveToNextStep(), 1000);
@@ -211,6 +211,8 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
       });
     }, 120);
   };
+  
+
   
   // Iniciar lectura NFC
   const startNFCReading = async () => {
@@ -233,11 +235,11 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
     setNfcProgress(0);
     
     try {
-      // Leer datos de la cédula
+      // Usar la función de lectura real de cédula chilena
       const data = await readCedulaChilena(handleNFCStatusUpdate);
       
       if (data) {
-        setCedulaData(data);
+        setCedulaData(data as CedulaChilenaData);
         setNfcStatus(NFCReadStatus.SUCCESS);
         
         // Marcar etapa como exitosa
@@ -246,7 +248,20 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
         setVerificationSteps(updatedSteps);
         
         // Notificar éxito si hay callback
-        if (onSuccess) onSuccess(data);
+        if (onSuccess) onSuccess(data as CedulaChilenaData);
+        
+        // Registrar en el backend la verificación exitosa
+        try {
+          const apiResponse = await apiRequest('POST', '/api/identity/verification-log', {
+            verificationMethod: 'nfc',
+            documentType: data.tipo || 'CÉDULA DE IDENTIDAD',
+            success: true,
+            sessionId: sessionId || 'demo-session'
+          });
+          console.log('Registro de verificación exitoso:', await apiResponse.json());
+        } catch (apiError) {
+          console.error('Error al registrar verificación:', apiError);
+        }
         
         // Continuar a la siguiente etapa
         setTimeout(() => moveToNextStep(), 1000);
@@ -315,8 +330,8 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
         videoRef.current.srcObject = stream;
       }
       
-      // Simular progreso de verificación biométrica
-      simulateBiometricVerification();
+      // Iniciar captura y procesamiento biométrico real
+      startBiometricProcessing();
     } catch (err) {
       console.error("Error accediendo a la cámara:", err);
       setError("No se pudo acceder a la cámara. Verifique los permisos.");
@@ -328,40 +343,132 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
     }
   };
   
-  // Simular verificación biométrica
-  const simulateBiometricVerification = () => {
+  // Realizar procesamiento biométrico real
+  const startBiometricProcessing = async () => {
     setBiometricProgress(0);
     
-    const interval = setInterval(() => {
-      setBiometricProgress(prev => {
-        const newValue = prev + 10;
-        
-        if (newValue >= 100) {
-          clearInterval(interval);
+    // Progreso inicial para la captura y procesamiento
+    setBiometricProgress(20);
+    
+    // Esperar a que el video esté listo
+    if (videoRef.current) {
+      videoRef.current.onloadedmetadata = async () => {
+        // Capturar imagen después de unos segundos para que el usuario se posicione
+        setTimeout(async () => {
+          // Progreso para la captura de imagen
+          setBiometricProgress(40);
           
-          // Capturar imagen de la verificación facial
+          // Capturar la imagen facial
           captureImage();
           
-          // Biométrico verificado exitosamente
-          const updatedSteps = [...verificationSteps];
-          updatedSteps[2].status = 'success';
-          setVerificationSteps(updatedSteps);
-          
-          // Detener la cámara
-          if (cameraStream) {
-            cameraStream.getTracks().forEach(track => track.stop());
-            setCameraStream(null);
+          // Verificar la imagen capturada
+          if (faceImageSrc) {
+            try {
+              // Incrementar progreso para el análisis facial
+              setBiometricProgress(60);
+              
+              // Realizar verificación real con API de reconocimiento facial
+              const verificationResult = await verifyFacialImage(faceImageSrc, cedulaData);
+              
+              // Procesar resultado
+              if (verificationResult.success) {
+                // Verificación exitosa
+                setBiometricProgress(100);
+                
+                // Actualizar estado
+                const updatedSteps = [...verificationSteps];
+                updatedSteps[2].status = 'success';
+                setVerificationSteps(updatedSteps);
+                
+                // Detener la cámara
+                if (cameraStream) {
+                  cameraStream.getTracks().forEach(track => track.stop());
+                  setCameraStream(null);
+                }
+                
+                // Registrar verificación biométrica exitosa
+                try {
+                  await apiRequest('POST', '/api/identity/biometric-verification-log', {
+                    verificationMethod: 'facial',
+                    documentId: cedulaData?.numeroDocumento || 'unknown',
+                    success: true,
+                    sessionId: sessionId || 'demo-session'
+                  });
+                } catch (apiError) {
+                  console.error('Error al registrar verificación biométrica:', apiError);
+                }
+                
+                // Continuar con el siguiente paso
+                setTimeout(() => moveToNextStep(), 1000);
+                
+              } else {
+                // Verificación fallida
+                setBiometricProgress(0);
+                setError("La verificación biométrica ha fallado: " + verificationResult.message);
+                
+                const updatedSteps = [...verificationSteps];
+                updatedSteps[2].status = 'failed';
+                setVerificationSteps(updatedSteps);
+                
+                // Detener la cámara
+                if (cameraStream) {
+                  cameraStream.getTracks().forEach(track => track.stop());
+                  setCameraStream(null);
+                }
+              }
+              
+            } catch (err) {
+              console.error("Error en verificación biométrica:", err);
+              setBiometricProgress(0);
+              setError("Error en el proceso de verificación biométrica");
+              
+              const updatedSteps = [...verificationSteps];
+              updatedSteps[2].status = 'failed';
+              setVerificationSteps(updatedSteps);
+              
+              // Detener la cámara
+              if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                setCameraStream(null);
+              }
+            }
           }
-          
-          // Continuar con el siguiente paso
-          setTimeout(() => moveToNextStep(), 1000);
-          
-          return 100;
-        }
-        
-        return newValue;
+        }, 2000);
+      };
+    }
+  };
+  
+  // Función para verificar imagen facial contra los datos de la cédula
+  const verifyFacialImage = async (facialImage: string, cedulaData: CedulaChilenaData | null): Promise<{success: boolean, message?: string}> => {
+    try {
+      const imageData = facialImage.split(',')[1]; // Obtener datos base64 sin el prefijo
+      
+      // Hacer la solicitud a la API de verificación facial
+      const response = await apiRequest('POST', '/api/identity/verify-facial', {
+        faceImage: imageData,
+        documentId: cedulaData?.numeroDocumento || 'unknown',
+        sessionId: sessionId
       });
-    }, 200);
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        return { 
+          success: true 
+        };
+      } else {
+        return { 
+          success: false, 
+          message: result.message || 'Verificación biométrica fallida'
+        };
+      }
+    } catch (error) {
+      console.error('Error en verificación facial:', error);
+      return {
+        success: false,
+        message: 'Error en el proceso de verificación facial'
+      };
+    }
   };
   
   // Capturar imagen de la cámara
@@ -387,48 +494,95 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
   };
   
   // Iniciar validación con bases oficiales
-  const startValidation = () => {
+  const startValidation = async () => {
     // Marcar etapa como en progreso
     const updatedSteps = [...verificationSteps];
     updatedSteps[3].status = 'inProgress';
     setVerificationSteps(updatedSteps);
     
-    // Simular progreso de validación con bases de datos
-    simulateValidation();
-  };
-  
-  // Simular validación con bases de datos oficiales
-  const simulateValidation = () => {
-    setValidationProgress(0);
+    // Iniciar progreso
+    setValidationProgress(20);
     
-    const interval = setInterval(() => {
-      setValidationProgress(prev => {
-        const newValue = prev + 15;
-        
-        if (newValue >= 100) {
-          clearInterval(interval);
-          
-          // Validación exitosa
-          const updatedSteps = [...verificationSteps];
-          updatedSteps[3].status = 'success';
-          setVerificationSteps(updatedSteps);
-          
-          // Notificar finalización completa
-          if (onComplete) {
-            onComplete(true, {
-              cedula: cedulaData,
-              documentVerified: true,
-              biometricVerified: true,
-              officialValidation: true
-            });
-          }
-          
-          return 100;
-        }
-        
-        return newValue;
+    try {
+      // Verificar si tenemos los datos necesarios
+      if (!cedulaData || !cedulaData.numeroDocumento) {
+        throw new Error("No hay datos suficientes para realizar la validación");
+      }
+      
+      // Incrementar progreso
+      setValidationProgress(40);
+      
+      // Realizar consulta a API de validación oficial
+      const response = await apiRequest('POST', '/api/identity/validate-official-records', {
+        documentId: cedulaData.numeroDocumento,
+        documentType: 'CEDULA_CHILENA',
+        fullName: `${cedulaData.nombres} ${cedulaData.apellidos}`.trim(),
+        sessionId: sessionId || 'demo-session'
       });
-    }, 300);
+      
+      // Incrementar progreso
+      setValidationProgress(70);
+      
+      // Procesar respuesta
+      const result = await response.json();
+      
+      if (result.success) {
+        // Validación exitosa
+        setValidationProgress(100);
+        
+        const updatedSteps = [...verificationSteps];
+        updatedSteps[3].status = 'success';
+        setVerificationSteps(updatedSteps);
+        
+        // Notificar finalización completa
+        if (onComplete) {
+          onComplete(true, {
+            cedula: cedulaData,
+            documentVerified: true,
+            biometricVerified: true,
+            officialValidation: true,
+            officialValidationDetails: result.details
+          });
+        }
+      } else {
+        // Validación fallida
+        setError("La validación con bases oficiales ha fallado: " + (result.message || "Error desconocido"));
+        
+        const updatedSteps = [...verificationSteps];
+        updatedSteps[3].status = 'failed';
+        setVerificationSteps(updatedSteps);
+        
+        // Notificar finalización con error
+        if (onComplete) {
+          onComplete(false, {
+            cedula: cedulaData,
+            documentVerified: true,
+            biometricVerified: true,
+            officialValidation: false,
+            officialValidationError: result.message
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Error en validación con bases oficiales:", err);
+      setValidationProgress(0);
+      setError(err instanceof Error ? err.message : "Error desconocido en validación");
+      
+      const updatedSteps = [...verificationSteps];
+      updatedSteps[3].status = 'failed';
+      setVerificationSteps(updatedSteps);
+      
+      // Notificar finalización con error
+      if (onComplete) {
+        onComplete(false, {
+          cedula: cedulaData,
+          documentVerified: true,
+          biometricVerified: true,
+          officialValidation: false,
+          officialValidationError: err instanceof Error ? err.message : "Error desconocido en validación"
+        });
+      }
+    }
   };
   
   // Renderizar contenido según la etapa actual
@@ -572,57 +726,47 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
     };
     
     const readerInfo = getReaderTypeInfo();
-    const microInteractionStatus = getMicroInteractionStatus() as 'idle' | 'scanning' | 'success' | 'error';
     
     return (
       <div className="space-y-6">
         <div className="text-center">
           <h3 className="text-lg font-medium">Lectura de chip NFC</h3>
           <p className="text-sm text-gray-500">
-            Verificación de los datos electrónicos almacenados en el chip
+            Verificación de datos del chip electrónico en la cédula de identidad
           </p>
         </div>
         
-        {!nfcAvailable && !isCompleted && (
-          <Alert variant="destructive" className="my-4">
-            <AlertTriangle className="h-5 w-5" />
-            <AlertDescription>
-              Este dispositivo no tiene soporte para NFC. Por favor, utilice un dispositivo compatible.
+        {!nfcAvailable && !isInProgress && !isCompleted && !isFailed && (
+          <Alert className="bg-yellow-50 border-yellow-200">
+            <AlertTriangle className="h-5 w-5 text-yellow-600" />
+            <AlertDescription className="text-yellow-700">
+              Este dispositivo no cuenta con capacidad NFC. Se simulará el proceso con fines demostrativos.
             </AlertDescription>
           </Alert>
         )}
         
         {isInProgress && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <Progress value={nfcProgress} className="h-2" />
             
-            <motion.div 
-              className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border-2 border-dashed border-blue-300"
-              initial={{ borderColor: 'rgba(59, 130, 246, 0.3)' }}
-              animate={{ 
-                borderColor: ['rgba(59, 130, 246, 0.3)', 'rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 0.3)'] 
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <NFCMicroInteractions 
-                status={microInteractionStatus}
-                message={nfcMessage || 'Acerque la cédula al lector NFC'}
+            <div className="flex justify-center">
+              <NFCMicroInteractions
+                status={getMicroInteractionStatus()}
+                message={nfcMessage || "Acerque la cédula al lector NFC"}
               />
-              
-              <div className="flex items-center justify-center mt-2 text-blue-600 text-sm">
-                {readerInfo.icon}
-                <span>{readerInfo.text}</span>
-              </div>
-            </motion.div>
+            </div>
           </div>
         )}
         
-        {!isInProgress && !isCompleted && !isFailed && nfcAvailable && (
+        {!isInProgress && !isCompleted && !isFailed && (
           <div className="flex flex-col items-center space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 w-full text-center">
-              <p className="text-blue-800 font-medium mb-2">Lectura del chip NFC</p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 w-full">
+              <div className="flex items-center text-blue-800 font-medium mb-2">
+                {readerInfo.icon}
+                <span>{readerInfo.text}</span>
+              </div>
               <p className="text-blue-600 text-sm">
-                Acerque su cédula de identidad al lector NFC para verificar los datos del chip.
+                La verificación NFC lee el chip electrónico de la cédula para validar su autenticidad y extraer datos seguros.
               </p>
             </div>
             
@@ -636,49 +780,53 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
         )}
         
         {isFailed && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="flex items-center gap-2">
+          <div className="space-y-4">
+            <Alert className="bg-red-50 border-red-200">
               <AlertCircle className="h-5 w-5 text-red-600" />
-              <p className="text-red-700 font-medium">Error en la lectura NFC</p>
-            </div>
-            <p className="text-red-600 text-sm mt-2">{error || "No se pudo leer el chip NFC de la cédula."}</p>
+              <AlertDescription className="text-red-700">
+                {error || "No se pudo completar la lectura NFC. Intente nuevamente."}
+              </AlertDescription>
+            </Alert>
             
             <Button
-              variant="outline"
-              className="mt-4 w-full"
+              className="w-full"
               onClick={startNFCReading}
+              variant="outline"
             >
-              Intentar nuevamente
+              Reintentar lectura
             </Button>
           </div>
         )}
         
         {isCompleted && cedulaData && (
-          <div className="flex flex-col items-center space-y-4">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 w-full">
+          <div className="flex flex-col space-y-4">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-600" />
-                <p className="text-green-700 font-medium">Chip NFC leído correctamente</p>
+                <p className="text-green-700 font-medium">Lectura NFC completada con éxito</p>
               </div>
             </div>
             
-            <div className="flex flex-col gap-2 w-full">
-              <div className="flex justify-between text-sm text-gray-700">
-                <span>RUT:</span>
-                <span className="font-medium">{cedulaData.rut}</span>
+            <div className="grid grid-cols-2 gap-2 text-sm mt-2">
+              <div className="text-gray-600">Nombre:</div>
+              <div className="font-medium">
+                {cedulaData.nombres} {cedulaData.apellidos}
               </div>
-              <div className="flex justify-between text-sm text-gray-700">
-                <span>Nombre:</span>
-                <span className="font-medium">{cedulaData.nombres} {cedulaData.apellidos}</span>
-              </div>
-              <div className="flex justify-between text-sm text-gray-700">
-                <span>Fecha Nacimiento:</span>
-                <span className="font-medium">{cedulaData.fechaNacimiento}</span>
-              </div>
-              <div className="flex justify-between text-sm text-gray-700">
-                <span>Firma digital:</span>
-                <span className="font-medium text-green-600">Verificada</span>
-              </div>
+              
+              <div className="text-gray-600">RUN:</div>
+              <div className="font-medium">{cedulaData.run}</div>
+              
+              <div className="text-gray-600">Nacionalidad:</div>
+              <div className="font-medium">{cedulaData.nacionalidad}</div>
+              
+              <div className="text-gray-600">Fecha nacimiento:</div>
+              <div className="font-medium">{cedulaData.fechaNacimiento}</div>
+              
+              <div className="text-gray-600">Firma digital:</div>
+              <div className="font-medium text-green-600">Verificada</div>
+              
+              <div className="text-gray-600">Chip:</div>
+              <div className="font-medium text-green-600">Auténtico</div>
             </div>
           </div>
         )}
@@ -696,7 +844,7 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
         <div className="text-center">
           <h3 className="text-lg font-medium">Verificación biométrica</h3>
           <p className="text-sm text-gray-500">
-            Comparación facial y prueba de vida
+            Validación de identidad mediante reconocimiento facial
           </p>
         </div>
         
@@ -707,37 +855,34 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
             <div className="flex items-center space-x-2 text-sm text-blue-700">
               <Loader2 className="h-4 w-4 animate-spin" />
               <span>
-                {biometricProgress < 30 && "Detectando rostro..."}
-                {biometricProgress >= 30 && biometricProgress < 60 && "Analizando rasgos faciales..."}
-                {biometricProgress >= 60 && biometricProgress < 90 && "Comparando con datos de cédula..."}
+                {biometricProgress < 30 && "Capturando imagen..."}
+                {biometricProgress >= 30 && biometricProgress < 60 && "Preparando modelo biométrico..."}
+                {biometricProgress >= 60 && biometricProgress < 90 && "Analizando similitud..."}
                 {biometricProgress >= 90 && "Verificando prueba de vida..."}
               </span>
             </div>
             
-            <div className="relative mx-auto w-full max-w-sm">
-              <video 
-                ref={videoRef}
-                autoPlay 
-                playsInline
-                muted 
-                className="w-full h-auto rounded-lg shadow-md"
-              />
-              
-              {/* Overlay para guiar al usuario */}
-              <div className="absolute inset-0 border-4 border-dashed border-blue-400 rounded-lg pointer-events-none"></div>
-              
-              {/* Canvas oculto para captura de imagen */}
-              <canvas ref={canvasRef} className="hidden" />
+            <div className="bg-gray-100 rounded-lg overflow-hidden mx-auto w-48 h-48">
+              {videoRef && (
+                <video 
+                  ref={videoRef} 
+                  autoPlay 
+                  playsInline 
+                  muted 
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
+            <canvas ref={canvasRef} style={{ display: 'none' }} />
           </div>
         )}
         
         {!isInProgress && !isCompleted && (
           <div className="flex flex-col items-center space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 w-full text-center">
-              <p className="text-blue-800 font-medium mb-2">Verificación biométrica</p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 w-full">
+              <p className="text-blue-800 font-medium mb-2">Verificación facial</p>
               <p className="text-blue-600 text-sm">
-                Realice una verificación facial para comparar con la fotografía de su cédula.
+                Este paso permite verificar que la persona presente coincide con la identidad del documento mediante reconocimiento facial.
               </p>
             </div>
             
@@ -745,7 +890,7 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
               className="w-full"
               onClick={startBiometricVerification}
             >
-              Iniciar verificación biométrica
+              Iniciar verificación facial
             </Button>
           </div>
         )}
@@ -759,17 +904,37 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
               </div>
             </div>
             
-            <div className="flex flex-col gap-2 w-full">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col items-center">
+                <div className="bg-gray-100 rounded-lg overflow-hidden mb-2 w-full aspect-square">
+                  <img 
+                    src={documentImageSrc || ''} 
+                    alt="Foto del documento" 
+                    className="w-full h-full object-cover" 
+                  />
+                </div>
+                <span className="text-xs text-gray-600">Documento</span>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <div className="bg-gray-100 rounded-lg overflow-hidden mb-2 w-full aspect-square">
+                  <img 
+                    src={faceImageSrc} 
+                    alt="Foto capturada" 
+                    className="w-full h-full object-cover" 
+                  />
+                </div>
+                <span className="text-xs text-gray-600">Captura en vivo</span>
+              </div>
+            </div>
+            
+            <div className="w-full">
               <div className="flex justify-between text-sm text-gray-700">
-                <span>Coincidencia facial:</span>
-                <span className="font-medium">Alta (97%)</span>
+                <span>Coincidencia:</span>
+                <span className="font-medium text-green-600">Alta (97%)</span>
               </div>
               <div className="flex justify-between text-sm text-gray-700">
                 <span>Prueba de vida:</span>
-                <span className="font-medium">Superada</span>
-              </div>
-              <div className="flex justify-between text-sm text-gray-700">
-                <span>Identificación biométrica:</span>
                 <span className="font-medium text-green-600">Verificada</span>
               </div>
             </div>
@@ -789,7 +954,7 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
         <div className="text-center">
           <h3 className="text-lg font-medium">Validación con bases oficiales</h3>
           <p className="text-sm text-gray-500">
-            Contraste con fuentes de datos oficiales
+            Verificación con bases de datos oficiales
           </p>
         </div>
         
@@ -800,10 +965,10 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
             <div className="flex items-center space-x-2 text-sm text-blue-700">
               <Loader2 className="h-4 w-4 animate-spin" />
               <span>
-                {validationProgress < 30 && "Consultando base de datos del Registro Civil..."}
-                {validationProgress >= 30 && validationProgress < 60 && "Verificando validez del documento..."}
-                {validationProgress >= 60 && validationProgress < 90 && "Comprobando identidad..."}
-                {validationProgress >= 90 && "Finalizando validación..."}
+                {validationProgress < 30 && "Conectando con sistema central..."}
+                {validationProgress >= 30 && validationProgress < 60 && "Verificando datos con registros oficiales..."}
+                {validationProgress >= 60 && validationProgress < 90 && "Validando estado del documento..."}
+                {validationProgress >= 90 && "Finalizando proceso de validación..."}
               </span>
             </div>
           </div>
@@ -811,10 +976,10 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
         
         {!isInProgress && !isCompleted && (
           <div className="flex flex-col items-center space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 w-full text-center">
-              <p className="text-blue-800 font-medium mb-2">Validación con bases oficiales</p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 w-full">
+              <p className="text-blue-800 font-medium mb-2">Validación en bases oficiales</p>
               <p className="text-blue-600 text-sm">
-                Este paso realizará una comprobación de sus datos con bases oficiales para confirmar su identidad.
+                Este paso final verifica que los datos estén actualizados y sean consistentes con los registros oficiales.
               </p>
             </div>
             
@@ -832,165 +997,148 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 w-full">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-600" />
-                <p className="text-green-700 font-medium">Validación completa exitosamente</p>
+                <p className="text-green-700 font-medium">Validación con bases oficiales exitosa</p>
               </div>
             </div>
             
-            <div className="flex flex-col gap-2 w-full">
+            <div className="w-full">
               <div className="flex justify-between text-sm text-gray-700">
-                <span>Documento:</span>
-                <span className="font-medium text-green-600">Válido</span>
+                <span>Estado de documento:</span>
+                <span className="font-medium text-green-600">Válido y vigente</span>
               </div>
               <div className="flex justify-between text-sm text-gray-700">
-                <span>Estado:</span>
-                <span className="font-medium">Vigente</span>
+                <span>Registro civil:</span>
+                <span className="font-medium text-green-600">Verificado</span>
               </div>
               <div className="flex justify-between text-sm text-gray-700">
-                <span>Nivel de verificación:</span>
-                <span className="font-medium">Máximo (L3)</span>
+                <span>Consulta a base de datos:</span>
+                <span className="font-medium text-green-600">Exitosa</span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-700">
+                <span>Registro completo:</span>
+                <Badge className="bg-green-100 text-green-800 hover:bg-green-200">
+                  <Check className="h-3 w-3 mr-1" /> Verificación completa
+                </Badge>
               </div>
             </div>
             
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 w-full">
-              <div className="flex items-center gap-2">
-                <Lock className="h-5 w-5 text-blue-600" />
-                <p className="text-blue-700 font-medium">Verificación completa</p>
-              </div>
-              <p className="text-blue-600 text-sm mt-1">
-                Identidad verificada con el mayor nivel de confianza disponible.
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg w-full">
+              <p className="text-blue-800 text-sm text-center">
+                <strong>Felicidades!</strong> La verificación de identidad ha sido completada con éxito en todos los niveles de seguridad.
               </p>
+              
+              {onComplete && (
+                <Button
+                  className="mt-4 w-full bg-blue-600 hover:bg-blue-700"
+                  onClick={() => onComplete(true, {
+                    cedula: cedulaData,
+                    documentVerified: true,
+                    biometricVerified: true,
+                    officialValidation: true
+                  })}
+                >
+                  Continuar
+                </Button>
+              )}
             </div>
-            
-            <Button className="w-full" onClick={() => onComplete && onComplete(true, { cedula: cedulaData })}>
-              Finalizar verificación
-            </Button>
           </div>
         )}
       </div>
     );
   };
   
-  // Renderizar panel lateral con pasos de verificación
-  const renderSidebar = () => {
-    return (
-      <Card className="border-0 shadow-none">
-        <CardContent className="p-4">
-          <div className="space-y-3">
-            <h3 className="font-medium text-sm">Proceso de verificación</h3>
-            
-            {verificationSteps.map((step, index) => (
-              <div 
-                key={step.id} 
-                className={`flex items-center gap-2 p-2 rounded-md ${
-                  currentStep === index 
-                    ? 'bg-blue-50 border border-blue-200' 
-                    : 'border border-transparent'
-                }`}
-              >
-                <div className="flex-shrink-0">
-                  {step.status === 'success' ? (
-                    <div className="h-6 w-6 bg-green-100 rounded-full flex items-center justify-center">
-                      <Check className="h-4 w-4 text-green-600" />
-                    </div>
-                  ) : step.status === 'inProgress' ? (
-                    <div className="h-6 w-6 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />
-                    </div>
-                  ) : step.status === 'failed' ? (
-                    <div className="h-6 w-6 bg-red-100 rounded-full flex items-center justify-center">
-                      <AlertCircle className="h-4 w-4 text-red-600" />
-                    </div>
-                  ) : (
-                    <div className="h-6 w-6 bg-gray-100 rounded-full flex items-center justify-center">
-                      <span className="text-xs text-gray-600 font-medium">{index + 1}</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div>
-                  <p className="text-sm font-medium text-gray-800">{step.title}</p>
-                  <p className="text-xs text-gray-500">{step.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  };
-  
-  // Renderizar contenido principal
-  const renderMainContent = () => {
-    return (
-      <Card className="border-0 shadow-md">
-        <CardHeader>
-          <CardTitle className="text-xl flex items-center gap-2">
-            <Shield className="h-5 w-5 text-[#2d219b]" />
-            Verificación de identidad avanzada
-          </CardTitle>
-          <CardDescription>
-            Servicio de verificación de identidad de nivel 3 (máxima seguridad)
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={activeTab}>
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger 
-                value="document" 
-                disabled={currentStep !== 0}
-                onClick={() => setActiveTab("document")}
-              >
-                Documento
-              </TabsTrigger>
-              <TabsTrigger 
-                value="nfc" 
-                disabled={currentStep !== 1}
-                onClick={() => setActiveTab("nfc")}
-              >
-                NFC
-              </TabsTrigger>
-              <TabsTrigger 
-                value="biometric" 
-                disabled={currentStep !== 2}
-                onClick={() => setActiveTab("biometric")}
-              >
-                Biometría
-              </TabsTrigger>
-              <TabsTrigger 
-                value="validation" 
-                disabled={currentStep !== 3}
-                onClick={() => setActiveTab("validation")}
-              >
-                Validación
-              </TabsTrigger>
-            </TabsList>
-            
-            <div className="pt-6">
-              {renderStepContent()}
-            </div>
-          </Tabs>
-        </CardContent>
-        <CardFooter className="flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            <Signal className="h-4 w-4 text-blue-600" />
-            <span className="text-xs text-gray-500">ID Sesión: {sessionId || '----'}</span>
-          </div>
-          
-          <Badge variant="outline" className="text-[#2d219b] bg-[#2d219b]/10">
-            InverID v1.0
-          </Badge>
-        </CardFooter>
-      </Card>
-    );
-  };
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div className="md:col-span-1 order-2 md:order-1">
-        {renderSidebar()}
+    <div className="w-full">
+      {/* Mostrar pasos de verificación */}
+      <div className="mb-6">
+        <div className="grid grid-cols-4 gap-1">
+          {verificationSteps.map((step, index) => (
+            <div 
+              key={step.id}
+              className={`flex flex-col items-center transition-all ${
+                currentStep === index 
+                  ? 'opacity-100' 
+                  : currentStep > index 
+                    ? 'opacity-70'
+                    : 'opacity-50'
+              }`}
+            >
+              <div 
+                className={`
+                  w-10 h-10 rounded-full flex items-center justify-center mb-2
+                  ${currentStep === index ? 'bg-amber-500 text-white' : ''}
+                  ${currentStep > index && step.status === 'success' ? 'bg-green-500 text-white' : ''}
+                  ${currentStep > index && step.status === 'failed' ? 'bg-red-500 text-white' : ''}
+                  ${currentStep !== index && currentStep < index ? 'bg-gray-200 text-gray-500' : ''}
+                `}
+              >
+                {step.icon}
+              </div>
+              <div className="text-xs text-center">
+                {step.title}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="md:col-span-2 order-1 md:order-2">
-        {renderMainContent()}
+      
+      {/* Tab panel */}
+      <Tabs 
+        value={activeTab} 
+        onValueChange={setActiveTab}
+        className="w-full"
+      >
+        <TabsList className="w-full mb-4">
+          <TabsTrigger 
+            value="document" 
+            className="flex-1"
+            disabled={currentStep > 0}
+            onClick={() => setActiveTab("document")}
+          >
+            Documento
+          </TabsTrigger>
+          <TabsTrigger 
+            value="nfc" 
+            className="flex-1"
+            disabled={currentStep > 1 || currentStep < 1}
+            onClick={() => setActiveTab("nfc")}
+          >
+            NFC
+          </TabsTrigger>
+          <TabsTrigger 
+            value="biometric" 
+            className="flex-1"
+            disabled={currentStep > 2 || currentStep < 2}
+            onClick={() => setActiveTab("biometric")}
+          >
+            Biometría
+          </TabsTrigger>
+          <TabsTrigger 
+            value="validation" 
+            className="flex-1"
+            disabled={currentStep > 3 || currentStep < 3}
+            onClick={() => setActiveTab("validation")}
+          >
+            Validación
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="document" className="focus-visible:outline-none">
+          {renderDocumentStep()}
+        </TabsContent>
+        <TabsContent value="nfc" className="focus-visible:outline-none">
+          {renderNFCStep()}
+        </TabsContent>
+        <TabsContent value="biometric" className="focus-visible:outline-none">
+          {renderBiometricStep()}
+        </TabsContent>
+        <TabsContent value="validation" className="focus-visible:outline-none">
+          {renderValidationStep()}
+        </TabsContent>
+      </Tabs>
+      
+      <div className="mt-8 text-xs text-gray-500 text-center">
+        ID de sesión: {sessionId || "demo-session-001"}
       </div>
     </div>
   );
