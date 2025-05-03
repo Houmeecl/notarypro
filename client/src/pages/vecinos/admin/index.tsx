@@ -423,20 +423,20 @@ interface StatsCardProps {
 
 const StatsCard = ({ title, value, description, icon, trend }: StatsCardProps) => {
   return (
-    <Card>
+    <Card className="border-0 shadow-md hover:shadow-lg transition-shadow">
       <CardContent className="pt-6">
         <div className="flex justify-between items-start">
           <div>
-            <p className="text-sm font-medium text-gray-500">{title}</p>
-            <h3 className="text-2xl font-bold mt-1">{value}</h3>
+            <p className="text-sm font-medium text-gray-600">{title}</p>
+            <h3 className="text-2xl font-bold mt-1 text-[#2d219b]">{value}</h3>
             <p className="text-xs text-gray-500 mt-1">{description}</p>
           </div>
-          <div className="p-2 bg-gray-50 rounded-full">
+          <div className="p-2 bg-[#2d219b] bg-opacity-10 rounded-full">
             {icon}
           </div>
         </div>
         {trend && (
-          <div className="mt-4 text-xs font-medium text-gray-500">
+          <div className="mt-4 text-xs font-medium text-[#2d219b]">
             {trend}
           </div>
         )}
@@ -480,10 +480,10 @@ const PartnerCard = ({ name, location, type, metrics }: PartnerCardProps) => {
   };
 
   return (
-    <div className="border rounded-lg p-3">
+    <div className="border border-[#e0deff] bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="font-medium">{name}</h3>
+          <h3 className="font-medium text-[#2d219b]">{name}</h3>
           <div className="flex items-center text-xs text-gray-500 mt-1">
             <MapPin className="h-3 w-3 mr-1" />
             <span>{location}</span>
@@ -493,17 +493,17 @@ const PartnerCard = ({ name, location, type, metrics }: PartnerCardProps) => {
             <span className="ml-1">{getTypeLabel(type)}</span>
           </div>
         </div>
-        <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Activo</Badge>
+        <Badge className="bg-[#deffde] text-green-800 hover:bg-[#deffde]">Activo</Badge>
       </div>
       
       <div className="grid grid-cols-2 gap-2 mt-3 text-center">
-        <div className="bg-gray-50 p-2 rounded">
+        <div className="bg-[#f9f8ff] p-2 rounded">
           <p className="text-xs text-gray-500">Documentos</p>
-          <p className="font-semibold">{metrics.docs}</p>
+          <p className="font-semibold text-[#2d219b]">{metrics.docs}</p>
         </div>
-        <div className="bg-gray-50 p-2 rounded">
+        <div className="bg-[#f9f8ff] p-2 rounded">
           <p className="text-xs text-gray-500">Saldo</p>
-          <p className="font-semibold">${metrics.balance.toLocaleString()}</p>
+          <p className="font-semibold text-[#2d219b]">${metrics.balance.toLocaleString()}</p>
         </div>
       </div>
     </div>

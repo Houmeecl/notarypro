@@ -24,8 +24,8 @@ const NavItem = ({ icon, label, href, active }: NavItemProps) => (
   <Link href={href}>
     <div className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
       active 
-        ? "bg-[#f2f1ff] text-[#2d219b]" 
-        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+        ? "bg-white text-[#2d219b] font-semibold" 
+        : "text-white hover:bg-[#3d31a9] hover:text-white"
     }`}>
       <div className="flex-shrink-0">{icon}</div>
       <span className="font-medium">{label}</span>
@@ -58,24 +58,24 @@ export const VecinosAdminLayout = ({
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <div className="hidden md:flex md:flex-shrink-0">
-        <div className="flex flex-col w-64 border-r border-gray-200 bg-white">
-          <div className="h-16 flex items-center px-6 border-b border-gray-200">
+        <div className="flex flex-col w-64 border-r border-gray-200 bg-[#2d219b]">
+          <div className="h-20 flex items-center px-6 border-b border-[#3d31a9]">
             <div className="flex items-center">
               <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                 {/* House/Document base */}
-                <path d="M10 10 L55 10 L55 80 L10 80 Z" fill="none" stroke="#2d219b" strokeWidth="4"/>
+                <path d="M10 10 L55 10 L55 80 L10 80 Z" fill="none" stroke="#ffffff" strokeWidth="4"/>
                 
                 {/* Angled overlay */}
-                <path d="M25 80 L70 80 L70 35 L50 10 L25 10" fill="none" stroke="#2d219b" strokeWidth="4"/>
+                <path d="M25 80 L70 80 L70 35 L50 10 L25 10" fill="none" stroke="#ffffff" strokeWidth="4"/>
                 
                 {/* Upward arrow */}
-                <path d="M35 60 L55 40" stroke="#2d219b" strokeWidth="4"/>
-                <path d="M55 40 L45 40 L55 40 L55 50" stroke="#2d219b" strokeWidth="4"/>
+                <path d="M35 60 L55 40" stroke="#ffffff" strokeWidth="4"/>
+                <path d="M55 40 L45 40 L55 40 L55 50" stroke="#ffffff" strokeWidth="4"/>
                 
                 {/* Star */}
-                <path d="M30 45 L33 39 L27 35 L34 35 L37 28 L40 35 L47 35 L41 39 L44 45 L37 41 Z" fill="#2d219b"/>
+                <path d="M30 45 L33 39 L27 35 L34 35 L37 28 L40 35 L47 35 L41 39 L44 45 L37 41 Z" fill="#ffffff"/>
               </svg>
-              <span className="ml-2 text-xl font-bold text-[#2d219b]">
+              <span className="ml-2 text-xl font-bold text-white">
                 VecinoXpress
               </span>
             </div>
@@ -85,55 +85,55 @@ export const VecinosAdminLayout = ({
             <div className="flex-grow flex flex-col">
               <nav className="flex-1 px-3 space-y-1">
                 <NavItem 
-                  icon={<Home size={20} />} 
+                  icon={<Home size={20} className="text-white" />} 
                   label="Dashboard" 
                   href="/vecinos/admin"
                   active={location === "/vecinos/admin"}
                 />
                 <NavItem 
-                  icon={<Store size={20} />} 
+                  icon={<Store size={20} className="text-white" />} 
                   label="Socios" 
                   href="/vecinos/admin/partners"
                   active={location === "/vecinos/admin/partners"}
                 />
                 <NavItem 
-                  icon={<Users size={20} />} 
+                  icon={<Users size={20} className="text-white" />} 
                   label="Supervisores" 
                   href="/vecinos/admin/supervisors"
                   active={location === "/vecinos/admin/supervisors"}
                 />
                 <NavItem 
-                  icon={<Users size={20} />} 
+                  icon={<Users size={20} className="text-white" />} 
                   label="Vendedores" 
                   href="/vecinos/admin/sellers"
                   active={location === "/vecinos/admin/sellers"}
                 />
                 <NavItem 
-                  icon={<FileText size={20} />} 
+                  icon={<FileText size={20} className="text-white" />} 
                   label="Documentos" 
                   href="/vecinos/admin/documents"
                   active={location === "/vecinos/admin/documents"}
                 />
                 <NavItem 
-                  icon={<CreditCard size={20} />} 
+                  icon={<CreditCard size={20} className="text-white" />} 
                   label="Transacciones" 
                   href="/vecinos/admin/transactions"
                   active={location === "/vecinos/admin/transactions"}
                 />
                 <NavItem 
-                  icon={<BarChart3 size={20} />} 
+                  icon={<BarChart3 size={20} className="text-white" />} 
                   label="Reportes" 
                   href="/vecinos/admin/reports"
                   active={location === "/vecinos/admin/reports"}
                 />
                 <NavItem 
-                  icon={<Settings size={20} />} 
+                  icon={<Settings size={20} className="text-white" />} 
                   label="Configuración" 
                   href="/vecinos/admin/settings"
                   active={location === "/vecinos/admin/settings"}
                 />
                 <NavItem 
-                  icon={<Users size={20} />} 
+                  icon={<Users size={20} className="text-white" />} 
                   label="Gestión de Usuarios" 
                   href="/vecinos/admin/users"
                   active={location === "/vecinos/admin/users"}
@@ -143,15 +143,15 @@ export const VecinosAdminLayout = ({
             
             <div className="px-3 mt-6">
               <NavItem 
-                icon={<HelpCircle size={20} />} 
+                icon={<HelpCircle size={20} className="text-white" />} 
                 label="Ayuda" 
                 href="/vecinos/admin/help"
               />
               <button
                 onClick={handleLogout}
-                className="w-full mt-2 flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                className="w-full mt-2 flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-white hover:bg-[#3d31a9]"
               >
-                <LogOut size={20} />
+                <LogOut size={20} className="text-white" />
                 <span className="font-medium">Cerrar sesión</span>
               </button>
             </div>
@@ -163,8 +163,8 @@ export const VecinosAdminLayout = ({
       <div className="flex flex-col flex-1 overflow-hidden">
         <header className="bg-white shadow-sm z-10">
           <div className="px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
+            <div className="flex items-center justify-between h-20">
+              <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
               
               <div className="flex items-center space-x-4">
                 {/* Search (optional) */}
@@ -172,7 +172,7 @@ export const VecinosAdminLayout = ({
                   <input
                     type="text"
                     placeholder="Buscar..."
-                    className="w-full py-2 pl-10 pr-3 text-sm leading-tight text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d219b]"
+                    className="w-64 py-2 pl-10 pr-3 text-sm leading-tight text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d219b]"
                   />
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <svg
@@ -195,8 +195,8 @@ export const VecinosAdminLayout = ({
                 {/* User dropdown */}
                 <div className="relative">
                   <button className="flex items-center space-x-2 focus:outline-none">
-                    <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-xs font-medium text-gray-600">
+                    <div className="h-10 w-10 rounded-full bg-[#2d219b] bg-opacity-10 flex items-center justify-center">
+                      <span className="text-sm font-medium text-[#2d219b]">
                         {mockUser.username.charAt(0).toUpperCase()}
                       </span>
                     </div>
@@ -211,7 +211,7 @@ export const VecinosAdminLayout = ({
           </div>
         </header>
         
-        <main className="flex-1 overflow-auto bg-gray-50 p-6">
+        <main className="flex-1 overflow-auto bg-gray-50 p-8">
           {children}
         </main>
       </div>
