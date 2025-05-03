@@ -212,7 +212,7 @@ async function checkPOSReaderAvailability(): Promise<boolean> {
 export async function readCedulaChilena(
   statusCallback: (status: NFCReadStatus, message?: string) => void,
   readerType?: NFCReaderType
-): Promise<CedulaChilenaData | null> {
+): Promise<CedulaChilenaData> {
   statusCallback(NFCReadStatus.WAITING, 'Esperando tarjeta NFC...');
 
   // Si no se especifica un tipo de lector, detectamos automáticamente
@@ -227,7 +227,7 @@ export async function readCedulaChilena(
   }
 
   try {
-    let cedulaData: CedulaChilenaData | null = null;
+    let cedulaData: CedulaChilenaData;
 
     switch (readerType) {
       case NFCReaderType.WEB_NFC:

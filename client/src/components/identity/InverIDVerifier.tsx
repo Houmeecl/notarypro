@@ -256,13 +256,15 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
         
         // Datos de ejemplo para simulación (demostración)
         resolve({
-          numeroDocumento: "12345678",
+          rut: "12.345.678-9",
           nombres: "CARLOS ANDRÉS",
           apellidos: "GÓMEZ SOTO",
           nacionalidad: "CHILENA",
           fechaNacimiento: "15/05/1990",
           fechaEmision: "22/10/2019",
-          fechaExpiracion: "22/10/2029"
+          fechaExpiracion: "22/10/2029",
+          sexo: "M",
+          numeroDocumento: "12345678"
         });
       }, 7500);
     });
@@ -527,14 +529,14 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
   };
   
   // Función para verificar imagen facial contra los datos de la cédula
-  const verifyFacialImage = async (facialImage: string, cedulaData: CedulaChilenaData | null): Promise<{success: boolean, message?: string}> => {
+  const verifyFacialImage = async (facialImage: string, cedulaData: CedulaChilenaData): Promise<{success: boolean, message?: string}> => {
     try {
       const imageData = facialImage.split(',')[1]; // Obtener datos base64 sin el prefijo
       
       // Hacer la solicitud a la API de verificación facial
       const response = await apiRequest('POST', '/api/identity/verify-facial', {
         faceImage: imageData,
-        documentId: cedulaData?.numeroDocumento || 'unknown',
+        documentId: cedulaData.numeroDocumento || 'unknown',
         sessionId: sessionId
       });
       
@@ -951,7 +953,7 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
               </div>
               
               <div className="text-gray-600">RUN:</div>
-              <div className="font-medium">{cedulaData.run}</div>
+              <div className="font-medium">{cedulaData.rut}</div>
               
               <div className="text-gray-600">Nacionalidad:</div>
               <div className="font-medium">{cedulaData.nacionalidad}</div>
