@@ -93,6 +93,18 @@ const TabletPOSPayment: React.FC = () => {
         }
       }
       
+      // Recuperar los items del carrito si está vacío
+      if (cartItems.length === 0) {
+        try {
+          const savedCart = localStorage.getItem(`tx_cart_${reference}`);
+          if (savedCart) {
+            setCartItems(JSON.parse(savedCart));
+          }
+        } catch (e) {
+          console.error('Error recuperando items del carrito:', e);
+        }
+      }
+      
       // Procesar según el estado
       if (status === 'success' || status === 'approved') {
         setIsCompleted(true);
@@ -101,13 +113,19 @@ const TabletPOSPayment: React.FC = () => {
           description: `Transacción ${reference} procesada exitosamente`,
         });
       } else if (status === 'pending') {
+        setActiveTab('payment');
+        setErrorMessage(
+          'Tu pago está en proceso de verificación. Una vez confirmado, ' +
+          'actualizaremos el estado de tu transacción. No es necesario realizar el pago nuevamente.'
+        );
         toast({
           title: 'Pago pendiente',
           description: 'El pago está en proceso de verificación',
           variant: 'default',
         });
       } else {
-        setErrorMessage('El pago no pudo ser procesado. Por favor intente nuevamente.');
+        setActiveTab('payment');
+        setErrorMessage('El pago no pudo ser procesado. Por favor intente nuevamente o elija otro método de pago.');
         toast({
           title: 'Pago fallido',
           description: 'No se pudo completar la transacción',
@@ -635,6 +653,29 @@ const TabletPOSPayment: React.FC = () => {
                           </div>
                         </div>
                       </div>
+                      
+                      {paymentMethod === 'mercadopago' && (
+                        <div className="mt-4 p-4 border rounded-lg bg-blue-50 border-blue-200">
+                          <div className="flex items-center mb-3">
+                            <CreditCard className="w-5 h-5 mr-2 text-blue-500" />
+                            <h4 className="font-medium text-blue-700">Pago con MercadoPago</h4>
+                          </div>
+                          <div className="space-y-2 mb-4">
+                            <p className="text-sm text-blue-600">
+                              Al continuar serás redirigido a la plataforma segura de MercadoPago donde podrás:
+                            </p>
+                            <ul className="text-sm text-blue-600 list-disc pl-5 space-y-1">
+                              <li>Pagar con tarjeta de crédito o débito</li>
+                              <li>Transferencia bancaria</li>
+                              <li>Pagar con QR desde tu aplicación móvil</li>
+                              <li>Usar el saldo de tu cuenta MercadoPago</li>
+                            </ul>
+                          </div>
+                          <p className="text-xs text-blue-500">
+                            Serás retornado automáticamente a esta pantalla cuando completes el pago
+                          </p>
+                        </div>
+                      )}
                       
                       {paymentMethod === 'paypal' && (
                         <div className="mt-4 p-4 border rounded-lg bg-gray-50">
