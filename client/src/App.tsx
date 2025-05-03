@@ -67,6 +67,7 @@ import VerificacionIdentidadQR from "@/pages/verificacion-identidad-qr";
 import VerificacionIdentidadNFC from "@/pages/verificacion-identidad-nfc";
 import VerificacionIntegradaPage from "@/pages/verificacion-integrada";
 import VerificacionMovil from "@/pages/verificacion-movil";
+import VerificacionNFCMovil from "@/pages/verificacion-nfc-movil";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -498,6 +499,7 @@ function Router() {
       <Route path="/verificacion-identidad-nfc" component={VerificacionIdentidadNFC} />
       <Route path="/verificacion-integrada" component={VerificacionIntegradaPage} />
       <Route path="/verificacion-movil" component={VerificacionMovil} />
+      <Route path="/verificacion-nfc-movil" component={VerificacionNFCMovil} />
       <Route path="/verificacion-identidad-movil" component={() => (
         <Suspense fallback={<LazyLoadingFallback />}>
           <LazyVerificacionMovil />

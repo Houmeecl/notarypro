@@ -60,7 +60,7 @@ const VerificacionIdentidadQR: React.FC = () => {
 
   // Iniciar verificación en el celular
   const iniciarVerificacionMovil = () => {
-    setLocation('/verificacion-movil');
+    setLocation('/verificacion-nfc-movil');
   };
 
   // Generar QR para POS
