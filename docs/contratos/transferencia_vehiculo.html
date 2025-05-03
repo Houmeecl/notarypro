@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrato de Transferencia de Vehículo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 40px;
+            color: #333;
+        }
+        h1 {
+            color: #2d219b;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #2d219b;
+            padding-bottom: 10px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 200px;
+        }
+        .contract-info {
+            margin-bottom: 40px;
+        }
+        .signature-area {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature {
+            width: 45%;
+            border-top: 1px solid #999;
+            padding-top: 10px;
+            text-align: center;
+        }
+        .field-value {
+            font-weight: bold;
+            color: #2d219b;
+        }
+        .date {
+            text-align: right;
+            margin: 30px 0;
+        }
+        .footer {
+            margin-top: 50px;
+            font-size: 0.8em;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        <h2>VecinoXpress</h2>
+    </div>
+    
+    <h1>Contrato de Transferencia de Propiedad de Vehículo</h1>
+
+    <div class="date">
+        Santiago, <span class="field-value">{{fecha}}</span>
+    </div>
+    
+    <div class="contract-info">
+        <p>En Santiago de Chile, a <span class="field-value">{{fecha}}</span>, entre <span class="field-value">{{nombreVendedor}}</span>, RUT <span class="field-value">{{rutVendedor}}</span>, domiciliado en <span class="field-value">{{domicilioVendedor}}</span>, en adelante "EL VENDEDOR", y <span class="field-value">{{nombreComprador}}</span>, RUT <span class="field-value">{{rutComprador}}</span>, domiciliado en <span class="field-value">{{domicilioComprador}}</span>, en adelante "EL COMPRADOR", se ha convenido el siguiente contrato de compraventa:</p>
+        
+        <h3>PRIMERO: OBJETO DEL CONTRATO</h3>
+        <p>Por el presente instrumento, EL VENDEDOR vende, cede y transfiere a EL COMPRADOR, quien compra, acepta y adquiere para sí, el vehículo que se individualiza a continuación:</p>
+        
+        <h3>VEHÍCULO</h3>
+        <p>Tipo: <span class="field-value">{{tipoVehiculo}}</span></p>
+        <p>Marca: <span class="field-value">{{marcaVehiculo}}</span></p>
+        <p>Modelo: <span class="field-value">{{modeloVehiculo}}</span></p>
+        <p>Año: <span class="field-value">{{anioVehiculo}}</span></p>
+        <p>Color: <span class="field-value">{{colorVehiculo}}</span></p>
+        <p>Patente: <span class="field-value">{{patenteVehiculo}}</span></p>
+        <p>Nº de Motor: <span class="field-value">{{numeroMotor}}</span></p>
+        <p>Nº de Chasis: <span class="field-value">{{numeroChasis}}</span></p>
+        <p>Nº de Inscripción: <span class="field-value">{{numeroInscripcion}}</span></p>
+        
+        <h3>SEGUNDO: PRECIO Y FORMA DE PAGO</h3>
+        <p>El precio de la compraventa es la suma de <span class="field-value">{{precioVenta}}</span> pesos, que EL COMPRADOR paga al VENDEDOR en este acto de la siguiente forma:</p>
+        <p><span class="field-value">{{formaPago}}</span></p>
+        <p>EL VENDEDOR declara haber recibido el precio a su entera satisfacción.</p>
+        
+        <h3>TERCERO: DECLARACIONES DEL VENDEDOR</h3>
+        <p>EL VENDEDOR declara:</p>
+        <ol>
+            <li>Que es dueño exclusivo del vehículo y que lo adquirió por compra según consta en inscripción Nº <span class="field-value">{{numeroInscripcion}}</span> del Registro de Vehículos Motorizados.</li>
+            <li>Que el vehículo no tiene deudas de ninguna especie, incluyendo pero no limitado a: permisos de circulación, multas, impuestos, gravámenes, prohibiciones o encargos por robo.</li>
+            <li>Que entrega al comprador toda la documentación del vehículo.</li>
+        </ol>
+        
+        <h3>CUARTO: ENTREGA MATERIAL</h3>
+        <p>La entrega material del vehículo se efectúa en este acto, declarando EL COMPRADOR recibirlo a su entera conformidad, en el estado en que se encuentra, que declara conocer y aceptar.</p>
+        
+        <h3>QUINTO: TRÁMITES DE TRANSFERENCIA</h3>
+        <p>Las partes se comprometen a concurrir al Registro Civil y de Identificación para efectuar la inscripción de la transferencia dentro del plazo legal de 30 días.</p>
+    </div>
+    
+    <div class="signature-area">
+        <div class="signature">
+            <p>Firma del Vendedor</p>
+            <p><span class="field-value">{{nombreVendedor}}</span></p>
+            <p>RUT: <span class="field-value">{{rutVendedor}}</span></p>
+        </div>
+        
+        <div class="signature">
+            <p>Firma del Comprador</p>
+            <p><span class="field-value">{{nombreComprador}}</span></p>
+            <p>RUT: <span class="field-value">{{rutComprador}}</span></p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Documento generado por VecinoXpress - Plataforma de Servicios Notariales</p>
+        <p>Este documento tiene validez legal según la Ley 19.799 sobre Documentos Electrónicos</p>
+        <p>Código de Verificación: <span class="field-value">{{codigoVerificacion}}</span></p>
+    </div>
+</body>
+</html>

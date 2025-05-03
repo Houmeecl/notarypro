@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrato de Liberación de Prenda de Vehículo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 40px;
+            color: #333;
+        }
+        h1 {
+            color: #2d219b;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #2d219b;
+            padding-bottom: 10px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 200px;
+        }
+        .contract-info {
+            margin-bottom: 40px;
+        }
+        .signature-area {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature {
+            width: 45%;
+            border-top: 1px solid #999;
+            padding-top: 10px;
+            text-align: center;
+        }
+        .field-value {
+            font-weight: bold;
+            color: #2d219b;
+        }
+        .date {
+            text-align: right;
+            margin: 30px 0;
+        }
+        .footer {
+            margin-top: 50px;
+            font-size: 0.8em;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        <h2>VecinoXpress</h2>
+    </div>
+    
+    <h1>Contrato de Liberación de Prenda de Vehículo</h1>
+
+    <div class="date">
+        Santiago, <span class="field-value">{{fecha}}</span>
+    </div>
+    
+    <div class="contract-info">
+        <p>Por medio del presente instrumento, <span class="field-value">{{nombreEntidadAcreedora}}</span>, RUT <span class="field-value">{{rutEntidadAcreedora}}</span>, representada por <span class="field-value">{{representanteLegal}}</span>, RUT <span class="field-value">{{rutRepresentante}}</span>, en adelante "EL ACREEDOR", declara que libera la prenda que existía sobre el vehículo que a continuación se individualiza, propiedad de <span class="field-value">{{nombreDeudor}}</span>, RUT <span class="field-value">{{rutDeudor}}</span>, en adelante "EL DEUDOR".</p>
+        
+        <h3>VEHÍCULO</h3>
+        <p>Marca: <span class="field-value">{{marcaVehiculo}}</span></p>
+        <p>Modelo: <span class="field-value">{{modeloVehiculo}}</span></p>
+        <p>Año: <span class="field-value">{{anioVehiculo}}</span></p>
+        <p>Patente: <span class="field-value">{{patenteVehiculo}}</span></p>
+        <p>Nº de Motor: <span class="field-value">{{numeroMotor}}</span></p>
+        <p>Nº de Chasis: <span class="field-value">{{numeroChasis}}</span></p>
+        
+        <h3>ANTECEDENTES DE LA PRENDA</h3>
+        <p>Fecha del contrato: <span class="field-value">{{fechaContratoPrenda}}</span></p>
+        <p>Notaría: <span class="field-value">{{notaria}}</span></p>
+        <p>Deuda original: <span class="field-value">{{deudaOriginal}}</span> CLP</p>
+        
+        <p>El ACREEDOR declara que el DEUDOR ha cumplido con todas sus obligaciones de pago conforme al contrato antes individualizado, y que no existen deudas pendientes. En consecuencia, por este acto, libera la prenda que mantenía sobre el vehículo, permitiendo al DEUDOR disponer libremente del mismo.</p>
+        
+        <p>El ACREEDOR se compromete a realizar todos los trámites y gestiones necesarias ante el Registro Civil y de Identificación para alzar la prohibición de enajenar y actualizar el Registro de Vehículos Motorizados.</p>
+    </div>
+    
+    <div class="signature-area">
+        <div class="signature">
+            <p>Firma del Deudor</p>
+            <p><span class="field-value">{{nombreDeudor}}</span></p>
+            <p>RUT: <span class="field-value">{{rutDeudor}}</span></p>
+        </div>
+        
+        <div class="signature">
+            <p>Firma del Acreedor</p>
+            <p><span class="field-value">{{nombreEntidadAcreedora}}</span></p>
+            <p>RUT: <span class="field-value">{{rutEntidadAcreedora}}</span></p>
+            <p>Representante: <span class="field-value">{{representanteLegal}}</span></p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Documento generado por VecinoXpress - Plataforma de Servicios Notariales</p>
+        <p>Este documento tiene validez legal según la Ley 19.799 sobre Documentos Electrónicos</p>
+        <p>Código de Verificación: <span class="field-value">{{codigoVerificacion}}</span></p>
+    </div>
+</body>
+</html>

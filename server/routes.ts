@@ -10,6 +10,7 @@ import { db } from "./db";
 import { users, partners } from "@shared/schema";
 import { documentForensicsRouter } from "./document-forensics-routes";
 import { identityVerificationRouter } from "./identity-verification-routes";
+import { contractRouter } from "./contract-routes";
 import { eq } from "drizzle-orm";
 
 export function registerRoutes(app: Express): Server {
@@ -24,6 +25,12 @@ export function registerRoutes(app: Express): Server {
 
   // Rutas para verificación de identidad
   app.use("/api/identity", identityVerificationRouter);
+  
+  // Rutas para gestión de contratos
+  app.use("/api/contracts", contractRouter);
+  
+  // Ruta para servir archivos estáticos (como los contratos)
+  app.use("/docs", express.static(path.join(process.cwd(), "docs")));
 
   // Inicializar admins de prueba si no existen
   initializeTestAdmins().catch(error => {
