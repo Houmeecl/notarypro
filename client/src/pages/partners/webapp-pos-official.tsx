@@ -125,6 +125,61 @@ const WebAppPOSOfficial = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [_, setLocation] = useLocation();
 
+  // Verificar parámetros de URL al cargar (para el retorno de MercadoPago)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
+    const reference = params.get('reference');
+    
+    if (status && reference) {
+      // Recuperar información del cliente del localStorage
+      try {
+        const customerData = localStorage.getItem(`tx_customer_${reference}`);
+        if (customerData) {
+          const customerInfo = JSON.parse(customerData);
+          console.log('Cliente recuperado:', customerInfo);
+          
+          // Recuperar datos de verificación si existen
+          const verificationData = localStorage.getItem(`tx_verification_${reference}`);
+          if (verificationData) {
+            const verificationInfo = JSON.parse(verificationData);
+            setVerificationPoints(verificationInfo.verificationPoints || 0);
+          }
+          
+          // Determinar qué hacer según el estado
+          if (status === 'success') {
+            toast({
+              title: "Pago exitoso",
+              description: "Su pago ha sido procesado correctamente.",
+              variant: "default",
+            });
+            setIsSignatureSheetOpen(true);
+          } else if (status === 'pending') {
+            toast({
+              title: "Pago pendiente",
+              description: "Su pago está siendo procesado. Le notificaremos cuando sea completado.",
+              variant: "default",
+            });
+            setStep('payment');
+          } else if (status === 'failure') {
+            toast({
+              title: "Error en el pago",
+              description: "Su pago no pudo ser procesado. Por favor intente nuevamente.",
+              variant: "destructive",
+            });
+            setStep('payment');
+          }
+          
+          // Limpiar los datos almacenados
+          localStorage.removeItem(`tx_customer_${reference}`);
+          localStorage.removeItem(`tx_verification_${reference}`);
+        }
+      } catch (error) {
+        console.error('Error procesando respuesta de pago:', error);
+      }
+    }
+  }, [toast, setLocation]);
+  
   // Cargar información del partner al inicio
   useEffect(() => {
     const loadPartnerInfo = async () => {
@@ -341,9 +396,9 @@ const WebAppPOSOfficial = () => {
       try {
         // Guardar información que necesitaremos recuperar después de la redirección
         localStorage.setItem(`tx_customer_${externalReference}`, JSON.stringify({
-          name: customerName,
-          email: customerEmail,
-          document: customerDocument
+          name: userIdentityData ? `${userIdentityData.nombres} ${userIdentityData.apellidos}` : 'Cliente',
+          email: 'cliente@vecinos.cl',
+          document: userIdentityData ? userIdentityData.rut : '12345678-9'
         }));
         
         // También podemos guardar el estado de verificación y otros datos relevantes
@@ -373,11 +428,11 @@ const WebAppPOSOfficial = () => {
           externalReference,
           identification: {
             type: 'RUT',
-            number: customerDocument
+            number: userIdentityData ? userIdentityData.rut : '12345678-9'
           },
           customer: {
-            name: customerName,
-            email: customerEmail
+            name: userIdentityData ? `${userIdentityData.nombres} ${userIdentityData.apellidos}` : 'Cliente',
+            email: 'cliente@vecinos.cl'
           }
         })
       });
