@@ -1246,26 +1246,25 @@ const WebAppPOSButtons = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="p-2 relative overflow-hidden">
-                {/* Logo estilo NotaryPro */}
+                {/* Logo estilo NotaryPro como en la web principal */}
                 <div className="flex items-center">
-                  <div className="bg-zinc-100 p-2 rounded-md shadow-md border border-zinc-300 mr-1 flex items-center">
-                    {/* Logo NotaryPro oficial en rojo */}
-                    <svg width="30" height="30" viewBox="0 0 100 100" className="mr-2">
+                  <div className="bg-zinc-800 p-2 rounded-md shadow-md border border-zinc-700 flex items-center">
+                    {/* Logo NotaryPro rojo */}
+                    <svg width="32" height="32" viewBox="0 0 100 100" className="mr-2">
                       <path d="M30,10 L30,65 L10,50 L10,10 L30,10 Z M70,10 L70,50 L50,65 L50,10 L70,10 Z" 
                             fill="#E11D48" strokeWidth="2" stroke="#E11D48" />
                     </svg>
-                    <h1 className="text-xl font-black text-zinc-900 tracking-tight">
-                      NOTARY<span className="text-blue-600">PRO</span>
-                    </h1>
-                  </div>
-                  <div className="h-8 w-0.5 bg-zinc-600 mx-2"></div>
-                  <div className="bg-zinc-700 p-2 rounded-md shadow-md border border-zinc-600 flex items-center">
-                    {/* Texto estilo Vecinos Express como en la web principal */}
-                    <div className="flex items-center">
-                      <h2 className="text-lg font-bold tracking-tight">
-                        <span className="text-white">VECINOS</span> <span className="text-blue-400">EXPRESS</span>
-                      </h2>
+                    <div>
+                      <h1 className="text-xl font-black text-white tracking-tight">
+                        NotaryPro
+                      </h1>
                     </div>
+                  </div>
+                  <div className="ml-3">
+                    <h2 className="text-lg font-bold text-white tracking-tight">
+                      Vecinos NotaryPro Express
+                    </h2>
+                    <p className="text-xs text-zinc-400">Transformando negocios locales</p>
                   </div>
                 </div>
                 <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-400 mt-2"></div>
