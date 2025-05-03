@@ -216,45 +216,58 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
   
 
   
-  // Simular lectura NFC para modo demostración
+  // Simular lectura NFC para modo demostración con interface Web NFC
   const simulateNFCReading = async (): Promise<CedulaChilenaData> => {
     return new Promise((resolve) => {
-      // Simulación de los pasos de lectura NFC
+      // Simulación de los pasos de lectura NFC con interfaz Web NFC
       setNfcStatus(NFCReadStatus.WAITING);
-      setNfcMessage("Acercando cédula de identidad...");
+      setNfcMessage("Acercando cédula de identidad al lector NFC...");
       setNfcProgress(15);
+
+      // Mostrar diálogo de demostración Web NFC
+      const showWebNFCDialog = () => {
+        // Simulamos el diálogo de permisos del navegador para Web NFC
+        console.log("Simulando diálogo de permisos de Web NFC");
+      };
+
+      // Simular el proceso de escaneo en etapas
+      setTimeout(() => {
+        showWebNFCDialog();
+        setNfcMessage("Esperando acercar la cédula al dispositivo...");
+      }, 1000);
 
       setTimeout(() => {
         setNfcStatus(NFCReadStatus.READING);
         setNfcMessage("Leyendo datos personales...");
         setNfcProgress(40);
-      }, 1500);
-
-      setTimeout(() => {
-        setNfcStatus(NFCReadStatus.READING);
-        setNfcMessage("Verificando firma digital...");
-        setNfcProgress(65);
       }, 3000);
 
       setTimeout(() => {
         setNfcStatus(NFCReadStatus.READING);
-        setNfcMessage("Procesando datos biométricos...");
-        setNfcProgress(80);
-      }, 4500);
+        setNfcMessage("Verificando firma digital de la cédula...");
+        setNfcProgress(65);
+      }, 5000);
 
       setTimeout(() => {
         setNfcStatus(NFCReadStatus.READING);
-        setNfcMessage("Validando información con base de datos...");
-        setNfcProgress(90);
-      }, 6000);
+        setNfcMessage("Procesando datos biométricos del chip...");
+        setNfcProgress(80);
+      }, 7000);
 
-      // Finalizar simulación con datos de demostración
+      setTimeout(() => {
+        setNfcStatus(NFCReadStatus.READING);
+        setNfcMessage("Validando información con base de datos oficial...");
+        setNfcProgress(90);
+      }, 8500);
+
+      // Finalizar simulación con datos detallados para demostración
       setTimeout(() => {
         setNfcStatus(NFCReadStatus.SUCCESS);
         setNfcMessage("Lectura completada con éxito");
         setNfcProgress(100);
         
-        // Datos de ejemplo para simulación (demostración)
+        // Datos de ejemplo mejorados para la demostración
+        // Usamos el formato oficial de cédula chilena
         resolve({
           rut: "12.345.678-9",
           nombres: "CARLOS ANDRÉS",
@@ -264,9 +277,10 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
           fechaEmision: "22/10/2019",
           fechaExpiracion: "22/10/2029",
           sexo: "M",
-          numeroDocumento: "12345678"
+          numeroDocumento: "12345678",
+          numeroSerie: "ACF23580917" // Añadimos un número de serie simulado
         });
-      }, 7500);
+      }, 10000);
     });
   };
 
@@ -468,7 +482,7 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
             setBiometricProgress(60);
             
             // Realizar verificación real con API de reconocimiento facial
-            const verificationResult = await verifyFacialImage(faceImageSrc, cedulaData);
+            const verificationResult = await verifyFacialImage(faceImageSrc, cedulaData as CedulaChilenaData);
             verificationSuccess = verificationResult.success;
             
             if (!verificationSuccess) {

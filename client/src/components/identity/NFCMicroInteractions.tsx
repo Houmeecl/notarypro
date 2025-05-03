@@ -10,6 +10,12 @@ interface NFCMicroInteractionsProps {
 /**
  * Componente para microinteracciones durante la lectura NFC
  * Muestra diferentes animaciones según el estado: idle, scanning, success, error
+ * 
+ * Este componente utiliza framer-motion para crear animaciones fluidas
+ * que mejoran la experiencia del usuario durante el proceso de verificación NFC.
+ * 
+ * Compatible con API Web NFC según la especificación de Mozilla:
+ * https://developer.mozilla.org/es/docs/Web/API/Web_NFC_API
  */
 const NFCMicroInteractions: React.FC<NFCMicroInteractionsProps> = ({ 
   status, 
