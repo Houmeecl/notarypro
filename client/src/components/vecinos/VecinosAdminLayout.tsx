@@ -120,23 +120,51 @@ export const VecinosAdminLayout = ({
                   href="/vecinos/admin/transactions"
                   active={location === "/vecinos/admin/transactions"}
                 />
+                
+                {/* Nuevas secciones financieras */}
+                <div className="pt-4 pb-2">
+                  <h2 className="px-3 text-xs font-semibold text-gray-200 uppercase">
+                    Gerencia Financiera
+                  </h2>
+                </div>
+                
+                <NavItem 
+                  icon={<BarChart3 size={20} className="text-white" />} 
+                  label="Finanzas" 
+                  href="/vecinos/admin/finance"
+                  active={location === "/vecinos/admin/finance"}
+                />
+                <NavItem 
+                  icon={<CreditCard size={20} className="text-white" />} 
+                  label="Contabilidad" 
+                  href="/vecinos/admin/accounting"
+                  active={location === "/vecinos/admin/accounting"}
+                />
                 <NavItem 
                   icon={<BarChart3 size={20} className="text-white" />} 
                   label="Reportes" 
                   href="/vecinos/admin/reports"
                   active={location === "/vecinos/admin/reports"}
                 />
-                <NavItem 
-                  icon={<Settings size={20} className="text-white" />} 
-                  label="Configuración" 
-                  href="/vecinos/admin/settings"
-                  active={location === "/vecinos/admin/settings"}
-                />
+                
+                {/* Administración */}
+                <div className="pt-4 pb-2">
+                  <h2 className="px-3 text-xs font-semibold text-gray-200 uppercase">
+                    Administración
+                  </h2>
+                </div>
+                
                 <NavItem 
                   icon={<Users size={20} className="text-white" />} 
                   label="Gestión de Usuarios" 
                   href="/vecinos/admin/users"
                   active={location === "/vecinos/admin/users"}
+                />
+                <NavItem 
+                  icon={<Settings size={20} className="text-white" />} 
+                  label="Configuración" 
+                  href="/vecinos/admin/settings"
+                  active={location === "/vecinos/admin/settings"}
                 />
               </nav>
             </div>
