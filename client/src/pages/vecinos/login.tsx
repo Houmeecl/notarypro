@@ -60,8 +60,8 @@ export default function VecinosLogin() {
         description: "Bienvenido a VecinoXpress",
       });
       
-      // Redirigir directamente a la página de documentos para generar QR
-      setLocation("/documents");
+      // Redirigir directamente a la página de selección de documentos para generar QR
+      setLocation("/document-selection");
     },
     onError: (error: Error) => {
       toast({
