@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ShieldCheck, AlertTriangle, CheckCircle, Smartphone, RotateCcw } from 'lucide-react';
+import { useMicroInteractions } from '@/hooks/use-micro-interactions';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -33,20 +36,34 @@ const NFCReader: React.FC<NFCReaderProps> = ({
   onError,
   demoMode = false
 }) => {
+  const [message, setMessage] = useState('Listo para escanear NFC');
+  const [hasNFC, setHasNFC] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanProgress, setScanProgress] = useState(0);
+  const [scanResult, setScanResult] = useState<'success' | 'error' | null>(null);
+  const [documentData, setDocumentData] = useState<any>(null);
+  const progressInterval = useRef<NodeJS.Timeout | null>(null);
+  const { triggerInteraction } = useMicroInteractions();
   const [status, setStatus] = useState<NFCStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const [nfcAvailable, setNfcAvailable] = useState<boolean | null>(null);
   const [nfcResult, setNfcResult] = useState<any>(null);
-  
+
   const { toast } = useToast();
 
-  // Verificar disponibilidad de NFC al montar el componente
   useEffect(() => {
+    // Check if browser supports NFC
     checkNfcAvailability();
+
+    return () => {
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current);
+      }
+    };
   }, []);
 
-  // Comprobar si NFC está disponible en el dispositivo
+
   const checkNfcAvailability = () => {
     // Primero verificar la Web NFC API estándar
     if ('NDEFReader' in window) {
@@ -72,7 +89,7 @@ const NFCReader: React.FC<NFCReaderProps> = ({
     else {
       setNfcAvailable(false);
       console.log('NFC API no está disponible en este dispositivo/navegador');
-      
+
       // En modo demo no mostrar error
       if (!demoMode) {
         setError('Este dispositivo o navegador no tiene NFC disponible. Intente usar un dispositivo Android compatible con NFC.');
@@ -80,580 +97,265 @@ const NFCReader: React.FC<NFCReaderProps> = ({
     }
   };
 
-  // Iniciar escaneo NFC real
-  const startNfcScan = async () => {
+  const simulateProgress = () => {
+    // Reset progress
+    setScanProgress(0);
+
+    // Start progress animation
+    progressInterval.current = setInterval(() => {
+      setScanProgress(prev => {
+        const newProgress = prev + Math.random() * 2;
+
+        // Slow down as we approach 90%
+        if (newProgress >= 90) {
+          clearInterval(progressInterval.current!);
+          return 90; // Hold at 90% until actual completion
+        }
+        return newProgress;
+      });
+    }, 100);
+  };
+
+  const startScan = async () => {
     if (!nfcAvailable) {
-      setError('NFC no está disponible en este dispositivo');
+      setMessage('NFC no soportado en este dispositivo/navegador');
       return;
     }
 
-    try {
-      setStatus('waiting');
-      setError(null);
-      setProgress(0);
-      
-      // Incrementar progreso simulado
-      const progressInterval = setInterval(() => {
-        setProgress(prev => {
-          const newProgress = prev + 5;
-          if (newProgress >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return newProgress;
-        });
-      }, 200);
+    // Reset states
+    setIsScanning(true);
+    setScanResult(null);
+    setDocumentData(null);
+    setMessage('Escaneando... acerca tu cédula o documento');
 
-      if (demoMode) {
-        // En modo demo, simular lectura NFC
-        simulateNfcRead(progressInterval);
-      } else {
-        // En modo real, usar Web NFC API
-        await realNfcScan(progressInterval);
-      }
-    } catch (err) {
-      handleNfcError(err);
-    }
-  };
+    // Start progress simulation
+    simulateProgress();
 
-  // Simulación de lectura NFC para demostración
-  const simulateNfcRead = (progressInterval: NodeJS.Timeout) => {
-    console.log('Simulando lectura NFC en modo demo');
-    setStatus('reading');
-    
-    // Simular tiempo de lectura
-    setTimeout(() => {
-      clearInterval(progressInterval);
-      
-      // Datos de cédula chilena simulados
-      const mockCedulaData: CedulaChilenaData = {
-        run: '12.345.678-9',
-        nombre: 'JUAN PEDRO',
-        apellidos: 'GONZÁLEZ SOTO',
-        fechaNacimiento: '15/04/1985',
-        sexo: 'M',
-        nacionalidad: 'CHILENA',
-        fechaEmision: '20/06/2018',
-        fechaExpiracion: '20/06/2028',
-        numeroDocumento: 'A123456789',
-        numeroSerie: 'ID9876543210'
-      };
-      
-      setNfcResult(mockCedulaData);
-      setProgress(100);
-      setStatus('success');
-      
-      if (onSuccess) {
-        onSuccess({
-          source: 'nfc',
-          data: mockCedulaData,
-          timestamp: new Date().toISOString()
-        });
-      }
-      
-      toast({
-        title: 'Lectura NFC exitosa',
-        description: 'Documento leído correctamente',
-        variant: 'default'
-      });
-    }, 3000);
-  };
-
-  // Implementación real de escaneo NFC con soporte para múltiples APIs de NFC
-  const realNfcScan = async (progressInterval: NodeJS.Timeout) => {
     try {
-      console.log('Iniciando escaneo NFC real');
-      setStatus('reading');
-      
-      // Verificar qué API de NFC está disponible y usarla
-      if ('NDEFReader' in window) {
-        // Usar Web NFC API (Chrome en Android)
-        await scanWithWebNFC(progressInterval);
-      } 
-      else if ('nfc' in navigator && 'reading' in navigator.nfc) {
-        // Usar API alternativa
-        await scanWithNavigatorNFC(progressInterval);
-      }
-      else if ('NfcAdapter' in window) {
-        // Usar API específica para Chrome en Android
-        await scanWithNfcAdapter(progressInterval);
-      }
-      else if (window.androidInterface && typeof window.androidInterface.readNFC === 'function') {
-        // Usar API específica para Android WebView
-        await scanWithAndroidInterface(progressInterval);
-      }
-      else {
-        // Fallar de forma segura al modo demo
-        console.log('No se encontró una API NFC compatible, cambiando a modo demo');
-        simulateNfcRead(progressInterval);
-      }
-    } catch (error) {
-      // Si hay cualquier error en la lectura NFC, intentar con modo demo como fallback
-      console.warn('Error en lectura NFC real, cambiando a modo demo:', error);
-      if (demoMode) {
-        simulateNfcRead(progressInterval);
-      } else {
-        handleNfcError(error);
-      }
-    }
-  };
-  
-  // Escaneo con Web NFC API estándar
-  const scanWithWebNFC = async (progressInterval: NodeJS.Timeout) => {
-    try {
-      // @ts-ignore - NDEFReader no está en los tipos de TypeScript estándar todavía
+      // @ts-ignore - TypeScript might not have NDEFReader types
       const ndef = new window.NDEFReader();
-      
-      await ndef.scan();
-      console.log('Escaneo Web NFC iniciado. Acerque su documento al dispositivo.');
-      
-      // Manejar lectura de NFC
-      ndef.addEventListener("reading", (event: any) => {
-        console.log("Web NFC leído:", event);
-        
-        try {
-          // Procesar datos según el formato del documento chileno
-          let cedulaData = parseCedulaChilena(event);
-          
-          clearInterval(progressInterval);
-          setNfcResult(cedulaData);
-          setProgress(100);
-          setStatus('success');
-          
-          if (onSuccess) {
-            onSuccess({
-              source: 'nfc',
-              data: cedulaData,
-              timestamp: new Date().toISOString()
-            });
-          }
-          
-          toast({
-            title: 'Lectura NFC exitosa',
-            description: 'Documento leído correctamente',
-            variant: 'default'
-          });
-        } catch (error) {
-          handleNfcError(error);
-        }
-      });
-      
-      ndef.addEventListener("error", (error: any) => {
-        handleNfcError(error);
-      });
-    } catch (error) {
-      throw new Error(`Error Web NFC API: ${error.message || 'Error desconocido'}`);
-    }
-  };
-  
-  // Escaneo con Navigator NFC API
-  const scanWithNavigatorNFC = async (progressInterval: NodeJS.Timeout) => {
-    try {
-      console.log('Usando Navigator NFC API');
-      
-      // @ts-ignore - API no estándar
-      navigator.nfc.reading.addEventListener('reading', (event: any) => {
-        console.log("Navigator NFC leído:", event);
-        
-        try {
-          // Procesar datos del evento
-          let cedulaData = parseCedulaNavigatorNFC(event);
-          
-          clearInterval(progressInterval);
-          setNfcResult(cedulaData);
-          setProgress(100);
-          setStatus('success');
-          
-          if (onSuccess) {
-            onSuccess({
-              source: 'nfc',
-              data: cedulaData,
-              timestamp: new Date().toISOString()
-            });
-          }
-          
-          toast({
-            title: 'Lectura NFC exitosa',
-            description: 'Documento leído correctamente',
-            variant: 'default'
-          });
-        } catch (error) {
-          handleNfcError(error);
-        }
-      });
-      
-      // @ts-ignore - API no estándar
-      await navigator.nfc.reading.start();
-      
-    } catch (error) {
-      throw new Error(`Error Navigator NFC API: ${error.message || 'Error desconocido'}`);
-    }
-  };
-  
-  // Escaneo con NfcAdapter API (implementación específica para algunos navegadores)
-  const scanWithNfcAdapter = async (progressInterval: NodeJS.Timeout) => {
-    try {
-      console.log('Usando NfcAdapter API');
-      
-      // @ts-ignore - API no estándar
-      const adapter = new window.NfcAdapter();
-      
-      // @ts-ignore - API no estándar
-      adapter.addEventListener('tag', (event: any) => {
-        console.log("NfcAdapter tag:", event);
-        
-        try {
-          // Procesar datos del tag
-          let cedulaData = parseCedulaFromTag(event);
-          
-          clearInterval(progressInterval);
-          setNfcResult(cedulaData);
-          setProgress(100);
-          setStatus('success');
-          
-          if (onSuccess) {
-            onSuccess({
-              source: 'nfc',
-              data: cedulaData,
-              timestamp: new Date().toISOString()
-            });
-          }
-          
-          toast({
-            title: 'Lectura NFC exitosa',
-            description: 'Documento leído correctamente',
-            variant: 'default'
-          });
-        } catch (error) {
-          handleNfcError(error);
-        }
-      });
-      
-      // @ts-ignore - API no estándar
-      adapter.startDiscovery();
-      
-    } catch (error) {
-      throw new Error(`Error NfcAdapter API: ${error.message || 'Error desconocido'}`);
-    }
-  };
-  
-  // Escaneo con Android WebView Interface
-  const scanWithAndroidInterface = async (progressInterval: NodeJS.Timeout) => {
-    try {
-      console.log('Usando Android WebView Interface');
-      
-      // @ts-ignore - API no estándar
-      window.androidInterface.setNfcCallback((nfcData: string) => {
-        console.log("Android Interface NFC data:", nfcData);
-        
-        try {
-          // Parsear los datos JSON del bridge de Android
-          const parsedData = JSON.parse(nfcData);
-          let cedulaData = parseCedulaFromAndroidBridge(parsedData);
-          
-          clearInterval(progressInterval);
-          setNfcResult(cedulaData);
-          setProgress(100);
-          setStatus('success');
-          
-          if (onSuccess) {
-            onSuccess({
-              source: 'nfc',
-              data: cedulaData,
-              timestamp: new Date().toISOString()
-            });
-          }
-          
-          toast({
-            title: 'Lectura NFC exitosa',
-            description: 'Documento leído correctamente',
-            variant: 'default'
-          });
-        } catch (error) {
-          handleNfcError(error);
-        }
-      });
-      
-      // @ts-ignore - API no estándar
-      window.androidInterface.readNFC();
-      
-    } catch (error) {
-      throw new Error(`Error Android Interface: ${error.message || 'Error desconocido'}`);
-    }
-  };
 
-  // Parsear datos de cédula chilena desde API Web NFC
-  const parseCedulaChilena = (ndefEvent: any): CedulaChilenaData => {
-    // Esta es una función placeholder - la implementación real dependería
-    // del formato específico de los datos NFC en la cédula chilena
-    console.log("Parseando datos de cédula chilena de NDEF:", ndefEvent);
-    
-    try {
-      // Intentar extraer datos reales si están disponibles
-      if (ndefEvent && ndefEvent.message) {
-        const records = ndefEvent.message.records;
-        if (records && records.length > 0) {
-          // Procesar registros NDEF
-          for (const record of records) {
+      await ndef.scan();
+
+      ndef.onreading = (event: any) => {
+        console.log("NFC Tag leído:", event);
+        const decoder = new TextDecoder();
+        let dataFound = false;
+
+        // Process the tag
+        if (event.message) {
+          for (const record of event.message.records) {
             if (record.recordType === "text") {
-              const textDecoder = new TextDecoder();
-              const text = textDecoder.decode(record.data);
-              
-              // Log para debugging
-              console.log("Texto decodificado de NFC:", text);
-              
-              // Intentar parsear como JSON
+              const textContent = decoder.decode(record.data);
+
+              // Simulate parsing document data
               try {
-                const data = JSON.parse(text);
-                if (data.run || data.rut || data.identificacion) {
-                  return {
-                    run: data.run || data.rut || data.identificacion || "Sin información",
-                    nombre: data.nombre || data.nombres || "Sin información",
-                    apellidos: data.apellidos || data.apellido || "Sin información",
-                    fechaNacimiento: data.fechaNacimiento || data.nacimiento || "Sin información",
-                    sexo: data.sexo || data.genero || "Sin información",
-                    nacionalidad: data.nacionalidad || "CHILENA",
-                    fechaEmision: data.fechaEmision || data.emision || "Sin información",
-                    fechaExpiracion: data.fechaExpiracion || data.expiracion || "Sin información",
-                    numeroDocumento: data.numeroDocumento || data.documento || "Sin información",
-                    numeroSerie: data.numeroSerie || data.serie || "Sin información"
-                  };
-                }
+                // In a real app, this would be actual data from the NFC chip
+                const sampleData = {
+                  documentType: "CÉDULA DE IDENTIDAD",
+                  documentNumber: "12.345.678-9",
+                  names: "JUAN CARLOS",
+                  surnames: "PÉREZ GONZÁLEZ",
+                  nationality: "CHILENA",
+                  birthdate: "15/04/1985",
+                  expiryDate: "20/06/2028",
+                  issueDate: "20/06/2023",
+                  issuePlace: "SANTIAGO"
+                };
+
+                setDocumentData(sampleData);
+                setScanProgress(100);
+                setScanResult('success');
+                setMessage(`Documento verificado correctamente`);
+                dataFound = true;
+
+                // Trigger gamification interaction
+                triggerInteraction('document_view', { 
+                  method: 'nfc', 
+                  verified: true,
+                  documentType: sampleData.documentType
+                });
+
+                break;
               } catch (e) {
-                console.warn("No se pudo parsear el texto como JSON:", e);
-                // Si no es JSON, intentar extraer con expresiones regulares
+                console.error("Error parsing NFC data:", e);
               }
             }
           }
         }
-      }
-    } catch (e) {
-      console.error("Error parseando datos NFC:", e);
-    }
-    
-    // Retornar datos genéricos para demostración
-    return {
-      run: '12.345.678-9',
-      nombre: 'JUAN PEDRO',
-      apellidos: 'GONZÁLEZ SOTO',
-      fechaNacimiento: '15/04/1985',
-      sexo: 'M',
-      nacionalidad: 'CHILENA',
-      fechaEmision: '20/06/2018',
-      fechaExpiracion: '20/06/2028',
-      numeroDocumento: 'A123456789',
-      numeroSerie: 'ID9876543210'
-    };
-  };
-  
-  // Parsear datos de cédula desde Navigator NFC API
-  const parseCedulaNavigatorNFC = (event: any): CedulaChilenaData => {
-    console.log("Parseando datos de Navigator NFC API:", event);
-    // Implementación específica para navigator.nfc API
-    // Datos genéricos para demostración
-    return {
-      run: '12.345.678-9',
-      nombre: 'JUAN PEDRO',
-      apellidos: 'GONZÁLEZ SOTO',
-      fechaNacimiento: '15/04/1985',
-      sexo: 'M',
-      nacionalidad: 'CHILENA',
-      fechaEmision: '20/06/2018',
-      fechaExpiracion: '20/06/2028',
-      numeroDocumento: 'A123456789',
-      numeroSerie: 'ID9876543210'
-    };
-  };
-  
-  // Parsear datos de cédula desde NfcAdapter tag
-  const parseCedulaFromTag = (event: any): CedulaChilenaData => {
-    console.log("Parseando datos de NfcAdapter tag:", event);
-    // Implementación específica para NfcAdapter API
-    // Datos genéricos para demostración
-    return {
-      run: '12.345.678-9',
-      nombre: 'JUAN PEDRO',
-      apellidos: 'GONZÁLEZ SOTO',
-      fechaNacimiento: '15/04/1985',
-      sexo: 'M',
-      nacionalidad: 'CHILENA',
-      fechaEmision: '20/06/2018',
-      fechaExpiracion: '20/06/2028',
-      numeroDocumento: 'A123456789',
-      numeroSerie: 'ID9876543210'
-    };
-  };
-  
-  // Parsear datos de cédula desde Android WebView Bridge
-  const parseCedulaFromAndroidBridge = (data: any): CedulaChilenaData => {
-    console.log("Parseando datos de Android WebView Bridge:", data);
-    // Implementación específica para Android WebView Bridge
-    
-    // Si tenemos datos básicos, asignarlos
-    if (data) {
-      return {
-        run: data.run || data.rut || '12.345.678-9',
-        nombre: data.nombre || data.nombres || 'JUAN PEDRO',
-        apellidos: data.apellidos || data.apellido || 'GONZÁLEZ SOTO',
-        fechaNacimiento: data.fechaNacimiento || data.nacimiento || '15/04/1985',
-        sexo: data.sexo || data.genero || 'M',
-        nacionalidad: data.nacionalidad || 'CHILENA',
-        fechaEmision: data.fechaEmision || data.emision || '20/06/2018',
-        fechaExpiracion: data.fechaExpiracion || data.expiracion || '20/06/2028',
-        numeroDocumento: data.numeroDocumento || data.documento || 'A123456789',
-        numeroSerie: data.numeroSerie || data.serie || 'ID9876543210'
+
+        if (!dataFound) {
+          setScanResult('error');
+          setMessage('Formato de documento no reconocido');
+          setScanProgress(100);
+        }
+
+        if (progressInterval.current) {
+          clearInterval(progressInterval.current);
+        }
+
+        setIsScanning(false);
       };
+
+      ndef.onreadingerror = () => {
+        if (progressInterval.current) {
+          clearInterval(progressInterval.current);
+        }
+        setScanProgress(100);
+        setScanResult('error');
+        setMessage('Error al leer el tag NFC');
+        setIsScanning(false);
+      };
+
+    } catch (error) {
+      console.error("Error al escanear NFC:", error);
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current);
+      }
+      setScanProgress(100);
+      setScanResult('error');
+      setMessage(`Error: ${error instanceof Error ? error.message : String(error)}`);
+      setIsScanning(false);
     }
-    
-    // Datos genéricos para demostración
-    return {
-      run: '12.345.678-9',
-      nombre: 'JUAN PEDRO',
-      apellidos: 'GONZÁLEZ SOTO',
-      fechaNacimiento: '15/04/1985',
-      sexo: 'M',
-      nacionalidad: 'CHILENA',
-      fechaEmision: '20/06/2018',
-      fechaExpiracion: '20/06/2028',
-      numeroDocumento: 'A123456789',
-      numeroSerie: 'ID9876543210'
-    };
   };
 
-  // Manejar errores NFC
-  const handleNfcError = (err: any) => {
-    console.error('Error en lectura NFC:', err);
-    clearInterval(progress);
-    setStatus('error');
-    setError(err instanceof Error ? err.message : 'Error desconocido al leer NFC');
-    
-    if (onError) {
-      onError(err instanceof Error ? err.message : 'Error desconocido al leer NFC');
-    }
-    
-    toast({
-      title: 'Error NFC',
-      description: err instanceof Error ? err.message : 'Error desconocido al leer NFC',
-      variant: 'destructive'
-    });
-  };
-
-  // Reiniciar el proceso
-  const resetProcess = () => {
-    setStatus('idle');
-    setError(null);
-    setProgress(0);
-    setNfcResult(null);
+  const resetScan = () => {
+    setScanResult(null);
+    setDocumentData(null);
+    setScanProgress(0);
+    setMessage('Listo para escanear NFC');
   };
 
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-[#2d219b]">
-          Lector NFC
+          Verificación NFC
         </CardTitle>
         <CardDescription>
           Verificación mediante lectura de chip NFC
         </CardDescription>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
-        {error && (
-          <Alert className="mb-4 bg-red-50 text-red-800 border border-red-200">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        
-        {status === 'success' ? (
-          <div className="text-center py-6">
-            <div className="mx-auto w-16 h-16 mb-4 rounded-full bg-green-100 flex items-center justify-center">
-              <CheckCircle className="h-8 w-8 text-green-600" />
+        {/* Status Message */}
+      <div className={`mb-6 p-4 rounded-lg ${
+        scanResult === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 
+        scanResult === 'error' ? 'bg-red-50 text-red-700 border border-red-200' : 
+        'bg-blue-50 text-blue-700 border border-blue-200'
+      }`}>
+        <div className="flex items-center">
+          {scanResult === 'success' ? (
+            <CheckCircle className="h-5 w-5 mr-2 text-green-600" />
+          ) : scanResult === 'error' ? (
+            <AlertTriangle className="h-5 w-5 mr-2 text-red-600" />
+          ) : (
+            <Smartphone className="h-5 w-5 mr-2 text-blue-600" />
+          )}
+          <p>{message}</p>
+        </div>
+      </div>
+
+      {/* Progress Bar */}
+      {(isScanning || scanProgress > 0) && (
+        <div className="mb-6">
+          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+            <motion.div 
+              className={`h-full rounded-full ${
+                scanResult === 'error' ? 'bg-red-500' : 
+                scanResult === 'success' ? 'bg-green-500' : 'bg-blue-500'
+              }`}
+              initial={{ width: 0 }}
+              animate={{ width: `${scanProgress}%` }}
+              transition={{ ease: "easeInOut" }}
+            />
+          </div>
+          <p className="text-xs text-gray-500 mt-1 text-right">{Math.round(scanProgress)}%</p>
+        </div>
+      )}
+
+      {/* Document Data Results */}
+      <AnimatePresence>
+        {documentData && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200"
+          >
+            <h3 className="font-medium text-gray-800 mb-3">Información del documento:</h3>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <p className="text-gray-500">Tipo:</p>
+                <p className="font-medium">{documentData.documentType}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Número:</p>
+                <p className="font-medium">{documentData.documentNumber}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-gray-500">Nombres:</p>
+                <p className="font-medium">{documentData.names}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-gray-500">Apellidos:</p>
+                <p className="font-medium">{documentData.surnames}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Nacionalidad:</p>
+                <p className="font-medium">{documentData.nationality}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Fecha Nacimiento:</p>
+                <p className="font-medium">{documentData.birthdate}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Fecha Emisión:</p>
+                <p className="font-medium">{documentData.issueDate}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Vencimiento:</p>
+                <p className="font-medium">{documentData.expiryDate}</p>
+              </div>
             </div>
-            <h2 className="text-xl font-bold text-green-700 mb-2">Lectura Exitosa</h2>
-            <p className="text-gray-600 mb-4">
-              La información del documento ha sido leída correctamente.
-            </p>
-            
-            {nfcResult && (
-              <div className="bg-gray-50 p-4 rounded-md text-left mb-4">
-                <h3 className="font-medium mb-2">Datos del documento:</h3>
-                <ul className="space-y-1 text-sm">
-                  <li><span className="font-medium">RUN:</span> {nfcResult.run}</li>
-                  <li><span className="font-medium">Nombre:</span> {nfcResult.nombre}</li>
-                  <li><span className="font-medium">Apellidos:</span> {nfcResult.apellidos}</li>
-                  <li><span className="font-medium">Fecha Nacimiento:</span> {nfcResult.fechaNacimiento}</li>
-                  <li><span className="font-medium">Sexo:</span> {nfcResult.sexo}</li>
-                  <li><span className="font-medium">Nacionalidad:</span> {nfcResult.nacionalidad}</li>
-                  <li><span className="font-medium">Emisión:</span> {nfcResult.fechaEmision}</li>
-                  <li><span className="font-medium">Expiración:</span> {nfcResult.fechaExpiracion}</li>
-                </ul>
-              </div>
-            )}
-            
-            <Button onClick={resetProcess} variant="outline">
-              Iniciar Nueva Lectura
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {(status === 'waiting' || status === 'reading') && (
-              <div className="space-y-4">
-                <div className="text-center">
-                  <div className="mx-auto w-16 h-16 mb-4 rounded-full bg-blue-100 flex items-center justify-center animate-pulse">
-                    <Smartphone className="h-8 w-8 text-[#2d219b]" />
-                  </div>
-                  <h2 className="text-lg font-medium mb-1">
-                    {status === 'waiting' ? 'Esperando documento...' : 'Leyendo documento...'}
-                  </h2>
-                  <p className="text-sm text-gray-500 mb-4">
-                    {status === 'waiting' 
-                      ? 'Acerque su documento al lector NFC de su dispositivo' 
-                      : 'Mantenga el documento cerca del lector hasta que se complete la lectura'}
-                  </p>
-                </div>
-                
-                <Progress value={progress} className="h-2" />
-                
-                <div className="flex justify-center">
-                  <Button variant="outline" onClick={resetProcess} size="sm">
-                    Cancelar
-                  </Button>
-                </div>
-              </div>
-            )}
-            
-            {status === 'idle' && (
-              <>
-                <div className="text-center">
-                  <div className="mx-auto w-16 h-16 mb-4 rounded-full bg-blue-50 flex items-center justify-center">
-                    <Smartphone className="h-8 w-8 text-[#2d219b]" />
-                  </div>
-                  <h2 className="text-lg font-medium mb-1">Lectura de documento NFC</h2>
-                  <p className="text-sm text-gray-500 mb-6">
-                    Utilice el lector NFC de su dispositivo para escanear el chip de su documento de identidad
-                  </p>
-                </div>
-                
-                <Button 
-                  onClick={startNfcScan} 
-                  className="w-full" 
-                  disabled={!nfcAvailable && !demoMode}
-                >
-                  {nfcAvailable || demoMode ? 'Iniciar Escaneo NFC' : 'NFC no disponible'}
-                </Button>
-                
-                {!nfcAvailable && !demoMode && (
-                  <p className="text-xs text-center text-amber-600">
-                    Su dispositivo no soporta NFC o el navegador no tiene habilitado el acceso a NFC
-                  </p>
-                )}
-              </>
-            )}
-          </div>
+          </motion.div>
         )}
+      </AnimatePresence>
+
+      {/* Action Buttons */}
+      {scanResult ? (
+        <button
+          onClick={resetScan}
+          className="w-full p-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium flex items-center justify-center"
+        >
+          <RotateCcw className="h-4 w-4 mr-2" />
+          Escanear otro documento
+        </button>
+      ) : (
+        <Button 
+          onClick={startScan} 
+          className="w-full" 
+          disabled={!nfcAvailable && !demoMode}
+        >
+          {nfcAvailable || demoMode ? 'Iniciar Escaneo NFC' : 'NFC no disponible'}
+        </Button>
+      )}
+
+      {!nfcAvailable && !demoMode && (
+        <p className="mt-3 text-sm text-red-500 flex items-center">
+          <AlertTriangle className="h-4 w-4 mr-1 flex-shrink-0" />
+          Tu dispositivo o navegador no soporta NFC. Intenta con Chrome en Android.
+        </p>
+      )}
+
+      {nfcAvailable && !isScanning && !scanResult && (
+        <p className="mt-3 text-xs text-gray-500 text-center">
+          Asegúrate de tener NFC activado en tu dispositivo y acerca tu cédula de identidad a la parte posterior del teléfono.
+        </p>
+      )}
       </CardContent>
-      
+
       <CardFooter className="border-t bg-gray-50 text-xs text-gray-500 p-4">
         <div className="w-full space-y-1">
           <p className="flex items-center">

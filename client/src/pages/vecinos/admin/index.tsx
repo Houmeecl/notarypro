@@ -169,15 +169,23 @@ const VecinosAdminIndexPage = () => {
               </div>
             </CardContent>
             <CardFooter className="pt-0 flex justify-between">
-              <Link href="/vecinos/admin/partners">
-                <Button variant="outline">Gestionar socios</Button>
-              </Link>
-              <Link href="/vecinos/admin/express-dashboard">
-                <Button>Dashboard Express</Button>
-              </Link>
-              <Link href="/vecinos/admin/users">
-                <Button variant="outline">Gestión de usuarios</Button>
-              </Link>
+              <div className="flex flex-wrap gap-2">
+                <Link href="/vecinos/admin/partners">
+                  <Button variant="outline">Gestionar socios</Button>
+                </Link>
+                <Link href="/vecinos/admin/express-dashboard">
+                  <Button>Dashboard Express</Button>
+                </Link>
+                <Link href="/vecinos/admin/users">
+                  <Button variant="outline">Gestión de usuarios</Button>
+                </Link>
+                <Link href="/vecinos/admin/partner-map">
+                  <Button variant="outline" className="flex items-center gap-1">
+                    <MapPin className="h-4 w-4" />
+                    Mapa de socios
+                  </Button>
+                </Link>
+              </div>
             </CardFooter>
           </Card>
           
