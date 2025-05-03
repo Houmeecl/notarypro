@@ -19,7 +19,8 @@ import {
   ChevronRight,
   ArrowLeft,
   Wifi,
-  Terminal
+  Terminal,
+  Shield
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -28,6 +29,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { POS_CONSTANTS, realPOSConfig, getPOSConfig } from '@/lib/pos-config';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/use-auth';
+import IdentityVerification, { VerificationResult } from '@/components/identity/IdentityVerification';
 
 // Tipo para los items del carrito
 interface CartItem {
