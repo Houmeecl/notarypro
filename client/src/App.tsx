@@ -183,6 +183,16 @@ function Router() {
           </Suspense>
         );
       }} />
+      <Route path="/iniciar-tramite-simple" component={() => {
+        const IniciarTramiteSimple = React.lazy(() => import("@/pages/iniciar-tramite-simple"));
+        return (
+          <Suspense fallback={<div className="flex items-center justify-center h-screen">
+            <p className="text-xl">Cargando iniciar trámite...</p>
+          </div>}>
+            <IniciarTramiteSimple />
+          </Suspense>
+        );
+      }} />
       <Route path="/verificacion-selfie" component={() => {
         const VerificacionSelfie = React.lazy(() => import("@/pages/verificacion-selfie"));
         return (
@@ -190,6 +200,16 @@ function Router() {
             <p className="text-xl">Cargando verificación de identidad...</p>
           </div>}>
             <VerificacionSelfie />
+          </Suspense>
+        );
+      }} />
+      <Route path="/verificacion-selfie-simple" component={() => {
+        const VerificacionSelfieSimple = React.lazy(() => import("@/pages/verificacion-selfie-simple"));
+        return (
+          <Suspense fallback={<div className="flex items-center justify-center h-screen">
+            <p className="text-xl">Cargando verificación de identidad...</p>
+          </div>}>
+            <VerificacionSelfieSimple />
           </Suspense>
         );
       }} />
@@ -272,6 +292,16 @@ function Router() {
             <p className="text-xl">Cargando verificación...</p>
           </div>}>
             <Verificar />
+          </Suspense>
+        );
+      }} />
+      <Route path="/verificar-simple/:id" component={() => {
+        const VerificarSimple = React.lazy(() => import("@/pages/verificar-simple"));
+        return (
+          <Suspense fallback={<div className="flex items-center justify-center h-screen">
+            <p className="text-xl">Cargando verificación...</p>
+          </div>}>
+            <VerificarSimple />
           </Suspense>
         );
       }} />

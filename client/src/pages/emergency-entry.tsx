@@ -88,13 +88,23 @@ export default function EmergencyEntryPage() {
                 </Link>
               </li>
               <li>
-                <Link href="/iniciar-tramite" className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center bg-green-100 px-2 py-1 rounded">
-                  <span className="material-icons mr-1 text-sm">✨</span> Iniciar Trámite con QR (Nuevo)
+                <Link href="/iniciar-tramite-simple" className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center bg-green-100 px-2 py-1 rounded">
+                  <span className="material-icons mr-1 text-sm">✨</span> Iniciar Trámite Simple (Recomendado)
                 </Link>
               </li>
               <li>
-                <Link href="/verificacion-selfie" className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center bg-green-100 px-2 py-1 rounded">
-                  <span className="material-icons mr-1 text-sm">✨</span> Verificación con Selfie (Nuevo)
+                <Link href="/verificacion-selfie-simple" className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center bg-green-100 px-2 py-1 rounded">
+                  <span className="material-icons mr-1 text-sm">✨</span> Verificación Simple (Recomendado)
+                </Link>
+              </li>
+              <li>
+                <Link href="/iniciar-tramite" className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center px-2 py-1 rounded">
+                  <span className="material-icons mr-1 text-sm">➡️</span> Iniciar Trámite con QR
+                </Link>
+              </li>
+              <li>
+                <Link href="/verificacion-selfie" className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center px-2 py-1 rounded">
+                  <span className="material-icons mr-1 text-sm">➡️</span> Verificación con Selfie
                 </Link>
               </li>
               <li>
