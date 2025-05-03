@@ -383,13 +383,22 @@ export default function VecinosExpress() {
                 >
                   Cómo funciona
                 </Button>
-                <Button 
-                  variant="default"
-                  className="bg-primary hover:bg-red-700 text-white"
-                  onClick={() => setLocation('/vecinos/login')}
-                >
-                  Acceder como Vecino
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                  <Button 
+                    variant="default"
+                    className="bg-primary hover:bg-red-700 text-white"
+                    onClick={() => setLocation('/vecinos/login')}
+                  >
+                    Acceder como Vecino
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    className="border-primary text-primary hover:bg-red-50"
+                    onClick={() => setLocation('/vecinos/pos-app')}
+                  >
+                    Acceder a POS Web
+                  </Button>
+                </div>
               </div>
             </div>
             <div className="md:w-1/2">
