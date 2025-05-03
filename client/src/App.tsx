@@ -151,7 +151,7 @@ function Router() {
       }} />
       <Route path="/landing" component={LandingPage} />
       <Route path="/auth" component={AuthPage} />
-      
+
       {/* User routes */}
       <ProtectedRoute 
         path="/user-dashboard" 
@@ -159,7 +159,7 @@ function Router() {
         allowedRoles={["user", "certifier", "admin"]} 
       />
       <Route path="/document-sign/:id" component={DocumentSign} />
-      
+
       {/* Document routes */}
       <Route path="/document-categories" component={DocumentCategoriesPage} />
       <Route path="/document-templates/:categoryId" component={DocumentTemplatesPage} />
@@ -225,7 +225,7 @@ function Router() {
         component={DocumentProcessor} 
         allowedRoles={["user", "certifier", "admin", "partner"]} 
       />
-      
+
       {/* Certifier routes */}
       <ProtectedRoute 
         path="/certifier-dashboard" 
@@ -237,21 +237,21 @@ function Router() {
         component={CertificationDashboard} 
         allowedRoles={["certifier", "admin"]} 
       />
-      
+
       {/* Supervisor routes */}
       <ProtectedRoute 
         path="/supervisor/dashboard" 
         component={SupervisorDashboard} 
         allowedRoles={["supervisor", "admin"]} 
       />
-      
+
       {/* Seller routes */}
       <ProtectedRoute 
         path="/seller/dashboard" 
         component={SellerDashboard} 
         allowedRoles={["seller", "admin"]} 
       />
-      
+
       {/* Admin routes */}
       <ProtectedRoute 
         path="/admin-dashboard" 
@@ -268,14 +268,14 @@ function Router() {
         component={PartnerApplications}
         allowedRoles={["admin", "supervisor"]} 
       />
-      
+
       {/* Course routes */}
       <ProtectedRoute 
         path="/courses/:id" 
         component={CoursePage} 
         allowedRoles={["user", "certifier", "admin"]} 
       />
-      
+
       {/* Public pages */}
       <Route path="/aviso-legal" component={AvisoLegal} />
       <Route path="/servicios-empresariales" component={ServiciosEmpresariales} />
@@ -309,7 +309,7 @@ function Router() {
       <Route path="/curso-certificador" component={CursoCertificador} />
       <Route path="/service-selection" component={ServiceSelectionPage} />
       <Route path="/quienes-somos" component={QuienesSomosPage} />
-      
+
       {/* Vecinos Xpress Pages (lazy loaded) */}
       <Route path="/vecinos" component={() => (
         <Suspense fallback={<LazyLoadingFallback />}>
@@ -360,7 +360,7 @@ function Router() {
           <LazyVecinosPaymentDemo />
         </Suspense>
       )} />
-      
+
       {/* Vecinos Admin Dashboard - Acceso directo temporalmente */}
       <Route 
         path="/vecinos/admin" 
@@ -435,7 +435,7 @@ function Router() {
       <Route path="/partners/password-generator" component={PasswordGenerator} />
       <Route path="/partners/webapp-login" component={WebappLogin} />
       {/* POS Web Oficial (ahora redirecciona al login de Vecinos) */}
-      
+
       {/* Rutas de versiones antiguas que redirigen a la versión oficial del POS */}
       <Route path="/partners/webapp-pos" component={() => {
         window.location.href = "/partners/webapp-pos-official";
@@ -453,7 +453,7 @@ function Router() {
         window.location.href = "/partners/webapp-pos-official";
         return null;
       }} />
-      
+
       {/* Versión oficial del POS web accessible directamente */}
       <Route path="/partners/webapp-pos-official" component={WebAppPOSOfficial} />
       <Route path="/partners/sdk-demo" component={SdkDemo} />
@@ -464,124 +464,125 @@ function Router() {
         component={PosIntegrationPage} 
         allowedRoles={["partner"]} 
       />
-      
+      <Route path="/partners/webapp-pos-tramite" component={React.lazy(() => import('./pages/partners/webapp-pos-tramite'))} />
+
       {/* Admin POS Management */}
       <ProtectedRoute 
         path="/admin/pos-management" 
         component={PosManagementPage} 
         allowedRoles={["admin"]} 
       />
-      
+
       {/* Admin API Integrations */}
       <ProtectedRoute 
         path="/admin/api-integrations" 
         component={ApiIntegrationsPage} 
         allowedRoles={["admin"]} 
       />
-      
+
       {/* Admin Master Dashboard */}
       <ProtectedRoute 
         path="/admin/dashboard" 
         component={AdminDashboardPage} 
         allowedRoles={["admin"]} 
       />
-      
+
       {/* Admin Documents Management */}
       <ProtectedRoute 
         path="/admin/documents" 
         component={AdminDocumentsPage} 
         allowedRoles={["admin"]} 
       />
-      
+
       {/* Admin Certifiers Management */}
       <ProtectedRoute 
         path="/admin/certifiers" 
         component={AdminCertifiersPage} 
         allowedRoles={["admin"]} 
       />
-      
+
       {/* Admin AI Strategy */}
       <ProtectedRoute 
         path="/admin/ai-strategy" 
         component={AdminAIStrategyPage} 
         allowedRoles={["admin"]} 
       />
-      
+
       {/* Admin Test Document Generator */}
       <ProtectedRoute 
         path="/admin/test-document-generator" 
         component={TestDocumentGenerator} 
         allowedRoles={["admin"]} 
       />
-      
+
       {/* Admin Document Templates Manager */}
       <ProtectedRoute 
         path="/admin/document-templates-manager" 
         component={DocumentTemplatesManager} 
         allowedRoles={["admin"]} 
       />
-      
+
       {/* Videocall demo */}
       <ProtectedRoute 
         path="/videocall-interface-demo" 
         component={VideocallInterfaceDemo} 
         allowedRoles={["certifier", "admin"]} 
       />
-      
+
       {/* RON (Remote Online Notarization) */}
       <ProtectedRoute 
         path="/ron-videocall/:sessionId" 
         component={RonVideocall} 
         allowedRoles={["certifier", "admin"]} 
       />
-      
+
       {/* Lawyer Dashboard */}
       <ProtectedRoute 
         path="/lawyer-dashboard" 
         component={LawyerDashboard} 
         allowedRoles={["lawyer", "admin"]} 
       />
-      
+
       {/* Video Consultation */}
       <ProtectedRoute 
         path="/video-consultation/:consultationId" 
         component={VideoConsultation} 
         allowedRoles={["lawyer", "admin"]} 
       />
-      
+
       {/* Purchase Code */}
       <Route path="/purchase-code" component={PurchaseCode} />
-      
+
       {/* Micro-Interactions Demo */}
       <ProtectedRoute 
         path="/micro-interactions-demo" 
         component={MicroInteractionsDemo} 
         allowedRoles={["user", "certifier", "lawyer", "admin"]}
       />
-      
+
       {/* Achievement Sharing */}
       <Route path="/share-achievement/:id" component={ShareAchievementPage} />
-      
+
       {/* RON Platform (Independent Access) */}
       <Route path="/ron-login" component={RonLoginPage} />
       <Route path="/ron-platform" component={RonPlatform} />
       <Route path="/ron-session/:id?" component={RonSession} />
-      
+
       {/* Ayuda Legal */}
       <ProtectedRoute 
         path="/ayuda-legal" 
         component={AyudaLegal} 
         allowedRoles={["lawyer", "certifier", "admin"]} 
       />
-      
+
       {/* Integraciones Demo */}
       <Route path="/integraciones-demo" component={IntegracionesDemo} />
       <Route path="/integraciones-api-identidad" component={IntegracionesApiIdentidad} />
-      
+
       {/* VERIFICACIÓN DE IDENTIDAD - Flujo unificado */}
       <Route path="/verificacion-identidad" component={VerificacionIdentidadDemo} />
       <Route path="/readid-verification" component={ReadIDVerificationPage} />
-      
+
       {/* MODO NFC SIMPLIFICADO - usando un solo componente*/}
       <Route path="/verificacion-nfc" component={() => {
         // Importar dinámicamente el componente nuevo
@@ -592,13 +593,13 @@ function Router() {
           </Suspense>
         );
       }} />
-      
+
       {/* MODO FALLBACK PARA DISPOSITIVOS MÓVILES - Redirige a la versión unificada */}
       <Route path="/verificacion-movil" component={() => {
         window.location.href = "/verificacion-nfc";
         return null;
       }} />
-      
+
       {/* Redirecciones de URLs anteriores para compatibilidad */}
       <Route path="/verificacion-identidad-nfc" component={() => {
         window.location.href = "/verificacion-nfc";
@@ -636,10 +637,10 @@ function Router() {
         window.location.href = "/verificacion-identidad";
         return null;
       }} />
-      
+
       {/* Demostración de Pagos con MercadoPago */}
       <Route path="/payment-demo" component={PaymentDemo} />
-      
+
       {/* Páginas de retorno para MercadoPago */}
       <Route path="/payment-success" component={() => {
         // Redireccionar a la página de demo con parámetros
@@ -662,10 +663,10 @@ function Router() {
           <p className="text-xl">Redireccionando...</p>
         </div>;
       }} />
-      
+
       {/* Documento Ejemplo */}
       <Route path="/documento-ejemplo" component={DocumentoEjemplo} />
-      
+
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

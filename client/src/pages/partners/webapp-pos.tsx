@@ -102,10 +102,7 @@ const WebAppPOS = () => {
   };
   
   const handleProcessDocument = () => {
-    toast({
-      title: 'Próximamente',
-      description: 'Esta funcionalidad estará disponible pronto',
-    });
+    navigate('/partners/webapp-pos-tramite');
   };
   
   const formatCurrency = (amount: number) => {
