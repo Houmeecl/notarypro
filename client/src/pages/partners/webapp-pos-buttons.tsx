@@ -395,9 +395,24 @@ const WebAppPOSButtons = () => {
   
   // Función para iniciar la lectura NFC
   const iniciarLecturaNFC = () => {
+    // Primero establecemos el estado idle para asegurar que el componente NFC se muestre correctamente
+    setNfcReadStatus('idle');
     setShowNFCReader(true);
     setShowCamera(false);
-    setNfcReadStatus('scanning');
+    
+    // Después de mostrar el modal, cambiamos el estado a scanning con un pequeño retraso
+    // para permitir la transición visual
+    setTimeout(() => {
+      setNfcReadStatus('scanning');
+    }, 500);
+    
+    // Registrar el inicio de la interacción en el sistema de gamificación
+    apiRequest("POST", "/api/micro-interactions/record", {
+      type: "nfc_scan_started",
+      points: 5, // Puntos por intentar verificar con NFC
+      metadata: { description: "Inicio de verificación con NFC" }
+    }).catch(err => console.error("Error al registrar inicio de verificación:", err));
+    
     toast({
       title: "Lector NFC activado",
       description: "Acerque la cédula chilena al lector NFC de su dispositivo",
@@ -437,29 +452,71 @@ const WebAppPOSButtons = () => {
   
   // Función para manejar cuando las micro-interacciones han finalizado
   const handleNFCInteractionsComplete = () => {
-    setShowNFCReader(false);
-    toast({
-      title: "Cédula leída correctamente",
-      description: "Se ha verificado la identidad con los datos del chip NFC",
-      variant: "default",
-    });
+    // Registrar los puntos ganados en el sistema de gamificación
+    const puntos = 125; // Puntos por verificar identidad con NFC
+    
+    // Llamar al endpoint para registrar la interacción (opcional)
+    apiRequest("POST", "/api/micro-interactions/record", {
+      type: "nfc_verification",
+      points: puntos,
+      metadata: { description: "Verificación de identidad con cédula NFC" }
+    }).catch(err => console.error("Error al registrar micro-interacción:", err));
+    
+    setTimeout(() => {
+      setShowNFCReader(false);
+      setNfcReadStatus('idle');
+      
+      toast({
+        title: "¡Verificación completada! +125 puntos",
+        description: "Se ha verificado la identidad con éxito mediante NFC",
+        variant: "default",
+      });
+    }, 1000); // Pequeño retraso para que se vea la animación completa
   };
   
   // El manejador para iniciar la lectura NFC fue declarado como duplicado y se eliminó
   
   // Manejador para error en la lectura NFC
   const handleNFCError = (error: any) => {
+    // Actualizar el estado para mostrar la animación de error
     setNfcReadStatus('error');
+    
+    // Registrar el error para análisis (opcional)
+    console.error("Error en lectura NFC:", error);
+    
+    // Identificar el tipo de error para mostrar un mensaje más específico
+    let errorMessage = "No se pudo leer la cédula. Intente nuevamente.";
+    
+    if (error?.name === "NotSupportedError") {
+      errorMessage = "Su dispositivo no admite la lectura NFC o está desactivada.";
+    } else if (error?.name === "TimeoutError") {
+      errorMessage = "Tiempo de espera agotado. Acerque la cédula nuevamente al lector.";
+    } else if (error?.name === "InvalidStateError") {
+      errorMessage = "El lector NFC no está disponible en este momento.";
+    } else if (error?.message) {
+      // Si hay un mensaje específico, usarlo
+      errorMessage = error.message;
+    }
+    
     // No cerramos el modal instantáneamente para mostrar la animación de error
     setTimeout(() => {
+      // Registrar la interacción fallida (opcionalmente con menos puntos negativos)
+      apiRequest("POST", "/api/micro-interactions/record", {
+        type: "nfc_verification_failed",
+        points: -10, // Puntos negativos por fallo (opcional)
+        metadata: { description: "Intento fallido de verificación NFC", error: errorMessage }
+      }).catch(err => console.error("Error al registrar interacción fallida:", err));
+      
+      // Después de un tiempo razonable, cerrar el modal y mostrar el toast
       setNfcReadStatus('idle');
       setShowNFCReader(false);
+      
       toast({
         title: "Error en la lectura NFC",
-        description: "No se pudo leer la cédula. Intente nuevamente.",
+        description: errorMessage,
         variant: "destructive",
       });
-    }, 2000);
+    }, 2500);
   };
 
   const verificarIdentidad = () => {
