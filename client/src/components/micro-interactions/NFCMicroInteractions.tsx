@@ -8,12 +8,14 @@ type NFCReadStatus = 'idle' | 'scanning' | 'success' | 'error';
 interface NFCMicroInteractionsProps {
   status: NFCReadStatus;
   points?: number;
+  message?: string;
   onComplete?: () => void;
 }
 
 const NFCMicroInteractions: React.FC<NFCMicroInteractionsProps> = ({ 
   status, 
   points = 100,
+  message,
   onComplete 
 }) => {
   const [confetti, setConfetti] = useState<Array<{ x: number; y: number; size: number; color: string }>>([]);
@@ -106,7 +108,7 @@ const NFCMicroInteractions: React.FC<NFCMicroInteractionsProps> = ({
             >
               <CreditCard className="w-16 h-16 text-zinc-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Lector NFC</h3>
-              <p className="text-zinc-500">Esperando para leer cédula</p>
+              <p className="text-zinc-500">{message || "Esperando para leer cédula"}</p>
             </motion.div>
           )}
           
@@ -132,7 +134,7 @@ const NFCMicroInteractions: React.FC<NFCMicroInteractionsProps> = ({
                 <h3 className="text-xl font-bold mb-2">Leyendo cédula...</h3>
               </motion.div>
               
-              <p className="text-zinc-500">Acerque la cédula al dispositivo</p>
+              <p className="text-zinc-500">{message || "Acerque la cédula al dispositivo"}</p>
               
               {/* Ondas de escaneo */}
               <div className="relative mt-6">

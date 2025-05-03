@@ -1531,10 +1531,26 @@ const WebAppPOSButtons = () => {
             </div>
             
             <div className="p-4">
-              <NFCIdentityReader
-                onSuccess={handleNFCSuccess}
-                onCancel={handleNFCCancel}
-              />
+              {/* Contenedor con altura fija para ambos componentes */}
+              <div className="relative h-72">
+                {/* Componente de micro-interacciones en la capa superior */}
+                <div className="absolute inset-0 z-10">
+                  <NFCMicroInteractions 
+                    status={nfcReadStatus}
+                    points={125}
+                    onComplete={handleNFCInteractionsComplete}
+                  />
+                </div>
+                
+                {/* Lector NFC que funciona por debajo de las animaciones */}
+                <div className={`absolute inset-0 ${nfcReadStatus !== 'idle' ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
+                  <NFCIdentityReader
+                    onSuccess={handleNFCSuccess}
+                    onCancel={handleNFCCancel}
+                    onError={handleNFCError}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>

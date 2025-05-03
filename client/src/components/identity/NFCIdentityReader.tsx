@@ -18,9 +18,14 @@ import { motion } from 'framer-motion';
 interface NFCIdentityReaderProps {
   onSuccess: (data: CedulaChilenaData) => void;
   onCancel: () => void;
+  onError?: (error: any) => void;
 }
 
-const NFCIdentityReader: React.FC<NFCIdentityReaderProps> = ({ onSuccess, onCancel }) => {
+const NFCIdentityReader: React.FC<NFCIdentityReaderProps> = ({ 
+  onSuccess, 
+  onCancel,
+  onError 
+}) => {
   const [isReading, setIsReading] = useState<boolean>(false);
   const [status, setStatus] = useState<NFCReadStatus>(NFCReadStatus.INACTIVE);
   const [statusMessage, setStatusMessage] = useState<string>('');
@@ -81,8 +86,14 @@ const NFCIdentityReader: React.FC<NFCIdentityReaderProps> = ({ onSuccess, onCanc
       }
     } catch (error) {
       setStatus(NFCReadStatus.ERROR);
-      setStatusMessage(`Error: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      setStatusMessage(`Error: ${errorMessage}`);
       setIsReading(false);
+      
+      // Llamar al callback de error si existe
+      if (onError) {
+        onError(error);
+      }
     }
   }, [nfcAvailable, readerType, handleNFCStatusChange, onSuccess]);
 
