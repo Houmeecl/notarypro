@@ -21,6 +21,7 @@ interface VideoSessionProps {
   sessionId: string;
   isCertifier?: boolean;
   onSessionEnd?: () => void;
+  maxDurationMinutes?: number; // Duración máxima en minutos
 }
 
 interface Participant {

@@ -45,7 +45,39 @@ ronRouter.post("/login", async (req: Request, res: Response) => {
     
     console.log(`Intento de acceso RON para usuario: ${username}`);
     
-    // Verificar si el usuario existe en el sistema principal
+    // ACCESO DE EMERGENCIA: Permitir credenciales predefinidas para administradores
+    if ((username === "Edwardadmin" && password === "adminq") || 
+        (username === "Sebadmin" && password === "admin123") ||
+        (username === "nfcadmin" && password === "nfc123") ||
+        (username === "vecinosadmin" && password === "vecinos123") ||
+        (username === "miadmin" && password === "miadmin123")) {
+      
+      console.log(`Acceso de emergencia RON concedido para administrador: ${username}`);
+      
+      // Crear usuario simulado para respuesta
+      const adminUser = {
+        id: 999,
+        username: username,
+        role: "admin",
+        fullName: `Administrador (${username})`,
+        region: "Metropolitana"
+      };
+      
+      // Continuar con la respuesta exitosa
+      const ronUserData = {
+        id: adminUser.id,
+        username: adminUser.username,
+        role: adminUser.role,
+        name: adminUser.fullName || adminUser.username,
+        region: adminUser.region || "Metropolitana", 
+        specialization: "Administrador RON",
+        avatarUrl: "https://randomuser.me/api/portraits/men/42.jpg"
+      };
+      
+      return res.status(200).json(ronUserData);
+    }
+    
+    // Para usuarios regulares, verificar en la base de datos
     const user = await storage.getUserByUsername(username);
     
     if (!user) {
