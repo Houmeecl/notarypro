@@ -11,12 +11,10 @@ import { useToast } from "@/hooks/use-toast";
 interface NFCReaderProps {
   onSuccess?: (data: any) => void;
   onError?: (error: string) => void;
-  demoMode?: boolean;
 }
 
 type NFCStatus = 'idle' | 'waiting' | 'reading' | 'success' | 'error';
 
-// Datos de ejemplo para el modo demo (cédula chilena)
 interface CedulaChilenaData {
   run: string;
   nombre: string;
@@ -32,8 +30,7 @@ interface CedulaChilenaData {
 
 const NFCReader: React.FC<NFCReaderProps> = ({
   onSuccess,
-  onError,
-  demoMode = false
+  onError
 }) => {
   const [message, setMessage] = useState('Listo para escanear NFC');
   const [hasNFC, setHasNFC] = useState(false);
@@ -88,11 +85,7 @@ const NFCReader: React.FC<NFCReaderProps> = ({
     else {
       setNfcAvailable(false);
       console.log('NFC API no está disponible en este dispositivo/navegador');
-
-      // En modo demo no mostrar error
-      if (!demoMode) {
-        setError('Este dispositivo o navegador no tiene NFC disponible. Intente usar un dispositivo Android compatible con NFC.');
-      }
+      setError('Este dispositivo o navegador no tiene NFC disponible. Intente usar un dispositivo Android compatible con NFC.');
     }
   };
 
@@ -147,22 +140,25 @@ const NFCReader: React.FC<NFCReaderProps> = ({
             if (record.recordType === "text") {
               const textContent = decoder.decode(record.data);
 
-              // Simulate parsing document data
+              // Parse the actual NFC data
               try {
-                // In a real app, this would be actual data from the NFC chip
-                const sampleData = {
-                  documentType: "CÉDULA DE IDENTIDAD",
-                  documentNumber: "12.345.678-9",
-                  names: "JUAN CARLOS",
-                  surnames: "PÉREZ GONZÁLEZ",
-                  nationality: "CHILENA",
-                  birthdate: "15/04/1985",
-                  expiryDate: "20/06/2028",
-                  issueDate: "20/06/2023",
-                  issuePlace: "SANTIAGO"
+                // Parse the data from the NFC chip
+                const nfcData = JSON.parse(textContent);
+                
+                // Extract document data from NFC
+                const documentData = {
+                  documentType: nfcData.documentType || "CÉDULA DE IDENTIDAD",
+                  documentNumber: nfcData.documentNumber,
+                  names: nfcData.names,
+                  surnames: nfcData.surnames,
+                  nationality: nfcData.nationality,
+                  birthdate: nfcData.birthdate,
+                  expiryDate: nfcData.expiryDate,
+                  issueDate: nfcData.issueDate,
+                  issuePlace: nfcData.issuePlace
                 };
 
-                setDocumentData(sampleData);
+                setDocumentData(documentData);
                 setScanProgress(100);
                 setScanResult('success');
                 setMessage(`Documento verificado correctamente`);
@@ -172,8 +168,29 @@ const NFCReader: React.FC<NFCReaderProps> = ({
                 triggerInteraction('document_view', { 
                   method: 'nfc', 
                   verified: true,
-                  documentType: sampleData.documentType
+                  documentType: documentData.documentType
                 });
+                
+                // Automatically request camera access for the next step
+                if (onSuccess) {
+                  // Pass the document data to the parent component
+                  onSuccess(documentData);
+                  
+                  // Request camera access
+                  try {
+                    navigator.mediaDevices.getUserMedia({ video: true })
+                      .then(stream => {
+                        // Camera permission granted
+                        console.log("Cámara activada automáticamente después de verificación NFC");
+                        stream.getTracks().forEach(track => track.stop()); // Stop the stream since we just needed permission
+                      })
+                      .catch(err => {
+                        console.error("Error al solicitar acceso a la cámara:", err);
+                      });
+                  } catch (err) {
+                    console.error("Error al solicitar permisos de cámara:", err);
+                  }
+                }
 
                 break;
               } catch (e) {
@@ -335,13 +352,13 @@ const NFCReader: React.FC<NFCReaderProps> = ({
         <Button 
           onClick={startScan} 
           className="w-full" 
-          disabled={!nfcAvailable && !demoMode}
+          disabled={!nfcAvailable}
         >
-          {nfcAvailable || demoMode ? 'Iniciar Escaneo NFC' : 'NFC no disponible'}
+          {nfcAvailable ? 'Iniciar Escaneo NFC' : 'NFC no disponible'}
         </Button>
       )}
 
-      {!nfcAvailable && !demoMode && (
+      {!nfcAvailable && (
         <p className="mt-3 text-sm text-red-500 flex items-center">
           <AlertTriangle className="h-4 w-4 mr-1 flex-shrink-0" />
           Tu dispositivo o navegador no soporta NFC. Intenta con Chrome en Android.
@@ -359,9 +376,7 @@ const NFCReader: React.FC<NFCReaderProps> = ({
         <div className="w-full space-y-1">
           <p className="flex items-center">
             <AlertCircle className="h-3 w-3 mr-1 text-amber-500" />
-            {demoMode 
-              ? 'Modo de demostración - Los datos son simulados' 
-              : 'Asegúrese de que su documento tenga chip NFC'}
+            Asegúrese de que su documento tenga chip NFC
           </p>
           <p>La lectura NFC requiere un dispositivo compatible y un navegador actualizado.</p>
         </div>
