@@ -108,10 +108,10 @@ export default function POSAppPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="text-center bg-gradient-to-r from-red-50 to-red-100 rounded-t-lg">
+        <CardHeader className="text-center bg-gradient-to-r from-indigo-50 to-indigo-100 rounded-t-lg">
           <div className="flex items-center justify-center">
-            <CardTitle className="text-2xl font-bold text-[#EC1C24]">Vecinos Xpress</CardTitle>
-            <span className="ml-2 text-xs bg-[#EC1C24] text-white px-1 py-0.5 rounded-sm">by NotaryPro</span>
+            <CardTitle className="text-2xl font-bold text-[#2d219b]">Vecinos Xpress</CardTitle>
+            <span className="ml-2 text-xs bg-[#2d219b] text-white px-1 py-0.5 rounded-sm">by NotaryPro</span>
           </div>
           <CardDescription>Plataforma POS para socios</CardDescription>
         </CardHeader>
@@ -125,7 +125,7 @@ export default function POSAppPage() {
             
             <TabsContent value="web" className="space-y-4 mt-4">
               <div className="flex justify-center">
-                <Store className="h-16 w-16 text-[#EC1C24]" />
+                <Store className="h-16 w-16 text-[#2d219b]" />
               </div>
               
               <div className="text-center mb-4">
@@ -148,7 +148,7 @@ export default function POSAppPage() {
                 </div>
                 
                 <Button 
-                  className="w-full bg-[#EC1C24] hover:bg-[#d91920] h-12"
+                  className="w-full bg-[#2d219b] hover:bg-[#231a7c] h-12"
                   onClick={accessWebPOS}
                   disabled={isLoading}
                 >
@@ -182,7 +182,7 @@ export default function POSAppPage() {
             
             <TabsContent value="mobile" className="space-y-4 mt-4">
               <div className="flex justify-center">
-                <Smartphone className="h-16 w-16 text-[#EC1C24]" />
+                <Smartphone className="h-16 w-16 text-[#2d219b]" />
               </div>
               
               <div className="text-center space-y-2">
@@ -195,7 +195,7 @@ export default function POSAppPage() {
 
               <div className="space-y-3">
                 <Button 
-                  className="w-full bg-[#EC1C24] hover:bg-[#d91920] h-12"
+                  className="w-full bg-[#2d219b] hover:bg-[#231a7c] h-12"
                   onClick={handleDownloadApp}
                 >
                   <Download className="mr-2 h-5 w-5" />
@@ -204,7 +204,7 @@ export default function POSAppPage() {
 
                 <Button 
                   variant="outline" 
-                  className="w-full h-12 border-[#EC1C24] text-[#EC1C24]"
+                  className="w-full h-12 border-[#2d219b] text-[#2d219b]"
                   onClick={showQRCode}
                 >
                   <QrCode className="mr-2 h-5 w-5" />
