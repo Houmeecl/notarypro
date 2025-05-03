@@ -65,6 +65,7 @@ import PaymentDemo from "@/pages/payment-demo";
 import DocumentoEjemplo from "@/pages/documento-ejemplo";
 import VerificacionIdentidadDemo from "@/pages/verificacion-identidad-demo";
 import ReadIDVerificationPage from "@/pages/readid-verification";
+import AccesoDirecto from "@/pages/acceso-directo";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -128,7 +129,18 @@ const LazyVerificacionNFC = React.lazy(() => import("@/pages/verificacion-nfc-fi
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={LandingPage} />
+      {/* Página principal con redirección a acceso directo si es necesario */}
+      <Route path="/" component={() => {
+        try {
+          return <LandingPage />;
+        } catch (error) {
+          console.error("Error al cargar la página principal:", error);
+          window.location.href = "/acceso-directo";
+          return null;
+        }
+      }} />
+      {/* Página de acceso directo - evita problemas de navegación */}
+      <Route path="/acceso-directo" component={AccesoDirecto} />
       {/* VecinosExpress - Versión consolidada */}
       <Route path="/vecinos-express" component={VecinosExpress} />
       <Route path="/vecinos-express-new" component={() => {
