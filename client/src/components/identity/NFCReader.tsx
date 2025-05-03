@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, AlertTriangle, CheckCircle, Smartphone, RotateCcw } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, CheckCircle, Smartphone, RotateCcw, AlertCircle, RefreshCw } from 'lucide-react';
 import { useMicroInteractions } from '@/hooks/use-micro-interactions';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle, RefreshCw, Smartphone } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 
