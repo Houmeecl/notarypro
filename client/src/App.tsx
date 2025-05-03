@@ -491,30 +491,52 @@ function Router() {
       <Route path="/integraciones-demo" component={IntegracionesDemo} />
       <Route path="/integraciones-api-identidad" component={IntegracionesApiIdentidad} />
       
-      {/* Validación de Identidad */}
-      <Route path="/verificacion-identidad-demo" component={VerificacionIdentidadDemo} />
+      {/* VERIFICACIÓN DE IDENTIDAD - Flujo unificado */}
+      <Route path="/verificacion-identidad" component={VerificacionIdentidadDemo} />
       <Route path="/readid-verification" component={ReadIDVerificationPage} />
-      <Route path="/verificacion-avanzada" component={VerificacionAvanzada} />
-      <Route path="/verificacion-identidad-qr" component={VerificacionIdentidadQR} />
-      <Route path="/verificacion-identidad-nfc" component={VerificacionIdentidadNFC} />
-      <Route path="/verificacion-integrada" component={VerificacionIntegradaPage} />
+      
+      {/* MODO NFC SIMPLIFICADO - usando un solo componente*/}
+      <Route path="/verificacion-nfc" component={() => {
+        // Importar dinámicamente el componente nuevo
+        const VerificacionNFC = React.lazy(() => import("@/pages/verificacion-nfc"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <VerificacionNFC />
+          </Suspense>
+        );
+      }} />
+      
+      {/* MODO FALLBACK PARA DISPOSITIVOS MÓVILES */}
       <Route path="/verificacion-movil" component={VerificacionMovil} />
-      <Route path="/verificacion-nfc-movil" component={VerificacionNFCMovil} />
-      <Route path="/verificacion-identidad-movil" component={() => (
-        <Suspense fallback={<LazyLoadingFallback />}>
-          <LazyVerificacionMovil />
-        </Suspense>
-      )} />
-      <Route path="/verificacion-identidad-readid" component={() => (
-        <Suspense fallback={<LazyLoadingFallback />}>
-          <LazyVerificacionREADID />
-        </Suspense>
-      )} />
-      <Route path="/verificacion-inverid" component={() => (
-        <Suspense fallback={<LazyLoadingFallback />}>
-          <LazyVerificacionInverID />
-        </Suspense>
-      )} />
+      
+      {/* Redirecciones de URLs anteriores para compatibilidad */}
+      <Route path="/verificacion-identidad-nfc">
+        <Redirect to="/verificacion-nfc" />
+      </Route>
+      <Route path="/verificacion-nfc-movil">
+        <Redirect to="/verificacion-nfc" />
+      </Route>
+      <Route path="/verificacion-identidad-qr">
+        <Redirect to="/verificacion-identidad" />
+      </Route>
+      <Route path="/verificacion-identidad-demo">
+        <Redirect to="/verificacion-identidad" />
+      </Route>
+      <Route path="/verificacion-avanzada">
+        <Redirect to="/verificacion-identidad" />
+      </Route>
+      <Route path="/verificacion-integrada">
+        <Redirect to="/verificacion-identidad" />
+      </Route>
+      <Route path="/verificacion-identidad-movil">
+        <Redirect to="/verificacion-movil" />
+      </Route>
+      <Route path="/verificacion-identidad-readid">
+        <Redirect to="/verificacion-identidad" />
+      </Route>
+      <Route path="/verificacion-inverid">
+        <Redirect to="/verificacion-identidad" />
+      </Route>
       
       {/* Demostración de Pagos con MercadoPago */}
       <Route path="/payment-demo" component={PaymentDemo} />
