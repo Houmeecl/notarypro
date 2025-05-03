@@ -110,9 +110,9 @@ export const VecinosAdminLayout = ({
                 />
                 <NavItem 
                   icon={<FileText size={20} className="text-white" />} 
-                  label="Documentos" 
-                  href="/vecinos/admin/documents"
-                  active={location === "/vecinos/admin/documents"}
+                  label="Gestor Documental" 
+                  href="/vecinos/admin/document-manager"
+                  active={location === "/vecinos/admin/document-manager"}
                 />
                 <NavItem 
                   icon={<CreditCard size={20} className="text-white" />} 
