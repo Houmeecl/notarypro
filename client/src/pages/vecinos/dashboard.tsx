@@ -139,7 +139,7 @@ export default function VecinosDashboard() {
           <CardFooter>
             <Button 
               className="w-full" 
-              onClick={() => setLocation('/partners/webapp-pos-official')}
+              onClick={() => setLocation('/partners/webapp-pos')}
             >
               Iniciar POS Web
               <ArrowRight className="ml-2 h-4 w-4" />
