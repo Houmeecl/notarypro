@@ -132,9 +132,14 @@ export default function IntegracionesDemo() {
     <div className="container py-10 space-y-8">
       <div className="text-center">
         <h1 className="text-3xl font-bold tracking-tight mb-2">Demo de Integraciones</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-muted-foreground max-w-2xl mx-auto mb-4">
           Prueba las funcionalidades avanzadas integradas en la plataforma Cerfidoc: chatbot con inteligencia artificial, análisis de documentos legales con nuestra nueva API y videollamadas en tiempo real.
         </p>
+        <div className="flex justify-center gap-4">
+          <Button variant="outline" onClick={() => window.location.href = "/integraciones-api-identidad"}>
+            API de Verificación de Identidad
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="chatbot" className="max-w-4xl mx-auto">

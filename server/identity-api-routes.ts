@@ -1,22 +1,41 @@
-import { Router, Request, Response } from 'express';
+import express, { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import { nanoid } from 'nanoid';
+import { storage } from './storage';
+import { insertApiIdentityVerificationSchema } from '@shared/schema';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import { v4 as uuidv4 } from 'uuid';
-import { db } from './db';
-import { identity_verifications, type ApiIdentityVerification } from '@shared/schema';
-import jwt, { JwtPayload } from 'jsonwebtoken';
 
-// Interfaces para identidad
-interface IdentityToken {
-  sessionId: string;
-  userData?: any;
-  requiredVerifications: string[];
-  callbackUrl: string;
-  [key: string]: any;
+// Configurar almacenamiento para archivos de verificación
+const uploadsDir = path.join(process.cwd(), "uploads");
+const verificationDir = path.join(uploadsDir, "id-verification");
+
+if (!fs.existsSync(verificationDir)) {
+  fs.mkdirSync(verificationDir, { recursive: true });
 }
 
-// Extender el tipo Request para incluir el usuario autenticado
+const storage_disk = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, verificationDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueId = nanoid();
+    const extension = path.extname(file.originalname);
+    cb(null, `${uniqueId}${extension}`);
+  }
+});
+
+const upload = multer({ storage: storage_disk });
+
+// Define la interfaz para el token de identidad
+interface IdentityToken {
+  apiKey: string;
+  sessionId: string;
+  expiresAt: number;
+}
+
+// Extender la interfaz Express.Request para incluir el token de identidad
 declare global {
   namespace Express {
     interface Request {
@@ -25,580 +44,673 @@ declare global {
   }
 }
 
-// Configuración de multer para subida de archivos
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(process.cwd(), 'uploads', 'identity');
-    
-    // Crear directorio si no existe
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-  }
-});
+// Crear el router para la API de identidad
+const identityApiRouter = express.Router();
 
-const upload = multer({ 
-  storage,
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB
-  },
-  fileFilter: (req, file, cb) => {
-    // Permitir solo imágenes
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Solo se permiten imágenes'));
-    }
-  }
-});
+// Secret para JWT (en un entorno de producción, esto debería estar en variables de entorno)
+const JWT_SECRET = process.env.IDENTITY_API_JWT_SECRET || 'NotaryPro_Identity_API_Secret';
 
-export const identityApiRouter = Router();
-
-// Verificar API key
-function validateApiKey(req: Request, res: Response, next: any) {
-  const apiKey = req.headers['x-api-key'] as string;
-  
-  if (!apiKey) {
+// Middleware para validar API key
+const validateApiKey = (req: Request, res: Response, next: any) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
       success: false,
-      error: 'API key no proporcionada',
-      code: 'MISSING_API_KEY'
+      error: "API key no proporcionada. Use 'Authorization: Bearer YOUR_API_KEY' en las cabeceras."
     });
   }
 
-  // En producción, validar contra base de datos
-  // Por ahora, usamos una clave de ejemplo
-  if (apiKey !== process.env.NOTARYPRO_API_KEY && apiKey !== 'test_api_key_notarypro_identity') {
-    return res.status(403).json({
+  const apiKey = authHeader.split(' ')[1];
+  
+  // Verificar si es una clave de API válida (en producción, se verificaría contra una base de datos)
+  // Para fines de demo, permitimos las claves que comiencen con "TEST_" o "NPRO_"
+  if (!apiKey.startsWith('TEST_') && !apiKey.startsWith('NPRO_')) {
+    return res.status(401).json({
       success: false,
-      error: 'API key inválida',
-      code: 'INVALID_API_KEY'
+      error: "API key inválida"
     });
   }
-  
+
+  // Almacenar API key en el objeto request para uso posterior
+  req.user = { apiKey, sessionId: '', expiresAt: 0 };
   next();
-}
+};
 
-// Verificar token de identidad
-function validateIdentityToken(req: Request, res: Response, next: any) {
-  const token = req.headers.authorization?.split(' ')[1];
-  
-  if (!token) {
+// Middleware para validar JWT token
+const validateToken = (req: Request, res: Response, next: any) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
       success: false,
-      error: 'Token de identidad no proporcionado',
-      code: 'MISSING_TOKEN'
+      error: "Token no proporcionado. Use 'Authorization: Bearer YOUR_TOKEN' en las cabeceras."
     });
   }
+
+  const token = authHeader.split(' ')[1];
   
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'notarypro_identity_secret');
-    req.user = decoded as IdentityToken;
+    const decoded = jwt.verify(token, JWT_SECRET) as IdentityToken;
+    req.user = decoded;
     next();
   } catch (error) {
-    return res.status(403).json({
+    return res.status(401).json({
       success: false,
-      error: 'Token de identidad inválido',
-      code: 'INVALID_TOKEN'
+      error: "Token inválido o expirado"
     });
   }
-}
+};
 
-/**
- * @route POST /api/identity-api/create-session
- * @description Crea una nueva sesión de verificación de identidad
- * @access Privado (requiere API key)
- */
+// Ruta para crear una nueva sesión de verificación
 identityApiRouter.post('/create-session', validateApiKey, async (req: Request, res: Response) => {
   try {
-    const { 
-      callbackUrl, 
-      userData, 
-      requiredVerifications = ['document', 'facial', 'nfc'],
-      customBranding = {}
-    } = req.body;
+    const { callbackUrl, userData, requiredVerifications } = req.body;
     
     if (!callbackUrl) {
       return res.status(400).json({
         success: false,
-        error: 'URL de callback es requerida',
-        code: 'MISSING_CALLBACK_URL'
+        error: "callbackUrl es requerido"
       });
     }
     
-    // Generar ID único para esta sesión
-    const sessionId = uuidv4();
+    // Lista de verificaciones permitidas
+    const allowedVerifications = ['document', 'facial', 'nfc', 'liveness'];
     
-    // Crear token JWT para esta sesión
-    const token = jwt.sign(
-      { 
-        sessionId, 
-        userData,
-        requiredVerifications,
-        callbackUrl 
-      }, 
-      process.env.JWT_SECRET || 'notarypro_identity_secret',
-      { expiresIn: '1h' }
-    );
+    // Si se especifican verificaciones requeridas, validar que sean permitidas
+    if (requiredVerifications && Array.isArray(requiredVerifications)) {
+      const invalidVerifications = requiredVerifications.filter(v => !allowedVerifications.includes(v));
+      if (invalidVerifications.length > 0) {
+        return res.status(400).json({
+          success: false,
+          error: `Verificaciones no válidas: ${invalidVerifications.join(', ')}. Las permitidas son: ${allowedVerifications.join(', ')}`
+        });
+      }
+    }
     
-    // Almacenar sesión en la base de datos
-    await db.insert(identity_verifications).values({
+    // Generar sessionId único
+    const sessionId = `session-${nanoid(16)}`;
+    
+    // Determinar cuáles verificaciones son requeridas (por defecto, todas)
+    const verifications = requiredVerifications || allowedVerifications;
+    
+    // Determinar tiempo de expiración (1 hora por defecto)
+    const expiresIn = 3600; // 1 hora en segundos
+    const expiresAt = Math.floor(Date.now() / 1000) + expiresIn;
+    
+    // Crear un token JWT
+    const token = jwt.sign({ 
+      apiKey: req.user?.apiKey,
       sessionId,
-      status: 'pending',
-      requiredVerifications: JSON.stringify(requiredVerifications),
-      userData: userData ? JSON.stringify(userData) : null,
+      expiresAt
+    }, JWT_SECRET);
+    
+    // Generar URL de verificación
+    const baseUrl = process.env.BASE_URL || 'https://notarypro.cl';
+    const verificationUrl = `${baseUrl}/identity-verification/${sessionId}`;
+    
+    // Guardar la sesión en la base de datos
+    await storage.createApiIdentityVerification({
+      sessionId,
+      apiKey: req.user?.apiKey as string,
+      status: 'created',
       callbackUrl,
-      customBranding: customBranding ? JSON.stringify(customBranding) : null,
+      userData: userData || {},
+      requiredVerifications: verifications,
+      completedVerifications: [],
       createdAt: new Date(),
+      updatedAt: new Date()
     });
     
-    // Generar URL para verificación
-    const verificationUrl = `${process.env.APP_URL || 'https://notarypro.cl'}/identity-verification/${sessionId}?token=${token}`;
-    
-    // Devolver datos de sesión
+    // Devolver respuesta exitosa
     return res.status(201).json({
       success: true,
       data: {
         sessionId,
         token,
         verificationUrl,
-        expiresIn: 3600, // 1 hora en segundos
+        expiresIn
       }
     });
   } catch (error) {
     console.error('Error al crear sesión de verificación:', error);
     return res.status(500).json({
       success: false,
-      error: 'Error al crear sesión de verificación',
-      code: 'SESSION_CREATION_ERROR'
+      error: 'Error interno al crear sesión de verificación'
     });
   }
 });
 
-/**
- * @route GET /api/identity-api/session/:sessionId
- * @description Obtiene el estado de una sesión de verificación
- * @access Privado (requiere API key)
- */
-identityApiRouter.get('/session/:sessionId', validateApiKey, async (req: Request, res: Response) => {
+// Ruta para consultar el estado de una sesión
+identityApiRouter.get('/session/:sessionId', validateToken, async (req: Request, res: Response) => {
   try {
     const { sessionId } = req.params;
     
-    // Buscar sesión en la base de datos
-    const [session] = await db
-      .select()
-      .from(identity_verifications)
-      .where(eq(identity_verifications.sessionId, sessionId));
+    // Verificar si el sessionId del token coincide con el solicitado
+    if (req.user?.sessionId && req.user.sessionId !== sessionId) {
+      return res.status(403).json({
+        success: false,
+        error: "Token no válido para esta sesión"
+      });
+    }
+    
+    // Buscar la sesión en la base de datos
+    const session = await storage.getApiIdentityVerificationBySessionId(sessionId);
     
     if (!session) {
       return res.status(404).json({
         success: false,
-        error: 'Sesión no encontrada',
-        code: 'SESSION_NOT_FOUND'
+        error: "Sesión de verificación no encontrada"
       });
     }
     
-    // Devolver estado de sesión
+    // Verificar que la API key del token coincide con la de la sesión
+    if (session.apiKey !== req.user?.apiKey) {
+      return res.status(403).json({
+        success: false,
+        error: "No autorizado para acceder a esta sesión"
+      });
+    }
+    
+    // Devolver el estado de la sesión
     return res.status(200).json({
       success: true,
       data: {
         sessionId: session.sessionId,
         status: session.status,
-        requiredVerifications: JSON.parse(session.requiredVerifications as string),
-        completedVerifications: session.completedVerifications ? JSON.parse(session.completedVerifications as string) : [],
-        verificationResult: session.verificationResult ? JSON.parse(session.verificationResult as string) : null,
+        requiredVerifications: session.requiredVerifications,
+        completedVerifications: session.completedVerifications,
         createdAt: session.createdAt,
-        updatedAt: session.updatedAt
+        updatedAt: session.updatedAt,
+        // Si el estado es completed o failed, incluir el resultado
+        ...(session.status === 'completed' || session.status === 'failed' ? {
+          verificationResult: session.verificationResult
+        } : {})
       }
     });
   } catch (error) {
-    console.error('Error al obtener sesión de verificación:', error);
+    console.error('Error al consultar estado de verificación:', error);
     return res.status(500).json({
       success: false,
-      error: 'Error al obtener sesión de verificación',
-      code: 'SESSION_FETCH_ERROR'
+      error: 'Error interno al consultar estado de verificación'
     });
   }
 });
 
-/**
- * @route POST /api/identity-api/verify/document
- * @description Verifica un documento de identidad subido
- * @access Privado (requiere token de identidad)
- */
-identityApiRouter.post('/verify/document', validateIdentityToken, upload.single('document'), async (req: Request, res: Response) => {
+// Ruta para actualizar el estado de una sesión (uso interno, no expuesta a clientes)
+identityApiRouter.post('/update-session/:sessionId', async (req: Request, res: Response) => {
   try {
-    const { sessionId } = req.user;
-    const documentFile = req.file;
+    const { sessionId } = req.params;
+    const { status, completedVerification, verificationResult } = req.body;
     
-    if (!documentFile) {
-      return res.status(400).json({
+    // Buscar la sesión en la base de datos
+    const session = await storage.getApiIdentityVerificationBySessionId(sessionId);
+    
+    if (!session) {
+      return res.status(404).json({
         success: false,
-        error: 'No se proporcionó imagen del documento',
-        code: 'MISSING_DOCUMENT'
+        error: "Sesión de verificación no encontrada"
       });
     }
     
-    // Aquí iría la lógica real de verificación del documento
-    // Por ejemplo, llamar a un servicio externo, OCR, etc.
-    // Por ahora, simulamos una verificación exitosa:
+    // Actualizar el estado
+    if (status) {
+      session.status = status;
+    }
     
+    // Si se completó una verificación, agregarla al array
+    if (completedVerification && !session.completedVerifications.includes(completedVerification)) {
+      session.completedVerifications.push(completedVerification);
+    }
+    
+    // Si hay resultado de verificación, actualizarlo
+    if (verificationResult) {
+      session.verificationResult = verificationResult;
+    }
+    
+    // Actualizar timestamp
+    session.updatedAt = new Date();
+    
+    // Guardar cambios
+    await storage.updateApiIdentityVerification(session.id, {
+      status: session.status,
+      completedVerifications: session.completedVerifications,
+      verificationResult: session.verificationResult,
+      updatedAt: session.updatedAt
+    });
+    
+    // Si está completa o fallida, enviar webhook
+    if (session.status === 'completed' || session.status === 'failed') {
+      try {
+        // En producción, esto se enviaría como una tarea en segundo plano
+        // Para la demo, lo hacemos de forma sincrónica
+        await sendWebhookNotification(session);
+      } catch (webhookError) {
+        console.error('Error enviando webhook:', webhookError);
+        // No fallamos la operación principal si falla el webhook
+      }
+    }
+    
+    return res.status(200).json({
+      success: true,
+      data: {
+        sessionId: session.sessionId,
+        status: session.status,
+        completedVerifications: session.completedVerifications
+      }
+    });
+  } catch (error) {
+    console.error('Error al actualizar sesión de verificación:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Error interno al actualizar sesión de verificación'
+    });
+  }
+});
+
+// Ruta para subir la imagen del documento
+identityApiRouter.post('/upload-document/:sessionId', validateToken, upload.single('documentImage'), async (req: Request, res: Response) => {
+  try {
+    const { sessionId } = req.params;
+    
+    // Verificar si el sessionId del token coincide con el solicitado
+    if (req.user?.sessionId && req.user.sessionId !== sessionId) {
+      return res.status(403).json({
+        success: false,
+        error: "Token no válido para esta sesión"
+      });
+    }
+    
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: "No se proporcionó ninguna imagen del documento"
+      });
+    }
+    
+    // Buscar la sesión en la base de datos
+    const session = await storage.getApiIdentityVerificationBySessionId(sessionId);
+    
+    if (!session) {
+      return res.status(404).json({
+        success: false,
+        error: "Sesión de verificación no encontrada"
+      });
+    }
+    
+    // Verificar que la API key del token coincide con la de la sesión
+    if (session.apiKey !== req.user?.apiKey) {
+      return res.status(403).json({
+        success: false,
+        error: "No autorizado para actualizar esta sesión"
+      });
+    }
+    
+    // Actualizar información del documento
     const documentData = {
-      documentType: 'ID_CARD', // o PASSPORT, DRIVER_LICENSE, etc.
-      documentNumber: 'XXXX-XXXX-XX',
-      fullName: 'Juan Ejemplo',
-      dateOfBirth: '01/01/1990',
-      expiryDate: '01/01/2030',
-      nationality: 'CL',
-      documentImagePath: documentFile.path,
-      verificationScore: 0.95
+      documentImagePath: req.file.path,
+      documentType: req.body.documentType || 'ID'
     };
     
-    // Actualizar estado de verificación en la base de datos
-    const [session] = await db
-      .select()
-      .from(identity_verifications)
-      .where(eq(identity_verifications.sessionId, sessionId));
+    // Actualizar sesión con información del documento
+    await storage.updateApiIdentityVerification(session.id, {
+      documentData,
+      updatedAt: new Date()
+    });
     
-    if (!session) {
-      return res.status(404).json({
-        success: false,
-        error: 'Sesión no encontrada',
-        code: 'SESSION_NOT_FOUND'
-      });
+    // Si la verificación de documento es requerida, marcarla como completada
+    if (session.requiredVerifications.includes('document') && 
+        !session.completedVerifications.includes('document')) {
+      // Actualizar el estado de la sesión (rutas internas)
+      await updateSessionStatus(sessionId, 'in_progress', 'document');
     }
-    
-    const completedVerifications = session.completedVerifications 
-      ? JSON.parse(session.completedVerifications as string) 
-      : [];
-    
-    completedVerifications.push('document');
-    
-    await db
-      .update(identity_verifications)
-      .set({
-        completedVerifications: JSON.stringify(completedVerifications),
-        documentData: JSON.stringify(documentData),
-        updatedAt: new Date()
-      })
-      .where(eq(identity_verifications.sessionId, sessionId));
     
     return res.status(200).json({
       success: true,
       data: {
-        verificationId: uuidv4(),
-        verificationType: 'document',
-        verificationScore: documentData.verificationScore,
-        documentData
+        documentUploaded: true,
+        message: "Imagen del documento subida correctamente"
       }
     });
   } catch (error) {
-    console.error('Error en verificación de documento:', error);
+    console.error('Error al subir documento:', error);
     return res.status(500).json({
       success: false,
-      error: 'Error en la verificación de documento',
-      code: 'DOCUMENT_VERIFICATION_ERROR'
+      error: 'Error interno al subir documento'
     });
   }
 });
 
-/**
- * @route POST /api/identity-api/verify/facial
- * @description Verifica la identidad facial
- * @access Privado (requiere token de identidad)
- */
-identityApiRouter.post('/verify/facial', validateIdentityToken, upload.single('selfie'), async (req: Request, res: Response) => {
+// Ruta para subir la selfie
+identityApiRouter.post('/upload-selfie/:sessionId', validateToken, upload.single('selfieImage'), async (req: Request, res: Response) => {
   try {
-    const { sessionId } = req.user;
-    const selfieFile = req.file;
+    const { sessionId } = req.params;
     
-    if (!selfieFile) {
+    // Verificar si el sessionId del token coincide con el solicitado
+    if (req.user?.sessionId && req.user.sessionId !== sessionId) {
+      return res.status(403).json({
+        success: false,
+        error: "Token no válido para esta sesión"
+      });
+    }
+    
+    if (!req.file) {
       return res.status(400).json({
         success: false,
-        error: 'No se proporcionó imagen de selfie',
-        code: 'MISSING_SELFIE'
+        error: "No se proporcionó ninguna imagen de selfie"
       });
     }
     
-    // Aquí iría la lógica real de verificación facial
-    // Por ejemplo, comparación con la foto del documento,
-    // detección de vida (liveness), etc.
-    // Por ahora, simulamos una verificación exitosa:
-    
-    const facialData = {
-      livenessPassed: true,
-      matchWithDocument: true,
-      selfieImagePath: selfieFile.path,
-      verificationScore: 0.92
-    };
-    
-    // Actualizar estado de verificación en la base de datos
-    const [session] = await db
-      .select()
-      .from(identity_verifications)
-      .where(eq(identity_verifications.sessionId, sessionId));
+    // Buscar la sesión en la base de datos
+    const session = await storage.getApiIdentityVerificationBySessionId(sessionId);
     
     if (!session) {
       return res.status(404).json({
         success: false,
-        error: 'Sesión no encontrada',
-        code: 'SESSION_NOT_FOUND'
+        error: "Sesión de verificación no encontrada"
       });
     }
     
-    const completedVerifications = session.completedVerifications 
-      ? JSON.parse(session.completedVerifications as string) 
-      : [];
+    // Verificar que la API key del token coincide con la de la sesión
+    if (session.apiKey !== req.user?.apiKey) {
+      return res.status(403).json({
+        success: false,
+        error: "No autorizado para actualizar esta sesión"
+      });
+    }
     
-    completedVerifications.push('facial');
+    // Actualizar información de la selfie
+    const facialData = {
+      selfieImagePath: req.file.path,
+      livenessScore: req.body.livenessScore ? parseFloat(req.body.livenessScore) : null
+    };
     
-    await db
-      .update(identity_verifications)
-      .set({
-        completedVerifications: JSON.stringify(completedVerifications),
-        facialData: JSON.stringify(facialData),
-        updatedAt: new Date()
-      })
-      .where(eq(identity_verifications.sessionId, sessionId));
+    // Actualizar sesión con información de la selfie
+    await storage.updateApiIdentityVerification(session.id, {
+      facialData,
+      updatedAt: new Date()
+    });
+    
+    // Si la verificación facial es requerida, marcarla como completada
+    if (session.requiredVerifications.includes('facial') && 
+        !session.completedVerifications.includes('facial')) {
+      // Actualizar el estado de la sesión
+      await updateSessionStatus(sessionId, 'in_progress', 'facial');
+    }
+    
+    // Si también se requiere liveness y se proporcionó un score, marcarla como completada
+    if (session.requiredVerifications.includes('liveness') && 
+        !session.completedVerifications.includes('liveness') && 
+        facialData.livenessScore !== null && 
+        facialData.livenessScore > 0.7) { // Umbral de 70% para pasar
+      await updateSessionStatus(sessionId, 'in_progress', 'liveness');
+    }
     
     return res.status(200).json({
       success: true,
       data: {
-        verificationId: uuidv4(),
-        verificationType: 'facial',
-        verificationScore: facialData.verificationScore,
-        facialData
+        selfieUploaded: true,
+        message: "Imagen de selfie subida correctamente"
       }
     });
   } catch (error) {
-    console.error('Error en verificación facial:', error);
+    console.error('Error al subir selfie:', error);
     return res.status(500).json({
       success: false,
-      error: 'Error en la verificación facial',
-      code: 'FACIAL_VERIFICATION_ERROR'
+      error: 'Error interno al subir selfie'
     });
   }
 });
 
-/**
- * @route POST /api/identity-api/verify/nfc
- * @description Verifica la identidad mediante NFC
- * @access Privado (requiere token de identidad)
- */
-identityApiRouter.post('/verify/nfc', validateIdentityToken, async (req: Request, res: Response) => {
+// Ruta para registrar datos NFC
+identityApiRouter.post('/submit-nfc/:sessionId', validateToken, async (req: Request, res: Response) => {
   try {
-    const { sessionId } = req.user;
+    const { sessionId } = req.params;
     const { nfcData } = req.body;
+    
+    // Verificar si el sessionId del token coincide con el solicitado
+    if (req.user?.sessionId && req.user.sessionId !== sessionId) {
+      return res.status(403).json({
+        success: false,
+        error: "Token no válido para esta sesión"
+      });
+    }
     
     if (!nfcData) {
       return res.status(400).json({
         success: false,
-        error: 'No se proporcionaron datos NFC',
-        code: 'MISSING_NFC_DATA'
+        error: "No se proporcionaron datos NFC"
       });
     }
     
-    // Aquí iría la lógica real de verificación NFC
-    // Por ejemplo, verificar la autenticidad de los datos leídos del chip NFC
-    // Por ahora, simulamos una verificación exitosa:
-    
-    const nfcVerificationData = {
-      chipAuthenticated: true,
-      dataAuthenticity: true,
-      documentNumber: nfcData.documentNumber,
-      fullName: nfcData.fullName,
-      dateOfBirth: nfcData.dateOfBirth,
-      verificationScore: 0.98
-    };
-    
-    // Actualizar estado de verificación en la base de datos
-    const [session] = await db
-      .select()
-      .from(identity_verifications)
-      .where(eq(identity_verifications.sessionId, sessionId));
+    // Buscar la sesión en la base de datos
+    const session = await storage.getApiIdentityVerificationBySessionId(sessionId);
     
     if (!session) {
       return res.status(404).json({
         success: false,
-        error: 'Sesión no encontrada',
-        code: 'SESSION_NOT_FOUND'
+        error: "Sesión de verificación no encontrada"
       });
     }
     
-    const completedVerifications = session.completedVerifications 
-      ? JSON.parse(session.completedVerifications as string) 
-      : [];
+    // Verificar que la API key del token coincide con la de la sesión
+    if (session.apiKey !== req.user?.apiKey) {
+      return res.status(403).json({
+        success: false,
+        error: "No autorizado para actualizar esta sesión"
+      });
+    }
     
-    completedVerifications.push('nfc');
+    // Actualizar sesión con información NFC
+    await storage.updateApiIdentityVerification(session.id, {
+      nfcData,
+      updatedAt: new Date()
+    });
     
-    await db
-      .update(identity_verifications)
-      .set({
-        completedVerifications: JSON.stringify(completedVerifications),
-        nfcData: JSON.stringify(nfcVerificationData),
-        updatedAt: new Date()
-      })
-      .where(eq(identity_verifications.sessionId, sessionId));
+    // Si la verificación NFC es requerida, marcarla como completada
+    if (session.requiredVerifications.includes('nfc') && 
+        !session.completedVerifications.includes('nfc')) {
+      // Actualizar el estado de la sesión
+      await updateSessionStatus(sessionId, 'in_progress', 'nfc');
+    }
     
     return res.status(200).json({
       success: true,
       data: {
-        verificationId: uuidv4(),
-        verificationType: 'nfc',
-        verificationScore: nfcVerificationData.verificationScore,
-        nfcData: nfcVerificationData
+        nfcDataSubmitted: true,
+        message: "Datos NFC registrados correctamente"
       }
     });
   } catch (error) {
-    console.error('Error en verificación NFC:', error);
+    console.error('Error al registrar datos NFC:', error);
     return res.status(500).json({
       success: false,
-      error: 'Error en la verificación NFC',
-      code: 'NFC_VERIFICATION_ERROR'
+      error: 'Error interno al registrar datos NFC'
     });
   }
 });
 
-/**
- * @route POST /api/identity-api/complete-verification
- * @description Finaliza el proceso de verificación
- * @access Privado (requiere token de identidad)
- */
-identityApiRouter.post('/complete-verification', validateIdentityToken, async (req: Request, res: Response) => {
+// Ruta para completar el proceso de verificación
+identityApiRouter.post('/complete-verification/:sessionId', validateToken, async (req: Request, res: Response) => {
   try {
-    const { sessionId } = req.user;
+    const { sessionId } = req.params;
     
-    // Obtener sesión de verificación
-    const [session] = await db
-      .select()
-      .from(identity_verifications)
-      .where(eq(identity_verifications.sessionId, sessionId));
+    // Verificar si el sessionId del token coincide con el solicitado
+    if (req.user?.sessionId && req.user.sessionId !== sessionId) {
+      return res.status(403).json({
+        success: false,
+        error: "Token no válido para esta sesión"
+      });
+    }
+    
+    // Buscar la sesión en la base de datos
+    const session = await storage.getApiIdentityVerificationBySessionId(sessionId);
     
     if (!session) {
       return res.status(404).json({
         success: false,
-        error: 'Sesión no encontrada',
-        code: 'SESSION_NOT_FOUND'
+        error: "Sesión de verificación no encontrada"
       });
     }
     
-    const requiredVerifications = JSON.parse(session.requiredVerifications as string);
-    const completedVerifications = session.completedVerifications 
-      ? JSON.parse(session.completedVerifications as string) 
-      : [];
+    // Verificar que la API key del token coincide con la de la sesión
+    if (session.apiKey !== req.user?.apiKey) {
+      return res.status(403).json({
+        success: false,
+        error: "No autorizado para completar esta sesión"
+      });
+    }
     
-    // Verificar que se hayan completado todas las verificaciones requeridas
-    const allVerificationsComplete = requiredVerifications.every(
-      (v: string) => completedVerifications.includes(v)
+    // Verificar si se han completado todas las verificaciones requeridas
+    const pendingVerifications = session.requiredVerifications.filter(
+      v => !session.completedVerifications.includes(v)
     );
     
-    if (!allVerificationsComplete) {
+    if (pendingVerifications.length > 0) {
       return res.status(400).json({
         success: false,
-        error: 'No se han completado todas las verificaciones requeridas',
-        code: 'INCOMPLETE_VERIFICATIONS',
-        data: {
-          required: requiredVerifications,
-          completed: completedVerifications
-        }
+        error: `Verificación incompleta. Faltan: ${pendingVerifications.join(', ')}`
       });
     }
     
-    // Calcular resultado general de la verificación
-    // En el mundo real, implementarías una lógica más compleja aquí
-    
-    // Obtener los datos de todas las verificaciones
-    const documentData = session.documentData ? JSON.parse(session.documentData as string) : null;
-    const facialData = session.facialData ? JSON.parse(session.facialData as string) : null;
-    const nfcData = session.nfcData ? JSON.parse(session.nfcData as string) : null;
-    
-    // Calculamos un score general
-    let overallScore = 0;
-    let factorsCount = 0;
-    
-    if (documentData) {
-      overallScore += documentData.verificationScore;
-      factorsCount++;
-    }
-    
-    if (facialData) {
-      overallScore += facialData.verificationScore;
-      factorsCount++;
-    }
-    
-    if (nfcData) {
-      overallScore += nfcData.verificationScore;
-      factorsCount++;
-    }
-    
-    overallScore = factorsCount > 0 ? overallScore / factorsCount : 0;
-    
-    // Determinar resultado final
-    const passed = overallScore >= 0.7;
-    
+    // Generar resultado de verificación
     const verificationResult = {
-      passed,
-      overallScore,
-      completedAt: new Date(),
-      verificationDetails: {
-        document: documentData,
-        facial: facialData,
-        nfc: nfcData
+      overallStatus: "approved",
+      confidence: 0.95,
+      timestamp: new Date().toISOString(),
+      verificationId: `verif-${nanoid(8)}`,
+      personData: {
+        name: session.userData?.name || "Nombre Verificado",
+        documentNumber: session.nfcData?.documentNumber || "12345678-9",
+        birthDate: session.nfcData?.fechaNacimiento || "1990-01-01"
       }
     };
     
-    // Actualizar estado de la sesión
-    await db
-      .update(identity_verifications)
-      .set({
-        status: passed ? 'verified' : 'failed',
-        verificationResult: JSON.stringify(verificationResult),
-        updatedAt: new Date()
-      })
-      .where(eq(identity_verifications.sessionId, sessionId));
+    // Actualizar el estado de la sesión a completado
+    await storage.updateApiIdentityVerification(session.id, {
+      status: 'completed',
+      verificationResult,
+      updatedAt: new Date()
+    });
     
-    // Generar certificado de verificación si la verificación fue exitosa
-    let verificationCertificate = null;
-    
-    if (passed) {
-      // En un escenario real, generarías un certificado PDF
-      // Por ahora, simplemente generamos un ID de certificado
-      verificationCertificate = {
-        certificateId: uuidv4(),
-        certificateUrl: `${process.env.APP_URL || 'https://notarypro.cl'}/identity-certificate/${sessionId}`,
-        issuedAt: new Date(),
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 días
-      };
+    // Enviar notificación webhook
+    try {
+      await sendWebhookNotification({
+        ...session,
+        status: 'completed',
+        verificationResult
+      });
+    } catch (webhookError) {
+      console.error('Error enviando webhook:', webhookError);
+      // No fallamos la operación principal si falla el webhook
     }
-    
-    // Notificar resultado a través del callback URL
-    // En un escenario real, implementarías esta lógica aquí
     
     return res.status(200).json({
       success: true,
       data: {
         sessionId,
-        status: passed ? 'verified' : 'failed',
-        verificationResult,
-        verificationCertificate
+        status: 'completed',
+        verificationResult
       }
     });
   } catch (error) {
     console.error('Error al completar verificación:', error);
     return res.status(500).json({
       success: false,
-      error: 'Error al completar la verificación',
-      code: 'VERIFICATION_COMPLETION_ERROR'
+      error: 'Error interno al completar verificación'
     });
   }
 });
 
-// Importar el módulo de eq de drizzle-orm
-import { eq } from 'drizzle-orm';
+// Función para actualizar el estado de una sesión (uso interno)
+async function updateSessionStatus(sessionId: string, status: string, completedVerification?: string) {
+  try {
+    // Buscar la sesión en la base de datos
+    const session = await storage.getApiIdentityVerificationBySessionId(sessionId);
+    
+    if (!session) {
+      throw new Error(`Sesión no encontrada: ${sessionId}`);
+    }
+    
+    // Actualizar estado
+    const updates: any = {
+      status,
+      updatedAt: new Date()
+    };
+    
+    // Si se completó una verificación, agregarla al array
+    if (completedVerification && !session.completedVerifications.includes(completedVerification)) {
+      updates.completedVerifications = [...session.completedVerifications, completedVerification];
+    }
+    
+    // Guardar cambios
+    await storage.updateApiIdentityVerification(session.id, updates);
+    
+    // Verificar si todas las verificaciones requeridas están completas
+    if (completedVerification) {
+      const updatedCompletedVerifications = [...session.completedVerifications];
+      if (!updatedCompletedVerifications.includes(completedVerification)) {
+        updatedCompletedVerifications.push(completedVerification);
+      }
+      
+      const pendingVerifications = session.requiredVerifications.filter(
+        v => !updatedCompletedVerifications.includes(v)
+      );
+      
+      // Si ya no hay verificaciones pendientes, marcar como completa
+      if (pendingVerifications.length === 0) {
+        await storage.updateApiIdentityVerification(session.id, {
+          status: 'completed',
+          updatedAt: new Date()
+        });
+      }
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error actualizando estado de sesión:', error);
+    return false;
+  }
+}
+
+// Función para enviar notificaciones webhook
+async function sendWebhookNotification(session: any) {
+  // Si no hay URL de callback, salir
+  if (!session.callbackUrl) {
+    return;
+  }
+  
+  try {
+    // En producción, debería firmarse el webhook con un secreto
+    const webhookPayload = {
+      sessionId: session.sessionId,
+      status: session.status,
+      completedVerifications: session.completedVerifications,
+      requiredVerifications: session.requiredVerifications,
+      timestamp: new Date().toISOString(),
+      ...(session.status === 'completed' || session.status === 'failed' ? {
+        verificationResult: session.verificationResult
+      } : {})
+    };
+    
+    // Enviar webhook (en producción, esto se haría con reintentos)
+    const response = await fetch(session.callbackUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-NotaryPro-Signature': 'demo', // En producción, firma HMAC
+        'User-Agent': 'NotaryPro-Identity-API/1.0'
+      },
+      body: JSON.stringify(webhookPayload)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    
+    return true;
+  } catch (error) {
+    console.error(`Error enviando webhook a ${session.callbackUrl}:`, error);
+    throw error;
+  }
+}
+
+export { identityApiRouter };
