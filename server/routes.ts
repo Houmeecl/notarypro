@@ -62,6 +62,7 @@ import { mobileApiRouter } from "./partners/mobile-api";
 import { translationRouter } from "./translation-routes";
 import mercadoPagoRouter from "./mercadopago-routes";
 import { getApiRouter } from "./getapi-routes";
+import { identityApiRouter } from "./identity-api-routes";
 
 // Ensure these directories exist
 const uploadsDir = path.join(process.cwd(), "uploads");
@@ -202,6 +203,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Registrar rutas de validación de identidad con GetAPI
   app.use('/api/identity', getApiRouter);
+  
+  // Registrar rutas de API de verificación de identidad con NotaryPro
+  app.use('/api/identity-api', identityApiRouter);
 
   // Registrar rutas de APIs de integraciones
   registerAdminApiRoutes(app);

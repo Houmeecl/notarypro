@@ -51,6 +51,7 @@ import RonPlatform from "@/pages/ron-platform";
 import RonSession from "@/pages/ron-session";
 import AyudaLegal from "@/pages/ayuda-legal";
 import IntegracionesDemo from "@/pages/integraciones-demo";
+import IntegracionesApiIdentidad from "@/pages/integraciones-api-identidad";
 import DescargarApk from "@/pages/partners/descargar-apk";
 import ConfirmacionDescarga from "@/pages/partners/confirmacion-descarga";
 import WebAppPOSOfficial from "@/pages/partners/webapp-pos-official";
@@ -378,6 +379,7 @@ function Router() {
       
       {/* Integraciones Demo */}
       <Route path="/integraciones-demo" component={IntegracionesDemo} />
+      <Route path="/integraciones-api-identidad" component={IntegracionesApiIdentidad} />
       
       {/* Validación de Identidad */}
       <Route path="/verificacion-identidad-demo" component={VerificacionIdentidadDemo} />
