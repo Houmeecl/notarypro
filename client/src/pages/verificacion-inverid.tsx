@@ -5,7 +5,9 @@ import {
   Info,
   ShieldCheck,
   CheckCircle2,
-  LucideShieldCheck
+  LucideShieldCheck,
+  PlayCircle,
+  Laptop
 } from 'lucide-react';
 import { 
   Card, 
@@ -17,6 +19,8 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { CedulaChilenaData } from '@/lib/nfc-reader';
 import InverIDVerifier from '@/components/identity/InverIDVerifier';
@@ -25,6 +29,7 @@ const VerificacionInverID: React.FC = () => {
   const { toast } = useToast();
   const [verificationComplete, setVerificationComplete] = useState(false);
   const [verificationData, setVerificationData] = useState<any>(null);
+  const [demoMode, setDemoMode] = useState(true); // Por defecto, activamos el modo demostración
   
   // Manejar éxito en la verificación
   const handleSuccess = (data: CedulaChilenaData) => {
@@ -88,6 +93,28 @@ const VerificacionInverID: React.FC = () => {
               <AlertDescription className="text-blue-700">
                 Este sistema combina tecnología NFC, análisis forense documental y validación biométrica para asegurar la identidad con el mayor nivel de confianza.
               </AlertDescription>
+              <div className="mt-4 flex items-center justify-end">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="demo-mode"
+                    checked={demoMode}
+                    onCheckedChange={setDemoMode}
+                  />
+                  <Label htmlFor="demo-mode" className="flex items-center space-x-2 cursor-pointer">
+                    {demoMode ? (
+                      <>
+                        <PlayCircle className="h-4 w-4 text-amber-600" />
+                        <span className="text-amber-700 font-medium">Modo demostración activo</span>
+                      </>
+                    ) : (
+                      <>
+                        <Laptop className="h-4 w-4 text-blue-600" />
+                        <span className="text-blue-700 font-medium">Modo real activo</span>
+                      </>
+                    )}
+                  </Label>
+                </div>
+              </div>
             </Alert>
           </div>
           
