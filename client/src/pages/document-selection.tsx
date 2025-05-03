@@ -16,15 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from "@/components/ui/form";
+// Ya no necesitamos estas importaciones de Form
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 // Eliminamos esta importación temporalmente mientras corregimos errores
@@ -37,12 +29,12 @@ import { useAuth } from '@/hooks/use-auth';
 export default function DocumentSelectionPage() {
   const { toast } = useToast();
   const [location, navigate] = useLocation();
-  const { user } = useAuth();
+  const { user } = useAuth() || { user: null }; // Usar un objeto vacío si useAuth falla
   const [loading, setLoading] = useState(false);
   const [documentType, setDocumentType] = useState("");
   const [agreeToCertify, setAgreeToCertify] = useState(false);
 
-  // Verifica autenticación
+  // Verifica autenticación - pero no depende de ella para mostrar la interfaz
   useEffect(() => {
     if (user) {
       console.log("Usuario autenticado:", user.username);
@@ -96,9 +88,9 @@ export default function DocumentSelectionPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="bg-indigo-900 text-white rounded-t-lg">
+    <div className="min-h-screen flex items-center justify-center bg-[#f2f1ff] p-4">
+      <Card className="w-full max-w-md shadow-md">
+        <CardHeader className="bg-[#2d219b] text-white rounded-t-lg">
           <CardTitle className="text-xl">Seleccione el Documento a Firmar</CardTitle>
           <CardDescription className="text-gray-200">
             Seleccione el tipo de documento que desea generar y firmar
@@ -107,7 +99,7 @@ export default function DocumentSelectionPage() {
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <FormLabel htmlFor="document-type">Tipo de Documento:</FormLabel>
+              <label htmlFor="document-type" className="text-sm font-medium">Tipo de Documento:</label>
               <Select 
                 value={documentType} 
                 onValueChange={setDocumentType}
@@ -159,7 +151,7 @@ export default function DocumentSelectionPage() {
           <Button 
             onClick={handleSubmit} 
             disabled={loading || !documentType || !agreeToCertify}
-            className="bg-indigo-900 hover:bg-indigo-800"
+            className="bg-[#2d219b] hover:bg-[#231c7c]"
           >
             {loading ? "Procesando..." : "Generar Documento"}
           </Button>
