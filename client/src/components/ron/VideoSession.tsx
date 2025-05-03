@@ -1049,6 +1049,93 @@ const VideoSession: React.FC<VideoSessionProps> = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      
+      {/* Diálogo para configurar tiempo máximo de sesión */}
+      <Dialog open={showTimeLimitDialog} onOpenChange={setShowTimeLimitDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <Timer className="h-5 w-5 mr-2 text-indigo-400" />
+              Configurar tiempo máximo de sesión
+            </DialogTitle>
+            <DialogDescription>
+              Establezca el tiempo máximo permitido para esta sesión RON. La sesión finalizará automáticamente cuando se alcance este límite.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label htmlFor="time-limit" className="text-sm font-medium">
+                  Duración máxima (en minutos):
+                </label>
+                <span className="text-sm font-bold bg-indigo-900/30 px-2 py-1 rounded">
+                  {selectedTimeLimit} minutos
+                </span>
+              </div>
+              
+              <Select
+                value={selectedTimeLimit.toString()}
+                onValueChange={(value) => setSelectedTimeLimit(parseInt(value))}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Seleccione duración" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="15">15 minutos</SelectItem>
+                  <SelectItem value="30">30 minutos</SelectItem>
+                  <SelectItem value="45">45 minutos</SelectItem>
+                  <SelectItem value="60">1 hora</SelectItem>
+                  <SelectItem value="90">1 hora 30 minutos</SelectItem>
+                  <SelectItem value="120">2 horas</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded-md mt-2">
+              <div className="flex items-start">
+                <Info className="h-5 w-5 mr-2 text-blue-500 mt-0.5 flex-shrink-0" />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Información importante:</p>
+                  <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1 list-disc pl-4">
+                    <li>Los participantes recibirán avisos a los 5 minutos y 1 minuto antes de finalizar.</li>
+                    <li>La sesión se cerrará automáticamente al alcanzar el tiempo límite.</li>
+                    <li>Todos los documentos compartidos y firmados se guardarán automáticamente.</li>
+                    <li>La grabación de la sesión se detendrá al finalizar.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowTimeLimitDialog(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={() => {
+                // Actualizar el tiempo límite en segundos
+                setSessionTimeLimit(selectedTimeLimit * 60);
+                
+                // Cerrar el diálogo
+                setShowTimeLimitDialog(false);
+                
+                // Mostrar notificación de confirmación
+                toast({
+                  title: "Tiempo máximo actualizado",
+                  description: `El tiempo máximo de sesión se ha actualizado a ${selectedTimeLimit} minutos.`,
+                });
+                
+                // Añadir mensaje al chat
+                addSystemMessage(`El tiempo máximo de sesión ha sido actualizado a ${selectedTimeLimit} minutos.`);
+              }}
+            >
+              <Timer className="h-4 w-4 mr-2" />
+              Establecer tiempo
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
