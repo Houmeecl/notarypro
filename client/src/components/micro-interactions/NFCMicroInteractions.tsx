@@ -10,13 +10,15 @@ interface NFCMicroInteractionsProps {
   points?: number;
   message?: string;
   onComplete?: () => void;
+  onInteractionComplete?: () => void;
 }
 
 const NFCMicroInteractions: React.FC<NFCMicroInteractionsProps> = ({ 
   status, 
   points = 100,
   message,
-  onComplete 
+  onComplete,
+  onInteractionComplete
 }) => {
   const [confetti, setConfetti] = useState<Array<{ x: number; y: number; size: number; color: string }>>([]);
   const { width, height } = useWindowSize();
@@ -42,11 +44,12 @@ const NFCMicroInteractions: React.FC<NFCMicroInteractionsProps> = ({
       // Llamar a onComplete después de mostrar las animaciones
       const timer = setTimeout(() => {
         if (onComplete) onComplete();
+        if (onInteractionComplete) onInteractionComplete();
       }, 2500);
       
       return () => clearTimeout(timer);
     }
-  }, [status, onComplete]);
+  }, [status, onComplete, onInteractionComplete]);
   
   return (
     <div className="relative w-full h-full flex items-center justify-center">

@@ -98,7 +98,7 @@ const WebAppPOSOfficial = () => {
   const [identityVerified, setIdentityVerified] = useState(false);
   const [verificationPoints, setVerificationPoints] = useState(0);
   const [userIdentityData, setUserIdentityData] = useState<CedulaChilenaData | null>(null);
-  const [nfcStatus, setNfcStatus] = useState<NFCReadStatus>(NFCReadStatus.INACTIVE);
+  const [nfcStatus, setNfcStatus] = useState<'idle' | 'scanning' | 'success' | 'error'>('idle');
   const [isNfcModalOpen, setIsNfcModalOpen] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
@@ -413,7 +413,7 @@ const WebAppPOSOfficial = () => {
   };
 
   // Manejar cambios en NFC
-  const handleNFCStatusChange = (status: NFCReadStatus, message?: string) => {
+  const handleNFCStatusChange = (status: 'idle' | 'scanning' | 'success' | 'error', message?: string) => {
     setNfcStatus(status);
     if (message) {
       setNfcMessage(message);
@@ -423,7 +423,7 @@ const WebAppPOSOfficial = () => {
   // Manejar lectura exitosa de NFC
   const handleNFCSuccess = (data: CedulaChilenaData) => {
     setUserIdentityData(data);
-    setNfcStatus(NFCReadStatus.SUCCESS);
+    setNfcStatus('success');
     setIsNfcModalOpen(false);
     
     // Mostrar modal de comparación facial si queremos esa verificación adicional
@@ -438,7 +438,7 @@ const WebAppPOSOfficial = () => {
   // Manejar error de NFC
   const handleNFCError = (error: Error) => {
     console.error('Error NFC:', error);
-    setNfcStatus(NFCReadStatus.ERROR);
+    setNfcStatus('error');
     setNfcMessage(`Error: ${error.message}`);
     
     toast({
@@ -451,7 +451,7 @@ const WebAppPOSOfficial = () => {
   // Abrir modal de NFC
   const openNFCVerification = () => {
     setIsNfcModalOpen(true);
-    setNfcStatus(NFCReadStatus.INACTIVE);
+    setNfcStatus('idle');
     setNfcMessage('');
   };
 
@@ -548,7 +548,7 @@ const WebAppPOSOfficial = () => {
     setIdentityVerified(false);
     setVerificationPoints(0);
     setUserIdentityData(null);
-    setNfcStatus(NFCReadStatus.INACTIVE);
+    setNfcStatus('idle');
     setIsNfcModalOpen(false);
     setShowCamera(false);
     if (cameraStream) {
