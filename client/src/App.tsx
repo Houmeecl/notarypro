@@ -240,6 +240,7 @@ function Router() {
       />
       <Route path="/documents/:documentId" component={DocumentViewPage} />
       <Route path="/document-view-simple/:documentId" component={DocumentViewSimplePage} />
+      <Route path="/document-view/:documentId" component={DocumentViewPage} />
       <ProtectedRoute 
         path="/document-processor" 
         component={DocumentProcessor} 
