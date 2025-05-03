@@ -102,7 +102,7 @@ const WebAppPOS = () => {
   };
   
   const handleProcessDocument = () => {
-    navigate('/partners/webapp-pos-tramite');
+    navigate('/real-pos');
   };
   
   const formatCurrency = (amount: number) => {

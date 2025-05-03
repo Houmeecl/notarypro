@@ -177,7 +177,7 @@ const WebAppPOSOfficial = () => {
         const token = localStorage.getItem('vecinosPartnerToken');
         if (!token) {
           // Si no hay token, redirigir al login
-          setLocation('/vecinos/pos-app');
+          setLocation('/vecinos');
           return;
         }
 
@@ -187,7 +187,7 @@ const WebAppPOSOfficial = () => {
           if (decoded.exp * 1000 < Date.now()) {
             // Token expirado
             localStorage.removeItem('vecinosPartnerToken');
-            setLocation('/vecinos/pos-app');
+            setLocation('/vecinos');
             return;
           }
         } catch (err) {
