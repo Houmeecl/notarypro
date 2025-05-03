@@ -64,6 +64,7 @@ import VerificacionIdentidadDemo from "@/pages/verificacion-identidad-demo";
 import ReadIDVerificationPage from "@/pages/readid-verification";
 import VerificacionAvanzada from "@/pages/verificacion-avanzada";
 import VerificacionIdentidadQR from "@/pages/verificacion-identidad-qr";
+import VerificacionIdentidadNFC from "@/pages/verificacion-identidad-nfc";
 import VerificacionMovil from "@/pages/verificacion-movil";
 
 // Document pages
@@ -493,6 +494,7 @@ function Router() {
       <Route path="/readid-verification" component={ReadIDVerificationPage} />
       <Route path="/verificacion-avanzada" component={VerificacionAvanzada} />
       <Route path="/verificacion-identidad-qr" component={VerificacionIdentidadQR} />
+      <Route path="/verificacion-identidad-nfc" component={VerificacionIdentidadNFC} />
       <Route path="/verificacion-movil" component={VerificacionMovil} />
       <Route path="/verificacion-identidad-movil" component={() => (
         <Suspense fallback={<LazyLoadingFallback />}>
