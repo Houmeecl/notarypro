@@ -11,6 +11,7 @@ import { users, partners } from "@shared/schema";
 import { documentForensicsRouter } from "./document-forensics-routes";
 import { identityVerificationRouter } from "./identity-verification-routes";
 import { contractRouter } from "./contract-routes";
+import { mercadoPagoRouter } from "./mercadopago-routes";
 import { eq } from "drizzle-orm";
 
 export function registerRoutes(app: Express): Server {
@@ -28,6 +29,9 @@ export function registerRoutes(app: Express): Server {
   
   // Rutas para gestión de contratos
   app.use("/api/contracts", contractRouter);
+  
+  // Rutas para pagos con MercadoPago
+  app.use("/api/payments", mercadoPagoRouter);
   
   // Ruta para servir archivos estáticos (como los contratos)
   app.use("/docs", express.static(path.join(process.cwd(), "docs")));

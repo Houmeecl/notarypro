@@ -68,6 +68,46 @@ const TabletPOSPayment: React.FC = () => {
   const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   const tax = subtotal * POS_CONSTANTS.TAX_RATE;
   const total = subtotal + tax;
+  
+  // Verificar parámetros de URL para pagos de MercadoPago
+  useEffect(() => {
+    // Obtener parámetros de la URL
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
+    const reference = params.get('reference');
+    
+    // Si hay parámetros de pago de MercadoPago, procesarlos
+    if (status && reference && reference.startsWith('TX-TABLET-')) {
+      // Guardar ID de transacción
+      setTransactionId(reference);
+      
+      // Procesar según el estado
+      if (status === 'success' || status === 'approved') {
+        setIsCompleted(true);
+        toast({
+          title: 'Pago completado',
+          description: `Transacción ${reference} procesada exitosamente`,
+        });
+      } else if (status === 'pending') {
+        toast({
+          title: 'Pago pendiente',
+          description: 'El pago está en proceso de verificación',
+          variant: 'default',
+        });
+      } else {
+        setErrorMessage('El pago no pudo ser procesado. Por favor intente nuevamente.');
+        toast({
+          title: 'Pago fallido',
+          description: 'No se pudo completar la transacción',
+          variant: 'destructive',
+        });
+      }
+      
+      // Limpiar parámetros de URL para evitar procesamiento duplicado
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  }, []);
   const formattedSubtotal = subtotal.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
   const formattedTax = tax.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
   const formattedTotal = total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
@@ -145,7 +185,7 @@ const TabletPOSPayment: React.FC = () => {
         };
         
         // Crear la preferencia de pago
-        const response = await fetch('/api/mp/create-preference', {
+        const response = await fetch('/api/payments/create-preference', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
