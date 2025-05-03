@@ -1,317 +1,226 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWindowSize } from 'react-use';
-import { Shield, CheckCircle2, Zap, Award, PartyPopper } from 'lucide-react';
+import { CreditCard, CheckCircle, XCircle, Smartphone } from 'lucide-react';
+
+type NFCReadStatus = 'idle' | 'scanning' | 'success' | 'error';
 
 interface NFCMicroInteractionsProps {
-  status: 'idle' | 'scanning' | 'success' | 'error';
-  message?: string;
+  status: NFCReadStatus;
+  points?: number;
   onComplete?: () => void;
 }
 
-/**
- * Componente de micro-interacciones para la validación NFC
- * Muestra diferentes animaciones según el estado del proceso de lectura NFC
- */
 const NFCMicroInteractions: React.FC<NFCMicroInteractionsProps> = ({ 
-  status,
-  message,
-  onComplete
+  status, 
+  points = 100,
+  onComplete 
 }) => {
-  const [showConfetti, setShowConfetti] = useState(false);
+  const [confetti, setConfetti] = useState<Array<{ x: number; y: number; size: number; color: string }>>([]);
   const { width, height } = useWindowSize();
-  const [pointsEarned, setPointsEarned] = useState(0);
-  const [badgeEarned, setBadgeEarned] = useState(false);
-  const [progressValue, setProgressValue] = useState(0);
   
-  // Efecto para manejar la animación de progreso durante el escaneo
+  // Al cambiar a success, generar confeti
   useEffect(() => {
-    let intervalId: NodeJS.Timeout;
-    
-    if (status === 'scanning') {
-      // Reiniciar progreso
-      setProgressValue(0);
+    if (status === 'success') {
+      // Crear partículas de confeti
+      const newConfetti = [];
+      const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
       
-      // Animar el progreso de 0 a 100% mientras está escaneando
-      intervalId = setInterval(() => {
-        setProgressValue(prev => {
-          // Aumentar progreso gradualmente, más lento cerca del final
-          const nextValue = prev + (100 - prev) * 0.03;
-          return Math.min(nextValue, 98); // Nunca llega al 100% hasta que realmente termine
+      for (let i = 0; i < 100; i++) {
+        newConfetti.push({
+          x: Math.random() * 100, // posición x en porcentaje
+          y: Math.random() * 100, // posición y en porcentaje
+          size: Math.random() * 10 + 5, // tamaño entre 5 y 15px
+          color: colors[Math.floor(Math.random() * colors.length)]
         });
-      }, 150);
-    } else if (status === 'success') {
-      // Completar progreso inmediatamente al éxito
-      setProgressValue(100);
-      
-      // Mostrar confeti al tener éxito
-      setShowConfetti(true);
-      
-      // Asignar puntos de gamificación
-      setPointsEarned(25);
-      
-      // Otorgar insignia ocasionalmente (20% de probabilidad)
-      if (Math.random() < 0.2) {
-        setBadgeEarned(true);
       }
       
-      // Ocultar confetti después de 4 segundos
-      setTimeout(() => {
-        setShowConfetti(false);
-        
-        // Notificar que la animación ha terminado
-        if (onComplete) {
-          onComplete();
-        }
-      }, 4000);
-    } else if (status === 'error') {
-      // Resetear progreso en error
-      setProgressValue(0);
+      setConfetti(newConfetti);
+      
+      // Llamar a onComplete después de mostrar las animaciones
+      const timer = setTimeout(() => {
+        if (onComplete) onComplete();
+      }, 2500);
+      
+      return () => clearTimeout(timer);
     }
-    
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
   }, [status, onComplete]);
   
-  // Simulación visual de confeti con elementos DOM
-  const renderConfetti = () => {
-    if (!showConfetti) return null;
-    
-    // En lugar de usar un componente de confeti externo, usamos elementos DOM animados
-    return (
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {Array.from({ length: 30 }).map((_, i) => (
+  return (
+    <div className="relative w-full h-full flex items-center justify-center">
+      {/* Fondo con animación según el estado */}
+      <motion.div
+        className="absolute inset-0 rounded-2xl"
+        animate={{
+          backgroundColor: 
+            status === 'idle' ? 'rgba(255, 255, 255, 0.1)' : 
+            status === 'scanning' ? 'rgba(59, 130, 246, 0.1)' :
+            status === 'success' ? 'rgba(34, 197, 94, 0.1)' :
+            'rgba(239, 68, 68, 0.1)'
+        }}
+        transition={{ duration: 0.5 }}
+      />
+      
+      {/* Confeti en caso de éxito */}
+      <AnimatePresence>
+        {status === 'success' && confetti.map((particle, index) => (
           <motion.div
-            key={i}
-            className={`absolute rounded-sm w-2 h-2 ${
-              ['bg-green-500', 'bg-blue-500', 'bg-yellow-500', 'bg-purple-500', 'bg-pink-500'][
-                Math.floor(Math.random() * 5)
-              ]
-            }`}
+            key={index}
+            className="absolute rounded-full"
             initial={{ 
-              x: Math.random() * width, 
-              y: -20,
-              rotate: Math.random() * 360,
-              opacity: 1 
+              top: '40%', 
+              left: '50%',
+              opacity: 1,
+              scale: 0
             }}
             animate={{ 
-              y: height + 20,
-              rotate: Math.random() * 360 * (Math.random() > 0.5 ? 1 : -1),
-              opacity: 0
+              top: `${particle.y}%`, 
+              left: `${particle.x}%`,
+              opacity: 0,
+              scale: 1
             }}
+            exit={{ opacity: 0 }}
             transition={{ 
-              duration: 2 + Math.random() * 2,
-              ease: "easeOut",
-              delay: Math.random() * 0.8
+              duration: 1 + Math.random(), 
+              ease: "easeOut" 
             }}
-            style={{ 
-              width: 5 + Math.random() * 10, 
-              height: 5 + Math.random() * 10 
+            style={{
+              width: particle.size,
+              height: particle.size,
+              backgroundColor: particle.color
             }}
           />
         ))}
-      </div>
-    );
-  };
-  
-  return (
-    <div className="relative">
-      {/* Animación mientras escanea */}
-      {status === 'scanning' && (
-        <div className="mb-6">
-          {/* Barra de progreso animada */}
-          <div className="bg-gray-200 rounded-full h-4 mb-3 overflow-hidden">
-            <motion.div 
-              className="bg-blue-500 h-full rounded-full"
-              initial={{ width: '0%' }}
-              animate={{ width: `${progressValue}%` }}
-              transition={{ ease: "easeInOut" }}
-            />
-          </div>
-          
-          {/* Círculo pulsante con ícono */}
-          <div className="flex justify-center">
+      </AnimatePresence>
+      
+      {/* Contenido principal según el estado */}
+      <div className="relative z-10 text-center p-6">
+        <AnimatePresence mode="wait">
+          {status === 'idle' && (
             <motion.div
-              className="relative bg-blue-50 rounded-full p-6 border-2 border-blue-300"
-              animate={{
-                scale: [1, 1.1, 1],
-                boxShadow: [
-                  '0 0 0 0 rgba(59, 130, 246, 0.5)',
-                  '0 0 0 15px rgba(59, 130, 246, 0)',
-                  '0 0 0 0 rgba(59, 130, 246, 0)'
-                ]
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatType: "loop"
-              }}
+              key="idle"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="flex flex-col items-center"
+            >
+              <CreditCard className="w-16 h-16 text-zinc-600 mb-4" />
+              <h3 className="text-xl font-bold mb-2">Lector NFC</h3>
+              <p className="text-zinc-500">Esperando para leer cédula</p>
+            </motion.div>
+          )}
+          
+          {status === 'scanning' && (
+            <motion.div
+              key="scanning"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="flex flex-col items-center"
+            >
+              <motion.div 
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
+              >
+                <Smartphone className="w-20 h-20 text-blue-600 mb-4" />
+              </motion.div>
+              
+              <motion.div
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
+              >
+                <h3 className="text-xl font-bold mb-2">Leyendo cédula...</h3>
+              </motion.div>
+              
+              <p className="text-zinc-500">Acerque la cédula al dispositivo</p>
+              
+              {/* Ondas de escaneo */}
+              <div className="relative mt-6">
+                <motion.div
+                  className="absolute rounded-full border-4 border-blue-400"
+                  initial={{ width: 50, height: 50, x: -25, y: -25, opacity: 1 }}
+                  animate={{ width: 150, height: 150, x: -75, y: -75, opacity: 0 }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "easeOut" }}
+                />
+                <motion.div
+                  className="absolute rounded-full border-4 border-blue-400"
+                  initial={{ width: 50, height: 50, x: -25, y: -25, opacity: 1 }}
+                  animate={{ width: 150, height: 150, x: -75, y: -75, opacity: 0 }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "easeOut", delay: 0.5 }}
+                />
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <CreditCard className="w-6 h-6 text-blue-600" />
+                </div>
+              </div>
+            </motion.div>
+          )}
+          
+          {status === 'success' && (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.2 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col items-center"
             >
               <motion.div
                 animate={{ 
-                  rotate: 360,
-                  opacity: [0.6, 1, 0.6] 
+                  scale: [0.8, 1.2, 1],
+                  rotate: [0, 10, -10, 0]
                 }}
-                transition={{ 
-                  duration: 3, 
-                  repeat: Infinity,
-                  ease: "linear" 
-                }}
+                transition={{ duration: 0.6 }}
               >
-                <Zap size={40} className="text-blue-500" />
+                <CheckCircle className="w-24 h-24 text-green-500 mb-4" />
               </motion.div>
               
-              {/* Partículas girando alrededor */}
-              <motion.div
-                className="absolute -top-2 -right-2 bg-blue-400 rounded-full p-1"
-                animate={{
-                  rotate: 360,
-                  x: [0, 10, 0, -10, 0],
-                  y: [0, -10, 0, 10, 0],
-                }}
-                transition={{
-                  duration: 5,
-                  repeat: Infinity,
-                  repeatType: "loop"
-                }}
-              >
-                <div className="w-2 h-2 bg-blue-600 rounded-full" />
-              </motion.div>
+              <h3 className="text-2xl font-bold mb-2">¡Cédula verificada!</h3>
               
+              {/* Puntos ganados con animación */}
               <motion.div
-                className="absolute -bottom-2 -left-2 bg-blue-500 rounded-full p-1"
-                animate={{
-                  rotate: -360,
-                  x: [0, -10, 0, 10, 0],
-                  y: [0, 10, 0, -10, 0],
-                }}
-                transition={{
-                  duration: 5,
-                  repeat: Infinity,
-                  repeatType: "loop"
-                }}
-              >
-                <div className="w-2 h-2 bg-blue-600 rounded-full" />
-              </motion.div>
-            </motion.div>
-          </div>
-          
-          <motion.p 
-            className="text-center text-blue-600 font-medium mt-4"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            {message || "Leyendo cédula... Mantenga quieto el dispositivo"}
-          </motion.p>
-        </div>
-      )}
-      
-      {/* Animación de éxito */}
-      <AnimatePresence>
-        {status === 'success' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="text-center py-6"
-          >
-            <motion.div 
-              className="mb-4 inline-flex items-center justify-center bg-green-100 p-4 rounded-full"
-              animate={{ 
-                scale: [1, 1.2, 1],
-                boxShadow: [
-                  '0 0 0 0 rgba(74, 222, 128, 0.4)',
-                  '0 0 0 20px rgba(74, 222, 128, 0)',
-                  '0 0 0 0 rgba(74, 222, 128, 0)'
-                ]
-              }}
-              transition={{ duration: 1.5 }}
-            >
-              <CheckCircle2 size={50} className="text-green-500" />
-            </motion.div>
-            
-            <motion.h3 
-              className="text-xl font-bold text-green-700 mb-2"
-              initial={{ y: 20 }}
-              animate={{ y: 0 }}
-            >
-              ¡Validación exitosa!
-            </motion.h3>
-            
-            <motion.p 
-              className="text-green-600"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              {message || "Cédula verificada correctamente"}
-            </motion.p>
-            
-            {/* Puntos ganados */}
-            {pointsEarned > 0 && (
-              <motion.div 
-                className="mt-4 bg-blue-50 rounded-lg p-3 inline-block"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-green-100 text-green-800 rounded-full px-4 py-2 font-bold text-lg mt-4"
+              >
+                +{points} puntos
+              </motion.div>
+              
+              <motion.p 
+                className="text-zinc-500 mt-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
               >
-                <p className="text-blue-800 font-medium">
-                  <span className="text-xl">+{pointsEarned}</span> puntos ganados
-                </p>
-              </motion.div>
-            )}
-            
-            {/* Insignia obtenida */}
-            {badgeEarned && (
-              <motion.div 
-                className="mt-4"
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1, type: "spring" }}
-              >
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 inline-block">
-                  <div className="mb-2">
-                    <Award size={30} className="text-yellow-500 mx-auto" />
-                  </div>
-                  <p className="text-yellow-700 font-bold">¡Nueva insignia!</p>
-                  <p className="text-yellow-600 text-sm">Verificador NFC</p>
-                </div>
-              </motion.div>
-            )}
-            
-            {renderConfetti()}
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Animación de error */}
-      <AnimatePresence>
-        {status === 'error' && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0 }}
-            className="bg-red-50 rounded-lg p-4 border border-red-200"
-          >
-            <motion.div 
-              animate={{ 
-                x: [0, -5, 5, -5, 5, 0]
-              }}
-              transition={{ duration: 0.5 }}
-              className="text-center"
-            >
-              <Shield size={30} className="text-red-500 mx-auto mb-2" />
-              <h3 className="text-red-700 font-medium">Error de lectura</h3>
-              <p className="text-red-600 text-sm mt-1">
-                {message || "No se pudo leer la cédula. Intente nuevamente."}
-              </p>
+                Identidad verificada correctamente
+              </motion.p>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+          
+          {status === 'error' && (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="flex flex-col items-center"
+            >
+              <motion.div
+                animate={{ 
+                  scale: [0.8, 1.1, 1],
+                  x: [0, -10, 10, -10, 10, 0]
+                }}
+                transition={{ duration: 0.5 }}
+              >
+                <XCircle className="w-24 h-24 text-red-500 mb-4" />
+              </motion.div>
+              
+              <h3 className="text-xl font-bold mb-2">Error de lectura</h3>
+              <p className="text-zinc-500">No se pudo leer la cédula, intente nuevamente</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

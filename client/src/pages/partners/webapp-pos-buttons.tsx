@@ -36,6 +36,7 @@ const WebAppPOSButtons = () => {
   const [photoTaken, setPhotoTaken] = useState(false);
   const [showNFCReader, setShowNFCReader] = useState(false);
   const [nfcAvailable, setNfcAvailable] = useState(false);
+  const [nfcReadStatus, setNfcReadStatus] = useState<'idle' | 'scanning' | 'success' | 'error'>('idle');
   
   // Estado para múltiples firmantes
   const [currentSignerIndex, setCurrentSignerIndex] = useState(0); // 0 = primer firmante, 1 = segundo firmante
@@ -392,16 +393,25 @@ const WebAppPOSButtons = () => {
     }
   };
   
-  // Manejar verificación con NFC
+  // Función para iniciar la lectura NFC
   const iniciarLecturaNFC = () => {
     setShowNFCReader(true);
     setShowCamera(false);
+    setNfcReadStatus('scanning');
+    toast({
+      title: "Lector NFC activado",
+      description: "Acerque la cédula chilena al lector NFC de su dispositivo",
+    });
   };
   
   const handleNFCSuccess = (data: CedulaChilenaData) => {
     setCedulaData(data);
-    setShowNFCReader(false);
-    setIdentityVerified(true);
+    
+    // Actualizar el estado de lectura para las micro-interacciones
+    setNfcReadStatus('success');
+    
+    // No cerramos inmediatamente el modal para permitir que se muestren las micro-interacciones
+    // El componente NFCMicroInteractions llamará a onComplete después de la animación
     
     // Actualizar datos del cliente con la información de la cédula
     setClienteInfo(prevInfo => ({
@@ -410,6 +420,24 @@ const WebAppPOSButtons = () => {
       rut: data.rut
     }));
     
+    // Ahora el toast se mostrará después de las micro-interacciones
+    // Las micro-interacciones completarán la verificación de identidad
+    setIdentityVerified(true);
+  };
+  
+  const handleNFCCancel = () => {
+    setNfcReadStatus('idle');
+    setShowNFCReader(false);
+    toast({
+      title: "Lectura NFC cancelada",
+      description: "Se ha cancelado la lectura de la cédula",
+      variant: "destructive",
+    });
+  };
+  
+  // Función para manejar cuando las micro-interacciones han finalizado
+  const handleNFCInteractionsComplete = () => {
+    setShowNFCReader(false);
     toast({
       title: "Cédula leída correctamente",
       description: "Se ha verificado la identidad con los datos del chip NFC",
@@ -417,13 +445,21 @@ const WebAppPOSButtons = () => {
     });
   };
   
-  const handleNFCCancel = () => {
-    setShowNFCReader(false);
-    toast({
-      title: "Lectura NFC cancelada",
-      description: "Se ha cancelado la lectura de la cédula",
-      variant: "destructive",
-    });
+  // El manejador para iniciar la lectura NFC fue declarado como duplicado y se eliminó
+  
+  // Manejador para error en la lectura NFC
+  const handleNFCError = (error: any) => {
+    setNfcReadStatus('error');
+    // No cerramos el modal instantáneamente para mostrar la animación de error
+    setTimeout(() => {
+      setNfcReadStatus('idle');
+      setShowNFCReader(false);
+      toast({
+        title: "Error en la lectura NFC",
+        description: "No se pudo leer la cédula. Intente nuevamente.",
+        variant: "destructive",
+      });
+    }, 2000);
   };
 
   const verificarIdentidad = () => {
