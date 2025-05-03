@@ -722,3 +722,37 @@ function parseChileanIDFromPlainText(plainText: string): CedulaChilenaData {
     numeroSerie: extractByPattern(/SERIE:\s*([A-Z0-9]+)/i) || ''
   };
 }
+
+/**
+ * Formatea un RUT chileno al formato estándar (XX.XXX.XXX-X)
+ * @param rut RUT en cualquier formato
+ * @returns RUT formateado
+ */
+export function formatearRut(rut: string): string {
+  if (!rut) return '';
+  
+  // Eliminar puntos y guiones
+  let valor = rut.replace(/\./g, '').replace(/-/g, '');
+  
+  // Obtener dígito verificador
+  const dv = valor.slice(-1);
+  
+  // Obtener cuerpo del RUT
+  const rutNumerico = valor.slice(0, -1);
+  
+  if (rutNumerico.length === 0) return '';
+  
+  // Formatear con puntos y guión
+  let rutFormateado = '';
+  
+  // Insertar puntos
+  for (let i = rutNumerico.length - 1, j = 0; i >= 0; i--, j++) {
+    rutFormateado = rutNumerico.charAt(i) + rutFormateado;
+    if (j === 2 && i !== 0) {
+      rutFormateado = '.' + rutFormateado;
+      j = -1;
+    }
+  }
+  
+  return rutFormateado + '-' + dv;
+}

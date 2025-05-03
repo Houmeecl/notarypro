@@ -58,6 +58,7 @@ import ConfirmacionDescarga from "@/pages/partners/confirmacion-descarga";
 import PaymentDemo from "@/pages/payment-demo";
 import DocumentoEjemplo from "@/pages/documento-ejemplo";
 import VerificacionIdentidadDemo from "@/pages/verificacion-identidad-demo";
+import ReadIDVerificationPage from "@/pages/readid-verification";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -384,6 +385,7 @@ function Router() {
       
       {/* Validación de Identidad */}
       <Route path="/verificacion-identidad-demo" component={VerificacionIdentidadDemo} />
+      <Route path="/readid-verification" component={ReadIDVerificationPage} />
       <Route path="/verificacion-identidad-movil" component={() => (
         <Suspense fallback={<LazyLoadingFallback />}>
           <LazyVerificacionMovil />

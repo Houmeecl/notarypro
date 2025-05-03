@@ -17,7 +17,7 @@ import {
   ChevronDown,
   ChevronUp
 } from "lucide-react";
-import { nfcSupported, readNFCChipData, stopNFCReading } from "@/lib/nfc-reader";
+import { nfcSupported, readNFCChipData, stopNFCReading, CedulaChilenaData } from "@/lib/nfc-reader";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
