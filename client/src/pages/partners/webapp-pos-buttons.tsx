@@ -501,7 +501,7 @@ const WebAppPOSButtons = () => {
         title: "¡Documento procesado!",
         description: `El documento ha sido procesado exitosamente. Comisión: $${result.commission}`,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al procesar documento:', error);
       toast({
         title: "Error al procesar documento",
@@ -1248,13 +1248,27 @@ const WebAppPOSButtons = () => {
               <div className="p-2 relative overflow-hidden">
                 {/* Logo estilo NotaryPro */}
                 <div className="flex items-center">
-                  <div className="bg-zinc-100 p-2 rounded-md shadow-md border border-zinc-300 mr-1">
+                  <div className="bg-zinc-100 p-2 rounded-md shadow-md border border-zinc-300 mr-1 flex items-center">
+                    {/* Logo NotaryPro azul */}
+                    <svg width="30" height="30" viewBox="0 0 100 100" className="mr-2">
+                      <path d="M30,10 L30,60 L15,50 L15,10 L30,10 Z M70,10 L70,50 L55,60 L55,10 L70,10 Z" 
+                            fill="#2563EB" strokeWidth="4" stroke="#2563EB" />
+                      <circle cx="30" cy="30" r="5" fill="#2563EB" />
+                      <circle cx="70" cy="30" r="5" fill="#2563EB" />
+                    </svg>
                     <h1 className="text-xl font-black text-zinc-900 tracking-tight">
                       NOTARY<span className="text-blue-600">PRO</span>
                     </h1>
                   </div>
                   <div className="h-8 w-0.5 bg-zinc-600 mx-2"></div>
-                  <div className="bg-zinc-700 p-2 rounded-md shadow-md border border-zinc-600">
+                  <div className="bg-zinc-700 p-2 rounded-md shadow-md border border-zinc-600 flex items-center">
+                    {/* Logo VecinosXpress rojo */}
+                    <svg width="30" height="30" viewBox="0 0 100 100" className="mr-2">
+                      <path d="M30,10 L30,60 L15,50 L15,10 L30,10 Z M70,10 L70,50 L55,60 L55,10 L70,10 Z" 
+                            fill="#E11D48" strokeWidth="4" stroke="#E11D48" />
+                      <circle cx="30" cy="30" r="5" fill="#E11D48" />
+                      <circle cx="70" cy="30" r="5" fill="#E11D48" />
+                    </svg>
                     <h2 className="text-lg font-bold text-white tracking-tight">
                       VECINOS <span className="text-blue-400">XPRESS</span>
                     </h2>
