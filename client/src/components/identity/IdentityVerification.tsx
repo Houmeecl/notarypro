@@ -24,7 +24,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
   mode = 'simple'
 }) => {
   const { toast } = useToast();
-  const [, navigate] = useNavigate();
+  const [, navigate] = useLocation();
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
   

@@ -69,6 +69,8 @@ const RealPOSPayment: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'connecting' | 'waiting' | 'processing' | 'success' | 'failure'>('idle');
   const [terminalStatus, setTerminalStatus] = useState<'connected' | 'disconnected' | 'error'>('disconnected');
+  const [isIdentityVerified, setIsIdentityVerified] = useState(false);
+  const [verificationData, setVerificationData] = useState<VerificationResult | null>(null);
   
   // Obtener configuración POS
   const posConfig = realPOSConfig;
@@ -592,6 +594,47 @@ const RealPOSPayment: React.FC = () => {
                             placeholder="12.345.678-9"
                           />
                         </div>
+                      </div>
+                      
+                      {/* Verificación de identidad */}
+                      <div className="mt-6 pt-4 border-t">
+                        <h3 className="text-lg font-medium mb-4">Verificación de Identidad</h3>
+                        
+                        {isIdentityVerified ? (
+                          <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start">
+                            <CheckCircle className="text-green-600 w-5 h-5 mt-0.5 mr-3 flex-shrink-0" />
+                            <div>
+                              <p className="font-medium text-green-800">Identidad Verificada</p>
+                              {verificationData && (
+                                <div className="mt-2 text-sm text-green-700">
+                                  <p>Nombre: {verificationData.fullName}</p>
+                                  <p>Documento: {verificationData.documentNumber}</p>
+                                  <p>Método: {verificationData.verificationMethod === 'simulate' ? 'Simulado' : 
+                                             verificationData.verificationMethod === 'nfc' ? 'NFC' :
+                                             verificationData.verificationMethod === 'document' ? 'Documento' : 
+                                             'Selfie'}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <IdentityVerification 
+                            onVerificationComplete={(data) => {
+                              setIsIdentityVerified(true);
+                              setVerificationData(data);
+                              setCustomer({
+                                ...customer,
+                                name: data.fullName,
+                                document: data.documentNumber
+                              });
+                              toast({
+                                title: "Identidad verificada",
+                                description: "La información ha sido verificada exitosamente."
+                              });
+                            }}
+                            mode="simple"
+                          />
+                        )}
                       </div>
                       
                       <div className="mt-6 flex justify-between">
