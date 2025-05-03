@@ -24,7 +24,7 @@ const NavItem = ({ icon, label, href, active }: NavItemProps) => (
   <Link href={href}>
     <div className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
       active 
-        ? "bg-green-50 text-green-700" 
+        ? "bg-[#f2f1ff] text-[#2d219b]" 
         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
     }`}>
       <div className="flex-shrink-0">{icon}</div>
@@ -61,13 +61,15 @@ export const VecinosAdminLayout = ({
         <div className="flex flex-col w-64 border-r border-gray-200 bg-white">
           <div className="h-16 flex items-center px-6 border-b border-gray-200">
             <div className="flex items-center">
-              <img 
-                src="/logo-vecinos-xpress.svg" 
-                alt="Vecinos Xpress" 
-                className="h-8 w-auto"
-              />
-              <span className="ml-2 text-lg font-semibold text-gray-800">
-                Vecinos<span className="text-green-600">Xpress</span>
+              <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 20 L65 20 L80 35 L80 80 L20 80 Z" fill="none" stroke="#2d219b" strokeWidth="4"/>
+                <path d="M65 20 L65 35 L80 35" fill="none" stroke="#2d219b" strokeWidth="4"/>
+                <path d="M35 45 L65 45" stroke="#2d219b" strokeWidth="4"/>
+                <path d="M35 55 L65 55" stroke="#2d219b" strokeWidth="4"/>
+                <path d="M35 65 L65 65" stroke="#2d219b" strokeWidth="4"/>
+              </svg>
+              <span className="ml-2 text-xl font-bold text-[#2d219b]">
+                ABDHDA#PE
               </span>
             </div>
           </div>
@@ -163,7 +165,7 @@ export const VecinosAdminLayout = ({
                   <input
                     type="text"
                     placeholder="Buscar..."
-                    className="w-full py-2 pl-10 pr-3 text-sm leading-tight text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full py-2 pl-10 pr-3 text-sm leading-tight text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d219b]"
                   />
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <svg

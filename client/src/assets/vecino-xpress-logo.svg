@@ -1,10 +1,20 @@
 <svg width="400" height="100" viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
-  <!-- Documento Icon -->
-  <path d="M36 20 L76 20 L76 25 L81 30 L81 81 L36 81 Z" fill="none" stroke="#2d219b" stroke-width="4"/>
-  <path d="M76 20 L76 30 L81 30" fill="none" stroke="#2d219b" stroke-width="4"/>
-  <path d="M46 50 L71 50" fill="none" stroke="#2d219b" stroke-width="4"/>
-  <path d="M46 60 L71 60" fill="none" stroke="#2d219b" stroke-width="4"/>
+  <!-- Logo inspired by VecinoXpress but adapted for ABDHDA#PE -->
+  <g transform="translate(36, 20) scale(0.7)">
+    <!-- House/Document outline -->
+    <path d="M10 0 L90 0 L90 100 L10 100 Z" fill="none" stroke="#2d219b" stroke-width="8"/>
+    
+    <!-- Upward arrow -->
+    <path d="M30 70 L70 30" stroke="#2d219b" stroke-width="8"/>
+    <path d="M70 30 L50 30 L70 30 L70 50" stroke="#2d219b" stroke-width="8"/>
+    
+    <!-- Star -->
+    <path d="M30 50 L33 41 L25 35 L35 35 L40 25 L45 35 L55 35 L47 41 L50 50 L40 44 Z" fill="#2d219b"/>
+  </g>
   
   <!-- ABDHDA#PE Text -->
-  <text x="100" y="65" font-family="Arial, sans-serif" font-weight="bold" font-size="48" fill="#2d219b">ABDHDA#PE</text>
+  <text x="115" y="50" font-family="Arial, sans-serif" font-weight="bold" font-size="40" fill="#2d219b">ABDHDA#PE</text>
+  
+  <!-- Tagline -->
+  <text x="115" y="75" font-family="Arial, sans-serif" font-size="20" fill="#2d219b">Transformando negocios locales</text>
 </svg>

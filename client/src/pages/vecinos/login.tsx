@@ -167,14 +167,14 @@ export default function VecinosLogin() {
                   </Button>
                   
                   {/* Ayuda con credenciales de demostración */}
-                  <div className="bg-blue-50 border border-blue-100 rounded-md p-3 mt-4">
-                    <p className="text-sm text-blue-800 font-medium">Credenciales de demostración</p>
+                  <div className="bg-[#f2f1ff] border border-[#d8d4ff] rounded-md p-3 mt-4">
+                    <p className="text-sm text-[#2d219b] font-medium">Credenciales de demostración</p>
                     <div className="grid grid-cols-2 gap-2 mt-2">
-                      <div className="text-xs p-1 bg-white rounded border border-blue-100">
+                      <div className="text-xs p-1 bg-white rounded border border-[#d8d4ff]">
                         <span className="font-medium">Usuario: demopartner</span>
                         <p className="text-gray-500">Contraseña: password123</p>
                       </div>
-                      <div className="text-xs p-1 bg-white rounded border border-blue-100">
+                      <div className="text-xs p-1 bg-white rounded border border-[#d8d4ff]">
                         <span className="font-medium">Tienda: Minimarket El Sol</span>
                         <p className="text-gray-500">Código: LOCAL-XP125</p>
                       </div>
