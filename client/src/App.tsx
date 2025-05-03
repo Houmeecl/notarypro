@@ -48,6 +48,7 @@ import VecinosExpress from "@/pages/vecinos-express";
 import PartnerApplications from "@/pages/admin/partner-applications";
 import ServiceSelectionPage from "@/pages/service-selection";
 import RonVideocall from "@/pages/ron-videocall";
+import RonSessionNativePage from "@/pages/ron-session-native";
 import VideoConsultation from "@/pages/video-consultation";
 import PurchaseCode from "@/pages/purchase-code";
 import MicroInteractionsDemo from "@/pages/micro-interactions-demo";
@@ -577,6 +578,7 @@ function Router() {
       <Route path="/ron-login" component={RonLoginPage} />
       <Route path="/ron-platform" component={RonPlatform} />
       <Route path="/ron-session/:id?" component={RonSession} />
+      <Route path="/ron-session-native/:sessionId" component={RonSessionNativePage} />
 
       {/* Ayuda Legal */}
       <ProtectedRoute 
