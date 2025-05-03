@@ -59,8 +59,8 @@ export default function VecinosLogin() {
         description: "Bienvenido a Vecinos Xpress",
       });
       
-      // Redirigir directamente a la aplicación POS (omitir dashboard)
-      setLocation("/partners/webapp-pos-official");
+      // Redirigir al dashboard de Vecinos
+      setLocation("/vecinos/dashboard");
     },
     onError: (error: Error) => {
       toast({
