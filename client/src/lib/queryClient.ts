@@ -24,6 +24,17 @@ export async function apiRequest(
     };
   }
   
+  // Si estamos haciendo una solicitud a una API de Vecinos, incluir el token JWT
+  if (url.startsWith('/api/vecinos')) {
+    const vecinosToken = localStorage.getItem('vecinos_token');
+    if (vecinosToken) {
+      headers = {
+        ...headers,
+        "Authorization": `Bearer ${vecinosToken}`
+      };
+    }
+  }
+  
   const res = await fetch(url, {
     method,
     headers,
