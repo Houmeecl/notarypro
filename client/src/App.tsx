@@ -53,9 +53,7 @@ import AyudaLegal from "@/pages/ayuda-legal";
 import IntegracionesDemo from "@/pages/integraciones-demo";
 import DescargarApk from "@/pages/partners/descargar-apk";
 import ConfirmacionDescarga from "@/pages/partners/confirmacion-descarga";
-import WebAppPOSAlternativa from "@/pages/partners/webapp-pos-alternativa";
-import WebAppPOSButtons from "@/pages/partners/webapp-pos-buttons";
-import WebAppPOSNFC from "@/pages/partners/webapp-pos-nfc";
+import WebAppPOSOfficial from "@/pages/partners/webapp-pos-official";
 import PaymentDemo from "@/pages/payment-demo";
 import DocumentoEjemplo from "@/pages/documento-ejemplo";
 import VerificacionIdentidadDemo from "@/pages/verificacion-identidad-demo";
@@ -112,7 +110,10 @@ const LazyVerificacionREADID = React.lazy(() => import("@/pages/verificacion-ide
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={LandingPage} />
+      <Route path="/">
+        <Redirect to="/vecinos-express" />
+      </Route>
+      <Route path="/landing" component={LandingPage} />
       <Route path="/auth" component={AuthPage} />
       
       {/* User routes */}
@@ -239,10 +240,22 @@ function Router() {
       <Route path="/partners/android-sdk-test" component={AndroidSdkTest} />
       <Route path="/partners/password-generator" component={PasswordGenerator} />
       <Route path="/partners/webapp-login" component={WebappLogin} />
-      <Route path="/partners/webapp-pos" component={WebAppPOS} />
-      <Route path="/partners/webapp-pos-alternativa" component={WebAppPOSAlternativa} />
-      <Route path="/partners/webapp-pos-buttons" component={WebAppPOSButtons} />
-      <Route path="/partners/webapp-pos-nfc" component={WebAppPOSNFC} />
+      {/* POS Web Oficial (versión unificada) */}
+      <Route path="/partners/webapp-pos-official" component={WebAppPOSOfficial} />
+      
+      {/* Rutas de versiones antiguas que redirigen a la versión oficial */}
+      <Route path="/partners/webapp-pos">
+        <Redirect to="/partners/webapp-pos-official" />
+      </Route>
+      <Route path="/partners/webapp-pos-alternativa">
+        <Redirect to="/partners/webapp-pos-official" />
+      </Route>
+      <Route path="/partners/webapp-pos-buttons">
+        <Redirect to="/partners/webapp-pos-official" />
+      </Route>
+      <Route path="/partners/webapp-pos-nfc">
+        <Redirect to="/partners/webapp-pos-official" />
+      </Route>
       <Route path="/partners/sdk-demo" component={SdkDemo} />
       <Route path="/partners/descargar-apk" component={DescargarApk} />
       <Route path="/partners/confirmacion-descarga" component={ConfirmacionDescarga} />

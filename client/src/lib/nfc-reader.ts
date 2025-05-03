@@ -12,10 +12,12 @@ export interface CedulaChilenaData {
   apellidos: string;    // Apellidos
   fechaNacimiento: string; // Fecha de nacimiento
   fechaEmision: string; // Fecha de emisión del documento
-  fechaExpiracion: string; // Fecha de expiración
+  fechaExpiracion: string; // Fecha de expiración (también se puede usar como fechaVencimiento)
   sexo: string;         // Sexo (M/F)
   nacionalidad: string; // Nacionalidad
   fotografia?: string;  // Fotografía en base64 (opcional, depende del lector)
+  numeroDocumento?: string; // Número del documento (opcional)
+  numeroSerie?: string; // Número de serie del chip (opcional)
 }
 
 // Estado de la lectura NFC
