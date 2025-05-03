@@ -12,6 +12,8 @@ import {
   formatearRut
 } from '@/lib/nfc-reader';
 import { Loader2, CreditCard, Shield, CheckCircle, AlertTriangle, Smartphone } from 'lucide-react';
+import NFCMicroInteractions from '@/components/micro-interactions/NFCMicroInteractions';
+import { motion } from 'framer-motion';
 
 interface NFCIdentityReaderProps {
   onSuccess: (data: CedulaChilenaData) => void;
@@ -117,27 +119,48 @@ const NFCIdentityReader: React.FC<NFCIdentityReaderProps> = ({ onSuccess, onCanc
     }
   };
 
+  // Mapear el estado de NFCReadStatus a los estados de micro-interacciones
+  const getMicroInteractionStatus = () => {
+    if (isReading) {
+      return 'scanning';
+    }
+    
+    switch (status) {
+      case NFCReadStatus.SUCCESS:
+        return 'success';
+      case NFCReadStatus.ERROR:
+        return 'error';
+      default:
+        return 'idle';
+    }
+  };
+  
   // Contenido según el estado de la lectura
   const renderContent = () => {
     const readerInfo = getReaderTypeInfo();
+    const microInteractionStatus = getMicroInteractionStatus() as 'idle' | 'scanning' | 'success' | 'error';
     
     if (isReading) {
       return (
         <>
-          <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-            <Loader2 className="h-12 w-12 text-blue-500 animate-spin mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Leyendo cédula de identidad
-            </h3>
-            <p className="text-sm text-gray-600 text-center mb-4">
-              {statusMessage || 'Acerque la cédula al lector NFC'}
-            </p>
+          <motion.div 
+            className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border-2 border-dashed border-blue-300"
+            initial={{ borderColor: 'rgba(59, 130, 246, 0.3)' }}
+            animate={{ 
+              borderColor: ['rgba(59, 130, 246, 0.3)', 'rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 0.3)'] 
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <NFCMicroInteractions 
+              status={microInteractionStatus}
+              message={statusMessage || 'Acerque la cédula al lector NFC'}
+            />
             
             <div className="flex items-center justify-center mt-2 text-blue-600 text-sm">
               {readerInfo.icon}
               <span>{readerInfo.text}</span>
             </div>
-          </div>
+          </motion.div>
           
           <Button 
             variant="outline" 
@@ -153,15 +176,18 @@ const NFCIdentityReader: React.FC<NFCIdentityReaderProps> = ({ onSuccess, onCanc
     if (status === NFCReadStatus.ERROR) {
       return (
         <>
-          <Alert variant="destructive" className="mb-4">
-            <AlertTriangle className="h-4 w-4 mr-2" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>
-              {statusMessage || 'Se produjo un error al leer la cédula'}
-            </AlertDescription>
-          </Alert>
+          <motion.div
+            initial={{ x: 0 }}
+            animate={{ x: [0, -10, 10, -10, 10, 0] }}
+            transition={{ duration: 0.5 }}
+          >
+            <NFCMicroInteractions 
+              status="error"
+              message={statusMessage || 'Se produjo un error al leer la cédula'}
+            />
+          </motion.div>
           
-          <div className="flex justify-between">
+          <div className="flex justify-between mt-4">
             <Button 
               variant="outline" 
               onClick={cancelReading}
@@ -181,35 +207,61 @@ const NFCIdentityReader: React.FC<NFCIdentityReaderProps> = ({ onSuccess, onCanc
     if (status === NFCReadStatus.SUCCESS && cedulaData) {
       return (
         <>
-          <Alert className="mb-4 bg-green-50 border-green-200">
-            <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-            <AlertTitle className="text-green-800">Lectura exitosa</AlertTitle>
-            <AlertDescription className="text-green-700">
-              Se ha leído correctamente la información de la cédula
-            </AlertDescription>
-          </Alert>
+          <NFCMicroInteractions 
+            status="success"
+            message="Cédula verificada correctamente"
+            onComplete={() => console.log("Animación de éxito completada")}
+          />
           
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm font-medium text-gray-500">RUT</p>
-                <p className="text-base font-semibold">{formatearRut(cedulaData.rut)}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Nombres</p>
-                <p className="text-base font-semibold">{cedulaData.nombres}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Apellidos</p>
-                <p className="text-base font-semibold">{cedulaData.apellidos}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Fecha de nacimiento</p>
-                <p className="text-base font-semibold">{cedulaData.fechaNacimiento}</p>
+          <motion.div 
+            className="space-y-4 mt-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <div className="bg-white p-4 rounded-lg border border-green-100 shadow-sm">
+              <div className="grid grid-cols-2 gap-4">
+                <motion.div 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.7 }}
+                >
+                  <p className="text-sm font-medium text-gray-500">RUT</p>
+                  <p className="text-base font-semibold">{formatearRut(cedulaData.rut)}</p>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.8 }}
+                >
+                  <p className="text-sm font-medium text-gray-500">Nombres</p>
+                  <p className="text-base font-semibold">{cedulaData.nombres}</p>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.9 }}
+                >
+                  <p className="text-sm font-medium text-gray-500">Apellidos</p>
+                  <p className="text-base font-semibold">{cedulaData.apellidos}</p>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 1 }}
+                >
+                  <p className="text-sm font-medium text-gray-500">Fecha de nacimiento</p>
+                  <p className="text-base font-semibold">{cedulaData.fechaNacimiento}</p>
+                </motion.div>
               </div>
             </div>
             
-            <div className="flex justify-between mt-4">
+            <motion.div 
+              className="flex justify-between mt-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2 }}
+            >
               <Button 
                 variant="outline" 
                 onClick={cancelReading}
@@ -221,8 +273,8 @@ const NFCIdentityReader: React.FC<NFCIdentityReaderProps> = ({ onSuccess, onCanc
               >
                 Confirmar identidad
               </Button>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </>
       );
     }
@@ -231,14 +283,20 @@ const NFCIdentityReader: React.FC<NFCIdentityReaderProps> = ({ onSuccess, onCanc
     if (!nfcAvailable) {
       return (
         <>
-          <Alert variant="destructive" className="mb-4">
-            <AlertTriangle className="h-4 w-4 mr-2" />
-            <AlertTitle>NFC no disponible</AlertTitle>
-            <AlertDescription>
-              Este dispositivo no cuenta con capacidad NFC o no está habilitada.
-              Por favor, utilice otro método de verificación de identidad.
-            </AlertDescription>
-          </Alert>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Alert variant="destructive" className="mb-4">
+              <AlertTriangle className="h-4 w-4 mr-2" />
+              <AlertTitle>NFC no disponible</AlertTitle>
+              <AlertDescription>
+                Este dispositivo no cuenta con capacidad NFC o no está habilitada.
+                Por favor, utilice otro método de verificación de identidad.
+              </AlertDescription>
+            </Alert>
+          </motion.div>
           
           <Button 
             variant="outline" 
@@ -253,34 +311,73 @@ const NFCIdentityReader: React.FC<NFCIdentityReaderProps> = ({ onSuccess, onCanc
     
     return (
       <>
-        <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <Shield className="h-12 w-12 text-blue-500 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Verificación mediante NFC
-          </h3>
-          <p className="text-sm text-gray-600 text-center mb-4">
-            Lea los datos de la cédula de identidad utilizando el chip NFC incorporado
-          </p>
+        <motion.div 
+          className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300"
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, type: "spring" }}
+          >
+            <Shield className="h-12 w-12 text-blue-500 mb-4" />
+          </motion.div>
           
-          <div className="flex items-center justify-center mt-2 text-blue-600 text-sm">
+          <motion.h3 
+            className="text-lg font-medium text-gray-900 mb-2"
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            Verificación mediante NFC
+          </motion.h3>
+          
+          <motion.p 
+            className="text-sm text-gray-600 text-center mb-4"
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            Lea los datos de la cédula de identidad utilizando el chip NFC incorporado
+          </motion.p>
+          
+          <motion.div 
+            className="flex items-center justify-center mt-2 text-blue-600 text-sm"
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
             {readerInfo.icon}
             <span>{readerInfo.text} disponible</span>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
         
-        <div className="flex justify-between mt-4">
+        <motion.div 
+          className="flex justify-between mt-4"
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
           <Button 
             variant="outline" 
             onClick={cancelReading}
           >
             Cancelar
           </Button>
-          <Button 
-            onClick={startReading}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            Iniciar lectura
-          </Button>
-        </div>
+            <Button 
+              onClick={startReading}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Iniciar lectura
+            </Button>
+          </motion.div>
+        </motion.div>
       </>
     );
   };
