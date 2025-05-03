@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import QRCode from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -218,17 +218,11 @@ const QRVerification: React.FC<QRVerificationProps> = ({
           <div className="flex flex-col items-center space-y-6">
             {/* Código QR */}
             <div className="p-4 bg-white rounded-md shadow-sm border">
-              <QRCode 
+              <QRCodeCanvas 
                 value={qrData} 
                 size={200} 
                 level="H" 
                 includeMargin={true}
-                imageSettings={{
-                  src: "",
-                  width: 30,
-                  height: 30,
-                  excavate: true,
-                }}
               />
             </div>
             

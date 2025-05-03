@@ -492,6 +492,8 @@ function Router() {
       <Route path="/verificacion-identidad-demo" component={VerificacionIdentidadDemo} />
       <Route path="/readid-verification" component={ReadIDVerificationPage} />
       <Route path="/verificacion-avanzada" component={VerificacionAvanzada} />
+      <Route path="/verificacion-identidad-qr" component={VerificacionIdentidadQR} />
+      <Route path="/verificacion-movil" component={VerificacionMovil} />
       <Route path="/verificacion-identidad-movil" component={() => (
         <Suspense fallback={<LazyLoadingFallback />}>
           <LazyVerificacionMovil />

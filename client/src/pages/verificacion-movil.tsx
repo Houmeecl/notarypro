@@ -26,8 +26,8 @@ import { apiRequest } from "@/lib/queryClient";
 
 const VerificacionMovil: React.FC = () => {
   // Extraer sessionId de la URL
-  const [, params] = useLocation();
-  const queryParams = new URLSearchParams(params);
+  const [location] = useLocation();
+  const queryParams = new URLSearchParams(window.location.search);
   const sessionId = queryParams.get('session');
 
   // Estados para el proceso de verificación
