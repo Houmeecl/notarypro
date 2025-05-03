@@ -22,10 +22,28 @@ async function hashPassword(password: string) {
 }
 
 async function comparePasswords(supplied: string, stored: string) {
-  const [hashed, salt] = stored.split(".");
-  const hashedBuf = Buffer.from(hashed, "hex");
-  const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
-  return timingSafeEqual(hashedBuf, suppliedBuf);
+  try {
+    // Verificar que stored sea una cadena válida y tenga el formato correcto
+    if (!stored || !stored.includes(".")) {
+      console.error("Error: Formato de contraseña almacenada inválido");
+      return false;
+    }
+    
+    const [hashed, salt] = stored.split(".");
+    
+    // Verificar que ambos componentes estén presentes
+    if (!hashed || !salt) {
+      console.error("Error: Componentes de contraseña faltantes");
+      return false;
+    }
+    
+    const hashedBuf = Buffer.from(hashed, "hex");
+    const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
+    return timingSafeEqual(hashedBuf, suppliedBuf);
+  } catch (error) {
+    console.error("Error al comparar contraseñas:", error);
+    return false;
+  }
 }
 
 // Variable para modo de emergencia (bypass de autenticación)
