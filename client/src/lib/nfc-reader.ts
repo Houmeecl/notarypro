@@ -137,26 +137,6 @@ async function checkPOSReaderAvailability(): Promise<boolean> {
  * @param statusCallback Función que se llamará con actualizaciones del estado
  * @param readerType Tipo de lector a utilizar (si no se especifica, se detecta automáticamente)
  */
-/**
- * Obtiene datos reales de cédula chilena para entornos de prueba
- * Estos datos son representativos para pruebas, pero no corresponden a personas reales
- */
-function getRealTestChileanIDData(): CedulaChilenaData {
-  // Esta función devuelve un conjunto de datos que representan una cédula chilena real
-  // pero con información ficticia para pruebas, similar a la que obtendríamos de un chip NFC real
-  return {
-    rut: '12.345.678-5',
-    nombres: 'JUAN PEDRO',
-    apellidos: 'ROJAS MUÑOZ',
-    fechaNacimiento: '15/06/1985',
-    fechaEmision: '20/01/2020',
-    fechaExpiracion: '20/01/2030',
-    sexo: 'M',
-    nacionalidad: 'CHL',
-    numeroDocumento: 'P2345678',
-    numeroSerie: 'CSC123456789'
-  };
-}
 
 export async function readCedulaChilena(
   statusCallback: (status: NFCReadStatus, message?: string) => void,

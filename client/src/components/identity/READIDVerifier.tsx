@@ -254,18 +254,23 @@ const READIDVerifier: React.FC<READIDVerifierProps> = ({
         throw new Error(result.message || "Verificación fallida");
       }
       
-      // Crear objeto de datos de cédula compatible
+      // Verificar que tenemos datos reales
+      if (!result.data || !result.data.rut) {
+        throw new Error("No se recibieron datos válidos de la verificación");
+      }
+      
+      // Crear objeto de datos de cédula con los datos reales recibidos
       const cedulaData: CedulaChilenaData = {
-        rut: result.data.rut || '12.345.678-5',
-        nombres: result.data.nombres || 'NOMBRE',
-        apellidos: result.data.apellidos || 'APELLIDO',
-        fechaNacimiento: result.data.fechaNacimiento || '01/01/1980',
-        fechaEmision: result.data.fechaEmision || '01/01/2020',
-        fechaExpiracion: result.data.fechaExpiracion || '01/01/2030',
-        sexo: result.data.sexo || 'M',
-        nacionalidad: result.data.nacionalidad || 'CHL',
-        numeroDocumento: result.data.numeroDocumento || '',
-        numeroSerie: result.data.numeroSerie || ''
+        rut: result.data.rut,
+        nombres: result.data.nombres,
+        apellidos: result.data.apellidos,
+        fechaNacimiento: result.data.fechaNacimiento,
+        fechaEmision: result.data.fechaEmision,
+        fechaExpiracion: result.data.fechaExpiracion,
+        sexo: result.data.sexo,
+        nacionalidad: result.data.nacionalidad,
+        numeroDocumento: result.data.numeroDocumento,
+        numeroSerie: result.data.numeroSerie
       };
       
       // Los datos reales se establecen en el estado
@@ -404,7 +409,7 @@ const READIDVerifier: React.FC<READIDVerifierProps> = ({
                   
                   {/* Mensaje informativo sobre la implementación real */}
                   <div className="mt-2 text-xs text-center text-gray-500">
-                    Se utilizará verificación NFC real para leer su cédula de identidad
+                    Sistema de verificación NFC para lectura de cédulas chilenas
                   </div>
                 </div>
                 

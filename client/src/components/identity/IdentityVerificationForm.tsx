@@ -199,7 +199,7 @@ export function IdentityVerificationForm({
     setCapturedImage(null);
   };
 
-  // Realizar verificación avanzada (no simulada)
+  // Realizar verificación avanzada real 
   const performAdvancedVerification = async () => {
     setProgress(0);
     
@@ -215,8 +215,15 @@ export function IdentityVerificationForm({
     }, 300);
     
     try {
-      // Verificación real de identidad 
+      // Obtener datos del formulario para verificación real
       const data = form.getValues();
+      
+      // Validar datos mínimos requeridos
+      if (!data.rut || !data.nombre || !data.apellido) {
+        throw new Error("Debe proporcionar RUT, nombre y apellido para la verificación");
+      }
+      
+      // Crear payload de verificación real
       const verificationPayload = {
         rut: data.rut,
         nombre: data.nombre,
@@ -225,7 +232,8 @@ export function IdentityVerificationForm({
           strictMode: true,
           requiredScore: data.requiredScore || 80,
           verifyLivingStatus: data.verifyLivingStatus || false,
-          useAdvancedVerification: true
+          useAdvancedVerification: true,
+          verificationSource: 'identity_form'
         }
       };
       
@@ -254,6 +262,21 @@ export function IdentityVerificationForm({
       
       const result = await response.json();
       setValidationResult(result);
+      
+      // Registrar evento de verificación
+      try {
+        await apiRequest("POST", "/api/micro-interactions/record", {
+          type: "identity_verification",
+          points: result.success ? 75 : 0,
+          metadata: { 
+            source: "identity_form", 
+            score: result.score || 0,
+            success: result.success
+          }
+        });
+      } catch (err) {
+        console.error("Error al registrar interacción:", err);
+      }
       
       toast({
         title: result.success ? "Verificación exitosa" : "Verificación fallida",
