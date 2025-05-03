@@ -333,11 +333,11 @@ function Router() {
         </Suspense>
       )} />
       <Route path="/vecinos/pos-app" component={WebAppPOS} />
-      <Route path="/vecinos/dashboard" component={() => (
-        <Suspense fallback={<LazyLoadingFallback />}>
-          <LazyVecinosDashboard />
-        </Suspense>
-      )} />
+      {/* Redirección directa al POS web desde el dashboard */}
+      <Route path="/vecinos/dashboard" component={() => {
+        window.location.href = "/partners/webapp-pos-official";
+        return null;
+      }} />
       <Route path="/vecinos/cuenta" component={() => (
         <Suspense fallback={<LazyLoadingFallback />}>
           <LazyVecinosCuenta />
