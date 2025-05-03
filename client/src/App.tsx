@@ -613,7 +613,7 @@ function Router() {
         return null;
       }} />
       <Route path="/verificacion-identidad-movil" component={() => {
-        window.location.href = "/verificacion-movil";
+        window.location.href = "/verificacion-nfc";
         return null;
       }} />
       <Route path="/verificacion-identidad-readid" component={() => {
