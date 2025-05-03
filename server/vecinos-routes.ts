@@ -285,102 +285,17 @@ vecinosRouter.post("/process-document", isPartnerAuthenticated, async (req: Requ
     const partnerId = req.vecinosUser!.id;
     const data = processDocumentSchema.parse(req.body);
     
-    // Obtener información del socio
-    const [partner] = await db.select().from(partners).where(eq(partners.id, partnerId));
-    
-    if (!partner) {
-      return res.status(404).json({ message: "Socio no encontrado" });
-    }
-    
-    // Definir precios según el tipo de documento (ejemplo)
-    const documentPrices: { [key: string]: number } = {
-      "contrato-arriendo": 4900,
-      "contrato-trabajo": 3900,
-      "autorizacion-viaje": 5900,
-      "finiquito": 4500,
-      "certificado-residencia": 3500,
-      "declaracion-jurada": 3900,
-      "poder-simple": 3800,
-      "certificado-nacimiento": 3200,
-    };
-    
-    // Obtener nombre y precio del documento
-    const documentPrice = documentPrices[data.documentType] || 3500; // Precio por defecto
-    let documentTitle = "Documento";
-    
-    switch (data.documentType) {
-      case "contrato-arriendo": documentTitle = "Contrato de Arriendo"; break;
-      case "contrato-trabajo": documentTitle = "Contrato de Trabajo"; break;
-      case "autorizacion-viaje": documentTitle = "Autorización de Viaje"; break;
-      case "finiquito": documentTitle = "Finiquito"; break;
-      case "certificado-residencia": documentTitle = "Certificado de Residencia"; break;
-      case "declaracion-jurada": documentTitle = "Declaración Jurada"; break;
-      case "poder-simple": documentTitle = "Poder Simple"; break;
-      case "certificado-nacimiento": documentTitle = "Certificado de Nacimiento"; break;
-      default: documentTitle = "Documento General";
-    }
-    
-    // Generar código de verificación único
-    const verificationCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    
-    // Calcular comisión del socio
-    const commissionRate = partner.commissionRate || 20; // Porcentaje de comisión (por defecto 20%)
-    const commissionAmount = Math.round(documentPrice * (commissionRate / 100));
-    
-    // Registrar el documento
-    const [newDocument] = await db.insert(documents).values({
-      title: documentTitle,
-      type: data.documentType,
-      price: documentPrice,
-      status: "completed",
-      partnerId: partnerId,
-      clientName: data.clientInfo.name,
-      clientRut: data.clientInfo.rut,
-      clientPhone: data.clientInfo.phone,
-      clientEmail: data.clientInfo.email || null,
-      verificationCode: verificationCode,
-      commissionRate: commissionRate,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }).returning();
-    
-    // Registrar la transacción (comisión del socio)
-    const [newTransaction] = await db.insert(partnerTransactions).values({
-      partnerId: partnerId,
-      documentId: newDocument.id,
-      amount: commissionAmount,
-      type: "commission",
-      status: "completed",
-      description: `Comisión por ${documentTitle}`,
-      createdAt: new Date(),
-    }).returning();
-    
-    // Actualizar el balance del socio
-    await db
-      .update(partners)
-      .set({ 
-        balance: partner.balance + commissionAmount,
-        updatedAt: new Date()
-      })
-      .where(eq(partners.id, partnerId));
-    
-    // Crear notificación para el socio
-    await db.insert(partnerNotifications).values({
-      partnerId: partnerId,
-      title: "Nuevo documento procesado",
-      message: `Has procesado un ${documentTitle} con éxito. Comisión: $${commissionAmount}`,
-      type: "success",
-      createdAt: new Date(),
-    });
+    // Procesar el documento usando el almacenamiento en memoria
+    const result = vecinosStore.processDocument(partnerId, data);
     
     // Devolver resultado del proceso
     return res.status(200).json({
       success: true,
-      documentId: newDocument.id,
-      verificationCode: verificationCode,
-      clientName: data.clientInfo.name,
-      timestamp: new Date().toISOString(),
-      commission: commissionAmount
+      documentId: result.document.id,
+      verificationCode: result.document.verificationCode,
+      clientName: result.document.clientName,
+      timestamp: result.document.createdAt.toISOString(),
+      commission: result.transaction.amount
     });
   } catch (error) {
     console.error("Error al procesar documento:", error);
@@ -476,25 +391,12 @@ vecinosRouter.post("/notifications/:id/read", isPartnerAuthenticated, async (req
     const partnerId = req.vecinosUser!.id;
     const notificationId = parseInt(req.params.id);
     
-    // Buscar la notificación
-    const [notification] = await db.select()
-      .from(partnerNotifications)
-      .where(and(
-        eq(partnerNotifications.id, notificationId),
-        eq(partnerNotifications.partnerId, partnerId)
-      ));
+    // Marcar notificación como leída usando el almacenamiento en memoria
+    const success = vecinosStore.markNotificationAsRead(notificationId, partnerId);
     
-    if (!notification) {
+    if (!success) {
       return res.status(404).json({ message: "Notificación no encontrada" });
     }
-    
-    // Marcar como leída
-    await db.update(partnerNotifications)
-      .set({ 
-        read: true,
-        readAt: new Date() 
-      })
-      .where(eq(partnerNotifications.id, notificationId));
     
     return res.status(200).json({ message: "Notificación marcada como leída" });
   } catch (error) {

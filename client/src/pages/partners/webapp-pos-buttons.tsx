@@ -74,7 +74,7 @@ const WebAppPOSButtons = () => {
         
         toast({
           title: "Bienvenido al POS Web",
-          description: `${data.store_name} - ${data.address}`,
+          description: `${data.storeName} - ${data.address}`,
         });
       } catch (error) {
         console.error('Error al cargar información del socio:', error);
