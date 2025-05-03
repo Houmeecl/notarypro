@@ -1456,9 +1456,9 @@ const WebAppPOSButtons = () => {
                 Cerrar
               </Button>
               <div className="space-x-2">
-                <Button variant="outline" onClick={iniciarCamara} disabled={identityVerified}>
+                <Button variant="outline" onClick={verificarIdentidad} disabled={identityVerified}>
                   <UserCheck className="h-4 w-4 mr-2" />
-                  {identityVerified ? 'Identidad verificada' : 'Verificar identidad'}
+                  {identityVerified ? 'Identidad verificada' : (nfcAvailable ? 'Verificar identidad (NFC/Cámara)' : 'Verificar identidad')}
                 </Button>
                 <Button 
                   onClick={() => {
@@ -1472,6 +1472,30 @@ const WebAppPOSButtons = () => {
                   Firmar documento
                 </Button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Modal para lector NFC */}
+      {showNFCReader && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-xl overflow-hidden">
+            <div className="p-4 bg-zinc-800 text-white flex justify-between items-center">
+              <h2 className="text-lg font-bold flex items-center">
+                <Wallet className="h-5 w-5 mr-2 text-blue-400" />
+                Lector NFC de Cédula
+              </h2>
+              <Button variant="ghost" size="icon" onClick={handleNFCCancel} className="text-zinc-400 hover:text-white">
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <div className="p-4">
+              <NFCIdentityReader
+                onSuccess={handleNFCSuccess}
+                onCancel={handleNFCCancel}
+              />
             </div>
           </div>
         </div>
