@@ -15,9 +15,12 @@ import {
   RefreshCw, 
   XCircle,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  User,
+  CheckCircle,
+  AlertTriangle
 } from "lucide-react";
-import { nfcSupported, readNFCChipData, stopNFCReading, CedulaChilenaData, validarRut } from "@/lib/nfc-reader";
+import { nfcSupported, readNFCChipData, stopNFCReading, CedulaChilenaData, validarRut, formatearRut } from "@/lib/nfc-reader";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
