@@ -34,7 +34,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
   // Función para iniciar verificación NFC
   const startNFCVerification = () => {
     // Redireccionar a la página de verificación NFC
-    setLocation('/verificacion-nfc-fixed');
+    setLocation('/verificacion-nfc');
   };
   
   // Función para iniciar verificación con foto de documento
