@@ -48,14 +48,35 @@ const NFCReader: React.FC<NFCReaderProps> = ({
 
   // Comprobar si NFC está disponible en el dispositivo
   const checkNfcAvailability = () => {
-    // Verificar si el navegador soporta NFC
+    // Primero verificar la Web NFC API estándar
     if ('NDEFReader' in window) {
       setNfcAvailable(true);
-      console.log('NFC API está disponible');
-    } else {
+      console.log('NFC API Web (NDEFReader) está disponible');
+    } 
+    // Verificar API alternativa para navegadores Android
+    else if ('nfc' in navigator && 'reading' in navigator.nfc) {
+      setNfcAvailable(true);
+      console.log('NFC API alternativa está disponible');
+    }
+    // Verificar API específica para Chrome en Android
+    else if ('NfcAdapter' in window) {
+      setNfcAvailable(true);
+      console.log('NFC API Android (NfcAdapter) está disponible');
+    }
+    // Verificar API específica para Android WebView
+    else if (window.androidInterface && typeof window.androidInterface.readNFC === 'function') {
+      setNfcAvailable(true);
+      console.log('Android WebView NFC API está disponible');
+    }
+    // No hay NFC disponible
+    else {
       setNfcAvailable(false);
       console.log('NFC API no está disponible en este dispositivo/navegador');
-      setError('Este dispositivo o navegador no soporta NFC');
+      
+      // En modo demo no mostrar error
+      if (!demoMode) {
+        setError('Este dispositivo o navegador no tiene NFC disponible. Intente usar un dispositivo Android compatible con NFC.');
+      }
     }
   };
 
