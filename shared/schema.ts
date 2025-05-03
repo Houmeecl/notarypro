@@ -24,6 +24,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   fullName: text("full_name").notNull(),
   role: text("role").notNull().default("user"), // user, certifier, admin, lawyer, notary, partner
+  platform: text("platform").default("notarypro"), // notarypro, vecinos
   businessName: text("business_name"), // For partners
   address: text("address"),
   region: text("region"),
@@ -37,6 +38,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   fullName: true,
   role: true,
+  platform: true,
   businessName: true,
   address: true,
   region: true,
