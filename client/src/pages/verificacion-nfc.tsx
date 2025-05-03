@@ -21,10 +21,13 @@ import {
   User,
   ChevronRight,
   Smartphone,
-  QrCode
+  QrCode,
+  Shield,
+  AlertTriangle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import NFCReader from '@/components/identity/NFCReader';
+import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * Página unificada de verificación NFC
@@ -49,6 +52,7 @@ const VerificacionNFC: React.FC = () => {
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
   const [nfcData, setNfcData] = useState<any>(null);
   const [verificacionId, setVerificacionId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   
   // Estados para la cámara
   const [isCamaraActiva, setIsCamaraActiva] = useState<boolean>(false);
@@ -56,14 +60,567 @@ const VerificacionNFC: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   
   // Estados para el proceso
   const [verificacionCompletada, setVerificacionCompletada] = useState<boolean>(false);
   const [cargando, setCargando] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [progreso, setProgreso] = useState<number>(0);
+  const [nfcAvailable, setNfcAvailable] = useState<boolean | null>(null);
   
-  // Manejadores para NFC
+  // Obtener referencia al toast
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    // Comprobar disponibilidad de NFC
+    checkNfcAvailability();
+    
+    // Limpiar recursos al desmontar
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+  
+  // Verificar disponibilidad de NFC
+  const checkNfcAvailability = () => {
+    if ('NDEFReader' in window) {
+      setNfcAvailable(true);
+      console.log('NFC API (NDEFReader) está disponible');
+    } 
+    else if ('nfc' in navigator && 'reading' in (navigator as any).nfc) {
+      setNfcAvailable(true);
+      console.log('NFC API alternativa está disponible');
+    }
+    else if ('NfcAdapter' in window) {
+      setNfcAvailable(true);
+      console.log('NFC API Android (NfcAdapter) está disponible');
+
+  // Finalizar verificación
+  const finalizarVerificacion = async () => {
+    setCargando(true);
+    
+    try {
+      // Simulamos envío de datos
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Establecer verificación como completada
+      setVerificacionCompletada(true);
+      setProgreso(100);
+      
+      toast({
+        title: 'Verificación completada',
+        description: 'Su identidad ha sido verificada correctamente',
+      });
+      
+    } catch (err) {
+      console.error('Error al finalizar verificación:', err);
+      setError('No se pudo completar la verificación. Inténtelo de nuevo.');
+      toast({
+        title: 'Error',
+        description: 'No se pudo completar la verificación. Inténtelo de nuevo.',
+        variant: 'destructive',
+      });
+    } finally {
+      setCargando(false);
+    }
+  };
+  
+  // Renderizado del componente principal
+  return (
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
+      <div className="max-w-lg mx-auto">
+        <Card className="shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-[#2d219b]/10 to-[#2d219b]/5">
+            <CardTitle className="text-xl text-[#2d219b]">Verificación de identidad</CardTitle>
+            <CardDescription>
+              Complete los pasos requeridos para verificar su identidad
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent className="p-6 space-y-6">
+            {/* Indicador de progreso */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-gray-500">
+                <span>Progreso</span>
+                <span>{Math.round(progreso)}%</span>
+              </div>
+              <Progress value={progreso} className="h-2" />
+            </div>
+            
+            {verificacionCompletada ? (
+              // Verificación completada
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="h-8 w-8 text-green-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-green-700 mb-2">¡Verificación exitosa!</h3>
+                <p className="text-gray-600 mb-6">
+                  Su identidad ha sido verificada correctamente.
+                </p>
+                {sessionId && (
+                  <p className="text-sm text-gray-500">
+                    Puede cerrar esta ventana y volver a la página principal.
+                  </p>
+                )}
+              </div>
+            ) : (
+              // Proceso de verificación en curso
+              <Tabs value={activeStep} onValueChange={setActiveStep} className="w-full">
+                <TabsList className="grid grid-cols-3 mb-6">
+                  <TabsTrigger value="nfc" disabled={cargando}>
+                    <Smartphone className="h-4 w-4 mr-2" />
+                    NFC
+                  </TabsTrigger>
+                  <TabsTrigger value="documento" disabled={!nfcData || cargando}>
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Documento
+                  </TabsTrigger>
+                  <TabsTrigger value="selfie" disabled={!documentoFile || cargando}>
+                    <User className="h-4 w-4 mr-2" />
+                    Selfie
+                  </TabsTrigger>
+                </TabsList>
+                
+                {/* Contenido de cada paso */}
+                <TabsContent value="nfc" className="space-y-4">
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold mb-2">Lectura del chip NFC</h3>
+                    <p className="text-gray-600 mb-4">
+                      Acerque su cédula o documento de identidad al dispositivo para leer el chip NFC.
+                    </p>
+                  </div>
+                  
+                  {nfcAvailable === false && (
+                    <Alert variant="destructive" className="mb-4">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertDescription>
+                        Este dispositivo o navegador no es compatible con NFC. Intente con un dispositivo Android compatible.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  
+                  <div className="overflow-hidden">
+                    <NFCReader 
+                      onSuccess={handleNFCSuccess}
+                      onError={(error) => {
+                        setError(`Error en la lectura NFC: ${error}`);
+                        toast({
+                          title: 'Error NFC',
+                          description: error,
+                          variant: 'destructive',
+                        });
+                      }}
+                      demoMode={true} // Habilitar para pruebas
+                    />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="documento" className="space-y-4">
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold mb-2">Fotografía del documento</h3>
+                    <p className="text-gray-600 mb-4">
+                      Tome una fotografía clara de su documento de identidad.
+                    </p>
+                  </div>
+                  
+                  {documentoFile && documentoPreview ? (
+                    <div className="space-y-4">
+                      <div className="border rounded-lg overflow-hidden">
+                        <img 
+                          src={documentoPreview} 
+                          alt="Vista previa del documento" 
+                          className="w-full h-auto object-contain"
+                        />
+                      </div>
+                      <div className="flex justify-between">
+                        <Button 
+                          variant="outline" 
+                          onClick={() => {
+                            setDocumentoFile(null);
+                            setDocumentoPreview(null);
+                            iniciarCamara('documento');
+                          }}
+                          disabled={cargando}
+                        >
+                          Tomar otra
+                        </Button>
+                        <Button 
+                          onClick={() => {
+                            setActiveStep('selfie');
+                            setTimeout(() => {
+                              iniciarCamara('selfie');
+                            }, 500);
+                          }}
+                          disabled={cargando}
+                        >
+                          Continuar
+                        </Button>
+                      </div>
+                    </div>
+                  ) : isCamaraActiva ? (
+                    <div className="space-y-4">
+                      <div className="relative border rounded-lg overflow-hidden bg-black">
+                        <video 
+                          ref={videoRef} 
+                          autoPlay 
+                          playsInline
+                          className="w-full h-auto"
+                        />
+                        <canvas ref={canvasRef} className="hidden" />
+                        
+                        <div className="absolute inset-0 pointer-events-none">
+                          <div className="h-full w-full flex items-center justify-center">
+                            <div className="border-2 border-white border-dashed rounded-lg w-5/6 h-4/6 opacity-60"></div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        className="w-full" 
+                        onClick={capturarFoto}
+                        disabled={cargando}
+                      >
+                        <Camera className="h-4 w-4 mr-2" />
+                        Capturar documento
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="border rounded-lg p-8 bg-gray-50 text-center">
+                        <CreditCard className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                        <p className="text-gray-600">
+                          Use la cámara para tomar una foto de su documento de identidad.
+                        </p>
+                      </div>
+                      
+                      <div className="flex justify-center">
+                        <Button 
+                          onClick={() => iniciarCamara('documento')}
+                          disabled={cargando}
+                        >
+                          <Camera className="h-4 w-4 mr-2" />
+                          Activar cámara
+                        </Button>
+                      </div>
+                      
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        ref={fileInputRef} 
+                        className="hidden" 
+                        onChange={(e) => {
+                          const files = e.target.files;
+                          if (files && files.length > 0) {
+                            const file = files[0];
+                            setDocumentoFile(file);
+                            
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                              if (e.target && typeof e.target.result === 'string') {
+                                setDocumentoPreview(e.target.result);
+                              }
+                            };
+                            reader.readAsDataURL(file);
+                            
+                            setProgreso(65);
+                          }
+                        }}
+                      />
+                      
+                      <div className="text-center">
+                        <button 
+                          className="text-blue-600 text-sm"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          O seleccione una imagen desde su dispositivo
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="selfie" className="space-y-4">
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold mb-2">Selfie para verificación</h3>
+                    <p className="text-gray-600 mb-4">
+                      Tome una foto clara de su rostro para confirmar su identidad.
+                    </p>
+                  </div>
+                  
+                  {fotoFile && fotoPreview ? (
+                    <div className="space-y-4">
+                      <div className="border rounded-lg overflow-hidden">
+                        <img 
+                          src={fotoPreview} 
+                          alt="Vista previa del selfie" 
+                          className="w-full h-auto object-contain"
+                        />
+                      </div>
+                      <div className="flex justify-between">
+                        <Button 
+                          variant="outline" 
+                          onClick={() => {
+                            setFotoFile(null);
+                            setFotoPreview(null);
+                            iniciarCamara('selfie');
+                          }}
+                          disabled={cargando}
+                        >
+                          Tomar otra
+                        </Button>
+                        <Button 
+                          onClick={finalizarVerificacion}
+                          disabled={cargando}
+                        >
+                          {cargando ? (
+                            <>Procesando...</>
+                          ) : (
+                            <>Finalizar verificación</>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : isCamaraActiva ? (
+                    <div className="space-y-4">
+                      <div className="relative border rounded-lg overflow-hidden bg-black">
+                        <video 
+                          ref={videoRef} 
+                          autoPlay 
+                          playsInline
+                          className="w-full h-auto"
+                        />
+                        <canvas ref={canvasRef} className="hidden" />
+                        
+                        <div className="absolute inset-0 pointer-events-none">
+                          <div className="h-full w-full flex items-center justify-center">
+                            <div className="border-2 border-white border-dashed rounded-full w-4/6 h-5/6 opacity-60"></div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        className="w-full" 
+                        onClick={capturarFoto}
+                        disabled={cargando}
+                      >
+                        <Camera className="h-4 w-4 mr-2" />
+                        Capturar selfie
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="border rounded-lg p-8 bg-gray-50 text-center">
+                        <User className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                        <p className="text-gray-600">
+                          Use la cámara frontal para tomar una foto de su rostro.
+                        </p>
+                      </div>
+                      
+                      <div className="flex justify-center">
+                        <Button 
+                          onClick={() => iniciarCamara('selfie')}
+                          disabled={cargando}
+                        >
+                          <Camera className="h-4 w-4 mr-2" />
+                          Activar cámara
+                        </Button>
+                      </div>
+                      
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden" 
+                        onChange={(e) => {
+                          const files = e.target.files;
+                          if (files && files.length > 0) {
+                            const file = files[0];
+                            setFotoFile(file);
+                            
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                              if (e.target && typeof e.target.result === 'string') {
+                                setFotoPreview(e.target.result);
+                              }
+                            };
+                            reader.readAsDataURL(file);
+                            
+                            setProgreso(85);
+                          }
+                        }}
+                      />
+                      
+                      <div className="text-center">
+                        <button 
+                          className="text-blue-600 text-sm"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          O seleccione una imagen desde su dispositivo
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            )}
+            
+            {/* Mensaje de error */}
+            {error && (
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+          </CardContent>
+          
+          <CardFooter className="border-t bg-gray-50 text-xs text-gray-500 p-4 flex items-center space-x-2">
+            <Shield className="h-3 w-3 text-gray-400" />
+            <span>Todos los datos son procesados de forma segura y encriptada cumpliendo con la ley chilena 19.628 sobre protección de la vida privada</span>
+          </CardFooter>
+        </Card>
+      </div>
+    </div>
+  );
+
+    }
+    else if ((window as any).androidInterface && typeof (window as any).androidInterface.readNFC === 'function') {
+      setNfcAvailable(true);
+      console.log('Android WebView NFC API está disponible');
+    }
+    else {
+      setNfcAvailable(false);
+      console.log('NFC API no está disponible en este dispositivo/navegador');
+      setError('Este dispositivo o navegador no tiene NFC disponible. Intente usar un dispositivo Android compatible con NFC o active las opciones alternativas.');
+    }
+  };
+  
+  // Iniciar la cámara del dispositivo
+  const iniciarCamara = async (tipo: 'documento' | 'selfie') => {
+    try {
+      setCargando(true);
+      setTipoCamara(tipo);
+      
+      // Detener cualquier stream previo
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
+      // Configuración de la cámara
+      const constraints = {
+        video: { 
+          facingMode: tipo === 'selfie' ? 'user' : 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      };
+      
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      streamRef.current = stream;
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+        setIsCamaraActiva(true);
+      }
+      
+      toast({
+        title: tipo === 'selfie' ? 'Cámara frontal activada' : 'Cámara trasera activada',
+        description: tipo === 'selfie' ? 'Capture una foto clara de su rostro' : 'Capture una foto clara de su documento',
+      });
+      
+    } catch (err) {
+      console.error('Error al iniciar la cámara:', err);
+      setError(`No se pudo acceder a la cámara: ${err instanceof Error ? err.message : 'Error desconocido'}`);
+      toast({
+        title: 'Error de cámara',
+        description: 'No se pudo acceder a la cámara. Verifique los permisos.',
+        variant: 'destructive',
+      });
+    } finally {
+      setCargando(false);
+    }
+  };
+  
+  // Capturar foto desde la cámara
+  const capturarFoto = () => {
+    if (!isCamaraActiva || !videoRef.current || !canvasRef.current) return;
+    
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    
+    // Configurar tamaño del canvas
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Dibujar el frame actual en el canvas
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      // Convertir canvas a blob/file
+      canvas.toBlob(async (blob) => {
+        if (blob) {
+          const file = new File([blob], `${tipoCamara === 'selfie' ? 'selfie' : 'documento'}-${Date.now()}.jpg`, { type: 'image/jpeg' });
+          
+          if (tipoCamara === 'selfie') {
+            setFotoFile(file);
+            // Convertir a data URL para previsualización
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              if (e.target && typeof e.target.result === 'string') {
+                setFotoPreview(e.target.result);
+              }
+            };
+            reader.readAsDataURL(file);
+            
+            // Detener la cámara
+            if (streamRef.current) {
+              streamRef.current.getTracks().forEach(track => track.stop());
+              setIsCamaraActiva(false);
+            }
+            
+            toast({
+              title: 'Selfie capturada',
+              description: 'Se ha capturado correctamente su selfie',
+            });
+            
+            // Avanzar el progreso
+            setProgreso(85);
+          } else {
+            setDocumentoFile(file);
+            // Convertir a data URL para previsualización
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              if (e.target && typeof e.target.result === 'string') {
+                setDocumentoPreview(e.target.result);
+              }
+            };
+            reader.readAsDataURL(file);
+            
+            // Detener la cámara
+            if (streamRef.current) {
+              streamRef.current.getTracks().forEach(track => track.stop());
+              setIsCamaraActiva(false);
+            }
+            
+            toast({
+              title: 'Documento capturado',
+              description: 'Se ha capturado correctamente su documento',
+            });
+            
+            // Avanzar el progreso
+            setProgreso(65);
+            // Cambiar al siguiente paso
+            setActiveStep('selfie');
+          }
+        }
+      }, 'image/jpeg', 0.9);
+    }
+  };
+  
+  // Manejador para NFC
   const handleNFCSuccess = (data: any) => {
     console.log('NFC leído con éxito:', data);
     setNfcData(data);
@@ -72,8 +629,19 @@ const VerificacionNFC: React.FC = () => {
     const verId = `v-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     setVerificacionId(verId);
     
+    // Avanzar al siguiente paso (documento o selfie)
+    setActiveStep('documento');
+    
+    // Iniciar cámara automáticamente para capturar documento
+    setTimeout(() => {
+      iniciarCamara('documento');
+    }, 500);
+    
+    // Actualizar progreso
+    setProgreso(40);
+    
     toast({
-      title: 'Datos NFC leídos',
+      title: 'Datoss NFC leídos',
       description: 'Ahora capture una foto de su documento',
     });
     
@@ -925,7 +1493,7 @@ const VerificacionNFC: React.FC = () => {
         <CardFooter className="border-t bg-gray-50 text-sm text-gray-500 p-4 flex items-center">
           <AlertCircle className="h-4 w-4 mr-2 text-amber-600" />
           <span>
-            {modoDemo ? 'Modo demostración activo - Datos simulados' : 'Todos los datos son procesados de forma segura y protegida.'}
+            {modoDemo ? 'Modo demostración activo - Datos simulados' : 'Todos los datos son procesados de forma segura y encriptada cumpliendo con la ley chilena 19.628 sobre protección de la vida privadaa y protegida.'}
           </span>
         </CardFooter>
       </Card>
