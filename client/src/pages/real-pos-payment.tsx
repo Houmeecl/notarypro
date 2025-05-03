@@ -554,22 +554,80 @@ const RealPOSPayment: React.FC = () => {
                 <p className="text-sm text-gray-500 mb-4">Total a pagar</p>
               </div>
               
-              {/* Opción de terminal físico */}
+              {/* Opción de terminal Tuu Payments */}
+              <div className="border rounded-lg p-4 border-green-200 bg-green-50">
+                <div className="flex items-center mb-2">
+                  <Terminal className="w-5 h-5 mr-3 text-green-600" />
+                  <div>
+                    <p className="font-medium">Tuu Payments - Sunmi T5810</p>
+                    <p className="text-sm text-gray-500">Terminal POS moderno con integración nativa</p>
+                  </div>
+                </div>
+                <div className="text-xs text-green-700 mb-3">
+                  Recomendado - Integración oficial con terminal Sunmi
+                </div>
+                
+                <TuuPOSPayment
+                  amount={total}
+                  description={`Pago VecinoXpress - ${storeCode}`}
+                  clientRut={customer.document}
+                  onPaymentComplete={(transactionData) => {
+                    // Generar un ID de transacción
+                    const txId = 'TX-TUU-' + Date.now().toString().slice(-6);
+                    setTransactionId(txId);
+                    setPaymentStatus('success');
+                    setIsCompleted(true);
+                    
+                    toast({
+                      title: 'Pago completado',
+                      description: `Transacción ${txId} procesada exitosamente`,
+                    });
+                    
+                    // Registrar la transacción
+                    console.log('Transacción Tuu registrada:', {
+                      id: txId,
+                      tuuData: transactionData,
+                      storeCode,
+                      items: cartItems,
+                      customer,
+                      total,
+                      subtotal,
+                      tax,
+                      operatorId: user?.id || 'unknown',
+                      timestamp: new Date().toISOString()
+                    });
+                  }}
+                  onPaymentError={(error) => {
+                    console.error('Error procesando el pago:', error);
+                    setErrorMessage('Error al procesar el pago. Intente nuevamente.');
+                    setPaymentStatus('failure');
+                    
+                    toast({
+                      title: 'Error',
+                      description: 'No se pudo completar la transacción',
+                      variant: 'destructive',
+                    });
+                  }}
+                />
+              </div>
+              
+              {/* Opción de terminal físico (simulado) */}
               <div className="border rounded-lg p-4">
                 <div className="flex items-center mb-2">
                   <Terminal className="w-5 h-5 mr-3 text-gray-600" />
                   <div>
-                    <p className="font-medium">Pago con terminal físico</p>
-                    <p className="text-sm text-gray-500">Tarjeta de crédito, débito o QR en dispositivo físico</p>
+                    <p className="font-medium">Terminal de pago (simulado)</p>
+                    <p className="text-sm text-gray-500">Simula el pago con un terminal físico</p>
                   </div>
                 </div>
                 <Button
                   className="w-full mt-3"
+                  variant="outline"
                   onClick={processPaymentWithTerminal}
                   disabled={isProcessing || terminalStatus !== 'connected'}
                 >
                   <CreditCard className="w-4 h-4 mr-2" />
-                  Pagar con terminal
+                  Usar terminal simulado
                 </Button>
                 
                 {terminalStatus !== 'connected' && (
@@ -611,14 +669,8 @@ const RealPOSPayment: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="max-w-4xl mx-auto mb-4">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
-            <button 
-              onClick={() => navigate('/')}
-              className="mr-4 flex items-center justify-center w-10 h-10 rounded-full bg-white shadow hover:bg-gray-100"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
             <h1 className="text-2xl font-bold text-[#2d219b]">VecinoXpress POS</h1>
           </div>
           <div className="flex gap-2">
@@ -628,6 +680,14 @@ const RealPOSPayment: React.FC = () => {
             </div>
           </div>
         </div>
+        
+        {/* Componente de navegación con migas de pan */}
+        <PageNavigation 
+          items={breadcrumbItems} 
+          backTo="/pos-menu"
+          backLabel="Volver a POS Menu"
+          className="mb-6"
+        />
         
         {/* Mensaje de error */}
         {errorMessage && !isCompleted && (
