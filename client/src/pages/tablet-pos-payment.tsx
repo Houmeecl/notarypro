@@ -81,6 +81,18 @@ const TabletPOSPayment: React.FC = () => {
       // Guardar ID de transacción
       setTransactionId(reference);
       
+      // Recuperar los datos del cliente si no están disponibles
+      if (!customer.name || !customer.email) {
+        try {
+          const savedCustomer = localStorage.getItem(`tx_customer_${reference}`);
+          if (savedCustomer) {
+            setCustomer(JSON.parse(savedCustomer));
+          }
+        } catch (e) {
+          console.error('Error recuperando datos del cliente:', e);
+        }
+      }
+      
       // Procesar según el estado
       if (status === 'success' || status === 'approved') {
         setIsCompleted(true);
@@ -177,11 +189,19 @@ const TabletPOSPayment: React.FC = () => {
         // Generar identificador único para la transacción
         const externalReference = `TX-TABLET-${Date.now().toString()}`;
         
+        // Guardar datos del cliente en localStorage para recuperación post-redirección
+        try {
+          localStorage.setItem(`tx_customer_${externalReference}`, JSON.stringify(customer));
+          localStorage.setItem(`tx_cart_${externalReference}`, JSON.stringify(cartItems));
+        } catch (e) {
+          console.error('Error guardando datos del cliente:', e);
+        }
+        
         // URLs de retorno para procesamiento de pago
         const backUrls = {
-          success: `${window.location.origin}/tablet-pos?status=success&reference=${externalReference}`,
-          failure: `${window.location.origin}/tablet-pos?status=failure&reference=${externalReference}`,
-          pending: `${window.location.origin}/tablet-pos?status=pending&reference=${externalReference}`
+          success: `${window.location.origin}/tablet-pos-payment?status=success&reference=${externalReference}`,
+          failure: `${window.location.origin}/tablet-pos-payment?status=failure&reference=${externalReference}`,
+          pending: `${window.location.origin}/tablet-pos-payment?status=pending&reference=${externalReference}`
         };
         
         // Crear la preferencia de pago
@@ -592,8 +612,11 @@ const TabletPOSPayment: React.FC = () => {
                             <CreditCard className="w-5 h-5 mr-3 text-blue-500" />
                             <div>
                               <p className="font-medium">MercadoPago</p>
-                              <p className="text-sm text-gray-500">Pago con tarjeta o QR</p>
+                              <p className="text-sm text-gray-500">Pago con tarjeta, transferencia o QR</p>
                             </div>
+                          </div>
+                          <div className="mt-3 p-2 bg-blue-50 rounded text-xs text-blue-700">
+                            Método recomendado - Acepta todos los medios de pago
                           </div>
                         </div>
                         
