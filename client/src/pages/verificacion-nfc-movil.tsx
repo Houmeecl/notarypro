@@ -394,6 +394,40 @@ const VerificacionNFCMovil: React.FC = () => {
                       onError={handleNFCError}
                       demoMode={true} // Modo demo para pruebas
                     />
+                    
+                    <div className="mt-4 text-center">
+                      <p className="text-sm text-gray-500 mb-2">¿Problemas con NFC?</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          // Simular éxito de NFC para continuar al siguiente paso
+                          handleNFCSuccess({
+                            source: 'nfc',
+                            data: {
+                              run: '12.345.678-9',
+                              nombre: 'DEMO USUARIO',
+                              apellidos: 'PRUEBA NFC',
+                              fechaNacimiento: '01/01/1990',
+                              sexo: 'M',
+                              nacionalidad: 'CHILENA',
+                              fechaEmision: '01/01/2020',
+                              fechaExpiracion: '01/01/2030',
+                              numeroDocumento: 'DEMO123456',
+                              numeroSerie: 'DEMO9876543210'
+                            },
+                            timestamp: new Date().toISOString()
+                          });
+                          
+                          toast({
+                            title: 'Modo alternativo activado',
+                            description: 'Continuando en modo alternativo sin NFC',
+                          });
+                        }}
+                      >
+                        Continuar sin NFC (modo demostración)
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </TabsContent>
