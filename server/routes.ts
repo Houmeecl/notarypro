@@ -134,6 +134,80 @@ async function initializeTestAdmins() {
       });
       console.log("Admin NFC inicializado correctamente");
     }
+
+    // Admin para VecinoXpress
+    const [existingVecinosAdmin] = await db.select().from(users).where(
+      eq(users.username, "vecinosadmin")
+    );
+
+    if (existingVecinosAdmin) {
+      console.log("El administrador vecinosadmin ya existe. Actualizando contraseña...");
+      await db.update(users)
+        .set({ password: "vecinos123", platform: "vecinos" })
+        .where(eq(users.username, "vecinosadmin"));
+      console.log("Contraseña del administrador vecinosadmin actualizada.");
+    } else {
+      await db.insert(users).values({
+        username: "vecinosadmin",
+        password: "vecinos123",
+        email: "admin@vecinoxpress.cl",
+        fullName: "Admin VecinoXpress",
+        role: "admin",
+        platform: "vecinos",
+        createdAt: new Date()
+      });
+      console.log("Admin VecinoXpress inicializado correctamente");
+    }
+    
+    // Usuario demo partner para VecinoXpress
+    const [existingDemoPartner] = await db.select().from(users).where(
+      eq(users.username, "demopartner")
+    );
+
+    if (existingDemoPartner) {
+      console.log("El usuario demopartner ya existe. Actualizando contraseña...");
+      await db.update(users)
+        .set({ password: "password123", platform: "vecinos", role: "partner" })
+        .where(eq(users.username, "demopartner"));
+      console.log("Credenciales del usuario demopartner actualizadas.");
+    } else {
+      // Crear usuario demopartner
+      const [newUser] = await db.insert(users).values({
+        username: "demopartner",
+        password: "password123",
+        email: "demo@vecinoxpress.cl",
+        fullName: "Demo Partner",
+        role: "partner",
+        platform: "vecinos",
+        createdAt: new Date()
+      }).returning();
+      
+      // Verificar si ya existe el perfil de socio
+      const [existingPartner] = await db.select().from(partners).where(
+        eq(partners.userId, newUser.id)
+      );
+      
+      // Crear perfil de socio si no existe
+      if (!existingPartner) {
+        await db.insert(partners).values({
+          userId: newUser.id,
+          storeName: "Minimarket El Sol",
+          managerName: "John Doe",
+          region: "Metropolitana",
+          commune: "Providencia",
+          address: "Av. Providencia 1234, Santiago",
+          phone: "+56 9 1234 5678",
+          email: "demo@vecinoxpress.cl",
+          hasInternet: true,
+          hasDevice: true,
+          status: "active",
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+      }
+      
+      console.log("Usuario demo partner inicializado correctamente");
+    }
   } catch (error) {
     console.error("Error inicializando admins:", error);
   }
