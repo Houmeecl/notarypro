@@ -9,32 +9,31 @@ import {
   Home, 
   User, 
   FileText, 
-  CreditCard, 
+  Calendar, 
   HelpCircle,
-  BarChart3,
-  Monitor,
-  ChevronRight
+  Video,
+  ChevronRight,
+  Settings
 } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-interface VecinosLayoutProps {
+interface CertifierLayoutProps {
   children: ReactNode;
   title?: string;
   showNavigation?: boolean;
 }
 
-export default function VecinosLayout({ 
+export default function CertifierLayout({ 
   children, 
-  title = "Vecinos NotaryPro Express", 
+  title = "Panel de Certificador", 
   showNavigation = true 
-}: VecinosLayoutProps) {
+}: CertifierLayoutProps) {
   const [_, setLocation] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  
-  const isLoggedIn = localStorage.getItem("vecinos_token") !== null;
+  const { user, logoutMutation } = useAuth();
   
   const handleLogout = () => {
-    localStorage.removeItem("vecinos_token");
-    setLocation("/vecinos/login");
+    logoutMutation.mutate();
   };
 
   return (
@@ -46,24 +45,24 @@ export default function VecinosLayout({
             <div className="flex items-center">
               <div 
                 className="font-bold text-xl cursor-pointer flex items-center" 
-                onClick={() => setLocation(isLoggedIn ? "/vecinos/dashboard" : "/vecinos")}
+                onClick={() => setLocation("/")}
               >
                 <img src="/images/logo-notarypro-rojo.svg" alt="NotaryPro Logo" className="h-8 mr-2" />
-                <span className="text-red-600 font-light">Vecinos <span className="font-semibold">NotaryPro</span></span>
+                <span className="text-red-600 font-medium">Notary<span className="font-bold">Pro</span></span>
               </div>
             </div>
-            
+
             <div className="flex items-center">
-              {isLoggedIn ? (
+              {user ? (
                 <>
-                  <Button 
-                    variant="outline" 
-                    className="text-gray-700 border-0 hover:bg-gray-50 font-normal mr-2 text-sm"
-                    onClick={() => setLocation("/vecinos/cuenta")}
-                  >
-                    <User className="h-4 w-4 mr-1 text-gray-400" />
-                    <span className="hidden md:inline">Mi Cuenta</span>
-                  </Button>
+                  <div className="hidden md:flex items-center mr-2">
+                    <span className="text-sm text-gray-600 mr-2">Hola, {user.username}</span>
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-red-100 text-red-600 text-xs">
+                        {user.username?.substring(0, 2).toUpperCase() || "NP"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
                   
                   <Button 
                     variant="ghost" 
@@ -75,21 +74,12 @@ export default function VecinosLayout({
                   </Button>
                 </>
               ) : (
-                <>
-                  <Button 
-                    variant="outline" 
-                    className="text-gray-700 border-gray-200 hover:bg-gray-50 mr-2 font-normal text-sm"
-                    onClick={() => setLocation("/vecinos/registro")}
-                  >
-                    Registro
-                  </Button>
-                  <Button 
-                    className="bg-red-600 hover:bg-red-700 text-white font-normal text-sm"
-                    onClick={() => setLocation("/vecinos/login")}
-                  >
-                    Acceder
-                  </Button>
-                </>
+                <Button 
+                  className="bg-red-600 hover:bg-red-700 text-white font-normal text-sm"
+                  onClick={() => setLocation("/auth")}
+                >
+                  Acceder
+                </Button>
               )}
               
               {/* Botón de menú móvil */}
@@ -108,41 +98,41 @@ export default function VecinosLayout({
       </header>
 
       {/* Navegación de escritorio */}
-      {isLoggedIn && showNavigation && (
+      {user && showNavigation && (
         <div className="hidden md:block bg-white border-b border-gray-100">
           <div className="container mx-auto px-4">
             <nav className="flex space-x-6">
               <Button 
                 variant="link" 
                 className="text-gray-600 hover:text-red-600 font-normal text-sm h-12"
-                onClick={() => setLocation("/vecinos/dashboard")}
+                onClick={() => setLocation("/certifier-dashboard")}
               >
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Dashboard
+                <Home className="h-4 w-4 mr-2" />
+                Inicio
               </Button>
               <Button 
                 variant="link" 
                 className="text-gray-600 hover:text-red-600 font-normal text-sm h-12"
-                onClick={() => setLocation("/vecinos/pos-app")}
+                onClick={() => setLocation("/certification-documents")}
               >
                 <FileText className="h-4 w-4 mr-2" />
-                Procesar Docs
+                Documentos
               </Button>
               <Button 
                 variant="link" 
                 className="text-gray-600 hover:text-red-600 font-normal text-sm h-12"
-                onClick={() => window.open("/partners/webapp-pos-official", "_blank")}
+                onClick={() => setLocation("/certification-calendar")}
               >
-                <Monitor className="h-4 w-4 mr-2" />
-                POS Web
+                <Calendar className="h-4 w-4 mr-2" />
+                Calendario
               </Button>
               <Button 
                 variant="link" 
                 className="text-gray-600 hover:text-red-600 font-normal text-sm h-12"
-                onClick={() => setLocation("/vecinos/retiros")}
+                onClick={() => setLocation("/video-sessions")}
               >
-                <CreditCard className="h-4 w-4 mr-2" />
-                Retiros
+                <Video className="h-4 w-4 mr-2" />
+                Videollamadas
               </Button>
             </nav>
           </div>
@@ -150,7 +140,7 @@ export default function VecinosLayout({
       )}
       
       {/* Menú móvil */}
-      {menuOpen && isLoggedIn && showNavigation && (
+      {menuOpen && user && showNavigation && (
         <div className="md:hidden bg-white border-b border-gray-100">
           <div className="container mx-auto px-4 py-2">
             <nav className="flex flex-col">
@@ -158,67 +148,67 @@ export default function VecinosLayout({
                 variant="link" 
                 className="text-gray-600 hover:text-red-600 justify-start h-10 px-0 font-normal"
                 onClick={() => {
-                  setLocation("/vecinos/dashboard");
+                  setLocation("/certifier-dashboard");
                   setMenuOpen(false);
                 }}
               >
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Dashboard
+                <Home className="h-4 w-4 mr-2" />
+                Inicio
               </Button>
               <Button 
                 variant="link" 
                 className="text-gray-600 hover:text-red-600 justify-start h-10 px-0 font-normal"
                 onClick={() => {
-                  setLocation("/vecinos/pos-app");
+                  setLocation("/certification-documents");
                   setMenuOpen(false);
                 }}
               >
                 <FileText className="h-4 w-4 mr-2" />
-                Procesar Documentos
+                Documentos
               </Button>
               <Button 
                 variant="link" 
                 className="text-gray-600 hover:text-red-600 justify-start h-10 px-0 font-normal"
                 onClick={() => {
-                  window.open("/partners/webapp-pos-official", "_blank");
+                  setLocation("/certification-calendar");
                   setMenuOpen(false);
                 }}
               >
-                <Monitor className="h-4 w-4 mr-2" />
-                Abrir POS Web
+                <Calendar className="h-4 w-4 mr-2" />
+                Calendario
               </Button>
               <Button 
                 variant="link" 
                 className="text-gray-600 hover:text-red-600 justify-start h-10 px-0 font-normal"
                 onClick={() => {
-                  setLocation("/vecinos/retiros");
+                  setLocation("/video-sessions");
                   setMenuOpen(false);
                 }}
               >
-                <CreditCard className="h-4 w-4 mr-2" />
-                Retiros
+                <Video className="h-4 w-4 mr-2" />
+                Videollamadas
               </Button>
               <Button 
                 variant="link" 
                 className="text-gray-600 hover:text-red-600 justify-start h-10 px-0 font-normal"
                 onClick={() => {
-                  setLocation("/vecinos/cuenta");
+                  setLocation("/profile");
                   setMenuOpen(false);
                 }}
               >
                 <User className="h-4 w-4 mr-2" />
-                Mi Cuenta
+                Mi Perfil
               </Button>
               <Button 
                 variant="link" 
                 className="text-gray-600 hover:text-red-600 justify-start h-10 px-0 font-normal"
                 onClick={() => {
-                  setLocation("/vecinos/soporte");
+                  setLocation("/ayuda-legal");
                   setMenuOpen(false);
                 }}
               >
                 <HelpCircle className="h-4 w-4 mr-2" />
-                Soporte
+                Ayuda Legal
               </Button>
             </nav>
           </div>
@@ -249,21 +239,21 @@ export default function VecinosLayout({
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
               <p className="text-xs text-gray-500">
-                © 2025 Vecinos NotaryPro Express | Una empresa de CerfiDoc
+                © 2025 NotaryPro | Una empresa de CerfiDoc
               </p>
             </div>
             <div className="flex space-x-4">
               <Button 
                 variant="link" 
                 className="text-gray-500 text-xs p-0 h-auto font-normal"
-                onClick={() => setLocation("/vecinos/soporte")}
+                onClick={() => setLocation("/ayuda-legal")}
               >
                 Soporte
               </Button>
               <Button 
                 variant="link" 
                 className="text-gray-500 text-xs p-0 h-auto font-normal"
-                onClick={() => setLocation("/vecinos/faq")}
+                onClick={() => setLocation("/faq")}
               >
                 Preguntas Frecuentes
               </Button>
