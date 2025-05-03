@@ -22,14 +22,14 @@ interface NavItemProps {
 
 const NavItem = ({ icon, label, href, active }: NavItemProps) => (
   <Link href={href}>
-    <a className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+    <div className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
       active 
         ? "bg-green-50 text-green-700" 
         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
     }`}>
       <div className="flex-shrink-0">{icon}</div>
       <span className="font-medium">{label}</span>
-    </a>
+    </div>
   </Link>
 );
 

@@ -3,349 +3,507 @@ import { VecinosAdminLayout } from "@/components/vecinos/VecinosAdminLayout";
 import {
   Card,
   CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Link } from "wouter";
 import {
-  BarChart,
-  LineChart,
-  Line,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-import {
+  Store,
   Users,
   FileText,
   CreditCard,
-  TrendingUp,
-  Store,
+  BarChart3,
+  ArrowRight,
+  CheckCircle2,
+  Clock,
   AlertCircle,
+  User,
+  Briefcase,
+  UserPlus,
+  Building,
+  GanttChart,
+  RotateCw
 } from "lucide-react";
 
-// Datos simulados para gráficos (en producción, estos datos vendrían de la API)
-const transactionData = [
-  { name: "Ene", valor: 8400 },
-  { name: "Feb", valor: 9200 },
-  { name: "Mar", valor: 7800 },
-  { name: "Abr", valor: 9600 },
-  { name: "May", valor: 12000 },
-  { name: "Jun", valor: 10800 },
-  { name: "Jul", valor: 14500 },
-];
+const VecinosAdminIndexPage = () => {
+  // Datos simulados para el dashboard
+  const dashboardData = {
+    partners: {
+      total: 72,
+      approved: 45,
+      pending: 18,
+      rejected: 9,
+    },
+    applications: {
+      total: 26,
+      draft: 8,
+      pending: 15,
+      pendingDocs: 3
+    },
+    sellers: {
+      total: 12,
+      active: 10
+    },
+    supervisors: {
+      total: 4,
+      active: 4
+    },
+    transactions: {
+      total: 567,
+      amount: 2_850_000,
+      commissions: 427_500
+    },
+    documents: {
+      total: 852,
+      thisMonth: 143,
+      pending: 38,
+      completed: 782
+    }
+  };
 
-const documentData = [
-  { name: "Lun", documentos: 12 },
-  { name: "Mar", documentos: 18 },
-  { name: "Mié", documentos: 14 },
-  { name: "Jue", documentos: 22 },
-  { name: "Vie", documentos: 26 },
-  { name: "Sáb", documentos: 16 },
-  { name: "Dom", documentos: 7 },
-];
-
-const StatsCard = ({
-  title,
-  value,
-  description,
-  icon,
-  trend,
-}: {
-  title: string;
-  value: string;
-  description: string;
-  icon: React.ReactNode;
-  trend?: { value: string; positive: boolean };
-}) => (
-  <Card>
-    <CardHeader className="flex flex-row items-center justify-between pb-2">
-      <CardTitle className="text-sm font-medium text-gray-500">{title}</CardTitle>
-      <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
-        {icon}
-      </div>
-    </CardHeader>
-    <CardContent>
-      <div className="text-2xl font-bold">{value}</div>
-      <p className="text-xs text-gray-500 mt-1">
-        {trend && (
-          <span
-            className={`inline-flex items-center mr-1 ${
-              trend.positive ? "text-green-500" : "text-red-500"
-            }`}
-          >
-            {trend.positive ? (
-              <TrendingUp size={12} className="mr-1" />
-            ) : (
-              <TrendingUp size={12} className="mr-1 transform rotate-180" />
-            )}
-            {trend.value}
-          </span>
-        )}
-        {description}
-      </p>
-    </CardContent>
-  </Card>
-);
-
-const VecinosAdminDashboard = () => {
   return (
-    <VecinosAdminLayout title="Dashboard Administrativo">
-      <div className="grid gap-6">
-        {/* Tarjetas de estadísticas */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <VecinosAdminLayout title="Panel de Control">
+      <div className="space-y-6">
+        {/* Primera fila - Estadísticas generales */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
             title="Socios Activos"
-            value="126"
-            description="desde el mes pasado"
-            trend={{ value: "12%", positive: true }}
-            icon={<Store size={18} className="text-green-600" />}
+            value={dashboardData.partners.approved}
+            description={`${dashboardData.partners.total} socios en total`}
+            icon={<Store className="h-5 w-5 text-blue-600" />}
+            trend="+12% este mes"
           />
+          
           <StatsCard
-            title="Documentos Procesados"
-            value="2,856"
-            description="en el último mes"
-            trend={{ value: "8%", positive: true }}
-            icon={<FileText size={18} className="text-blue-600" />}
+            title="Solicitudes"
+            value={dashboardData.applications.pending}
+            description="Pendientes de revisión"
+            icon={<FileText className="h-5 w-5 text-amber-600" />}
+            trend={`${dashboardData.applications.total} en total`}
           />
+          
           <StatsCard
-            title="Ingresos Totales"
-            value="$348,925"
-            description="para el año actual"
-            trend={{ value: "18%", positive: true }}
-            icon={<CreditCard size={18} className="text-purple-600" />}
+            title="Documentos"
+            value={dashboardData.documents.thisMonth}
+            description={`${dashboardData.documents.total} documentos totales`}
+            icon={<FileText className="h-5 w-5 text-green-600" />}
+            trend={`${dashboardData.documents.pending} pendientes`}
           />
+          
           <StatsCard
-            title="Usuarios Registrados"
-            value="1,245"
-            description="en la plataforma"
-            trend={{ value: "5%", positive: true }}
-            icon={<Users size={18} className="text-orange-600" />}
+            title="Comisiones"
+            value={`$${(dashboardData.transactions.commissions/1000).toLocaleString()}K`}
+            description={`$${(dashboardData.transactions.amount/1000).toLocaleString()}K en transacciones`}
+            icon={<CreditCard className="h-5 w-5 text-purple-600" />}
+            trend="+8% respecto al mes anterior"
           />
         </div>
-
-        {/* Gráficos */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Card className="col-span-1">
-            <CardHeader>
-              <CardTitle>Transacciones Mensuales</CardTitle>
+        
+        {/* Segunda fila - Paneles principales */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Panel izquierdo - Socios Vecinos Xpress */}
+          <Card className="lg:col-span-2">
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg font-semibold">Socios Vecinos Xpress</CardTitle>
+                <Link href="/vecinos/admin/partners">
+                  <Button variant="ghost" size="sm" className="h-8 gap-1">
+                    Ver todos
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
               <CardDescription>
-                Valor total de transacciones por mes (CLP)
+                Estado de socios y establecimientos registrados
               </CardDescription>
             </CardHeader>
-            <CardContent className="pt-2">
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={transactionData}
-                    margin={{
-                      top: 5,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip 
-                      formatter={(value) => [`$${value.toLocaleString()}`, "Valor"]}
-                    />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="valor"
-                      stroke="#16a34a"
-                      activeDot={{ r: 8 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="flex items-center gap-2 bg-green-50 p-3 rounded-lg">
+                  <CheckCircle2 className="h-8 w-8 text-green-500" />
+                  <div>
+                    <h3 className="font-semibold">{dashboardData.partners.approved}</h3>
+                    <p className="text-sm text-gray-500">Aprobados</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2 bg-amber-50 p-3 rounded-lg">
+                  <Clock className="h-8 w-8 text-amber-500" />
+                  <div>
+                    <h3 className="font-semibold">{dashboardData.partners.pending}</h3>
+                    <p className="text-sm text-gray-500">Pendientes</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2 bg-red-50 p-3 rounded-lg">
+                  <AlertCircle className="h-8 w-8 text-red-500" />
+                  <div>
+                    <h3 className="font-semibold">{dashboardData.partners.rejected}</h3>
+                    <p className="text-sm text-gray-500">Rechazados</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <h3 className="font-medium text-sm text-gray-500 mb-3">Socios destacados</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <PartnerCard
+                    name="Minimarket El Sol"
+                    location="Santiago, RM"
+                    type="tienda"
+                    metrics={{docs: 32, balance: 15600}}
+                  />
+                  
+                  <PartnerCard
+                    name="Farmacia Vida"
+                    location="Las Condes, RM"
+                    type="farmacia"
+                    metrics={{docs: 45, balance: 25400}}
+                  />
+                </div>
               </div>
             </CardContent>
+            <CardFooter className="pt-0 flex justify-between">
+              <Link href="/vecinos/admin/partners">
+                <Button variant="outline">Gestionar socios</Button>
+              </Link>
+              <Link href="/vecinos/admin/express-dashboard">
+                <Button>Dashboard Express</Button>
+              </Link>
+            </CardFooter>
           </Card>
-
-          <Card className="col-span-1">
-            <CardHeader>
-              <CardTitle>Documentos por día</CardTitle>
+          
+          {/* Panel derecho - Solicitudes */}
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg font-semibold">Solicitudes</CardTitle>
+                <Link href="/vecinos/admin/seller-forms">
+                  <Button variant="ghost" size="sm" className="h-8 gap-1">
+                    Ver todas
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
               <CardDescription>
-                Número de documentos procesados en la última semana
+                Formularios de captación por vendedores
               </CardDescription>
             </CardHeader>
-            <CardContent className="pt-2">
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={documentData}
-                    margin={{
-                      top: 5,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="documentos" fill="#16a34a" />
-                  </BarChart>
-                </ResponsiveContainer>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-amber-100 p-2 rounded-full">
+                      <Clock className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-sm">Pendientes</h3>
+                      <p className="text-2xl font-semibold">{dashboardData.applications.pending}</p>
+                    </div>
+                  </div>
+                  <Link href="/vecinos/admin/seller-forms?tab=pending">
+                    <Button variant="ghost" size="sm">
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+                
+                <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-100 p-2 rounded-full">
+                      <FileText className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-sm">Borradores</h3>
+                      <p className="text-2xl font-semibold">{dashboardData.applications.draft}</p>
+                    </div>
+                  </div>
+                  <Link href="/vecinos/admin/seller-forms?tab=draft">
+                    <Button variant="ghost" size="sm">
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+                
+                <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-purple-100 p-2 rounded-full">
+                      <AlertCircle className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-sm">Docs. Pendientes</h3>
+                      <p className="text-2xl font-semibold">{dashboardData.applications.pendingDocs}</p>
+                    </div>
+                  </div>
+                  <Link href="/vecinos/admin/seller-forms?tab=pending_docs">
+                    <Button variant="ghost" size="sm">
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </CardContent>
+            <CardFooter className="pt-0">
+              <Link href="/vecinos/admin/seller-forms">
+                <Button className="w-full">Gestionar solicitudes</Button>
+              </Link>
+            </CardFooter>
           </Card>
         </div>
-
-        {/* Pestañas de actividad reciente y alertas */}
-        <Tabs defaultValue="activity" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:w-auto">
-            <TabsTrigger value="activity">Actividad Reciente</TabsTrigger>
-            <TabsTrigger value="alerts">Alertas</TabsTrigger>
-          </TabsList>
-          <TabsContent value="activity" className="border rounded-md">
-            <Card className="border-0 shadow-none">
-              <CardContent className="p-6">
-                <div className="space-y-5">
-                  {/* Actividades recientes */}
-                  <div className="flex items-start gap-4">
-                    <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                      <Store size={16} className="text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">
-                        Nuevo socio registrado
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Farmacia Central - Santiago
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Hace 2 horas
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-4">
-                    <div className="h-9 w-9 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                      <FileText size={16} className="text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">
-                        Certificación completada
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Contrato de arrendamiento - ID #8745
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Hace 3 horas
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-4">
-                    <div className="h-9 w-9 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                      <Users size={16} className="text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">
-                        Nuevo vendedor asignado
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Carlos Mendoza - Zona Norte
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Hace 5 horas
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-4">
-                    <div className="h-9 w-9 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                      <CreditCard size={16} className="text-orange-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">
-                        Transacción completada
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        $12,500 - Mercado San José
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Hace 6 horas
-                      </p>
-                    </div>
+        
+        {/* Tercera fila - Equipo y Actividad */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Panel izquierdo - Equipo */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-semibold">Equipo</CardTitle>
+              <CardDescription>Supervisores y vendedores</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="flex items-center gap-2 bg-purple-50 p-3 rounded-lg">
+                  <Briefcase className="h-8 w-8 text-purple-500" />
+                  <div>
+                    <h3 className="font-semibold">{dashboardData.supervisors.active}</h3>
+                    <p className="text-sm text-gray-500">Supervisores</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="alerts" className="border rounded-md">
-            <Card className="border-0 shadow-none">
-              <CardContent className="p-6">
-                <div className="space-y-5">
-                  {/* Alertas */}
-                  <div className="flex items-start gap-4">
-                    <div className="h-9 w-9 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                      <AlertCircle size={16} className="text-red-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">
-                        Documento pendiente de revisión
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        ID #9932 - Esperando más de 48 horas
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Hace 2 días
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-4">
-                    <div className="h-9 w-9 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                      <AlertCircle size={16} className="text-amber-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">
-                        Socio sin actividad
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Minimarket El Sol - Sin transacciones por 14 días
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Hace 5 días
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-4">
-                    <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                      <AlertCircle size={16} className="text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">
-                        Actualización de sistema pendiente
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Nueva versión de POS disponible
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Hace 1 semana
-                      </p>
-                    </div>
+                
+                <div className="flex items-center gap-2 bg-blue-50 p-3 rounded-lg">
+                  <User className="h-8 w-8 text-blue-500" />
+                  <div>
+                    <h3 className="font-semibold">{dashboardData.sellers.active}</h3>
+                    <p className="text-sm text-gray-500">Vendedores</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between items-center border-b pb-2">
+                  <h3 className="font-medium text-sm">Miembro</h3>
+                  <h3 className="font-medium text-sm">Rol</h3>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                      <span className="text-xs font-medium text-purple-600">JC</span>
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Juan Carrasco</h4>
+                      <p className="text-xs text-gray-500">RM Norte</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100">Supervisor</Badge>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                      <span className="text-xs font-medium text-blue-600">CM</span>
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Carlos Mendoza</h4>
+                      <p className="text-xs text-gray-500">Santiago Centro</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Vendedor</Badge>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                      <span className="text-xs font-medium text-blue-600">AS</span>
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Ana Silva</h4>
+                      <p className="text-xs text-gray-500">Providencia</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Vendedor</Badge>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="pt-0 flex justify-between">
+              <Link href="/vecinos/admin/supervisors">
+                <Button variant="outline">Supervisores</Button>
+              </Link>
+              <Link href="/vecinos/admin/sellers">
+                <Button variant="outline">Vendedores</Button>
+              </Link>
+              <Button variant="default" className="ml-auto">
+                <UserPlus className="h-4 w-4 mr-2" />
+                Añadir
+              </Button>
+            </CardFooter>
+          </Card>
+          
+          {/* Panel derecho - Actividad */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-semibold">Actividad Reciente</CardTitle>
+              <CardDescription>Últimas acciones en la plataforma</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-green-100 p-1.5 rounded-full h-7 w-7 flex items-center justify-center flex-shrink-0 mt-1">
+                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">Socio aprobado</h4>
+                    <p className="text-xs text-gray-500">Carlos aprobó a Farmacia Vida como socio Vecinos Xpress</p>
+                    <p className="text-xs text-gray-400 mt-1">Hace 2 horas</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-100 p-1.5 rounded-full h-7 w-7 flex items-center justify-center flex-shrink-0 mt-1">
+                    <FileText className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">Nueva solicitud</h4>
+                    <p className="text-xs text-gray-500">Ana creó una solicitud para Verdulería Doña Rosa</p>
+                    <p className="text-xs text-gray-400 mt-1">Hace 5 horas</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="bg-purple-100 p-1.5 rounded-full h-7 w-7 flex items-center justify-center flex-shrink-0 mt-1">
+                    <Building className="h-4 w-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">Documentos completados</h4>
+                    <p className="text-xs text-gray-500">Minimarket El Sol procesó 5 nuevos documentos</p>
+                    <p className="text-xs text-gray-400 mt-1">Hace 1 día</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="bg-amber-100 p-1.5 rounded-full h-7 w-7 flex items-center justify-center flex-shrink-0 mt-1">
+                    <GanttChart className="h-4 w-4 text-amber-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">Informe generado</h4>
+                    <p className="text-xs text-gray-500">Informe mensual de comisiones generado automáticamente</p>
+                    <p className="text-xs text-gray-400 mt-1">Hace 2 días</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="pt-0">
+              <Button variant="outline" className="w-full">
+                <RotateCw className="h-4 w-4 mr-2" />
+                Cargar más actividad
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
     </VecinosAdminLayout>
   );
 };
 
-export default VecinosAdminDashboard;
+// Componente de tarjeta de estadísticas
+interface StatsCardProps {
+  title: string;
+  value: string | number;
+  description: string;
+  icon: React.ReactNode;
+  trend?: string;
+}
+
+const StatsCard = ({ title, value, description, icon, trend }: StatsCardProps) => {
+  return (
+    <Card>
+      <CardContent className="pt-6">
+        <div className="flex justify-between items-start">
+          <div>
+            <p className="text-sm font-medium text-gray-500">{title}</p>
+            <h3 className="text-2xl font-bold mt-1">{value}</h3>
+            <p className="text-xs text-gray-500 mt-1">{description}</p>
+          </div>
+          <div className="p-2 bg-gray-50 rounded-full">
+            {icon}
+          </div>
+        </div>
+        {trend && (
+          <div className="mt-4 text-xs font-medium text-gray-500">
+            {trend}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+// Componente de tarjeta de socio
+interface PartnerCardProps {
+  name: string;
+  location: string;
+  type: string;
+  metrics: {
+    docs: number;
+    balance: number;
+  };
+}
+
+const PartnerCard = ({ name, location, type, metrics }: PartnerCardProps) => {
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "tienda":
+        return <Store className="h-4 w-4 text-blue-600" />;
+      case "farmacia":
+        return <Building className="h-4 w-4 text-green-600" />;
+      default:
+        return <Building className="h-4 w-4 text-gray-600" />;
+    }
+  };
+  
+  const getTypeLabel = (type: string) => {
+    const types: {[key: string]: string} = {
+      "tienda": "Tienda/Minimarket",
+      "farmacia": "Farmacia", 
+      "libreria": "Librería/Papelería",
+      "cafe": "Café Internet",
+      "ferreteria": "Ferretería",
+    };
+    return types[type] || type;
+  };
+
+  return (
+    <div className="border rounded-lg p-3">
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="font-medium">{name}</h3>
+          <div className="flex items-center text-xs text-gray-500 mt-1">
+            <MapPin className="h-3 w-3 mr-1" />
+            <span>{location}</span>
+          </div>
+          <div className="flex items-center text-xs text-gray-500 mt-1">
+            {getTypeIcon(type)}
+            <span className="ml-1">{getTypeLabel(type)}</span>
+          </div>
+        </div>
+        <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Activo</Badge>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-2 mt-3 text-center">
+        <div className="bg-gray-50 p-2 rounded">
+          <p className="text-xs text-gray-500">Documentos</p>
+          <p className="font-semibold">{metrics.docs}</p>
+        </div>
+        <div className="bg-gray-50 p-2 rounded">
+          <p className="text-xs text-gray-500">Saldo</p>
+          <p className="font-semibold">${metrics.balance.toLocaleString()}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default VecinosAdminIndexPage;
