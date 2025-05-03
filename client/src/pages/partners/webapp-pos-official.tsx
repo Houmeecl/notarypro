@@ -977,12 +977,6 @@ const WebAppPOSOfficial = () => {
                 </DialogHeader>
                 
                 <div className="flex flex-col items-center py-4">
-                  <NFCMicroInteractions 
-                    status={nfcStatus} 
-                    message={nfcMessage}
-                    onInteractionComplete={() => {}}
-                  />
-                  
                   <NFCIdentityReader 
                     onSuccess={handleNFCSuccess}
                     onCancel={() => setIsNfcModalOpen(false)}

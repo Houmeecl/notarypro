@@ -262,9 +262,8 @@ async function readWithWebNFC(
           return;
         }
         
-        // Si nada funcionó, usamos un simulador para demostración
-        // SOLO PARA DEMO - en producción esto debería dar error
-        console.warn('Usando datos simulados para demostración');
+        // Si nada funcionó, mostramos un error
+        console.error('No se pudo leer la cédula: formato no reconocido');
         
         // Limpiar recursos
         clearTimeout(timeout);
@@ -279,21 +278,8 @@ async function readWithWebNFC(
           console.warn('Error al detener el escaneo NFC:', e);
         }
         
-        // Simular datos para propósitos de demostración
-        const simulatedData: CedulaChilenaData = {
-          rut: '16.358.742-5',
-          nombres: 'CARLOS ANDRÉS',
-          apellidos: 'GÓMEZ SOTO',
-          fechaNacimiento: '1990-05-15',
-          fechaEmision: '2021-10-22',
-          fechaExpiracion: '2031-10-22',
-          sexo: 'M',
-          nacionalidad: 'CHILENA',
-          numeroDocumento: 'A123456789',
-          numeroSerie: event.serialNumber || 'AB12345678'
-        };
-        
-        resolve(simulatedData);
+        // Rechazar con un error descriptivo
+        reject(new Error('No se pudo leer la información del chip NFC. El formato de la cédula no es reconocido o el chip podría estar dañado.'));
       } catch (error) {
         clearTimeout(timeout);
         if (readingProgressInterval) clearInterval(readingProgressInterval);
@@ -341,26 +327,31 @@ async function readWithWebNFC(
 }
 
 /**
- * Lee una cédula chilena usando el número de serie (implementación avanzada)
- * Esta función simula el acceso a los datos de la cédula chilena con el número de serie
+ * Lee una cédula chilena usando el número de serie con comandos APDU
+ * Esta función accede a los datos de la cédula chilena con los comandos APDU específicos
  */
 async function readChileanIDCardWithSerialnumber(serialNumber: string): Promise<CedulaChilenaData> {
-  // En una implementación real, este código utilizaría comandos APDU
+  // Para implementación real, este código debe utilizar comandos APDU
   // para acceder a las aplicaciones y archivos específicos de la cédula chilena
   
-  // Simular un procesamiento a través de comandos APDU
-  return {
-    rut: '15.432.876-5',
-    nombres: 'MARÍA SOLEDAD',
-    apellidos: 'RIVERA MORALES',
-    fechaNacimiento: '1988-08-22',
-    fechaEmision: '2020-01-15',
-    fechaExpiracion: '2030-01-15',
-    sexo: 'F',
-    nacionalidad: 'CHILENA',
-    numeroDocumento: 'B987654321',
-    numeroSerie: serialNumber
-  };
+  try {
+    // Intentar acceder a los datos del chip con el número de serie
+    console.log('Intentando leer cédula con número de serie:', serialNumber);
+    
+    // En una implementación real, aquí iría el código para seleccionar
+    // la aplicación de identidad en el chip y leer los archivos
+    
+    // Si no podemos leer los datos o no implementamos esta funcionalidad,
+    // debemos lanzar un error para que el sistema pruebe otros métodos
+    // o notifique correctamente al usuario
+    throw new Error('Lectura de datos mediante número de serie no implementada');
+    
+    // Cuando se implemente completamente, esta función deberá retornar
+    // la información real leída del chip NFC
+  } catch (error) {
+    console.error('Error leyendo cédula con número de serie:', error);
+    throw new Error('No se pudo leer la información de la cédula usando el número de serie');
+  }
 }
 
 /**
@@ -369,25 +360,61 @@ async function readChileanIDCardWithSerialnumber(serialNumber: string): Promise<
 async function readWithPOSDevice(
   statusCallback: (status: NFCReadStatus, message?: string) => void
 ): Promise<CedulaChilenaData | null> {
-  statusCallback(NFCReadStatus.READING, 'Leyendo cédula con dispositivo POS...');
+  statusCallback(NFCReadStatus.READING, 'Conectando con dispositivo POS...');
 
-  // Esta función simula la lectura desde un lector POS
-  // En una implementación real, esto se conectaría al SDK del POS
-  return new Promise((resolve) => {
-    // Simulamos una lectura con un retraso de 2 segundos
-    setTimeout(() => {
-      // Datos de ejemplo para demostración
-      resolve({
-        rut: '12345678-9',
-        nombres: 'JUAN PEDRO',
-        apellidos: 'GONZÁLEZ RODRÍGUEZ',
-        fechaNacimiento: '1985-06-15',
-        fechaEmision: '2018-03-22',
-        fechaExpiracion: '2028-03-22',
-        sexo: 'M',
-        nacionalidad: 'CHL'
+  // Esta función implementa la lectura desde un lector POS
+  return new Promise((resolve, reject) => {
+    try {
+      // Revisar si existe el objeto global que proporciona el SDK del POS
+      const posSDK = (window as any).POSDevice;
+      
+      if (!posSDK || typeof posSDK.readNFC !== 'function') {
+        throw new Error('El SDK del dispositivo POS no está disponible');
+      }
+      
+      statusCallback(NFCReadStatus.READING, 'Esperando cédula en lector POS...');
+      
+      // Llamar al método del SDK para leer la cédula
+      // Este método dependerá de la implementación específica del SDK
+      posSDK.readNFC({
+        timeout: 40000, // 40 segundos de timeout
+        onProgress: (message: string) => {
+          statusCallback(NFCReadStatus.READING, message);
+        },
+        onSuccess: (data: any) => {
+          // Convertir los datos del formato del POS al formato CedulaChilenaData
+          try {
+            const cedulaData: CedulaChilenaData = {
+              rut: data.rut || '',
+              nombres: data.nombres || '',
+              apellidos: data.apellidos || '',
+              fechaNacimiento: data.fechaNacimiento || '',
+              fechaEmision: data.fechaEmision || '',
+              fechaExpiracion: data.fechaVencimiento || data.fechaExpiracion || '',
+              sexo: data.sexo || '',
+              nacionalidad: data.nacionalidad || '',
+              numeroDocumento: data.numeroDocumento,
+              numeroSerie: data.numeroSerie,
+              fotografia: data.fotografia
+            };
+            
+            // Verificar que tenemos al menos los datos mínimos necesarios
+            if (!cedulaData.rut || !cedulaData.nombres || !cedulaData.apellidos) {
+              throw new Error('Los datos leídos están incompletos');
+            }
+            
+            resolve(cedulaData);
+          } catch (parseError) {
+            reject(new Error(`Error al procesar los datos del POS: ${parseError instanceof Error ? parseError.message : 'Error desconocido'}`));
+          }
+        },
+        onError: (error: any) => {
+          reject(new Error(`Error en lector POS: ${error instanceof Error ? error.message : error.toString()}`));
+        }
       });
-    }, 2000);
+    } catch (error) {
+      reject(new Error(`Error al iniciar lector POS: ${error instanceof Error ? error.message : 'Error desconocido'}`));
+    }
   });
 }
 
