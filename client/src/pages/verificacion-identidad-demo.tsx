@@ -17,8 +17,8 @@ const VerificacionIdentidadDemo: React.FC = () => {
     const newSessionId = `verify-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
     setSessionId(newSessionId);
     
-    // Crear URL para la verificación móvil
-    const verificationUrl = `${window.location.origin}/verificacion-identidad-movil?session=${newSessionId}`;
+    // Usar la ruta unificada de verificación NFC
+    const verificationUrl = `${window.location.origin}/verificacion-nfc?session=${newSessionId}`;
     // Generar código QR con la URL
     const qrCode = generateQRCodeSVG(verificationUrl);
     setVerificationQrCode(qrCode);

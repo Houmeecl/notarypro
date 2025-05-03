@@ -62,12 +62,6 @@ import PaymentDemo from "@/pages/payment-demo";
 import DocumentoEjemplo from "@/pages/documento-ejemplo";
 import VerificacionIdentidadDemo from "@/pages/verificacion-identidad-demo";
 import ReadIDVerificationPage from "@/pages/readid-verification";
-import VerificacionAvanzada from "@/pages/verificacion-avanzada";
-import VerificacionIdentidadQR from "@/pages/verificacion-identidad-qr";
-import VerificacionIdentidadNFC from "@/pages/verificacion-identidad-nfc";
-import VerificacionIntegradaPage from "@/pages/verificacion-integrada";
-import VerificacionMovil from "@/pages/verificacion-movil";
-import VerificacionNFCMovil from "@/pages/verificacion-nfc-movil";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -124,9 +118,8 @@ const LazyVecinosAdminExpressDashboard = React.lazy(() => import("@/pages/vecino
 const LazyVecinosAdminUsersManagement = React.lazy(() => import("@/pages/vecinos/admin/users-management"));
 const LazyVecinosAdminDocumentManager = React.lazy(() => import("@/pages/vecinos/admin/document-manager"));
 const LazyVecinosCertifierValidation = React.lazy(() => import("@/pages/vecinos/certifier-validation"));
-const LazyVerificacionMovil = React.lazy(() => import("@/pages/verificacion-identidad-movil"));
-const LazyVerificacionREADID = React.lazy(() => import("@/pages/verificacion-identidad-readid"));
-const LazyVerificacionInverID = React.lazy(() => import("@/pages/verificacion-inverid"));
+// Ahora utilizamos la página unificada de verificación
+const LazyVerificacionNFC = React.lazy(() => import("@/pages/verificacion-nfc"));
 
 function Router() {
   return (
@@ -506,8 +499,10 @@ function Router() {
         );
       }} />
       
-      {/* MODO FALLBACK PARA DISPOSITIVOS MÓVILES */}
-      <Route path="/verificacion-movil" component={VerificacionMovil} />
+      {/* MODO FALLBACK PARA DISPOSITIVOS MÓVILES - Redirige a la versión unificada */}
+      <Route path="/verificacion-movil">
+        <Redirect to="/verificacion-nfc" />
+      </Route>
       
       {/* Redirecciones de URLs anteriores para compatibilidad */}
       <Route path="/verificacion-identidad-nfc">
