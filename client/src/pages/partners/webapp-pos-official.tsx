@@ -13,6 +13,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet";
 import { jwtDecode } from "jwt-decode";
+import { QRCodeSVG } from 'qrcode.react';
 import { 
   CedulaChilenaData, 
   NFCReadStatus, 
@@ -118,6 +119,8 @@ const WebAppPOSOfficial = () => {
   const [readIDStep, setReadIDStep] = useState(0);
   const [showFacialCompare, setShowFacialCompare] = useState(false);
   const [validationProgress, setValidationProgress] = useState(0);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [showVerificationQR, setShowVerificationQR] = useState(false);
   
   const sigCanvas = useRef<SignatureCanvas | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -495,12 +498,39 @@ const WebAppPOSOfficial = () => {
     }
   };
 
+  // Generar código de verificación único
+  const generateVerificationCode = () => {
+    // Generar un código de 6 caracteres alfanuméricos
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    
+    // Generar primeros 3 caracteres (letras)
+    for (let i = 0; i < 3; i++) {
+      code += chars.charAt(Math.floor(Math.random() * 26)); // Solo letras (primeros 26 caracteres)
+    }
+    
+    // Añadir guión
+    code += '-';
+    
+    // Generar últimos 3 caracteres (números)
+    for (let i = 0; i < 3; i++) {
+      code += chars.charAt(26 + Math.floor(Math.random() * 10)); // Solo números (últimos 10 caracteres)
+    }
+    
+    return code;
+  };
+
   // Procesar documento (simulado)
   const processDocument = async (signatureImage: string) => {
     // En una implementación real, enviaríamos todos los datos al servidor
     try {
       // Simular procesamiento del documento
       await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Generar código de verificación único
+      const code = generateVerificationCode();
+      setVerificationCode(code);
+      setShowVerificationQR(true);
       
       // Generar datos de recibo para demostración
       const receipt = {
@@ -516,6 +546,7 @@ const WebAppPOSOfficial = () => {
         verificationLevel: 'Avanzada (NFC + Facial)',
         certificationStatus: 'Pendiente',
         estimatedDelivery: new Date(Date.now() + 86400000).toLocaleDateString('es-CL'),
+        verificationCode: code
       };
       
       setReceiptData(receipt);
