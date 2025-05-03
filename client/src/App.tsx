@@ -110,6 +110,7 @@ const LazyVecinosCuenta = React.lazy(() => import("@/pages/vecinos/cuenta"));
 const LazyVecinosRetiros = React.lazy(() => import("@/pages/vecinos/retiros"));
 const LazyVecinosSoporte = React.lazy(() => import("@/pages/vecinos/soporte"));
 const LazyVecinosFAQ = React.lazy(() => import("@/pages/vecinos/faq"));
+const LazyVecinosPaymentDemo = React.lazy(() => import("@/pages/vecinos/payment-demo"));
 const LazyVerificacionMovil = React.lazy(() => import("@/pages/verificacion-identidad-movil"));
 const LazyVerificacionREADID = React.lazy(() => import("@/pages/verificacion-identidad-readid"));
 
@@ -255,6 +256,11 @@ function Router() {
       <Route path="/vecinos/faq" component={() => (
         <Suspense fallback={<LazyLoadingFallback />}>
           <LazyVecinosFAQ />
+        </Suspense>
+      )} />
+      <Route path="/vecinos/payment-demo" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyVecinosPaymentDemo />
         </Suspense>
       )} />
 
