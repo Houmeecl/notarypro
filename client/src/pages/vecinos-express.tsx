@@ -408,7 +408,7 @@ export default function VecinosExpress() {
             <div className="flex items-center space-x-3">
               <Button 
                 variant="outline"
-                className={`hidden md:flex ${isScrolled ? 'border-indigo-600 text-indigo-600 hover:bg-indigo-50' : 'border-white text-white hover:bg-white/20'}`}
+                className={`hidden md:flex ${isScrolled ? 'border-indigo-600 text-indigo-600 hover:bg-indigo-50' : 'border-white border-2 text-white hover:bg-white/20 font-medium'}`}
                 onClick={() => setLocation('/vecinos/login')}
               >
                 <User className="mr-2 h-4 w-4" />
@@ -615,7 +615,7 @@ export default function VecinosExpress() {
         {/* Wave shape divider */}
         <div className="absolute bottom-0 left-0 w-full">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" className="w-full h-auto">
-            <path fill="#fff" fill-opacity="1" d="M0,288L48,272C96,256,192,224,288,213.3C384,203,480,213,576,224C672,235,768,245,864,240C960,235,1056,213,1152,202.7C1248,192,1344,192,1392,192L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+            <path fill="#fff" fillOpacity="1" d="M0,288L48,272C96,256,192,224,288,213.3C384,203,480,213,576,224C672,235,768,245,864,240C960,235,1056,213,1152,202.7C1248,192,1344,192,1392,192L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
           </svg>
         </div>
       </section>
