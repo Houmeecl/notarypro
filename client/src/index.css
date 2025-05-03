@@ -25,12 +25,12 @@
   --ring: 358 85% 52%;
   --radius: 0.75rem;
   
-  /* Variables específicas para Vecino Xpress */
-  --vecino-primary: 250 87% 40%; /* Azul índigo/morado del logo #2e22aa */
+  /* Variables específicas para ABDHDA#PE */
+  --vecino-primary: 250 85% 37%; /* Azul índigo del logo #2d219b */
   --vecino-primary-foreground: 0 0% 100%;
-  --vecino-accent: 250 87% 90%;
-  --vecino-accent-foreground: 250 87% 40%;
-  --vecino-ring: 250 87% 40%;
+  --vecino-accent: 250 85% 95%;
+  --vecino-accent-foreground: 250 85% 37%;
+  --vecino-ring: 250 85% 37%;
   
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);

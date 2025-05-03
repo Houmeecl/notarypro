@@ -78,7 +78,7 @@ export default function VecinosLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f5f4ff] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#f2f1ff] p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
           <div className="flex flex-col items-center justify-center">
@@ -160,7 +160,7 @@ export default function VecinosLogin() {
 
                   <Button
                     type="submit"
-                    className="w-full bg-[#2e22aa] hover:bg-[#231c7e]"
+                    className="w-full bg-[#2d219b] hover:bg-[#231c7c]"
                     disabled={loginMutation.isPending}
                   >
                     {loginMutation.isPending ? "Iniciando sesión..." : "Iniciar sesión"}
@@ -182,7 +182,7 @@ export default function VecinosLogin() {
                     <div className="mt-2 text-xs text-gray-500">
                       <button
                         type="button"
-                        className="text-[#2e22aa] underline"
+                        className="text-[#2d219b] underline"
                         onClick={() => {
                           form.setValue("username", "demopartner");
                           form.setValue("password", "password123");
@@ -257,7 +257,7 @@ export default function VecinosLogin() {
 
                   <Button
                     type="submit"
-                    className="w-full bg-[#2e22aa] hover:bg-[#231c7e] h-14 text-lg"
+                    className="w-full bg-[#2d219b] hover:bg-[#231c7c] h-14 text-lg"
                     disabled={loginMutation.isPending}
                   >
                     {loginMutation.isPending ? "Iniciando sesión..." : "Iniciar sesión"}
@@ -276,7 +276,7 @@ export default function VecinosLogin() {
                     <div className="mt-2 text-center">
                       <button
                         type="button"
-                        className="text-[#2e22aa] underline text-sm"
+                        className="text-[#2d219b] underline text-sm"
                         onClick={() => {
                           form.setValue("username", "demopartner");
                           form.setValue("password", "password123");
@@ -296,7 +296,7 @@ export default function VecinosLogin() {
           <div>
             <a 
               href="#" 
-              className="text-[#2e22aa] hover:underline"
+              className="text-[#2d219b] hover:underline"
               onClick={(e) => {
                 e.preventDefault();
                 setLocation("/vecinos/recuperar-password");
@@ -309,7 +309,7 @@ export default function VecinosLogin() {
             ¿No tienes una cuenta?{" "}
             <a 
               href="#" 
-              className="text-[#2e22aa] hover:underline"
+              className="text-[#2d219b] hover:underline"
               onClick={(e) => {
                 e.preventDefault();
                 setLocation("/partners/registration-form");
