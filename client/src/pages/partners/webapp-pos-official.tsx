@@ -14,6 +14,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet";
 import { jwtDecode } from "jwt-decode";
 import { 
+  ArrowLeft,
   BadgeDollarSign, 
   Check, 
   ChevronLeft, 
@@ -89,6 +90,7 @@ const WebAppPOSOfficial = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [partnerInfo, setPartnerInfo] = useState<any>(null);
+  const [partnerData, setPartnerData] = useState<any>(null);
   const [step, setStep] = useState('welcome'); // welcome, selectDocument, uploadDocument, verifyIdentity, payment, signature, success
   const [selectedDocumentType, setSelectedDocumentType] = useState('');
   const [documentFile, setDocumentFile] = useState<File | null>(null);
@@ -123,11 +125,54 @@ const WebAppPOSOfficial = () => {
     const loadPartnerInfo = async () => {
       setLoading(true);
       try {
-        // Verificar si hay token en localStorage
+        // Verificar primero si hay código de tienda (de la página vecinos/pos-app)
+        const storeCode = localStorage.getItem('store_code');
+        
+        if (storeCode) {
+          // Si tenemos código de tienda, cargamos la información de demostración asociada
+          console.log('Usando código de tienda:', storeCode);
+          
+          // Cargar información de la tienda de demostración basada en el código
+          let demoData = {
+            id: 1,
+            storeName: "Tienda Demo",
+            ownerName: "Usuario Demo",
+            storeCode: storeCode,
+            address: "Calle Ejemplo 123, Santiago",
+            balance: 0,
+            commission: 20
+          };
+          
+          // Personalizar según el código de tienda
+          switch(storeCode) {
+            case 'LOCAL-XP125':
+              demoData.storeName = "Mini Market El Sol";
+              demoData.ownerName = "Carlos Ramírez";
+              break;
+            case 'LOCAL-XP201':
+              demoData.storeName = "Farmacia Vida";
+              demoData.ownerName = "María González";
+              break;
+            case 'LOCAL-XP315':
+              demoData.storeName = "Librería Central";
+              demoData.ownerName = "Pablo Araya";
+              break;
+            case 'LOCAL-XP427':
+              demoData.storeName = "Café Internet Express";
+              demoData.ownerName = "Ana Figueroa";
+              break;
+          }
+          
+          setPartnerData(demoData);
+          setLoading(false);
+          return;
+        }
+        
+        // Si no hay código de tienda, verificar si hay token en localStorage
         const token = localStorage.getItem('vecinosPartnerToken');
         if (!token) {
           // Si no hay token, redirigir al login
-          setLocation('/partners/webapp-login');
+          setLocation('/vecinos/pos-app');
           return;
         }
 
@@ -137,13 +182,13 @@ const WebAppPOSOfficial = () => {
           if (decoded.exp * 1000 < Date.now()) {
             // Token expirado
             localStorage.removeItem('vecinosPartnerToken');
-            setLocation('/partners/webapp-login');
+            setLocation('/vecinos/pos-app');
             return;
           }
         } catch (err) {
           console.error('Error decodificando token:', err);
           localStorage.removeItem('vecinosPartnerToken');
-          setLocation('/partners/webapp-login');
+          setLocation('/vecinos/pos-app');
           return;
         }
 
@@ -530,12 +575,32 @@ const WebAppPOSOfficial = () => {
             <div className="text-center mb-6">
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">¡Bienvenido al POS de Vecinos NotaryPro!</h2>
               <p className="text-lg text-gray-700 mb-2">
-                {partnerInfo ? `${partnerInfo.storeName} - ${partnerInfo.storeCode}` : 'Cargando información...'}
+                {partnerData ? 
+                  `${partnerData.storeName} - ${partnerData.storeCode}` : 
+                  (partnerInfo ? `${partnerInfo.storeName} - ${partnerInfo.storeCode}` : 'Cargando información...')
+                }
               </p>
               <p className="text-gray-600">
                 Elija una opción para comenzar:
               </p>
             </div>
+            
+            {/* Botón para volver si se accedió con código de tienda */}
+            {localStorage.getItem('store_code') && (
+              <div className="flex items-center justify-center mb-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    localStorage.removeItem('store_code');
+                    setLocation('/vecinos/pos-app');
+                  }}
+                  className="text-primary border-primary hover:bg-red-50"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Volver a selección de tienda
+                </Button>
+              </div>
+            )}
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full max-w-5xl">
               <Card className="overflow-hidden transition-all hover:shadow-lg border border-gray-100">

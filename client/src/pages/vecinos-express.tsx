@@ -389,6 +389,7 @@ export default function VecinosExpress() {
                     className="bg-primary hover:bg-red-700 text-white"
                     onClick={() => setLocation('/vecinos/login')}
                   >
+                    <User className="mr-2 h-4 w-4" />
                     Acceder como Vecino
                   </Button>
                   <Button 
@@ -396,7 +397,24 @@ export default function VecinosExpress() {
                     className="border-primary text-primary hover:bg-red-50"
                     onClick={() => setLocation('/vecinos/pos-app')}
                   >
-                    Acceder a POS Web
+                    <Store className="mr-2 h-4 w-4" />
+                    Acceder a POS con Código
+                  </Button>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-3 mt-3">
+                  <Button 
+                    variant="outline"
+                    className="border-green-600 text-green-600 hover:bg-green-50"
+                    onClick={() => {
+                      // Redirección directa utilizando códigos de tienda de demostración
+                      const demoCode = 'LOCAL-XP125'; // Mini Market El Sol
+                      localStorage.setItem('store_code', demoCode);
+                      setLocation('/partners/webapp-pos-official');
+                    }}
+                  >
+                    <FileText className="mr-2 h-4 w-4" />
+                    Probar Demo POS Web
                   </Button>
                 </div>
               </div>

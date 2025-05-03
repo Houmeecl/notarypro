@@ -54,7 +54,7 @@ import IntegracionesDemo from "@/pages/integraciones-demo";
 import IntegracionesApiIdentidad from "@/pages/integraciones-api-identidad";
 import DescargarApk from "@/pages/partners/descargar-apk";
 import ConfirmacionDescarga from "@/pages/partners/confirmacion-descarga";
-import WebAppPOSOfficial from "@/pages/partners/webapp-pos-official";
+// WebAppPOSOfficial ya está importado más arriba
 import PaymentDemo from "@/pages/payment-demo";
 import DocumentoEjemplo from "@/pages/documento-ejemplo";
 import VerificacionIdentidadDemo from "@/pages/verificacion-identidad-demo";
@@ -77,6 +77,7 @@ import PasswordGenerator from "@/pages/partners/password-generator";
 import WebappLogin from "@/pages/partners/webapp-login";
 import WebAppPOS from "@/pages/partners/webapp-pos";
 import SdkDemo from "@/pages/partners/sdk-demo";
+import WebAppPOSOfficial from "@/pages/partners/webapp-pos-official";
 
 // Admin pages
 import PosManagementPage from "@/pages/admin/pos-management";
@@ -256,9 +257,9 @@ function Router() {
       <Route path="/partners/webapp-pos-nfc">
         <Redirect to="/vecinos/login" />
       </Route>
-      <Route path="/partners/webapp-pos-official">
-        <Redirect to="/vecinos/login" />
-      </Route>
+      
+      {/* Versión oficial del POS web accessible directamente */}
+      <Route path="/partners/webapp-pos-official" component={WebAppPOSOfficial} />
       <Route path="/partners/sdk-demo" component={SdkDemo} />
       <Route path="/partners/descargar-apk" component={DescargarApk} />
       <Route path="/partners/confirmacion-descarga" component={ConfirmacionDescarga} />
