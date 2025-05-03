@@ -78,16 +78,14 @@ export default function VecinosLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#f5f4ff] p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
           <div className="flex flex-col items-center justify-center">
             <img src={vecinoLogo} alt="Vecino Xpress Logo" className="h-24 mb-2" />
             <div className="flex items-center mt-1">
-              <CardTitle className="text-2xl font-bold text-[#2e22aa]">Vecinos Xpress</CardTitle>
-              <span className="ml-2 text-xs bg-[#2e22aa] text-white px-1 py-0.5 rounded-sm">by NotaryPro</span>
+              <CardTitle className="text-2xl font-bold text-[#2d219b]">ABDHDA#PE</CardTitle>
             </div>
-            <p className="text-sm font-medium text-[#2e22aa] mt-1">Transformando negocios locales</p>
           </div>
           <CardDescription className="mt-2">Accede a tu cuenta de socio</CardDescription>
         </CardHeader>
@@ -184,7 +182,7 @@ export default function VecinosLogin() {
                     <div className="mt-2 text-xs text-gray-500">
                       <button
                         type="button"
-                        className="text-blue-600 underline"
+                        className="text-[#2e22aa] underline"
                         onClick={() => {
                           form.setValue("username", "demopartner");
                           form.setValue("password", "password123");
@@ -259,7 +257,7 @@ export default function VecinosLogin() {
 
                   <Button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 h-14 text-lg"
+                    className="w-full bg-[#2e22aa] hover:bg-[#231c7e] h-14 text-lg"
                     disabled={loginMutation.isPending}
                   >
                     {loginMutation.isPending ? "Iniciando sesión..." : "Iniciar sesión"}
@@ -278,7 +276,7 @@ export default function VecinosLogin() {
                     <div className="mt-2 text-center">
                       <button
                         type="button"
-                        className="text-blue-600 underline text-sm"
+                        className="text-[#2e22aa] underline text-sm"
                         onClick={() => {
                           form.setValue("username", "demopartner");
                           form.setValue("password", "password123");
@@ -298,7 +296,7 @@ export default function VecinosLogin() {
           <div>
             <a 
               href="#" 
-              className="text-blue-600 hover:underline"
+              className="text-[#2e22aa] hover:underline"
               onClick={(e) => {
                 e.preventDefault();
                 setLocation("/vecinos/recuperar-password");
@@ -311,7 +309,7 @@ export default function VecinosLogin() {
             ¿No tienes una cuenta?{" "}
             <a 
               href="#" 
-              className="text-blue-600 hover:underline"
+              className="text-[#2e22aa] hover:underline"
               onClick={(e) => {
                 e.preventDefault();
                 setLocation("/partners/registration-form");
