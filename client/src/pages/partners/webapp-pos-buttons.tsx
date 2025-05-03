@@ -524,8 +524,8 @@ const WebAppPOSButtons = () => {
     const sessionId = `verify-pos-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
     
     // Crear una URL para la verificación móvil
-    const verificationUrl = `${window.location.origin}/verificacion-identidad-movil?session=${sessionId}`;
-    const readidUrl = `${window.location.origin}/verificacion-identidad-readid?session=${sessionId}`;
+    // Usamos la URL unificada de verificación NFC con soporte de sesión
+    const verificationUrl = `${window.location.origin}/verificacion-nfc?session=${sessionId}`;
     
     // Crear un diálogo para seleccionar el método de verificación
     const seleccionarMetodo = () => {
@@ -567,7 +567,8 @@ const WebAppPOSButtons = () => {
             
             if (openREADID) {
               // Abrir en nueva ventana
-              window.open(readidUrl, "_blank");
+              // Abrir la URL unificada de verificación con el parámetro session
+              window.open(verificationUrl, "_blank");
               
               // Simular que se completó la verificación después de un tiempo
               setTimeout(() => {

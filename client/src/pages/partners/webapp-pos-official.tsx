@@ -1018,7 +1018,7 @@ const WebAppPOSOfficial = () => {
                   <CardFooter>
                     <Button 
                       className="w-full bg-amber-600 hover:bg-amber-700"
-                      onClick={() => window.open('/verificacion-inverid', '_blank')}
+                      onClick={() => window.open('/verificacion-nfc?demo=true', '_blank')}
                     >
                       Abrir InverID
                     </Button>
