@@ -555,16 +555,16 @@ const RealPOSPayment: React.FC = () => {
               </div>
               
               {/* Opción de terminal Tuu Payments */}
-              <div className="border rounded-lg p-4 border-green-200 bg-green-50">
+              <div className="border rounded-lg p-4 border-[#2d219b]/20 bg-[#2d219b]/5">
                 <div className="flex items-center mb-2">
-                  <Terminal className="w-5 h-5 mr-3 text-green-600" />
+                  <Terminal className="w-5 h-5 mr-3 text-[#2d219b]" />
                   <div>
-                    <p className="font-medium">Tuu Payments - Sunmi T5810</p>
-                    <p className="text-sm text-gray-500">Terminal POS moderno con integración nativa</p>
+                    <p className="font-medium">VecinoXpress POS - Tuu Payments</p>
+                    <p className="text-sm text-gray-500">Terminal Sunmi T5810 con integración nativa</p>
                   </div>
                 </div>
-                <div className="text-xs text-green-700 mb-3">
-                  Recomendado - Integración oficial con terminal Sunmi
+                <div className="text-xs text-[#2d219b] mb-3">
+                  Recomendado - Sistema oficial de VecinoXpress POS
                 </div>
                 
                 <TuuPOSPayment

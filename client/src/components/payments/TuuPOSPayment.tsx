@@ -37,7 +37,7 @@ enum PaymentStatus {
 const TuuPOSPayment: React.FC<PaymentProps> = ({
   amount,
   terminalId,
-  description = 'Pago NotaryPro',
+  description = 'Pago VecinoXpress',
   onPaymentComplete,
   onPaymentError,
   clientRut,
@@ -299,7 +299,7 @@ const TuuPOSPayment: React.FC<PaymentProps> = ({
               </select>
             </div>
             <Button 
-              className="w-full" 
+              className="w-full bg-[#2d219b] hover:bg-[#2d219b]/90" 
               onClick={handleStartPayment}
               disabled={!selectedTerminal}
             >
@@ -332,7 +332,7 @@ const TuuPOSPayment: React.FC<PaymentProps> = ({
             </p>
             <Button 
               variant="outline" 
-              className="mt-2"
+              className="mt-2 border-[#2d219b]/30 text-[#2d219b] hover:bg-[#2d219b]/10"
               onClick={handleCancelPayment}
             >
               <XCircle className="mr-2 h-4 w-4" />
@@ -355,7 +355,10 @@ const TuuPOSPayment: React.FC<PaymentProps> = ({
                 </p>
               )}
             </div>
-            <Button onClick={handleReset} className="mt-2">
+            <Button 
+              onClick={handleReset} 
+              className="mt-2 bg-[#2d219b] hover:bg-[#2d219b]/90"
+            >
               <RefreshCw className="mr-2 h-4 w-4" />
               Nueva Transacción
             </Button>
@@ -370,7 +373,10 @@ const TuuPOSPayment: React.FC<PaymentProps> = ({
             <p className="text-center text-sm text-red-600 mb-4">
               {error || 'Ocurrió un error durante el procesamiento del pago'}
             </p>
-            <Button onClick={handleReset} className="mt-2">
+            <Button 
+              onClick={handleReset} 
+              className="mt-2 bg-[#2d219b] hover:bg-[#2d219b]/90"
+            >
               <RefreshCw className="mr-2 h-4 w-4" />
               Intentar Nuevamente
             </Button>
@@ -385,7 +391,10 @@ const TuuPOSPayment: React.FC<PaymentProps> = ({
             <p className="text-center text-sm text-muted-foreground mb-4">
               La transacción ha sido cancelada
             </p>
-            <Button onClick={handleReset} className="mt-2">
+            <Button 
+              onClick={handleReset} 
+              className="mt-2 bg-[#2d219b] hover:bg-[#2d219b]/90"
+            >
               <RefreshCw className="mr-2 h-4 w-4" />
               Iniciar Nuevamente
             </Button>
@@ -398,19 +407,19 @@ const TuuPOSPayment: React.FC<PaymentProps> = ({
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center text-xl">
+    <Card className="w-full shadow-sm border-[#2d219b]/20">
+      <CardHeader className="bg-gradient-to-r from-[#2d219b]/10 to-[#2d219b]/5 border-b border-[#2d219b]/10 pb-4">
+        <CardTitle className="flex items-center text-xl text-[#2d219b]">
           <Terminal className="mr-2 h-5 w-5" />
-          Pago con Terminal POS
+          VecinoXpress Terminal POS
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         {renderContent()}
       </CardContent>
-      <CardFooter className="flex flex-col items-center text-center text-sm text-muted-foreground">
+      <CardFooter className="flex flex-col items-center text-center text-sm border-t border-[#2d219b]/10 bg-[#2d219b]/5 pt-3">
         <p>Monto a pagar: <span className="font-semibold">${amount.toLocaleString('es-CL')}</span></p>
-        <p className="text-xs mt-1">Powered by Tuu Payments</p>
+        <p className="text-xs mt-1 text-[#2d219b]/70">Powered by VecinoXpress + Tuu Payments</p>
       </CardFooter>
     </Card>
   );
