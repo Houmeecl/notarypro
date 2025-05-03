@@ -107,6 +107,7 @@ const LazyVecinosRetiros = React.lazy(() => import("@/pages/vecinos/retiros"));
 const LazyVecinosSoporte = React.lazy(() => import("@/pages/vecinos/soporte"));
 const LazyVecinosFAQ = React.lazy(() => import("@/pages/vecinos/faq"));
 const LazyVerificacionMovil = React.lazy(() => import("@/pages/verificacion-identidad-movil"));
+const LazyVerificacionREADID = React.lazy(() => import("@/pages/verificacion-identidad-readid"));
 
 function Router() {
   return (

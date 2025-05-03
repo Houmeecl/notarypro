@@ -124,7 +124,8 @@ const NFCMicroInteractions: React.FC<NFCMicroInteractionsProps> = ({
                 animate={{ scale: [1, 1.1, 1] }}
                 transition={{ repeat: Infinity, duration: 1.5 }}
               >
-                <Smartphone className="w-20 h-20 text-blue-600 mb-4" />
+                <Smartphone className="w-20 h-20 text-blue-600 mb-2" />
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-blue-500 opacity-50 animate-ping" />
               </motion.div>
               
               <motion.div
@@ -135,6 +136,18 @@ const NFCMicroInteractions: React.FC<NFCMicroInteractionsProps> = ({
               </motion.div>
               
               <p className="text-zinc-500">{message || "Acerque la cédula al dispositivo"}</p>
+              
+              {/* Indicador de señal NFC */}
+              <div className="mt-4 flex flex-col items-center">
+                <p className="text-xs text-blue-600 mb-1">Intensidad de señal</p>
+                <div className="h-2 w-32 bg-gray-200 rounded-full overflow-hidden">
+                  <motion.div 
+                    className="h-full bg-blue-500"
+                    animate={{ width: ['10%', '90%', '30%', '80%', '50%', '10%'] }}
+                    transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                  />
+                </div>
+              </div>
               
               {/* Ondas de escaneo */}
               <div className="relative mt-6">
