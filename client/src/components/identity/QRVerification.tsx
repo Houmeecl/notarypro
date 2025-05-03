@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { QRCodeCanvas } from 'qrcode.react';
+// Importar correctamente la biblioteca en la versión 4.2.0
+import { QRCodeSVG } from 'qrcode.react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -20,7 +21,8 @@ const QRVerification: React.FC<QRVerificationProps> = ({
   sessionId
 }) => {
   const [qrData, setQrData] = useState<string>('');
-  const [verificationStatus, setVerificationStatus] = useState<'waiting' | 'processing' | 'completed' | 'error'>('waiting');
+  type VerificationStatusType = 'waiting' | 'processing' | 'completed' | 'error';
+  const [verificationStatus, setVerificationStatus] = useState<VerificationStatusType>('waiting');
   const [statusMessage, setStatusMessage] = useState<string>('Esperando escaneo del código QR');
   const [error, setError] = useState<string | null>(null);
   const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null);
@@ -110,7 +112,7 @@ const QRVerification: React.FC<QRVerificationProps> = ({
   };
   
   // Función para verificar el estado de una verificación (simulada)
-  const checkVerificationStatus = async (verificationId: string): Promise<'waiting' | 'processing' | 'completed' | 'error'> => {
+  const checkVerificationStatus = async (verificationId: string): Promise<VerificationStatusType> => {
     // En una implementación real, aquí harías una petición a tu API
     // Por ahora, simulamos una respuesta aleatoria para demostración
     return new Promise((resolve) => {
@@ -218,7 +220,7 @@ const QRVerification: React.FC<QRVerificationProps> = ({
           <div className="flex flex-col items-center space-y-6">
             {/* Código QR */}
             <div className="p-4 bg-white rounded-md shadow-sm border">
-              <QRCodeCanvas 
+              <QRCodeSVG 
                 value={qrData} 
                 size={200} 
                 level="H" 
@@ -233,9 +235,9 @@ const QRVerification: React.FC<QRVerificationProps> = ({
                 {verificationStatus === 'processing' && (
                   <RefreshCw className="h-4 w-4 animate-spin text-[#2d219b]" />
                 )}
-                {verificationStatus === 'completed' && (
+                {verificationStatus === 'completed' ? (
                   <CheckCircle className="h-4 w-4 text-green-600" />
-                )}
+                ) : null}
               </div>
               <p className="text-sm text-gray-500">
                 {verificationStatus === 'waiting' && "Utilice su aplicación móvil para escanear este código QR"}
