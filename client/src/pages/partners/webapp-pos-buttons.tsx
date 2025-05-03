@@ -1248,14 +1248,19 @@ const WebAppPOSButtons = () => {
               <div className="p-2 relative overflow-hidden">
                 {/* Logo estilo NotaryPro como en la web principal */}
                 <div className="flex items-center">
-                  <div className="bg-zinc-800 p-2 rounded-md shadow-md border border-zinc-700 flex items-center">
-                    {/* Logo NotaryPro rojo */}
-                    <svg width="32" height="32" viewBox="0 0 100 100" className="mr-2">
-                      <path d="M30,10 L30,65 L10,50 L10,10 L30,10 Z M70,10 L70,50 L50,65 L50,10 L70,10 Z" 
-                            fill="#E11D48" strokeWidth="2" stroke="#E11D48" />
+                  <div className="bg-white p-2 rounded-md shadow-md border border-zinc-200 flex items-center">
+                    {/* Logo NotaryPro oficial rojo */}
+                    <svg width="40" height="30" viewBox="0 0 200 150" className="mr-2">
+                      <g fill="none" stroke="#E11D48" strokeWidth="8">
+                        <path d="M40,20 L40,120 L20,100 L20,20 Z" fill="#E11D48" />
+                        <path d="M90,20 L90,70 L70,90 L70,20 Z" fill="#E11D48" />
+                        <circle cx="40" cy="50" r="5" fill="#E11D48" />
+                        <circle cx="90" cy="50" r="5" fill="#E11D48" />
+                        <rect x="20" y="20" width="70" height="100" strokeWidth="8" stroke="#E11D48" fill="none" />
+                      </g>
                     </svg>
                     <div>
-                      <h1 className="text-xl font-black text-white tracking-tight">
+                      <h1 className="text-xl font-black text-black tracking-tight">
                         NotaryPro
                       </h1>
                     </div>
