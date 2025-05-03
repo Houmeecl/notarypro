@@ -30,6 +30,8 @@ const WebAppPOSButtons = () => {
   const [partnerInfo, setPartnerInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   
+  // Estado para NFC y verificación de identidad
+  
   // Estado para múltiples firmantes
   const [currentSignerIndex, setCurrentSignerIndex] = useState(0); // 0 = primer firmante, 1 = segundo firmante
   const [signatureImages, setSignatureImages] = useState<string[]>(['', '']);
@@ -119,12 +121,8 @@ const WebAppPOSButtons = () => {
   // Para la captura de foto de identidad
   const videoRef = useRef<HTMLVideoElement>(null);
   const photoRef = useRef<HTMLCanvasElement>(null);
-  const [showCamera, setShowCamera] = useState(false);
-  const [photoTaken, setPhotoTaken] = useState(false);
   
   // Para lectura NFC
-  const [showNFCReader, setShowNFCReader] = useState(false);
-  const [nfcAvailable, setNfcAvailable] = useState(false);
   const [cedulaData, setCedulaData] = useState<CedulaChilenaData | null>(null);
   
   // Estado para previsualización de documento
