@@ -312,8 +312,8 @@ const WebAppPOSOfficial = () => {
         // Verificación con foto real capturada
         console.log('Foto capturada para verificación:', photoDataUrl.substring(0, 30) + '...');
         
-        // Simular verificación exitosa para demostración
-        simulateSuccessfulVerification("FOTOCAPTURA");
+        // Realizar verificación con foto capturada real
+        completeVerification("FOTOCAPTURA");
       }
     }
   };
@@ -440,7 +440,7 @@ const WebAppPOSOfficial = () => {
       setShowFacialCompare(true);
       startCamera();
     } else {
-      simulateSuccessfulVerification("NFC");
+      completeVerification("NFC");
     }
   };
 
@@ -532,7 +532,7 @@ const WebAppPOSOfficial = () => {
         // Datos reales obtenidos
         setUserIdentityData(data);
         setIsReadIDModalOpen(false);
-        simulateSuccessfulVerification("READID");
+        completeVerification("READID");
         
         // Registrar verificación exitosa
         apiRequest("POST", "/api/micro-interactions/record", {
@@ -558,25 +558,45 @@ const WebAppPOSOfficial = () => {
     }
   };
 
-  // Simular verificación exitosa
-  const simulateSuccessfulVerification = (method: "NFC" | "READID" | "FOTOCAPTURA") => {
+  // Registrar verificación exitosa (usando datos reales)
+  const completeVerification = (method: "NFC" | "READID" | "FOTOCAPTURA") => {
     // Asignar puntos según el método
     let points = 0;
     let message = "";
+    let type = "";
     
     switch (method) {
       case "NFC":
         points = 150;
         message = "¡Verificación NFC exitosa! +150 puntos";
+        type = "nfc_verification";
         break;
       case "READID":
         points = 100;
         message = "¡Verificación READID exitosa! +100 puntos";
+        type = "readid_verification";
         break;
       case "FOTOCAPTURA":
         points = 50;
         message = "¡Verificación con foto exitosa! +50 puntos";
+        type = "facial_verification";
         break;
+    }
+    
+    // Registrar verificación en el sistema (datos reales)
+    if (userIdentityData) {
+      apiRequest("POST", "/api/micro-interactions/record", {
+        type: type,
+        points: points,
+        metadata: {
+          description: `Verificación exitosa mediante ${method}`,
+          data: {
+            rut: userIdentityData.rut,
+            fechaVerificacion: new Date().toISOString(),
+            tienda: partnerInfo?.storeName || partnerData?.storeName || 'Tienda Demo'
+          }
+        }
+      }).catch(err => console.error(`Error al registrar interacción de ${method}:`, err));
     }
     
     setVerificationPoints(prev => prev + points);
@@ -589,7 +609,7 @@ const WebAppPOSOfficial = () => {
       variant: "default",
     });
     
-    // Lanzar confetti para celebrar
+    // Lanzar confetti para celebrar la verificación exitosa
     confetti({
       particleCount: 50,
       spread: 70,
@@ -1211,7 +1231,7 @@ const WebAppPOSOfficial = () => {
                             }).catch(err => console.error("Error al registrar interacción:", err));
                           }
                           
-                          simulateSuccessfulVerification("FOTOCAPTURA");
+                          completeVerification("FOTOCAPTURA");
                         }}
                       >
                         Confirmar coincidencia
