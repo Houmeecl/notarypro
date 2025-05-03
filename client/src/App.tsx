@@ -126,17 +126,7 @@ const LazyVerificacionNFC = React.lazy(() => import("@/pages/verificacion-nfc-fi
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={() => {
-        // Importar directamente el componente de emergencia
-        const EmergencyEntry = React.lazy(() => import("@/pages/emergency-entry"));
-        return (
-          <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
-            <p className="text-xl">Cargando acceso de emergencia...</p>
-          </div>}>
-            <EmergencyEntry />
-          </Suspense>
-        );
-      }} />
+      <Route path="/" component={LandingPage} />
       <Route path="/vecinos-express" component={() => {
         window.location.href = "/partners/webapp-pos-official";
         return null;
