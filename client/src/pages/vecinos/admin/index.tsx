@@ -26,7 +26,8 @@ import {
   UserPlus,
   Building,
   GanttChart,
-  RotateCw
+  RotateCw,
+  MapPin
 } from "lucide-react";
 
 const VecinosAdminIndexPage = () => {
