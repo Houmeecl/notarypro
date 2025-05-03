@@ -16,7 +16,11 @@ import {
   DollarSign,
   Store,
   ArrowRight,
-  FileText
+  FileText,
+  Stamp,
+  BookOpen,
+  FilePen,
+  FileCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +39,7 @@ import {
   CardTitle
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import VecinosIllustrations from "@/components/vecinos/VecinosIllustrations";
 
 // Importamos el logo
 import notaryProLogo from "@assets/logo12582620.png";

@@ -13,7 +13,10 @@ import {
   Filter,
   User,
   Calendar,
-  AlarmClock
+  AlarmClock,
+  ShieldCheck,
+  BookOpen,
+  Stamp
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
@@ -68,6 +71,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import CertifierLayout from "@/components/certifier/CertifierLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import VecinosIllustrations from "@/components/vecinos/VecinosIllustrations";
 
 // Tipos de estado de documentos con sus colores
 const documentStatusMap: Record<string, { label: string, color: string }> = {
