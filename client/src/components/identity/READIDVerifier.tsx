@@ -224,7 +224,7 @@ const READIDVerifier: React.FC<READIDVerifierProps> = ({
       nacionalidad: "CHILENA",
       sexo: "MASCULINO",
       fechaEmision: "2020-01-01",
-      fechaVencimiento: "2030-01-01",
+      fechaExpiracion: "2030-01-01",
       numeroDocumento: "12345678",
       numeroSerie: "A123456"
     });

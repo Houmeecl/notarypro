@@ -49,7 +49,7 @@ const CedulaDataDisplay = ({ data }: { data: CedulaChilenaData | null }) => {
       </div>
       <div className="grid grid-cols-2 gap-1">
         <div className="text-gray-500">Fecha vencimiento:</div>
-        <div className="font-medium text-right">{data.fechaVencimiento}</div>
+        <div className="font-medium text-right">{data.fechaExpiracion}</div>
       </div>
       <div className="grid grid-cols-2 gap-1">
         <div className="text-gray-500">N° Documento:</div>
