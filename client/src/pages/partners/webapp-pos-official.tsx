@@ -70,13 +70,13 @@ import confetti from "canvas-confetti";
 import VecinosLayout from "@/components/vecinos/VecinosLayout";
 import { apiRequest } from "@/lib/queryClient";
 
-// Logotipo oficial de NotaryPro
-const NotaryProLogo = () => (
+// Logotipo oficial de VecinoXpress
+const VecinoXpressLogo = () => (
   <div className="flex items-center">
-    <img src="/images/logo-notarypro-rojo.svg" alt="NotaryPro Logo" className="h-12 mr-3" />
+    <img src="/images/vecino-xpress-logo.svg" alt="VecinoXpress Logo" className="h-12 mr-3" />
     <div className="flex flex-col">
-      <span className="text-red-600 font-bold text-2xl">Vecinos NotaryPro Express</span>
-      <span className="text-sm text-gray-700">Servicio de certificación documental</span>
+      <span className="text-[#2d219b] font-bold text-2xl">Vecinos Xpress</span>
+      <span className="text-sm text-gray-700">Plataforma de servicios documentales</span>
     </div>
   </div>
 );
@@ -654,7 +654,7 @@ const WebAppPOSOfficial = () => {
         return (
           <div className="flex flex-col items-center p-4 space-y-8">
             <div className="text-center mb-6">
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">¡Bienvenido al POS de Vecinos NotaryPro!</h2>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">¡Bienvenido al POS de Vecinos Xpress!</h2>
               <p className="text-lg text-gray-700 mb-2">
                 {partnerData ? 
                   `${partnerData.storeName} - ${partnerData.storeCode}` : 
@@ -685,7 +685,7 @@ const WebAppPOSOfficial = () => {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full max-w-5xl">
               <Card className="overflow-hidden transition-all hover:shadow-lg border border-gray-100">
-                <CardHeader className="bg-gradient-to-r from-red-50 to-red-100">
+                <CardHeader className="bg-gradient-to-r from-indigo-50 to-indigo-100">
                   <CardTitle className="flex items-center gap-2 text-gray-900">
                     <FileText className="h-6 w-6 text-primary" />
                     Procesar documento
@@ -701,7 +701,7 @@ const WebAppPOSOfficial = () => {
                 </CardContent>
                 <CardFooter>
                   <Button 
-                    className="w-full bg-primary hover:bg-red-700"
+                    className="w-full bg-[#2d219b] hover:bg-[#231a7c]"
                     onClick={() => setStep('selectDocument')}
                   >
                     Iniciar proceso
@@ -1398,7 +1398,7 @@ const WebAppPOSOfficial = () => {
                   </CardHeader>
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between border-b pb-4">
-                      <NotaryProLogo />
+                      <VecinoXpressLogo />
                       <div className="text-right">
                         <p className="text-sm font-medium">{receiptData.partnerName}</p>
                         <p className="text-xs text-gray-600">{receiptData.partnerCode}</p>

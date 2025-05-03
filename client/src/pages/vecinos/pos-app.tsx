@@ -220,7 +220,7 @@ export default function POSAppPage() {
             <Button
               variant="link"
               onClick={() => setLocation('/vecinos/dashboard')}
-              className="text-[#EC1C24]"
+              className="text-[#2d219b]"
             >
               Ir al dashboard del socio
               <ArrowRight className="ml-2 h-4 w-4" />
