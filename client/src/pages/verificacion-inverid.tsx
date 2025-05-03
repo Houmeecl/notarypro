@@ -95,24 +95,15 @@ const VerificacionInverID: React.FC = () => {
               </AlertDescription>
               <div className="mt-4 flex items-center justify-end">
                 <div className="flex items-center space-x-2">
-                  <Switch
-                    id="demo-mode"
-                    checked={demoMode}
-                    onCheckedChange={setDemoMode}
-                  />
-                  <Label htmlFor="demo-mode" className="flex items-center space-x-2 cursor-pointer">
-                    {demoMode ? (
-                      <>
-                        <PlayCircle className="h-4 w-4 text-amber-600" />
-                        <span className="text-amber-700 font-medium">Modo demostración activo</span>
-                      </>
-                    ) : (
-                      <>
-                        <Laptop className="h-4 w-4 text-blue-600" />
-                        <span className="text-blue-700 font-medium">Modo real activo</span>
-                      </>
-                    )}
-                  </Label>
+                  <div className="flex items-center">
+                    <Label htmlFor="demo-mode" className="mr-2 text-gray-700">Modo real activo</Label>
+                    <Switch
+                      id="demo-mode"
+                      checked={!demoMode}
+                      onCheckedChange={checked => setDemoMode(!checked)}
+                      className="data-[state=checked]:bg-blue-600"
+                    />
+                  </div>
                 </div>
               </div>
             </Alert>

@@ -1275,7 +1275,15 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
       </Tabs>
       
       <div className="mt-8 text-xs text-gray-500 text-center">
-        ID de sesión: {sessionId || "demo-session-001"}
+        {demoMode ? (
+          <div className="flex items-center justify-center">
+            <span className="inline-flex items-center justify-center w-4 h-4 mr-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">D</span>
+            ID de sesión: {sessionId || "demo-session-001"} 
+            <span className="ml-1 text-xs bg-amber-100 text-amber-700 px-1 rounded">DEMO</span>
+          </div>
+        ) : (
+          <>ID de sesión: {sessionId}</>
+        )}
       </div>
     </div>
   );
