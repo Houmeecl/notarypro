@@ -1,9 +1,17 @@
-import { useState } from "react";
-import { Link } from "wouter";
-import { ArrowLeft } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { Link, useRoute } from "wouter";
+import { ArrowLeft, Loader2, Download, Check, X, Pen } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
 import DocumentNavbar from "@/components/layout/DocumentNavbar";
+import SignatureCanvas from "@/components/document/SignatureCanvas";
+import TranslationWidget from "@/components/document/TranslationWidget";
 
 // Definición simple para el componente
 interface Document {
@@ -303,11 +311,13 @@ export default function DocumentViewPage() {
             </Card>
             
             {/* Componente de firma digital */}
-            <SignatureCanvas 
-              isOpen={isSignatureDialogOpen}
-              onClose={() => setIsSignatureDialogOpen(false)}
-              onComplete={handleSignatureComplete}
-            />
+            {isSignatureDialogOpen && (
+              <SignatureCanvas 
+                isOpen={isSignatureDialogOpen}
+                onClose={() => setIsSignatureDialogOpen(false)}
+                onComplete={handleSignatureComplete}
+              />
+            )}
           </div>
           
           <div>
