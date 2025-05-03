@@ -37,6 +37,7 @@ import UneteAlEquipo from "@/pages/unete-al-equipo";
 import ConversorPresencialOnline from "@/pages/conversor-presencial-online";
 import QuienesSomosPage from "@/pages/quienes-somos";
 import TemplateAdminPage from "@/pages/template-admin";
+import ContratosPage from "@/pages/contratos";
 import VerificarDocumento from "@/pages/verificar-documento";
 import DocumentVerificationGame from "@/pages/document-verification-game";
 import VideocallInterfaceDemo from "@/pages/videocall-interface-demo";
@@ -573,6 +574,9 @@ function Router() {
 
       {/* Achievement Sharing */}
       <Route path="/share-achievement/:id" component={ShareAchievementPage} />
+
+      {/* Contratos Digitales */}
+      <Route path="/contratos" component={ContratosPage} />
 
       {/* RON Platform (Independent Access) */}
       <Route path="/ron-login" component={RonLoginPage} />

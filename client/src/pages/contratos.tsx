@@ -353,26 +353,23 @@ const ContratosPage: React.FC = () => {
         </div>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button
-            as="a"
+          <a 
             href={generatedContract.url}
             target="_blank"
-            variant="outline"
-            className="flex items-center justify-center"
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
           >
             <FileText className="mr-2 h-4 w-4" />
             Ver Contrato
-          </Button>
+          </a>
           
-          <Button
-            as="a"
+          <a
             href={generatedContract.url}
             download={`Contrato_${generatedContract.code}.html`}
-            className="flex items-center justify-center"
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
           >
             <Download className="mr-2 h-4 w-4" />
             Descargar Contrato
-          </Button>
+          </a>
         </div>
         
         <Separator className="my-6" />
