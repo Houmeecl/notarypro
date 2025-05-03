@@ -224,15 +224,10 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
       setNfcMessage("Acercando cédula de identidad al lector NFC...");
       setNfcProgress(15);
 
-      // Mostrar diálogo de demostración Web NFC
-      const showWebNFCDialog = () => {
-        // Simulamos el diálogo de permisos del navegador para Web NFC
-        console.log("Simulando diálogo de permisos de Web NFC");
-      };
-
       // Simular el proceso de escaneo en etapas
       setTimeout(() => {
-        showWebNFCDialog();
+        // No mostramos diálogo externo, solo actualizamos el mensaje
+        console.log("Simulando lectura NFC en proceso");
         setNfcMessage("Esperando acercar la cédula al dispositivo...");
       }, 1000);
 

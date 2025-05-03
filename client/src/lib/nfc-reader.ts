@@ -427,13 +427,23 @@ async function readWithWebNFC(
     ndef.addEventListener('error', onError);
 
     // Comenzar la lectura con opciones específicas para cédulas chilenas
-    ndef.scan({ 
-      signal: AbortSignal.timeout(40000), // AbortSignal que cancela después de 40s
-    }).catch((error: Error) => {
+    try {
+      // Utilizamos una configuración que evita ventanas emergentes
+      abortController = new AbortController();
+      const scanOptions = { 
+        signal: abortController.signal,
+      };
+      
+      ndef.scan(scanOptions).catch((error: Error) => {
+        clearTimeout(timeout);
+        if (readingProgressInterval) clearInterval(readingProgressInterval);
+        reject(error);
+      });
+    } catch (error) {
       clearTimeout(timeout);
       if (readingProgressInterval) clearInterval(readingProgressInterval);
       reject(error);
-    });
+    }
     
     // Notificar que estamos esperando la cédula
     statusCallback(NFCReadStatus.WAITING, 'Acerque su cédula al lector NFC del dispositivo');
