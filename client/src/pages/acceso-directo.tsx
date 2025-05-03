@@ -5,7 +5,7 @@
  * evitando redirecciones y problemas de navegación.
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { 
   Card,
@@ -23,11 +23,28 @@ import {
   QrCode,
   ArrowLeft,
   Smartphone,
-  Home
+  Home,
+  Copy
 } from "lucide-react";
 import { Helmet } from "react-helmet";
+import { QRCodeSVG } from 'qrcode.react';
 
 export default function AccesoDirecto() {
+  const [currentUrl, setCurrentUrl] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    // Obtener la URL actual completa incluyendo el host
+    setCurrentUrl(window.location.origin);
+  }, []);
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Helmet>
@@ -45,6 +62,42 @@ export default function AccesoDirecto() {
           </Link>
         </div>
       </header>
+      
+      {/* QR Code para acceso móvil */}
+      <div className="bg-white py-6 shadow-sm border-b">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-center md:justify-between">
+            <div className="mb-4 md:mb-0">
+              <h2 className="text-xl font-bold text-indigo-900 mb-2">Acceso desde dispositivo móvil</h2>
+              <p className="text-gray-600">Escanea este código QR para acceder desde tu teléfono</p>
+              <div className="mt-3 flex items-center">
+                <div className="text-sm font-mono bg-gray-100 p-2 rounded-md overflow-x-auto whitespace-nowrap max-w-[250px] md:max-w-full">
+                  {currentUrl}/acceso-directo
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="ml-2" 
+                  onClick={() => copyToClipboard(`${currentUrl}/acceso-directo`)}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+                {copied && <span className="text-green-600 ml-2 text-sm">¡Copiado!</span>}
+              </div>
+            </div>
+            <div className="border-4 border-indigo-900 rounded-lg p-2 bg-white">
+              <QRCodeSVG 
+                value={`${currentUrl}/acceso-directo`} 
+                size={150} 
+                bgColor={"#ffffff"} 
+                fgColor={"#2d219b"} 
+                level={"H"} 
+                includeMargin={false}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
       
       <main className="container mx-auto py-8 px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
