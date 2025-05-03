@@ -611,45 +611,110 @@ function parseChileanIDData(rawData: string): CedulaChilenaData {
     try {
       const jsonData = JSON.parse(rawData);
       return {
-        rut: jsonData.rut || jsonData.run || '',
-        nombres: jsonData.nombres || jsonData.name || jsonData.firstName || '',
-        apellidos: jsonData.apellidos || jsonData.lastname || jsonData.lastName || '',
-        fechaNacimiento: jsonData.fechaNacimiento || jsonData.birthDate || '',
-        fechaEmision: jsonData.fechaEmision || jsonData.issueDate || '',
-        fechaExpiracion: jsonData.fechaExpiracion || jsonData.fechaVencimiento || jsonData.expiryDate || '',
-        sexo: jsonData.sexo || jsonData.gender || '',
-        nacionalidad: jsonData.nacionalidad || jsonData.nationality || 'CHL',
-        numeroDocumento: jsonData.numeroDocumento || jsonData.documentNumber || '',
-        numeroSerie: jsonData.numeroSerie || jsonData.serialNumber || ''
+        rut: jsonData.rut || jsonData.run || jsonData.RUN || jsonData.RUT || '',
+        nombres: jsonData.nombres || jsonData.name || jsonData.firstName || jsonData.NOMBRES || '',
+        apellidos: jsonData.apellidos || jsonData.lastname || jsonData.lastName || jsonData.APELLIDOS || '',
+        fechaNacimiento: jsonData.fechaNacimiento || jsonData.birthDate || jsonData.FECHA_NACIMIENTO || '',
+        fechaEmision: jsonData.fechaEmision || jsonData.issueDate || jsonData.FECHA_EMISION || '',
+        fechaExpiracion: jsonData.fechaExpiracion || jsonData.fechaVencimiento || jsonData.expiryDate || jsonData.FECHA_VENCIMIENTO || '',
+        sexo: jsonData.sexo || jsonData.gender || jsonData.SEXO || '',
+        nacionalidad: jsonData.nacionalidad || jsonData.nationality || jsonData.NACIONALIDAD || 'CHL',
+        numeroDocumento: jsonData.numeroDocumento || jsonData.documentNumber || jsonData.NUMERO_DOCUMENTO || '',
+        numeroSerie: jsonData.numeroSerie || jsonData.serialNumber || jsonData.NUMERO_SERIE || '',
+        fotografia: jsonData.fotografia || jsonData.photo || jsonData.FOTOGRAFIA || ''
       };
     } catch (jsonError) {
       // No es JSON, intentamos otros formatos
       console.log('No se pudo interpretar como JSON, intentando otros formatos');
     }
 
+    // Formato XML (algunas cédulas devuelven XML)
+    if (rawData.includes('<?xml') || rawData.includes('<cedula>') || rawData.includes('<Cedula>')) {
+      console.log('Detectado formato XML, procesando...');
+      
+      // Extraer datos mediante expresiones regulares simples
+      // Este enfoque es básico pero funcional para formatos XML sencillos
+      const extraerDato = (tag: string): string => {
+        const regex = new RegExp(`<${tag}>(.*?)</${tag}>`, 'i');
+        const match = rawData.match(regex);
+        return match ? match[1] : '';
+      };
+      
+      return {
+        rut: extraerDato('rut') || extraerDato('run') || '',
+        nombres: extraerDato('nombres') || extraerDato('name') || '',
+        apellidos: extraerDato('apellidos') || extraerDato('lastname') || '',
+        fechaNacimiento: extraerDato('fechaNacimiento') || extraerDato('birthDate') || '',
+        fechaEmision: extraerDato('fechaEmision') || extraerDato('issueDate') || '',
+        fechaExpiracion: extraerDato('fechaExpiracion') || extraerDato('fechaVencimiento') || '',
+        sexo: extraerDato('sexo') || extraerDato('gender') || '',
+        nacionalidad: extraerDato('nacionalidad') || extraerDato('nationality') || 'CHL',
+        numeroDocumento: extraerDato('numeroDocumento') || extraerDato('documentNumber') || '',
+        numeroSerie: extraerDato('numeroSerie') || extraerDato('serialNumber') || '',
+        fotografia: extraerDato('fotografia') || extraerDato('photo') || ''
+      };
+    }
+
     // Formato delimitado por pipes (formato antiguo de algunas cédulas)
     if (rawData.includes('|')) {
-      const parts = rawData.split('|');
+      console.log('Detectado formato delimitado por pipes, procesando...');
+      
+      // Dividir y limpiar los campos
+      const parts = rawData.split('|').map(part => part.trim());
       if (parts.length < 7) {
         throw new Error('Formato de datos con pipe inválido, campos insuficientes');
       }
       
       return {
-        rut: parts[0],
-        nombres: parts[1],
-        apellidos: parts[2],
-        fechaNacimiento: parts[3],
-        fechaEmision: parts[4],
-        fechaExpiracion: parts[5],
-        sexo: parts[6],
-        nacionalidad: parts[7] || 'CHL'
+        rut: parts[0] || '',
+        nombres: parts[1] || '',
+        apellidos: parts[2] || '',
+        fechaNacimiento: parts[3] || '',
+        fechaEmision: parts[4] || '',
+        fechaExpiracion: parts[5] || '',
+        sexo: parts[6] || '',
+        nacionalidad: parts.length > 7 ? parts[7] : 'CHL',
+        numeroDocumento: parts.length > 8 ? parts[8] : '',
+        numeroSerie: parts.length > 9 ? parts[9] : '',
+        fotografia: parts.length > 10 ? parts[10] : ''
+      };
+    }
+
+    // Formato de formulario con campos etiquetados (como Key=Value\nKey2=Value2)
+    if (/\w+\s*=\s*[^=\n]+/.test(rawData)) {
+      console.log('Detectado formato de formulario, procesando...');
+      
+      const campos: Record<string, string> = {};
+      const lineas = rawData.split('\n');
+      
+      for (const linea of lineas) {
+        const match = linea.match(/^\s*([^=]+?)\s*=\s*(.+?)\s*$/);
+        if (match) {
+          const [, clave, valor] = match;
+          campos[clave.toLowerCase()] = valor;
+        }
+      }
+      
+      return {
+        rut: campos['rut'] || campos['run'] || '',
+        nombres: campos['nombres'] || campos['name'] || '',
+        apellidos: campos['apellidos'] || campos['lastname'] || '',
+        fechaNacimiento: campos['fechanacimiento'] || campos['birthdate'] || '',
+        fechaEmision: campos['fechaemision'] || campos['issuedate'] || '',
+        fechaExpiracion: campos['fechaexpiracion'] || campos['fechavencimiento'] || '',
+        sexo: campos['sexo'] || campos['gender'] || '',
+        nacionalidad: campos['nacionalidad'] || campos['nationality'] || 'CHL',
+        numeroDocumento: campos['numerodocumento'] || campos['documentnumber'] || '',
+        numeroSerie: campos['numeroserie'] || campos['serialnumber'] || '',
+        fotografia: campos['fotografia'] || campos['photo'] || ''
       };
     }
 
     // Formato TLV (Tag-Length-Value) - utilizado en algunos chips de cédulas chilenas
-    if (/[A-F0-9]{2,}/.test(rawData)) {
+    if (/^[A-Fa-f0-9]{10,}$/.test(rawData.replace(/\s+/g, ''))) {
+      console.log('Detectado posible formato TLV hexadecimal, procesando...');
+      
       // Este es un formato hexadecimal que requiere decodificación TLV
-      // Implementación básica de decodificación TLV (simplificada)
       const tlvData = decodeTLV(rawData);
       
       return {
@@ -660,12 +725,43 @@ function parseChileanIDData(rawData: string): CedulaChilenaData {
         fechaEmision: tlvData.fechaEmision || '',
         fechaExpiracion: tlvData.fechaExpiracion || '',
         sexo: tlvData.sexo || '',
-        nacionalidad: tlvData.nacionalidad || 'CHL'
+        nacionalidad: tlvData.nacionalidad || 'CHL',
+        numeroDocumento: tlvData.numeroDocumento || '',
+        numeroSerie: tlvData.numeroSerie || '',
+        fotografia: tlvData.fotografia || ''
       };
     }
     
+    // Intentar extraer datos de un texto plano no estructurado
+    // Este es un último recurso para cédulas con chips que devuelven texto sin formato específico
+    if (rawData.length > 20) {
+      console.log('Intentando extraer datos de texto no estructurado...');
+      
+      // Buscar posible RUT
+      const rutMatch = rawData.match(/\b(\d{1,2})\.?(\d{3})\.?(\d{3})-?([0-9K])\b/i);
+      const nombresMatch = rawData.match(/\b([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){1,3})\b/);
+      const fechaMatch = rawData.match(/\b(\d{1,2})[\/.-](\d{1,2})[\/.-]((?:19|20)\d{2})\b/);
+      
+      // Si encontramos al menos un RUT y posiblemente un nombre, devolver lo que podamos
+      if (rutMatch) {
+        return {
+          rut: rutMatch[0] || '',
+          nombres: nombresMatch ? nombresMatch[1] : '',
+          apellidos: '',
+          fechaNacimiento: fechaMatch ? `${fechaMatch[1]}/${fechaMatch[2]}/${fechaMatch[3]}` : '',
+          fechaEmision: '',
+          fechaExpiracion: '',
+          sexo: '',
+          nacionalidad: 'CHL', // Asumimos Chile por defecto
+          numeroDocumento: '',
+          numeroSerie: '',
+          fotografia: ''
+        };
+      }
+    }
+    
     // Si llegamos aquí, no pudimos interpretar el formato
-    throw new Error('Formato de datos desconocido');
+    throw new Error('Formato de datos desconocido o no compatible');
   } catch (error) {
     console.error('Error al procesar datos de cédula:', error);
     throw new Error(`No se pudo procesar la información de la cédula: ${error instanceof Error ? error.message : 'Error desconocido'}`);
@@ -674,58 +770,185 @@ function parseChileanIDData(rawData: string): CedulaChilenaData {
 
 /**
  * Decodifica datos en formato TLV (Tag-Length-Value)
- * Implementación básica para chips de cédulas chilenas
+ * Implementación completa para chips de cédulas chilenas
  */
 function decodeTLV(hexData: string): Record<string, string> {
-  // Mapa de tags conocidos para cédulas chilenas
+  // Mapa de tags conocidos para cédulas chilenas según estándar ISO-7816
   const tagMap: Record<string, string> = {
-    '5A': 'numeroDocumento',
-    '5F20': 'nombres',
-    '5F21': 'apellidos',
-    '5F1F': 'rut',
-    '5F24': 'fechaExpiracion',
-    '5F25': 'fechaEmision',
-    '5F2C': 'nacionalidad',
-    '5F35': 'sexo',
-    '5F9E': 'fechaNacimiento'
+    // Tags básicos
+    '5A': 'numeroDocumento',      // Número de documento (Application Primary Account Number)
+    '5F20': 'nombres',            // Nombres del titular (Cardholder Name)
+    '5F21': 'apellidos',          // Apellidos del titular
+    '5F1F': 'rut',                // RUT/RUN chileno
+    '5F24': 'fechaExpiracion',    // Fecha de expiración (Application Expiration Date)
+    '5F25': 'fechaEmision',       // Fecha de emisión (Application Effective Date)
+    '5F2C': 'nacionalidad',       // Código de nacionalidad (Country Code)
+    '5F35': 'sexo',               // Sexo del titular
+    '5F9E': 'fechaNacimiento',    // Fecha de nacimiento
+    
+    // Tags adicionales que pueden estar presentes
+    '42': 'emisor',               // Emisor del documento (Authority code)
+    '61': 'fichaDactilar',        // Información de huella digital (Template for File Management)
+    '65': 'imagenFirma',          // Imagen de firma (Cardholder Related Data)
+    '67': 'fotografia',           // Fotografía del titular (Authentication Data)
+    '6F': 'fci',                  // FCI Template
+    '70': 'datos',                // Application Elementary File data
+    '71': 'datosEmision',         // Issuer Script Template
+    '73': 'direccion',            // Directory Discretionary Template
+    '77': 'formatoRespuesta',     // Response Message Template Format 2
+    
+    // Tags específicos de cédulas chilenas (propietarios)
+    'DF01': 'regionNacimiento',   // Código de región de nacimiento
+    'DF02': 'comunaNacimiento',   // Código de comuna de nacimiento
+    'DF03': 'tipoDocumento',      // Tipo de documento (cédula, pasaporte, etc.)
+    'DF04': 'numeroSerie',        // Número de serie del chip
+    'DF05': 'checksum',           // Checksum de seguridad
+    'DF06': 'versionDoc',         // Versión del documento
+    'DF07': 'estadoDoc',          // Estado del documento
+    'DF20': 'algoritmoFirma',     // Algoritmo de firma digital
+    'DF21': 'firmaCertificado'    // Firma digital del certificado
   };
   
   const result: Record<string, string> = {};
   let position = 0;
   
   try {
+    // Intentar limpiar entrada: si empieza con '0x', lo eliminamos
+    if (hexData.startsWith('0x')) {
+      hexData = hexData.substring(2);
+    }
+    
+    // Eliminar posibles espacios y caracteres no hexadecimales
+    hexData = hexData.replace(/[^0-9A-Fa-f]/g, '');
+    
+    // Verificar que tengamos datos hexadecimales válidos
+    if (!/^[0-9A-Fa-f]+$/.test(hexData)) {
+      throw new Error('Formato hexadecimal inválido');
+    }
+    
+    // Leer datos mientras haya bytes disponibles
     while (position < hexData.length) {
-      // Obtener tag (1 o 2 bytes)
-      const tag = hexData.substr(position, 2);
-      position += 2;
+      // Obtener tag
+      let tagLength = 2; // Longitud del tag en bytes (1 byte = 2 caracteres hex)
+      let tag = hexData.substr(position, tagLength);
+      position += tagLength;
       
-      // Si el primer byte del tag comienza con 5 a 9, podría ser un tag de 2 bytes
-      let fullTag = tag;
-      if (/[5-9]/.test(tag[0])) {
-        fullTag = tag + hexData.substr(position, 2);
+      // Si el primer byte indica tag extendido (b8-b5 = '1111'), leer más bytes
+      const firstByte = parseInt(tag, 16);
+      if ((firstByte & 0xF0) === 0xF0) {
+        while (position < hexData.length) {
+          const nextByte = hexData.substr(position, 2);
+          position += 2;
+          tag += nextByte;
+          
+          // Si el bit más significativo es 0, este es el último byte del tag
+          if ((parseInt(nextByte, 16) & 0x80) === 0) {
+            break;
+          }
+        }
+      }
+      // Si bit b5 está activado, es un tag de 2 bytes
+      else if ((firstByte & 0x1F) === 0x1F) {
+        const secondByte = hexData.substr(position, 2);
         position += 2;
+        tag += secondByte;
       }
       
       // Obtener longitud
-      const lengthHex = hexData.substr(position, 2);
-      const length = parseInt(lengthHex, 16);
+      let lengthBytes = hexData.substr(position, 2);
       position += 2;
+      let length = parseInt(lengthBytes, 16);
+      
+      // Si el bit más significativo está activado, indica longitud en múltiples bytes
+      if ((length & 0x80) !== 0) {
+        const numLengthBytes = length & 0x7F; // Número de bytes que forman la longitud
+        if (numLengthBytes > 0) {
+          lengthBytes = hexData.substr(position, numLengthBytes * 2);
+          position += numLengthBytes * 2;
+          length = parseInt(lengthBytes, 16);
+        }
+      }
       
       // Obtener valor
       const valueHex = hexData.substr(position, length * 2);
       position += length * 2;
       
-      // Convertir hexadecimal a ASCII si es texto
-      let value;
-      try {
-        value = hexToAscii(valueHex);
-      } catch (e) {
-        value = valueHex; // Si no se puede convertir, mantener como hex
+      // Si no hay suficientes datos para el valor, terminar
+      if (valueHex.length < length * 2) {
+        console.warn('Datos TLV truncados');
+        break;
       }
       
-      // Guardar en el resultado
-      const fieldName = tagMap[fullTag] || fullTag;
+      // Procesar valor según el tag
+      let value = '';
+      
+      // Intentar determinar si el valor es ASCII o binario
+      const isAscii = /^[0-9A-Fa-f]*$/.test(valueHex) && 
+                     !valueHex.match(/[0-1][0-9A-Fa-f]/) && // No contiene valores menores a 20 (caracteres de control)
+                     !valueHex.match(/[8-9A-Fa-f][0-9A-Fa-f]/); // No contiene valores mayores a 7F
+      
+      if (isAscii) {
+        // Intentar convertir a texto ASCII
+        try {
+          value = hexToAscii(valueHex);
+        } catch (e) {
+          value = valueHex; // Mantener como hex si falla
+        }
+      } else {
+        // Tags conocidos que requieren formato específico
+        if (tag === '5F24' || tag === '5F25' || tag === '5F9E') {
+          // Fechas en formato YYMMDD
+          if (valueHex.length === 6) {
+            const year = valueHex.substr(0, 2);
+            const month = valueHex.substr(2, 2);
+            const day = valueHex.substr(4, 2);
+            value = `${day}/${month}/20${year}`;
+          } else {
+            value = valueHex;
+          }
+        } else if (tag === '5F2C') {
+          // Código de país en formato ISO-3166
+          if (valueHex === '152') {
+            value = 'CHL'; // Chile
+          } else {
+            value = valueHex;
+          }
+        } else if (tag === '5F35') {
+          // Sexo (1 = M, 2 = F)
+          if (valueHex === '01') {
+            value = 'M';
+          } else if (valueHex === '02') {
+            value = 'F';
+          } else {
+            value = valueHex;
+          }
+        } else if (tag === '67') {
+          // Fotografía (demasiado grande para mostrar, indicamos solo longitud)
+          value = `[Fotografía: ${length} bytes]`;
+        } else {
+          // Para otros tags binarios, mantener como hex
+          value = valueHex;
+        }
+      }
+      
+      // Guardar en el resultado con el nombre de campo correspondiente
+      const fieldName = tagMap[tag] || `tag_${tag}`;
       result[fieldName] = value;
+    }
+    
+    // Post-procesamiento: intentar formatear el RUT chileno si existe
+    if (result.rut && !/[.-]/.test(result.rut)) {
+      try {
+        // Si es sólo números, formatearlo
+        const rutClean = result.rut.replace(/\D/g, '');
+        if (/^\d{7,8}\d{1}$/.test(rutClean)) {
+          const dv = rutClean.slice(-1);
+          const rutNum = rutClean.slice(0, -1);
+          result.rut = formatearRut(`${rutNum}-${dv}`);
+        }
+      } catch (e) {
+        // Mantener el rut como está si hay error al formatear
+      }
     }
     
     return result;
