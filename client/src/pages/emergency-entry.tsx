@@ -83,6 +83,11 @@ export default function EmergencyEntryPage() {
                 </Link>
               </li>
               <li>
+                <Link href="/document-selection" className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center bg-yellow-100 px-2 py-1 rounded">
+                  <span className="material-icons mr-1 text-sm">✨</span> Selección de Documentos (Nuevo)
+                </Link>
+              </li>
+              <li>
                 <Link href="/verificar-documento" className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
                   <span className="material-icons mr-1 text-sm">➡️</span> Verificar Documento
                 </Link>

@@ -28,6 +28,21 @@ async function comparePasswords(supplied: string, stored: string) {
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
+// Variable para modo de emergencia (bypass de autenticación)
+export const EMERGENCY_MODE = true;
+
+// Simulación de usuario para uso en modo de emergencia
+export const EMERGENCY_USER: SelectUser = {
+  id: 999999,
+  username: "emergency_access",
+  email: "emergency@vecinoxpress.cl",
+  fullName: "Acceso de Emergencia",
+  password: "emergency_bypass_password",
+  role: "admin",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
 export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "docusignpro-secret-key",
@@ -128,6 +143,13 @@ export function setupAuth(app: Express) {
   });
 
   app.get("/api/user", (req, res) => {
+    // MODO DE EMERGENCIA: Siempre devuelve el usuario de emergencia
+    if (EMERGENCY_MODE) {
+      console.log("MODO DE EMERGENCIA ACTIVADO: Devolviendo usuario de emergencia");
+      return res.json(EMERGENCY_USER);
+    }
+    
+    // Comportamiento normal cuando no está en modo de emergencia
     if (!req.isAuthenticated()) return res.sendStatus(401);
     res.json(req.user);
   });

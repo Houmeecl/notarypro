@@ -163,6 +163,16 @@ function Router() {
       {/* Document routes */}
       <Route path="/document-categories" component={DocumentCategoriesPage} />
       <Route path="/document-templates/:categoryId" component={DocumentTemplatesPage} />
+      <Route path="/document-selection" component={() => {
+        const DocumentSelection = React.lazy(() => import("@/pages/document-selection"));
+        return (
+          <Suspense fallback={<div className="flex items-center justify-center h-screen">
+            <p className="text-xl">Cargando selección de documentos...</p>
+          </div>}>
+            <DocumentSelection />
+          </Suspense>
+        );
+      }} />
       <Route path="/document-form/:templateId" component={DocumentFormPage} />
       <ProtectedRoute 
         path="/documents" 

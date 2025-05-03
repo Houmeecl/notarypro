@@ -1,0 +1,59 @@
+<h2>Verificación de Identidad</h2>
+<form id="identity-verification-form">
+    <label for="face-image">Captura tu rostro:</label><br>
+    <video id="video" autoplay></video><br>
+    <button type="button" id="capture-photo">Capturar Foto</button><br>
+    <img id="captured-photo" style="display:none;" alt="Foto Capturada" /><br>
+    <button type="submit" style="display:none;" id="submit-verification">Enviar Foto</button>
+</form>
+
+<script>
+    const videoElement = document.getElementById('video');
+    const captureButton = document.getElementById('capture-photo');
+    const capturedPhotoElement = document.getElementById('captured-photo');
+    const submitButton = document.getElementById('submit-verification');
+
+    // Acceder a la cámara
+    async function startCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            videoElement.srcObject = stream;
+        } catch (err) {
+            console.error('Error al acceder a la cámara: ', err);
+        }
+    }
+
+    // Captura la foto y muestra la miniatura
+    captureButton.addEventListener('click', () => {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = videoElement.videoWidth;
+        canvas.height = videoElement.videoHeight;
+        context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+        const photoUrl = canvas.toDataURL('image/png');
+        capturedPhotoElement.src = photoUrl;
+        capturedPhotoElement.style.display = 'block';
+        submitButton.style.display = 'block';
+    });
+
+    // Enviar la foto para su verificación (aquí se integraría con una API de reconocimiento facial)
+    document.getElementById('identity-verification-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const photoData = capturedPhotoElement.src;
+        const response = await fetch('/verify-identity', {
+            method: 'POST',
+            body: JSON.stringify({ photo: photoData }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('Identidad verificada con éxito.');
+            // Redirigir al siguiente paso (selección de documento)
+        } else {
+            alert('Verificación fallida, intenta nuevamente.');
+        }
+    });
+
+    // Iniciar cámara
+    window.addEventListener('load', startCamera);
+</script>
