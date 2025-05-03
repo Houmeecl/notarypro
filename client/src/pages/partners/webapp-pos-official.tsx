@@ -965,7 +965,7 @@ const WebAppPOSOfficial = () => {
                   
                   <NFCIdentityReader 
                     onSuccess={handleNFCSuccess}
-                    onCancel={() => setShowIdentityVerification(false)}
+                    onCancel={() => setIsNfcModalOpen(false)}
                     onError={handleNFCError}
                   />
                 </div>

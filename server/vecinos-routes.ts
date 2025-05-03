@@ -63,20 +63,30 @@ const loginSchema = z.object({
 // Ruta de inicio de sesión para socios
 vecinosRouter.post("/login", async (req: Request, res: Response) => {
   try {
+    console.log("Intento de login con:", req.body);
+    
     const validatedData = loginSchema.parse(req.body);
     const { username, password } = validatedData;
+    
+    console.log(`Login validado para usuario: ${username}`);
     
     // Buscar el socio en el almacenamiento en memoria
     const partner = vecinosStore.getPartnerByUsername(username);
     
     if (!partner) {
+      console.log(`Socio no encontrado: ${username}`);
       return res.status(401).json({ message: "Credenciales inválidas" });
     }
     
+    console.log(`Socio encontrado: ${partner.username}, verificando contraseña`);
+    
     // Verificar contraseña (aquí deberías usar bcrypt en producción)
     if (partner.password !== password) {
+      console.log(`Contraseña incorrecta para usuario: ${username}`);
       return res.status(401).json({ message: "Credenciales inválidas" });
     }
+    
+    console.log(`Contraseña correcta, generando token para: ${username}`);
     
     // Generar token JWT
     const token = jwt.sign(
@@ -99,6 +109,8 @@ vecinosRouter.post("/login", async (req: Request, res: Response) => {
     
     // Actualizar fecha de último login
     vecinosStore.updateLastLogin(partner.id);
+    
+    console.log(`Login exitoso para: ${username}`);
     
     // Devolver información del socio y token
     return res.status(200).json({

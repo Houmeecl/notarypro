@@ -59,13 +59,8 @@ export default function VecinosLogin() {
         description: "Bienvenido a Vecinos Xpress",
       });
       
-      // Redirigir según el dispositivo
-      if (activeTab === "mobile") {
-        setLocation("/vecinos/pos-app");
-      } else {
-        // Ir al dashboard del vecino
-        setLocation("/vecinos/dashboard");
-      }
+      // Redirigir directamente a la aplicación POS (omitir dashboard)
+      setLocation("/partners/webapp-pos-official");
     },
     onError: (error: Error) => {
       toast({
@@ -167,6 +162,33 @@ export default function VecinosLogin() {
                   >
                     {loginMutation.isPending ? "Iniciando sesión..." : "Iniciar sesión"}
                   </Button>
+                  
+                  {/* Ayuda con credenciales de demostración */}
+                  <div className="bg-blue-50 border border-blue-100 rounded-md p-3 mt-4">
+                    <p className="text-sm text-blue-800 font-medium">Credenciales de demostración</p>
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      <div className="text-xs p-1 bg-white rounded border border-blue-100">
+                        <span className="font-medium">Usuario: demopartner</span>
+                        <p className="text-gray-500">Contraseña: password123</p>
+                      </div>
+                      <div className="text-xs p-1 bg-white rounded border border-blue-100">
+                        <span className="font-medium">Tienda: Minimarket El Sol</span>
+                        <p className="text-gray-500">Código: LOCAL-XP125</p>
+                      </div>
+                    </div>
+                    <div className="mt-2 text-xs text-gray-500">
+                      <button
+                        type="button"
+                        className="text-blue-600 underline"
+                        onClick={() => {
+                          form.setValue("username", "demopartner");
+                          form.setValue("password", "password123");
+                        }}
+                      >
+                        Autocompletar credenciales de demo
+                      </button>
+                    </div>
+                  </div>
                 </form>
               </Form>
             </CardContent>
@@ -237,6 +259,30 @@ export default function VecinosLogin() {
                   >
                     {loginMutation.isPending ? "Iniciando sesión..." : "Iniciar sesión"}
                   </Button>
+                  
+                  {/* Ayuda con credenciales de demostración */}
+                  <div className="bg-blue-50 border border-blue-100 rounded-md p-3 mt-4">
+                    <p className="text-sm text-blue-800 font-medium">Credenciales de demostración</p>
+                    <div className="grid grid-cols-1 gap-2 mt-2">
+                      <div className="text-sm p-2 bg-white rounded border border-blue-100">
+                        <div className="font-medium">Usuario: demopartner</div>
+                        <div className="text-gray-500">Contraseña: password123</div>
+                        <div className="text-gray-500 mt-1">Tienda: Minimarket El Sol</div>
+                      </div>
+                    </div>
+                    <div className="mt-2 text-center">
+                      <button
+                        type="button"
+                        className="text-blue-600 underline text-sm"
+                        onClick={() => {
+                          form.setValue("username", "demopartner");
+                          form.setValue("password", "password123");
+                        }}
+                      >
+                        Autocompletar credenciales
+                      </button>
+                    </div>
+                  </div>
                 </form>
               </Form>
             </CardContent>
