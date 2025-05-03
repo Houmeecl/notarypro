@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { VecinosAdminLayout } from "@/components/vecinos/VecinosAdminLayout";
+import DocumentQRGenerator from "@/components/vecinos/DocumentQRGenerator";
+import BatchDocumentImport from "@/components/vecinos/BatchDocumentImport";
 import {
   Card,
   CardContent,
@@ -40,7 +42,9 @@ import {
   Users,
   Building,
   ArrowUpDown,
-  History
+  History,
+  QrCode,
+  ScanLine
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -78,6 +82,8 @@ const DocumentManagerPage = () => {
   const [selectedDocumentType, setSelectedDocumentType] = useState("all");
   const [selectedPartner, setSelectedPartner] = useState("all");
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
+  const [isBatchImportDialogOpen, setIsBatchImportDialogOpen] = useState(false);
   const [selectedDocuments, setSelectedDocuments] = useState<number[]>([]);
   
   // Datos simulados para el gestor documental
@@ -451,6 +457,54 @@ const DocumentManagerPage = () => {
                   <Button variant="outline" onClick={() => setIsUploadDialogOpen(false)}>Cancelar</Button>
                   <Button type="submit">Subir documento</Button>
                 </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            
+            <Dialog open={isQRDialogOpen} onOpenChange={setIsQRDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <QrCode className="h-4 w-4" />
+                  Códigos QR
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-3xl">
+                <DialogHeader>
+                  <DialogTitle>Generador de códigos QR para documentos</DialogTitle>
+                  <DialogDescription>
+                    Genere códigos QR para compartir documentos o escanee documentos desde códigos QR
+                  </DialogDescription>
+                </DialogHeader>
+                <DocumentQRGenerator 
+                  onDocumentImport={(docData) => {
+                    console.log("Documento importado:", docData);
+                    setIsQRDialogOpen(false);
+                    // Aquí se implementaría la lógica para añadir el documento al sistema
+                  }}
+                />
+              </DialogContent>
+            </Dialog>
+            
+            <Dialog open={isBatchImportDialogOpen} onOpenChange={setIsBatchImportDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <FileSpreadsheet className="h-4 w-4" />
+                  Importar Lote
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-3xl">
+                <DialogHeader>
+                  <DialogTitle>Importación Masiva de Documentos</DialogTitle>
+                  <DialogDescription>
+                    Importe múltiples documentos desde un archivo CSV o carpeta
+                  </DialogDescription>
+                </DialogHeader>
+                <BatchDocumentImport 
+                  onImportComplete={(importedDocs) => {
+                    console.log("Documentos importados:", importedDocs);
+                    setIsBatchImportDialogOpen(false);
+                    // Aquí se implementaría la lógica para añadir los documentos al sistema
+                  }}
+                />
               </DialogContent>
             </Dialog>
             
