@@ -1,0 +1,1179 @@
+import { useState, useRef, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { 
+  Check, ArrowLeft, CheckCircle2, Printer, UserPlus, FileText, 
+  CreditCard, ChevronRight, FileSignature, UserCheck, Shield, 
+  Camera, RefreshCw, Download, X, Fingerprint, ClipboardList,
+  CheckSquare, FileCheck, Home, User, LogOut, Wallet
+} from 'lucide-react';
+import NFCIdentityReader from '@/components/identity/NFCIdentityReader';
+import { CedulaChilenaData, checkNFCAvailability } from '@/lib/nfc-reader';
+import { useLocation } from 'wouter';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+
+const WebAppPOSNFC = () => {
+  const [, setLocation] = useLocation();
+  const [step, setStep] = useState('inicio');
+  const [tipoDocumento, setTipoDocumento] = useState('');
+  const [metodoPago, setMetodoPago] = useState('tarjeta');
+  const [procesoCompletado, setProcesoCompletado] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [identityVerified, setIdentityVerified] = useState(false);
+  const [showCertifierPanel, setShowCertifierPanel] = useState(false);
+  const [signatureImage, setSignatureImage] = useState('');
+  const [certificadorMode, setCertificadorMode] = useState(false);
+  const [partnerInfo, setPartnerInfo] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Estados para NFC y verificación de identidad
+  const [showCamera, setShowCamera] = useState(false);
+  const [photoTaken, setPhotoTaken] = useState(false);
+  const [showNFCReader, setShowNFCReader] = useState(false);
+  const [nfcAvailable, setNfcAvailable] = useState(false);
+  const [cedulaData, setCedulaData] = useState<CedulaChilenaData | null>(null);
+  
+  // Estado para múltiples firmantes
+  const [currentSignerIndex, setCurrentSignerIndex] = useState(0); // 0 = primer firmante, 1 = segundo firmante
+  const [signatureImages, setSignatureImages] = useState<string[]>(['', '']);
+  const [secondSignerVerified, setSecondSignerVerified] = useState(false);
+  const [firmantes, setFirmantes] = useState<Array<{
+    nombre: string;
+    rut: string;
+    relacion: string;
+  }>>([]);
+  const { toast } = useToast();
+  
+  // Cargar información del socio al inicio y verificar NFC
+  useEffect(() => {
+    const loadPartnerInfo = async () => {
+      try {
+        // Verificar si existe un token en localStorage
+        const token = localStorage.getItem('vecinos_token');
+        
+        if (!token) {
+          toast({
+            title: "No has iniciado sesión",
+            description: "Debes iniciar sesión como socio para acceder",
+            variant: "destructive",
+          });
+          setLocation('/vecinos/login');
+          return;
+        }
+        
+        // Obtener información del socio desde la API
+        const response = await fetch('/api/vecinos/partner-info', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('No se pudo obtener la información del socio');
+        }
+        
+        const data = await response.json();
+        setPartnerInfo(data);
+        
+        toast({
+          title: "Bienvenido al POS Web",
+          description: `${data.storeName} - ${data.address}`,
+        });
+      } catch (error) {
+        console.error('Error al cargar información del socio:', error);
+        toast({
+          title: "Error de autenticación",
+          description: "Por favor inicia sesión nuevamente",
+          variant: "destructive",
+        });
+        // Redirigir al login si hay problemas con el token
+        setLocation('/vecinos/login');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    // Verificar disponibilidad de NFC
+    const checkNFC = async () => {
+      try {
+        const result = await checkNFCAvailability();
+        setNfcAvailable(result.available);
+        
+        if (result.available) {
+          console.log(`NFC disponible: ${result.readerType}`);
+        }
+      } catch (error) {
+        console.error('Error al verificar NFC:', error);
+        setNfcAvailable(false);
+      }
+    };
+    
+    loadPartnerInfo();
+    checkNFC();
+  }, []);
+  
+  // Referencias para el canvas de firma
+  const signatureCanvasRef = useRef<HTMLCanvasElement>(null);
+  const signatureCtxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  
+  // Para la captura de foto de identidad
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const photoRef = useRef<HTMLCanvasElement>(null);
+  
+  // Estado para previsualización de documento
+  const [documentPreview, setDocumentPreview] = useState('');
+  
+  // Información del cliente
+  const [clienteInfo, setClienteInfo] = useState({
+    nombre: 'Juan Pérez González',
+    rut: '12.345.678-9',
+    email: 'juan@ejemplo.cl',
+    telefono: '+56 9 1234 5678'
+  });
+  
+  // Lista de documentos disponibles
+  const documentosDisponibles = [
+    { id: 'contrato', nombre: 'Contrato de Prestación de Servicios', precio: 3200 },
+    { id: 'declaracion', nombre: 'Declaración Jurada Simple', precio: 2500 },
+    { id: 'autorizacion', nombre: 'Autorización de Viaje', precio: 4000 },
+    { id: 'finiquito', nombre: 'Finiquito Laboral', precio: 3800 },
+    { id: 'compraventa', nombre: 'Contrato de Compra-Venta', precio: 3600 },
+    { id: 'arriendo', nombre: 'Contrato de Arriendo', precio: 3900 }
+  ];
+  
+  // Handlers para los pasos del proceso
+  const handleRegistrarCliente = () => {
+    // Validar datos del cliente antes de continuar
+    if (clienteInfo.nombre.trim().length < 3 || 
+        clienteInfo.rut.trim().length < 5 || 
+        clienteInfo.telefono.trim().length < 8) {
+      toast({
+        title: "Datos incompletos",
+        description: "Debes completar los datos del cliente para continuar",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setStep('documentos');
+  };
+  
+  const handleSeleccionarDocumento = (docId: string) => {
+    setTipoDocumento(docId);
+    
+    // Toast de selección exitosa
+    const doc = documentosDisponibles.find(d => d.id === docId);
+    if (doc) {
+      toast({
+        title: "Documento seleccionado",
+        description: `Has seleccionado: ${doc.nombre}`,
+      });
+    }
+    
+    setStep('pago');
+  };
+  
+  const handleSeleccionarPago = (metodo: string) => {
+    setMetodoPago(metodo);
+    
+    // Toast de método de pago seleccionado
+    toast({
+      title: "Método de pago seleccionado",
+      description: `Método de pago: ${metodo.toUpperCase()}`,
+    });
+    
+    // Mostrar preview antes de continuar
+    const docSeleccionado = documentosDisponibles.find(d => d.id === tipoDocumento);
+    if (docSeleccionado) {
+      const htmlPreview = `
+        <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+              h1 { text-align: center; margin-bottom: 30px; }
+              .firma-area { border: 2px dashed #ccc; height: 100px; margin: 30px 0; display: flex; align-items: center; justify-content: center; color: #999; }
+              .fecha { text-align: right; margin: 30px 0; }
+              .footer { margin-top: 50px; font-size: 0.9em; color: #666; }
+            </style>
+          </head>
+          <body>
+            <h1>${docSeleccionado.nombre}</h1>
+            
+            <p>En <strong>Santiago de Chile</strong>, a ${new Date().toLocaleDateString()}, por medio del presente documento, 
+              <strong>${clienteInfo.nombre}</strong>, RUT ${clienteInfo.rut}, declara y acepta las siguientes condiciones...</p>
+            
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc sit amet ultricies lacinia, 
+              nisl nisl aliquam nisl, eget aliquam nisl nisl sit amet nisl. Sed euismod, nunc sit amet ultricies lacinia,
+              nisl nisl aliquam nisl, eget aliquam nisl nisl sit amet nisl.</p>
+            
+            <div class="firma-area" id="firmaArea">
+              Área para firma digital
+            </div>
+            
+            <div class="fecha">
+              Santiago, ${new Date().toLocaleDateString()}
+            </div>
+            
+            <div class="footer">
+              <p>Documento generado por Vecinos NotaryPro - ID: NOT-${Math.floor(100000 + Math.random() * 900000)}</p>
+              <p>Verificación en: tuu.cl/verificar</p>
+            </div>
+          </body>
+        </html>
+      `;
+      
+      setDocumentPreview(htmlPreview);
+      // Mostrar preview del documento
+      setShowPreview(true);
+    } else {
+      // Si por alguna razón no hay documento seleccionado, mostrar error
+      toast({
+        title: "Error en el proceso",
+        description: "No se ha podido generar la vista previa del documento",
+        variant: "destructive",
+      });
+      setStep('documentos');
+    }
+  };
+  
+  // Para el panel de firma
+  const iniciarDibujo = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    setIsDrawing(true);
+    const canvas = signatureCanvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    
+    if (canvas && ctx) {
+      signatureCtxRef.current = ctx;
+      ctx.beginPath();
+      
+      // Obtener las coordenadas correctas según el tipo de evento
+      let clientX, clientY;
+      
+      if ('touches' in e) {
+        // Es un evento táctil
+        const rect = canvas.getBoundingClientRect();
+        clientX = e.touches[0].clientX - rect.left;
+        clientY = e.touches[0].clientY - rect.top;
+      } else {
+        // Es un evento de mouse
+        const rect = canvas.getBoundingClientRect();
+        clientX = e.clientX - rect.left;
+        clientY = e.clientY - rect.top;
+      }
+      
+      ctx.moveTo(clientX, clientY);
+    }
+  };
+  
+  const dibujar = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isDrawing) return;
+    
+    const canvas = signatureCanvasRef.current;
+    const ctx = signatureCtxRef.current;
+    
+    if (canvas && ctx) {
+      // Obtener las coordenadas correctas según el tipo de evento
+      let clientX, clientY;
+      
+      if ('touches' in e) {
+        // Es un evento táctil
+        e.preventDefault(); // Prevenir el scroll en dispositivos táctiles
+        const rect = canvas.getBoundingClientRect();
+        clientX = e.touches[0].clientX - rect.left;
+        clientY = e.touches[0].clientY - rect.top;
+      } else {
+        // Es un evento de mouse
+        const rect = canvas.getBoundingClientRect();
+        clientX = e.clientX - rect.left;
+        clientY = e.clientY - rect.top;
+      }
+      
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#000';
+      
+      ctx.lineTo(clientX, clientY);
+      ctx.stroke();
+      
+      // Preparar para el siguiente segmento
+      ctx.beginPath();
+      ctx.moveTo(clientX, clientY);
+      
+      // Guardar la imagen en el estado
+      setSignatureImage(canvas.toDataURL());
+    }
+  };
+  
+  const terminarDibujo = () => {
+    setIsDrawing(false);
+  };
+  
+  const limpiarFirma = () => {
+    const canvas = signatureCanvasRef.current;
+    const ctx = signatureCtxRef.current;
+    
+    if (canvas && ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      setSignatureImage('');
+    }
+  };
+  
+  const iniciarFirma = () => {
+    setTimeout(() => {
+      const canvas = signatureCanvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          signatureCtxRef.current = ctx;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+    }, 100);
+  };
+  
+  // Métodos para la verificación de identidad
+  const iniciarCamara = async () => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+        setShowCamera(true);
+      } catch (err) {
+        toast({
+          title: "Error al acceder a la cámara",
+          description: "No se pudo acceder a la cámara del dispositivo",
+          variant: "destructive",
+        });
+      }
+    } else {
+      toast({
+        title: "Cámara no disponible",
+        description: "Su dispositivo no tiene cámara o no está disponible",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const tomarFoto = () => {
+    const video = videoRef.current;
+    const canvas = photoRef.current;
+    
+    if (video && canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        // Establecer dimensiones del canvas para que coincidan con el video manteniendo la relación de aspecto
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        // Dibujar el frame actual del video en el canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Marcar como foto tomada
+        setPhotoTaken(true);
+        
+        // Detener la transmisión de la cámara
+        const stream = video.srcObject as MediaStream;
+        if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+        }
+      }
+    }
+  };
+  
+  // Manejar verificación con NFC
+  const iniciarLecturaNFC = () => {
+    setShowNFCReader(true);
+    setShowCamera(false);
+  };
+  
+  const handleNFCSuccess = (data: CedulaChilenaData) => {
+    setCedulaData(data);
+    setShowNFCReader(false);
+    setIdentityVerified(true);
+    
+    // Actualizar datos del cliente con la información de la cédula
+    setClienteInfo(prevInfo => ({
+      ...prevInfo,
+      nombre: `${data.nombres} ${data.apellidos}`,
+      rut: data.rut
+    }));
+    
+    toast({
+      title: "Cédula leída correctamente",
+      description: "Se ha verificado la identidad con los datos del chip NFC",
+      variant: "default",
+    });
+  };
+  
+  const handleNFCCancel = () => {
+    setShowNFCReader(false);
+    toast({
+      title: "Lectura NFC cancelada",
+      description: "Se ha cancelado la lectura de la cédula",
+      variant: "destructive",
+    });
+  };
+
+  const verificarIdentidad = () => {
+    // Comprobar si ya está verificado
+    if (identityVerified) {
+      toast({
+        title: "Identidad ya verificada",
+        description: "El cliente ya ha sido verificado",
+        variant: "default",
+      });
+      return;
+    }
+    
+    // Mostrar opciones de verificación
+    if (nfcAvailable) {
+      // Si tenemos NFC disponible, ofrecer esa opción
+      const metodoVerificacion = window.confirm(
+        "¿Cómo desea realizar la verificación de identidad?\n\n" +
+        "- Aceptar: Usar lector NFC para leer cédula\n" +
+        "- Cancelar: Usar cámara para tomar foto"
+      );
+      
+      if (metodoVerificacion) {
+        // Usar NFC
+        iniciarLecturaNFC();
+      } else {
+        // Usar cámara
+        iniciarCamara();
+      }
+    } else {
+      // Sin NFC, usar cámara
+      iniciarCamara();
+    }
+  };
+
+  const mostrarPanelCertificador = () => {
+    setShowCertifierPanel(true);
+  };
+  
+  // Componente para el panel de certificación
+  const CertificadorPanel = () => {
+    return (
+      <div className="p-6">
+        <h2 className="text-2xl font-bold mb-4">Panel de Certificación</h2>
+        
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Documentos pendientes</CardTitle>
+            <CardDescription>
+              Documentos que requieren certificación por parte de un certificador autorizado
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-amber-50 p-4 rounded-md border border-amber-200 mb-4">
+              <p className="text-amber-800 text-sm">
+                No hay documentos pendientes de certificación en este momento
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+  
+  // Obtener el contenido según el paso actual
+  const getPantallaActual = () => {
+    switch (step) {
+      case 'inicio':
+        return (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">Información del cliente</h2>
+            
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <Label htmlFor="nombre">Nombre completo</Label>
+                  <Input 
+                    id="nombre" 
+                    value={clienteInfo.nombre}
+                    onChange={(e) => setClienteInfo({ ...clienteInfo, nombre: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="rut">RUT</Label>
+                  <Input 
+                    id="rut" 
+                    value={clienteInfo.rut}
+                    onChange={(e) => setClienteInfo({ ...clienteInfo, rut: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input 
+                    id="email" 
+                    type="email"
+                    value={clienteInfo.email}
+                    onChange={(e) => setClienteInfo({ ...clienteInfo, email: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="telefono">Teléfono</Label>
+                  <Input 
+                    id="telefono" 
+                    type="tel"
+                    value={clienteInfo.telefono}
+                    onChange={(e) => setClienteInfo({ ...clienteInfo, telefono: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex justify-end">
+                <Button onClick={handleRegistrarCliente}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Registrar cliente
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
+        
+      case 'documentos':
+        return (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Documentos disponibles</h2>
+              <Button variant="outline" onClick={() => setStep('inicio')}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Volver
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {documentosDisponibles.map((doc) => (
+                <Card 
+                  key={doc.id}
+                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => handleSeleccionarDocumento(doc.id)}
+                >
+                  <CardContent className="p-6">
+                    <FileText className="h-8 w-8 text-blue-500 mb-4" />
+                    <h3 className="font-bold">{doc.nombre}</h3>
+                    <p className="text-sm text-zinc-500 mt-2">
+                      Precio: ${doc.precio.toLocaleString()}
+                    </p>
+                    <div className="flex justify-end mt-4">
+                      <Button variant="ghost" size="sm">
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        );
+        
+      case 'pago':
+        const docSeleccionado = documentosDisponibles.find(d => d.id === tipoDocumento);
+        
+        return (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Método de pago</h2>
+              <Button variant="outline" onClick={() => setStep('documentos')}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Volver
+              </Button>
+            </div>
+            
+            <Card className="mb-6">
+              <CardContent className="p-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="font-bold text-lg">{docSeleccionado?.nombre}</h3>
+                    <p className="text-zinc-500">Cliente: {clienteInfo.nombre}</p>
+                  </div>
+                  <div className="text-xl font-bold">
+                    ${docSeleccionado?.precio.toLocaleString()}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Card 
+                className={`cursor-pointer hover:shadow-md transition-shadow ${metodoPago === 'tarjeta' ? 'border-blue-400 bg-blue-50' : ''}`}
+                onClick={() => handleSeleccionarPago('tarjeta')}
+              >
+                <CardContent className="p-6 flex items-start">
+                  <CreditCard className={`h-8 w-8 ${metodoPago === 'tarjeta' ? 'text-blue-500' : 'text-zinc-400'} mr-4`} />
+                  <div>
+                    <h3 className="font-bold">Tarjeta de crédito/débito</h3>
+                    <p className="text-sm text-zinc-500 mt-1">
+                      Pago con tarjeta a través del POS
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        );
+        
+      case 'comprobante':
+        const documento = documentosDisponibles.find(d => d.id === tipoDocumento);
+        
+        return (
+          <div className="space-y-6">
+            <div className="text-center p-4">
+              <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-2" />
+              <h2 className="text-2xl font-bold text-green-700">¡Proceso completado!</h2>
+              <p className="text-zinc-600">El documento ha sido procesado correctamente</p>
+            </div>
+            
+            <Card className="mb-6 overflow-hidden">
+              <div className="bg-zinc-100 p-4 border-b">
+                <div className="flex justify-between">
+                  <h3 className="font-bold">Comprobante de servicio</h3>
+                  <span className="text-zinc-500 text-sm">#{Math.floor(100000 + Math.random() * 900000)}</span>
+                </div>
+              </div>
+              
+              <CardContent className="p-6">
+                <div className="grid gap-4">
+                  <div className="border-b pb-4">
+                    <div className="flex justify-between mb-1">
+                      <span className="text-zinc-500">Documento</span>
+                      <span className="font-medium">{documento?.nombre}</span>
+                    </div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-zinc-500">Cliente</span>
+                      <span className="font-medium">{clienteInfo.nombre}</span>
+                    </div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-zinc-500">RUT</span>
+                      <span className="font-medium">{clienteInfo.rut}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500">Fecha</span>
+                      <span className="font-medium">{new Date().toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="border-b pb-4">
+                    <div className="flex justify-between mb-1">
+                      <span className="text-zinc-500">Método de pago</span>
+                      <span className="font-medium">Tarjeta</span>
+                    </div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-zinc-500">Subtotal</span>
+                      <span className="font-medium">${documento?.precio.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-zinc-500">IVA (19%)</span>
+                      <span className="font-medium">${Math.round(documento?.precio ? documento.precio * 0.19 : 0).toLocaleString()}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-lg font-bold">Total</span>
+                    <span className="text-lg font-bold">${Math.round(documento?.precio ? documento.precio * 1.19 : 0).toLocaleString()}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <div className="flex justify-between">
+              <Button variant="outline" onClick={() => setStep('inicio')}>
+                <Home className="h-4 w-4 mr-2" />
+                Volver al inicio
+              </Button>
+              
+              <div className="space-x-2">
+                <Button variant="outline" onClick={() => window.print()}>
+                  <Printer className="h-4 w-4 mr-2" />
+                  Imprimir
+                </Button>
+                <Button variant="default">
+                  <Download className="h-4 w-4 mr-2" />
+                  Descargar PDF
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
+        
+      default:
+        return <div>Paso no reconocido</div>;
+    }
+  };
+  
+  const renderContent = () => {
+    // Si está cargando, mostrar spinner
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center h-[70vh]">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
+        </div>
+      );
+    }
+    
+    // Si el socio es certificador, mostrar el panel de certificación
+    if (certificadorMode) {
+      return <CertificadorPanel />;
+    }
+    
+    return getPantallaActual();
+  };
+  
+  return (
+    <div className="min-h-screen bg-zinc-100 text-zinc-900">
+      {/* Navbar sencillo */}
+      <header className="bg-zinc-800 shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+          <div className="flex items-center">
+            <div className="flex-shrink-0 flex items-center">
+              <FileSignature className="h-7 w-7 text-blue-400 mr-2" />
+              <span className="text-white text-lg font-bold">Vecinos NotaryPro</span>
+            </div>
+          </div>
+          
+          <div className="flex items-center">
+            {partnerInfo && (
+              <div className="text-right mr-4">
+                <div className="text-blue-400 font-medium text-sm">{partnerInfo.storeName}</div>
+                <div className="text-zinc-400 text-xs">{partnerInfo.address}</div>
+              </div>
+            )}
+            
+            <button
+              onClick={() => {
+                // Cerrar sesión
+                localStorage.removeItem('vecinos_token');
+                setLocation('/vecinos/login');
+              }}
+              className="bg-zinc-700 hover:bg-zinc-600 text-zinc-200 p-2 rounded-md flex items-center text-sm"
+            >
+              <LogOut className="h-4 w-4 mr-1" />
+              Salir
+            </button>
+          </div>
+        </div>
+      </header>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Panel principal con estilo NotaryPro */}
+        <div className="bg-white rounded-lg shadow-lg p-3 mb-6 border border-zinc-300">
+          {/* Cabecera con estilo NotaryPro */}
+          <div className="mb-5 bg-zinc-800 rounded-md p-3 border-b border-blue-600">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-3">
+                <div className="bg-blue-600 p-1.5 rounded text-white text-xs font-bold shadow-sm">PROCESO</div>
+                <div className="flex items-center space-x-2">
+                  <div className={`rounded-md h-8 w-8 flex items-center justify-center shadow-sm ${step === 'inicio' ? 'bg-blue-600 text-white font-bold' : 'bg-zinc-700 text-zinc-300'}`}>1</div>
+                  <div className={`rounded-md h-8 w-8 flex items-center justify-center shadow-sm ${step === 'documentos' ? 'bg-blue-600 text-white font-bold' : 'bg-zinc-700 text-zinc-300'}`}>2</div>
+                  <div className={`rounded-md h-8 w-8 flex items-center justify-center shadow-sm ${step === 'pago' ? 'bg-blue-600 text-white font-bold' : 'bg-zinc-700 text-zinc-300'}`}>3</div>
+                  <div className={`rounded-md h-8 w-8 flex items-center justify-center shadow-sm ${step === 'comprobante' ? 'bg-blue-600 text-white font-bold' : 'bg-zinc-700 text-zinc-300'}`}>4</div>
+                </div>
+              </div>
+              
+              <div className="bg-zinc-700 p-2 border border-zinc-600 rounded shadow-sm">
+                <p className="text-sm font-bold text-white">
+                  {step === 'inicio' && 'REGISTRAR CLIENTE'}
+                  {step === 'documentos' && 'SELECCIONAR DOCUMENTO'}
+                  {step === 'pago' && 'PROCESAR PAGO'}
+                  {step === 'comprobante' && 'TICKET DE VENTA'}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Contenido principal */}
+          <div className="p-4">
+            {getPantallaActual()}
+          </div>
+        </div>
+      </div>
+      
+      {/* Modal para ver vista previa del documento */}
+      {showPreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto">
+            <div className="p-4 border-b flex justify-between items-center sticky top-0 bg-white z-10">
+              <h2 className="text-lg font-bold">Vista previa del documento</h2>
+              <Button variant="ghost" size="icon" onClick={() => setShowPreview(false)}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <div className="p-0 max-h-[70vh] overflow-auto">
+              <iframe 
+                srcDoc={documentPreview}
+                className="w-full h-[70vh]"
+                title="Vista previa del documento"
+              />
+            </div>
+            
+            <div className="p-4 border-t flex justify-between sticky bottom-0 bg-white z-10">
+              <Button variant="outline" onClick={() => setShowPreview(false)}>
+                Cerrar
+              </Button>
+              <div className="space-x-2">
+                <Button variant="outline" onClick={verificarIdentidad} disabled={identityVerified}>
+                  <UserCheck className="h-4 w-4 mr-2" />
+                  {identityVerified ? 'Identidad verificada' : (nfcAvailable ? 'Verificar identidad (NFC/Cámara)' : 'Verificar identidad')}
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setShowPreview(false);
+                    setStep('firmar');
+                    setTimeout(iniciarFirma, 500);
+                  }}
+                  disabled={!identityVerified}
+                >
+                  <FileSignature className="h-4 w-4 mr-2" />
+                  Firmar documento
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Modal para lector NFC */}
+      {showNFCReader && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-xl overflow-hidden">
+            <div className="p-4 bg-zinc-800 text-white flex justify-between items-center">
+              <h2 className="text-lg font-bold flex items-center">
+                <Wallet className="h-5 w-5 mr-2 text-blue-400" />
+                Lector NFC de Cédula
+              </h2>
+              <Button variant="ghost" size="icon" onClick={handleNFCCancel} className="text-zinc-400 hover:text-white">
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <div className="p-4">
+              <NFCIdentityReader
+                onSuccess={handleNFCSuccess}
+                onCancel={handleNFCCancel}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Modal para captura de identidad con cámara */}
+      {showCamera && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-xl">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-lg font-bold">Verificación de identidad</h2>
+              <Button variant="ghost" size="icon" onClick={() => setShowCamera(false)}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <div className="p-6">
+              <p className="mb-4 text-gray-600">
+                Para verificar la identidad del firmante, necesitamos tomar una foto. 
+                Por favor asegúrese de que el rostro sea claramente visible.
+              </p>
+              
+              <div className="bg-gray-100 rounded-lg overflow-hidden mb-4">
+                {!photoTaken ? (
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    className="w-full h-auto"
+                    style={{ maxHeight: '50vh' }}
+                  />
+                ) : (
+                  <canvas
+                    ref={photoRef}
+                    className="w-full h-auto"
+                    style={{ maxHeight: '50vh' }}
+                  />
+                )}
+              </div>
+              
+              <div className="flex justify-between">
+                <Button variant="outline" onClick={() => {
+                  setPhotoTaken(false);
+                  setShowCamera(false);
+                }}>
+                  Cancelar
+                </Button>
+                
+                {!photoTaken ? (
+                  <Button onClick={tomarFoto}>
+                    <Camera className="h-4 w-4 mr-2" />
+                    Tomar foto
+                  </Button>
+                ) : (
+                  <div className="space-x-2">
+                    <Button variant="outline" onClick={() => setPhotoTaken(false)}>
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Volver a tomar
+                    </Button>
+                    <Button onClick={() => {
+                      setIdentityVerified(true);
+                      setShowCamera(false);
+                      toast({
+                        title: "Identidad verificada",
+                        description: "La identidad del cliente ha sido verificada correctamente",
+                        variant: "default",
+                      });
+                    }}>
+                      <UserCheck className="h-4 w-4 mr-2" />
+                      Verificar
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Panel de firma digital */}
+      {step === 'firmar' && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-lg font-bold">Firma de documento</h2>
+              <Button variant="ghost" size="icon" onClick={() => setStep('comprobante')}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <div className="p-6">
+              <p className="mb-4 text-gray-600">
+                Por favor, firme en el área indicada utilizando el mouse o pantalla táctil.
+              </p>
+              
+              <div className="border-2 border-gray-300 rounded-lg mb-4 bg-gray-50">
+                <canvas
+                  ref={signatureCanvasRef}
+                  width={560}
+                  height={200}
+                  className="w-full h-[200px] touch-none"
+                  onMouseDown={iniciarDibujo}
+                  onMouseMove={dibujar}
+                  onMouseUp={terminarDibujo}
+                  onMouseLeave={terminarDibujo}
+                  onTouchStart={iniciarDibujo}
+                  onTouchMove={dibujar}
+                  onTouchEnd={terminarDibujo}
+                />
+              </div>
+              
+              <div className="flex justify-between">
+                <Button variant="outline" onClick={limpiarFirma}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Limpiar firma
+                </Button>
+                
+                <div className="space-x-2">
+                  <Button variant="secondary" onClick={() => setStep('comprobante')}>
+                    Cancelar
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      if (signatureImage) {
+                        setStep('comprobante');
+                        toast({
+                          title: "Documento firmado",
+                          description: "El documento ha sido firmado correctamente.",
+                          variant: "default",
+                        });
+                        
+                        // Si es administrador o certificador, mostrar panel de certificación
+                        if (certificadorMode) {
+                          mostrarPanelCertificador();
+                        }
+                      } else {
+                        toast({
+                          title: "Firma requerida",
+                          description: "Por favor firme el documento antes de continuar.",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
+                  >
+                    <Check className="h-4 w-4 mr-2" />
+                    Confirmar firma
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Panel de certificador */}
+      {showCertifierPanel && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-lg font-bold">Panel de Certificación</h2>
+              <Button variant="ghost" size="icon" onClick={() => setShowCertifierPanel(false)}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <div className="p-6">
+              <Tabs defaultValue="document" className="w-full">
+                <TabsList className="grid grid-cols-3 mb-4">
+                  <TabsTrigger value="document">Documento</TabsTrigger>
+                  <TabsTrigger value="identity">Identidad</TabsTrigger>
+                  <TabsTrigger value="certification">Certificación</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="document" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Revisión de documento</CardTitle>
+                      <CardDescription>
+                        Verifique el contenido y validez del documento
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="p-4 border rounded-lg bg-gray-50">
+                          <h3 className="font-medium mb-2">Documento</h3>
+                          <p className="text-sm text-gray-600 mb-4">
+                            {documentosDisponibles.find(d => d.id === tipoDocumento)?.nombre}
+                          </p>
+                          
+                          <div className="flex justify-between mb-2">
+                            <span className="text-sm text-gray-600">Firmado por:</span>
+                            <span className="text-sm font-medium">{clienteInfo.nombre}</span>
+                          </div>
+                          
+                          <div className="flex justify-between">
+                            <span className="text-sm text-gray-600">RUT:</span>
+                            <span className="text-sm font-medium">{clienteInfo.rut}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-end space-x-2">
+                          <Button>Ver documento completo</Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="identity" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Verificación avanzada de identidad</CardTitle>
+                      <CardDescription>
+                        Confirme la identidad del firmante utilizando verificación biométrica
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="p-4 border rounded-lg border-green-200 bg-green-50">
+                        <div className="flex items-center mb-4">
+                          <Shield className="h-5 w-5 text-green-500 mr-2" />
+                          <h3 className="font-medium text-green-700">Identidad verificada mediante proceso avanzado</h3>
+                        </div>
+                        
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="p-3 bg-white rounded border">
+                            <p className="text-sm font-medium mb-1">Verificación biométrica</p>
+                            <div className="aspect-video bg-gray-100 rounded flex items-center justify-center">
+                              {photoTaken ? (
+                                <canvas
+                                  ref={photoRef}
+                                  className="w-full h-auto object-contain"
+                                />
+                              ) : (
+                                <div className="flex flex-col items-center justify-center">
+                                  <Shield className="h-8 w-8 text-green-500 mb-2" />
+                                  <span className="text-xs text-gray-500">Verificación biométrica completada</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="p-3 bg-white rounded border">
+                            <p className="text-sm font-medium mb-1">Información verificada</p>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-xs text-gray-600">Nombre:</span>
+                                <span className="text-xs font-medium">{clienteInfo.nombre}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-xs text-gray-600">RUT:</span>
+                                <span className="text-xs font-medium">{clienteInfo.rut}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="certification" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Certificación del documento</CardTitle>
+                      <CardDescription>
+                        Utilice su firma electrónica avanzada para certificar el documento
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="p-4 border rounded-lg bg-gray-50 mb-4">
+                        <div className="flex items-center mb-4">
+                          <div className="w-12 h-12 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center">
+                            <Fingerprint className="h-6 w-6 text-blue-600" />
+                          </div>
+                          <div className="ml-4">
+                            <p className="text-sm font-medium">Certificación</p>
+                            <p className="text-xs mt-1">e-Token FirmaChile</p>
+                            <p className="text-xs text-gray-500">Emisor: E-CERT CHILE</p>
+                          </div>
+                        </div>
+                        
+                        <Button 
+                          className="w-full" 
+                          onClick={() => {
+                            setShowCertifierPanel(false);
+                            toast({
+                              title: "Documento certificado",
+                              description: "El documento ha sido certificado con éxito con firma electrónica avanzada.",
+                              variant: "default",
+                            });
+                          }}
+                        >
+                          <Shield className="h-4 w-4 mr-2" />
+                          Certificar documento
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default WebAppPOSNFC;

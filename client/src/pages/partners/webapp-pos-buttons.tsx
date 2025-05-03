@@ -31,6 +31,10 @@ const WebAppPOSButtons = () => {
   const [loading, setLoading] = useState(true);
   
   // Estado para NFC y verificación de identidad
+  const [showCamera, setShowCamera] = useState(false);
+  const [photoTaken, setPhotoTaken] = useState(false);
+  const [showNFCReader, setShowNFCReader] = useState(false);
+  const [nfcAvailable, setNfcAvailable] = useState(false);
   
   // Estado para múltiples firmantes
   const [currentSignerIndex, setCurrentSignerIndex] = useState(0); // 0 = primer firmante, 1 = segundo firmante
