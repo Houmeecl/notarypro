@@ -22,18 +22,21 @@ const NFCReader: React.FC<NFCReaderProps> = ({ onSuccess, onError, demoMode = fa
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Datos simulados de un documento chileno
+      // Usar datos que parezcan reales para mejor experiencia de demo
       const mockNFCData = {
         documentType: "CI-CHL",
-        documentNumber: "12345678-9",
-        names: "JUAN PEDRO",
-        surnames: "RODRIGUEZ SOTO",
+        documentNumber: "16.782.453-K",
+        names: "MARÍA ALEJANDRA",
+        surnames: "GONZÁLEZ FUENTES",
         nationality: "CHL",
-        birthDate: "1985-06-15",
-        gender: "M",
-        issueDate: "2020-01-10",
-        expiryDate: "2030-01-10",
-        personalNumber: "12345678-9",
-        chipId: "CLHSMF123456789",
+        birthDate: "1988-04-22",
+        gender: "F",
+        issueDate: "2019-08-15",
+        expiryDate: "2029-08-15",
+        personalNumber: "16782453K",
+        chipId: "CLHSMF7285631A44",
+        faceImage: true, // Indicar que hay imagen facial en el chip
+        fingerprints: true, // Indicar que hay huellas dactilares en el chip
         success: true
       };
       
