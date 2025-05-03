@@ -432,11 +432,27 @@ function Router() {
       <Route path="/partners/webapp-login" component={WebappLogin} />
       {/* POS Web Oficial (ahora redirecciona al login de Vecinos) */}
 
-      {/* Rutas de versiones del POS */}
-      <Route path="/partners/webapp-pos" component={WebAppPOS} />
-      <Route path="/partners/webapp-pos-alternativa" component={WebAppPOS} />
-      <Route path="/partners/webapp-pos-buttons" component={WebAppPOS} />
-      <Route path="/partners/webapp-pos-nfc" component={WebAppPOS} />
+      {/* Redirigir todas las versiones anteriores del POS a la versión oficial */}
+      <Route path="/partners/webapp-pos" component={() => {
+        window.location.href = "/partners/webapp-pos-official";
+        return null;
+      }} />
+      <Route path="/partners/webapp-pos-alternativa" component={() => {
+        window.location.href = "/partners/webapp-pos-official";
+        return null;
+      }} />
+      <Route path="/partners/webapp-pos-buttons" component={() => {
+        window.location.href = "/partners/webapp-pos-official";
+        return null;
+      }} />
+      <Route path="/partners/webapp-pos-nfc" component={() => {
+        window.location.href = "/partners/webapp-pos-official";
+        return null;
+      }} />
+      <Route path="/partners/webapp-pos-tramite" component={() => {
+        window.location.href = "/partners/webapp-pos-official";
+        return null;
+      }} />
 
       {/* Versión oficial del POS web accessible directamente */}
       <Route path="/partners/webapp-pos-official" component={WebAppPOSOfficial} />
@@ -448,7 +464,6 @@ function Router() {
         component={PosIntegrationPage} 
         allowedRoles={["partner"]} 
       />
-      <Route path="/partners/webapp-pos-tramite" component={React.lazy(() => import('./pages/partners/webapp-pos-tramite'))} />
 
       {/* Admin POS Management */}
       <ProtectedRoute 
@@ -566,13 +581,11 @@ function Router() {
       <Route path="/integraciones-demo" component={IntegracionesDemo} />
       <Route path="/integraciones-api-identidad" component={IntegracionesApiIdentidad} />
 
-      {/* VERIFICACIÓN DE IDENTIDAD - Flujo unificado */}
-      <Route path="/verificacion-identidad" component={VerificacionIdentidadDemo} />
-      <Route path="/readid-verification" component={ReadIDVerificationPage} />
-
-      {/* MODO NFC SIMPLIFICADO - usando un solo componente*/}
+      {/* VERIFICACIÓN DE IDENTIDAD - Dos métodos principales */}
+      
+      {/* 1. Verificación con NFC (Método principal y recomendado) */}
       <Route path="/verificacion-nfc" component={() => {
-        // Importar dinámicamente el componente nuevo (versión corregida)
+        // Importar dinámicamente el componente (versión corregida y más completa)
         const VerificacionNFC = React.lazy(() => import("@/pages/verificacion-nfc-fixed"));
         return (
           <Suspense fallback={<LazyLoadingFallback />}>
@@ -580,14 +593,16 @@ function Router() {
           </Suspense>
         );
       }} />
-
-      {/* MODO FALLBACK PARA DISPOSITIVOS MÓVILES - Redirige a la versión unificada */}
+      
+      {/* 2. Verificación con Demo vía QR (Alternativa) */}
+      <Route path="/verificacion-identidad" component={VerificacionIdentidadDemo} />
+      <Route path="/readid-verification" component={ReadIDVerificationPage} />
+      
+      {/* Redireccionar todas las demás versiones de verificación a las principales */}
       <Route path="/verificacion-movil" component={() => {
         window.location.href = "/verificacion-nfc";
         return null;
       }} />
-
-      {/* Redirecciones de URLs anteriores para compatibilidad */}
       <Route path="/verificacion-identidad-nfc" component={() => {
         window.location.href = "/verificacion-nfc";
         return null;
@@ -621,6 +636,14 @@ function Router() {
         return null;
       }} />
       <Route path="/verificacion-inverid" component={() => {
+        window.location.href = "/verificacion-identidad";
+        return null;
+      }} />
+      <Route path="/verificacion-selfie" component={() => {
+        window.location.href = "/verificacion-identidad";
+        return null;
+      }} />
+      <Route path="/verificacion-selfie-simple" component={() => {
         window.location.href = "/verificacion-identidad";
         return null;
       }} />
