@@ -1170,7 +1170,7 @@ documento: {...}           // Datos completos del documento`}
                       <Button 
                         variant="outline" 
                         className="w-full"
-                        onClick={() => window.location.href = "/partners/webapp-pos-buttons"}
+                        onClick={() => window.location.href = "/vecinos/login"}
                       >
                         <Globe className="mr-2 h-4 w-4" />
                         Versión con botones grandes
@@ -1178,7 +1178,7 @@ documento: {...}           // Datos completos del documento`}
                       <Button 
                         variant="outline" 
                         className="w-full"
-                        onClick={() => window.location.href = "/partners/webapp-pos-alternativa"}
+                        onClick={() => window.location.href = "/vecinos/login"}
                       >
                         <Globe className="mr-2 h-4 w-4" />
                         Versión con pestañas

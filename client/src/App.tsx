@@ -240,21 +240,23 @@ function Router() {
       <Route path="/partners/android-sdk-test" component={AndroidSdkTest} />
       <Route path="/partners/password-generator" component={PasswordGenerator} />
       <Route path="/partners/webapp-login" component={WebappLogin} />
-      {/* POS Web Oficial (versión unificada) */}
-      <Route path="/partners/webapp-pos-official" component={WebAppPOSOfficial} />
+      {/* POS Web Oficial (ahora redirecciona al login de Vecinos) */}
       
-      {/* Rutas de versiones antiguas que redirigen a la versión oficial */}
+      {/* Rutas de versiones antiguas que redirigen a la página de login de Vecinos */}
       <Route path="/partners/webapp-pos">
-        <Redirect to="/partners/webapp-pos-official" />
+        <Redirect to="/vecinos/login" />
       </Route>
       <Route path="/partners/webapp-pos-alternativa">
-        <Redirect to="/partners/webapp-pos-official" />
+        <Redirect to="/vecinos/login" />
       </Route>
       <Route path="/partners/webapp-pos-buttons">
-        <Redirect to="/partners/webapp-pos-official" />
+        <Redirect to="/vecinos/login" />
       </Route>
       <Route path="/partners/webapp-pos-nfc">
-        <Redirect to="/partners/webapp-pos-official" />
+        <Redirect to="/vecinos/login" />
+      </Route>
+      <Route path="/partners/webapp-pos-official">
+        <Redirect to="/vecinos/login" />
       </Route>
       <Route path="/partners/sdk-demo" component={SdkDemo} />
       <Route path="/partners/descargar-apk" component={DescargarApk} />
