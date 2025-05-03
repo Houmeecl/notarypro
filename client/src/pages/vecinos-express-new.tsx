@@ -54,7 +54,7 @@ import VecinosIllustrations from "@/components/vecinos/VecinosIllustrations";
 import { useToast } from "@/hooks/use-toast";
 
 // Importamos el logo
-import vecinosXpressLogo from "@assets/vecino-xpress-logo.svg";
+import vecinosXpressLogo from "@/assets/vecino-xpress-logo.svg";
 
 export default function VecinosExpress() {
   const [, setLocation] = useLocation();

@@ -42,7 +42,8 @@ import VerificarDocumento from "@/pages/verificar-documento";
 import DocumentVerificationGame from "@/pages/document-verification-game";
 import VideocallInterfaceDemo from "@/pages/videocall-interface-demo";
 import CursoCertificador from "@/pages/curso-certificador";
-import VecinosExpress from "@/pages/vecinos-express";
+// Importamos la versión más nueva/actualizada de VecinosExpress
+import VecinosExpress from "@/pages/vecinos-express-new";
 import PartnerApplications from "@/pages/admin/partner-applications";
 import ServiceSelectionPage from "@/pages/service-selection";
 import RonVideocall from "@/pages/ron-videocall";
@@ -127,7 +128,12 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={LandingPage} />
+      {/* VecinosExpress - Versión consolidada */}
       <Route path="/vecinos-express" component={VecinosExpress} />
+      <Route path="/vecinos-express-new" component={() => {
+        window.location.href = "/vecinos-express";
+        return null;
+      }} />
       {/* Página de entrada de emergencia */}
       <Route path="/emergency-entry" component={() => {
         // Importar dinámicamente para evitar problemas de carga
