@@ -50,53 +50,23 @@ const WebAppPOSNFC = () => {
   
   // Cargar información del socio al inicio y verificar NFC
   useEffect(() => {
-    const loadPartnerInfo = async () => {
-      try {
-        // Verificar si existe un token en localStorage
-        const token = localStorage.getItem('vecinos_token');
-        
-        if (!token) {
-          toast({
-            title: "No has iniciado sesión",
-            description: "Debes iniciar sesión como socio para acceder",
-            variant: "destructive",
-          });
-          setLocation('/vecinos/login');
-          return;
-        }
-        
-        // Obtener información del socio desde la API
-        const response = await fetch('/api/vecinos/partner-info', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error('No se pudo obtener la información del socio');
-        }
-        
-        const data = await response.json();
-        setPartnerInfo(data);
-        
-        toast({
-          title: "Bienvenido al POS Web",
-          description: `${data.storeName} - ${data.address}`,
-        });
-      } catch (error) {
-        console.error('Error al cargar información del socio:', error);
-        toast({
-          title: "Error de autenticación",
-          description: "Por favor inicia sesión nuevamente",
-          variant: "destructive",
-        });
-        // Redirigir al login si hay problemas con el token
-        setLocation('/vecinos/login');
-      } finally {
-        setLoading(false);
-      }
+    // Para demostración, cargar información de socio de prueba
+    const loadDemoPartner = () => {
+      setPartnerInfo({
+        id: 1,
+        storeName: "Minimarket El Sol (DEMO)",
+        address: "Av. Providencia 123, Santiago",
+        storeCode: "LOCAL-XP125",
+        commission: 10,
+        balance: 25600
+      });
+      
+      toast({
+        title: "Modo demostración",
+        description: "Estás viendo la página en modo de prueba"
+      });
+      
+      setLoading(false);
     };
     
     // Verificar disponibilidad de NFC
@@ -107,6 +77,17 @@ const WebAppPOSNFC = () => {
         
         if (result.available) {
           console.log(`NFC disponible: ${result.readerType}`);
+          toast({
+            title: "NFC detectado",
+            description: `Tipo de lector: ${result.readerType}`,
+          });
+        } else {
+          console.log("NFC no disponible");
+          toast({
+            title: "NFC no disponible",
+            description: "Su dispositivo no tiene NFC o no está habilitado",
+            variant: "destructive",
+          });
         }
       } catch (error) {
         console.error('Error al verificar NFC:', error);
@@ -114,7 +95,8 @@ const WebAppPOSNFC = () => {
       }
     };
     
-    loadPartnerInfo();
+    // Cargar datos de demo y verificar NFC
+    loadDemoPartner();
     checkNFC();
   }, []);
   
@@ -340,27 +322,50 @@ const WebAppPOSNFC = () => {
   
   // Métodos para la verificación de identidad
   const iniciarCamara = async () => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+    console.log("Iniciando cámara...");
+    setShowCamera(true); // Mostrar modal primero
+    
+    setTimeout(async () => {
+      // Verificar disponibilidad de la cámara
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          console.log("Solicitando permiso de cámara...");
+          const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { 
+              width: { ideal: 1280 },
+              height: { ideal: 720 } 
+            } 
+          });
+          
+          console.log("Permiso de cámara concedido, configurando video...");
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            videoRef.current.onloadedmetadata = () => {
+              videoRef.current?.play().catch(e => {
+                console.error("Error al reproducir video:", e);
+              });
+            };
+          } else {
+            console.error("Referencia de video no disponible");
+          }
+          
+        } catch (err) {
+          console.error("Error al acceder a la cámara:", err);
+          toast({
+            title: "Error al acceder a la cámara",
+            description: "No se pudo acceder a la cámara del dispositivo. Verifique los permisos.",
+            variant: "destructive",
+          });
         }
-        setShowCamera(true);
-      } catch (err) {
+      } else {
+        console.error("API mediaDevices no disponible");
         toast({
-          title: "Error al acceder a la cámara",
-          description: "No se pudo acceder a la cámara del dispositivo",
+          title: "Cámara no disponible",
+          description: "Su dispositivo o navegador no soporta acceso a la cámara",
           variant: "destructive",
         });
       }
-    } else {
-      toast({
-        title: "Cámara no disponible",
-        description: "Su dispositivo no tiene cámara o no está disponible",
-        variant: "destructive",
-      });
-    }
+    }, 500); // Pequeño retraso para asegurar que el modal esté listo
   };
   
   const tomarFoto = () => {
@@ -538,7 +543,11 @@ const WebAppPOSNFC = () => {
                 </div>
               </div>
               
-              <div className="flex justify-end">
+              <div className="flex justify-between">
+                <Button variant="outline" onClick={verificarIdentidad}>
+                  <UserCheck className="h-4 w-4 mr-2" />
+                  Verificar identidad {nfcAvailable ? '(NFC)' : '(Cámara)'}
+                </Button>
                 <Button onClick={handleRegistrarCliente}>
                   <UserPlus className="h-4 w-4 mr-2" />
                   Registrar cliente
@@ -878,9 +887,19 @@ const WebAppPOSNFC = () => {
       {showCamera && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-xl">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h2 className="text-lg font-bold">Verificación de identidad</h2>
-              <Button variant="ghost" size="icon" onClick={() => setShowCamera(false)}>
+            <div className="p-4 border-b flex justify-between items-center bg-zinc-800 text-white">
+              <h2 className="text-lg font-bold flex items-center">
+                <Camera className="h-5 w-5 mr-2 text-blue-400" />
+                Verificación de identidad
+              </h2>
+              <Button variant="ghost" size="icon" onClick={() => {
+                // Detener la cámara al cerrar
+                const stream = videoRef.current?.srcObject as MediaStream;
+                if (stream) {
+                  stream.getTracks().forEach(track => track.stop());
+                }
+                setShowCamera(false);
+              }} className="text-gray-300 hover:text-white">
                 <X className="h-5 w-5" />
               </Button>
             </div>
@@ -891,25 +910,52 @@ const WebAppPOSNFC = () => {
                 Por favor asegúrese de que el rostro sea claramente visible.
               </p>
               
-              <div className="bg-gray-100 rounded-lg overflow-hidden mb-4">
+              <div className="bg-gray-100 rounded-lg overflow-hidden mb-4 relative">
                 {!photoTaken ? (
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    className="w-full h-auto"
-                    style={{ maxHeight: '50vh' }}
-                  />
+                  <>
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      muted
+                      className="w-full h-auto"
+                      style={{ maxHeight: '50vh', minHeight: '300px' }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      {/* Guía para la posición de la cara */}
+                      <div className="border-2 border-dashed border-blue-400 rounded-full w-40 h-40 opacity-50 flex items-center justify-center">
+                        <div className="text-xs text-blue-600 font-medium bg-white px-2 py-1 rounded">
+                          Alinear rostro
+                        </div>
+                      </div>
+                    </div>
+                  </>
                 ) : (
                   <canvas
                     ref={photoRef}
                     className="w-full h-auto"
-                    style={{ maxHeight: '50vh' }}
+                    style={{ maxHeight: '50vh', minHeight: '300px' }}
                   />
+                )}
+                
+                {/* Overlay para mostrar cuando la cámara se está inicializando */}
+                {!photoTaken && !videoRef.current?.srcObject && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-90">
+                    <div className="text-center">
+                      <div className="animate-spin w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full mb-2 mx-auto"></div>
+                      <p className="text-gray-700">Inicializando cámara...</p>
+                    </div>
+                  </div>
                 )}
               </div>
               
               <div className="flex justify-between">
                 <Button variant="outline" onClick={() => {
+                  // Detener la cámara
+                  const stream = videoRef.current?.srcObject as MediaStream;
+                  if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                  }
                   setPhotoTaken(false);
                   setShowCamera(false);
                 }}>
@@ -917,13 +963,16 @@ const WebAppPOSNFC = () => {
                 </Button>
                 
                 {!photoTaken ? (
-                  <Button onClick={tomarFoto}>
+                  <Button onClick={tomarFoto} className="bg-blue-600 hover:bg-blue-700">
                     <Camera className="h-4 w-4 mr-2" />
                     Tomar foto
                   </Button>
                 ) : (
                   <div className="space-x-2">
-                    <Button variant="outline" onClick={() => setPhotoTaken(false)}>
+                    <Button variant="outline" onClick={() => {
+                      setPhotoTaken(false);
+                      iniciarCamara(); // Reiniciar la cámara
+                    }}>
                       <RefreshCw className="h-4 w-4 mr-2" />
                       Volver a tomar
                     </Button>
@@ -935,7 +984,7 @@ const WebAppPOSNFC = () => {
                         description: "La identidad del cliente ha sido verificada correctamente",
                         variant: "default",
                       });
-                    }}>
+                    }} className="bg-green-600 hover:bg-green-700">
                       <UserCheck className="h-4 w-4 mr-2" />
                       Verificar
                     </Button>
