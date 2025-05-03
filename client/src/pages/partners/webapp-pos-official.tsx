@@ -448,11 +448,31 @@ const WebAppPOSOfficial = () => {
     });
   };
 
-  // Abrir modal de NFC
+  // Abrir modal de NFC para verificación real
   const openNFCVerification = () => {
     setIsNfcModalOpen(true);
     setNfcStatus('idle');
     setNfcMessage('');
+    
+    // Registrar intento de verificación NFC para análisis
+    try {
+      // En una implementación real, esto registraría el intento en el servidor
+      console.log('Iniciando verificación NFC real');
+      
+      // Registrar evento de analítica
+      const analyticsData = {
+        event: 'nfc_verification_started',
+        partnerId: partnerInfo?.id || 'demo',
+        partnerName: partnerInfo?.storeName || 'Tienda Demo',
+        timestamp: new Date().toISOString()
+      };
+      
+      // Enviar datos de analítica (comentado para demostración)
+      // apiRequest('POST', '/api/analytics/event', analyticsData);
+      
+    } catch (error) {
+      console.error('Error registrando intento de verificación:', error);
+    }
   };
 
   // Abrir verificación READID
