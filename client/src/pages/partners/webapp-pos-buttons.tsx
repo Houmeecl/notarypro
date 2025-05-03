@@ -41,7 +41,7 @@ const WebAppPOSButtons = () => {
   }>>([]);
   const { toast } = useToast();
   
-  // Cargar información del socio al inicio
+  // Cargar información del socio al inicio y verificar NFC
   useEffect(() => {
     const loadPartnerInfo = async () => {
       try {
@@ -92,7 +92,23 @@ const WebAppPOSButtons = () => {
       }
     };
     
+    // Verificar disponibilidad de NFC
+    const checkNFC = async () => {
+      try {
+        const result = await checkNFCAvailability();
+        setNfcAvailable(result.available);
+        
+        if (result.available) {
+          console.log(`NFC disponible: ${result.readerType}`);
+        }
+      } catch (error) {
+        console.error('Error al verificar NFC:', error);
+        setNfcAvailable(false);
+      }
+    };
+    
     loadPartnerInfo();
+    checkNFC();
   }, []);
   
   // Referencias para el canvas de firma
@@ -105,6 +121,11 @@ const WebAppPOSButtons = () => {
   const photoRef = useRef<HTMLCanvasElement>(null);
   const [showCamera, setShowCamera] = useState(false);
   const [photoTaken, setPhotoTaken] = useState(false);
+  
+  // Para lectura NFC
+  const [showNFCReader, setShowNFCReader] = useState(false);
+  const [nfcAvailable, setNfcAvailable] = useState(false);
+  const [cedulaData, setCedulaData] = useState<CedulaChilenaData | null>(null);
   
   // Estado para previsualización de documento
   const [documentPreview, setDocumentPreview] = useState('');
@@ -368,6 +389,40 @@ const WebAppPOSButtons = () => {
     }
   };
   
+  // Manejar verificación con NFC
+  const iniciarLecturaNFC = () => {
+    setShowNFCReader(true);
+    setShowCamera(false);
+  };
+  
+  const handleNFCSuccess = (data: CedulaChilenaData) => {
+    setCedulaData(data);
+    setShowNFCReader(false);
+    setIdentityVerified(true);
+    
+    // Actualizar datos del cliente con la información de la cédula
+    setClienteInfo(prevInfo => ({
+      ...prevInfo,
+      nombre: `${data.nombres} ${data.apellidos}`,
+      rut: data.rut
+    }));
+    
+    toast({
+      title: "Cédula leída correctamente",
+      description: "Se ha verificado la identidad con los datos del chip NFC",
+      variant: "default",
+    });
+  };
+  
+  const handleNFCCancel = () => {
+    setShowNFCReader(false);
+    toast({
+      title: "Lectura NFC cancelada",
+      description: "Se ha cancelado la lectura de la cédula",
+      variant: "destructive",
+    });
+  };
+
   const verificarIdentidad = () => {
     // Generar un ID de sesión único para la verificación
     const sessionId = `verify-pos-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
@@ -398,7 +453,23 @@ const WebAppPOSButtons = () => {
       }
     };
     
-    // Si estamos en un dispositivo móvil, podemos usar la cámara
+    // Mostrar opciones de verificación
+    if (nfcAvailable) {
+      // Si tenemos NFC disponible, ofrecer esa opción
+      const metodoVerificacion = window.confirm(
+        "Seleccione el método de verificación:\n\n" +
+        "- Aceptar: Utilizar lector NFC para cédula chilena\n" +
+        "- Cancelar: Utilizar otros métodos (cámara/QR)"
+      );
+      
+      if (metodoVerificacion) {
+        // Usar NFC
+        iniciarLecturaNFC();
+        return;
+      }
+    }
+    
+    // Si no eligió NFC o no está disponible, continuar con otros métodos
     if (typeof navigator !== 'undefined' && navigator.mediaDevices) {
       if (photoTaken) {
         // Si ya tenemos una foto, verificar directamente
@@ -420,15 +491,8 @@ const WebAppPOSButtons = () => {
         if (useQR) {
           generarQR();
         } else {
-          // Continuar con el método básico por cámara
-          setIdentityVerified(true);
-          setShowCamera(false);
-          
-          toast({
-            title: "Identidad verificada",
-            description: "La identidad del cliente ha sido verificada correctamente",
-            variant: "default",
-          });
+          // Iniciar cámara para verificación
+          iniciarCamara();
         }
       }
     } else {
