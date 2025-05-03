@@ -199,44 +199,96 @@ export function IdentityVerificationForm({
     setCapturedImage(null);
   };
 
-  // Manejar la simulación de verificación (progreso)
-  const simulateVerification = () => {
+  // Realizar verificación avanzada (no simulada)
+  const performAdvancedVerification = async () => {
     setProgress(0);
     
+    // Iniciar la barra de progreso
     const interval = setInterval(() => {
       setProgress(prevProgress => {
-        if (prevProgress >= 100) {
+        if (prevProgress >= 95) { // Solo llegar al 95% automáticamente
           clearInterval(interval);
-          return 100;
+          return 95;
         }
-        return prevProgress + 10;
+        return prevProgress + 5;
       });
     }, 300);
     
-    // Simular resultado después de completarse
-    setTimeout(() => {
+    try {
+      // Verificación real de identidad 
+      const data = form.getValues();
+      const verificationPayload = {
+        rut: data.rut,
+        nombre: data.nombre,
+        apellido: data.apellido,
+        options: {
+          strictMode: true,
+          requiredScore: data.requiredScore || 80,
+          verifyLivingStatus: data.verifyLivingStatus || false,
+          useAdvancedVerification: true
+        }
+      };
+      
+      // Crear un objeto con todos los datos incluyendo la imagen si está disponible
+      const requestPayload = {
+        ...verificationPayload,
+        ...(capturedImage && { selfieImage: capturedImage })
+      };
+      
+      // Hacer la llamada API real
+      const response = await fetch('/api/identity/verify-advanced', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestPayload)
+      });
+      
+      // Detener la barra de progreso y poner al 100%
       clearInterval(interval);
       setProgress(100);
       
-      // Simular resultado de verificación
-      const mockResult = {
-        success: Math.random() > 0.3, // Simular éxito/fracaso aleatorio
-        score: Math.floor(Math.random() * 100),
-        validatedFields: ['nombre', 'rut', 'fechaNacimiento'],
-        message: 'Verificación completada'
-      };
+      if (!response.ok) {
+        throw new Error(`Error en la verificación: ${response.status} ${response.statusText}`);
+      }
       
-      setValidationResult(mockResult);
+      const result = await response.json();
+      setValidationResult(result);
       
       toast({
-        title: mockResult.success ? "Verificación exitosa" : "Verificación fallida",
-        description: `Puntuación: ${mockResult.score}/100`,
-        variant: mockResult.success ? "default" : "destructive",
+        title: result.success ? "Verificación exitosa" : "Verificación fallida",
+        description: `Puntuación: ${result.score || 0}/100`,
+        variant: result.success ? "default" : "destructive",
       });
       
-      if (onSuccess && mockResult.success) onSuccess(mockResult);
-      if (onError && !mockResult.success) onError(new Error("No se pudo verificar"));
-    }, 3000);
+      if (onSuccess && result.success) onSuccess(result);
+      if (onError && !result.success) onError(new Error(result.message || "No se pudo verificar"));
+      
+    } catch (error) {
+      // Detener la barra de progreso
+      clearInterval(interval);
+      setProgress(100);
+      
+      console.error("Error en verificación avanzada:", error);
+      
+      // Crear un resultado de error
+      const errorResult = {
+        success: false,
+        message: error instanceof Error ? error.message : 'Error desconocido en la verificación',
+        score: 0,
+        validatedFields: []
+      };
+      
+      setValidationResult(errorResult);
+      
+      toast({
+        title: "Error en la verificación",
+        description: errorResult.message,
+        variant: "destructive",
+      });
+      
+      if (onError) onError(error instanceof Error ? error : new Error('Error en verificación'));
+    }
   };
 
   // Enviar el formulario para verificación básica
@@ -262,8 +314,8 @@ export function IdentityVerificationForm({
         documentImage: capturedImage
       });
     } else {
-      // Usar simulación en modo de prueba
-      simulateVerification();
+      // Usar verificación avanzada real (no simulada)
+      performAdvancedVerification();
     }
   };
 

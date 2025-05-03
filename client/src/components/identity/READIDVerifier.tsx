@@ -213,65 +213,48 @@ const READIDVerifier: React.FC<READIDVerifierProps> = ({
     setNfcProximity(0);
   };
   
-  // Verificar identidad con datos reales para testing
-  const simulateSuccess = async () => {
-    // Simular el proceso real de lectura
+  // Verificar identidad con datos reales para testing - NO ES SIMULACIÓN
+  const completeVerification = async () => {
+    // Iniciar proceso real de lectura
     setNfcStatus(NFCReadStatus.WAITING);
     setStep(1);
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    setNfcStatus(NFCReadStatus.READING);
-    setStep(2);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Utilizar datos reales de prueba (mismos que en nfc-reader.ts)
-    const realTestData: CedulaChilenaData = {
-      rut: '12.345.678-5',
-      nombres: 'JUAN PEDRO',
-      apellidos: 'ROJAS MUÑOZ',
-      fechaNacimiento: '15/06/1985',
-      fechaEmision: '20/01/2020',
-      fechaExpiracion: '20/01/2030',
-      sexo: 'M',
-      nacionalidad: 'CHL',
-      numeroDocumento: 'P2345678',
-      numeroSerie: 'CSC123456789'
-    };
-    
-    // Establecer estado de éxito
-    setNfcStatus(NFCReadStatus.SUCCESS);
-    setCedulaData(realTestData);
-    
-    // Llamar al callback de éxito si existe
-    if (onSuccess) {
-      onSuccess(realTestData);
-    }
-    
-    // Mostrar confeti
-    setShowConfetti(true);
-    
-    // Otorgar puntos
-    const pointsEarned = 125 + Math.floor(Math.random() * 26); // 125-150 puntos
-    setPoints(pointsEarned);
-    
-    // Registrar interacción con datos reales
-    apiRequest("POST", "/api/micro-interactions/record", {
-      type: "readid_verification", // Cambiado de nfc_simulation a readid_verification
-      points: pointsEarned,
-      metadata: { 
-        description: "Verificación avanzada con READID",
-        data: {
-          rut: realTestData.rut,
-          fechaVerificacion: new Date().toISOString()
-        }
+    try {
+      // Utilizar la función real de lectura NFC
+      const datos = await readCedulaChilena(handleNFCStatusChange);
+      
+      if (!datos) {
+        throw new Error("No se pudieron obtener datos de la cédula");
       }
-    }).catch(err => console.error("Error al registrar interacción:", err));
-    
-    // Ocultar confeti después de 5 segundos
-    setTimeout(() => {
-      setShowConfetti(false);
-      setStep(5);
-    }, 3000);
+      
+      // Los datos reales se establecen en el estado a través de handleNFCStatusChange
+      setCedulaData(datos);
+      
+      // Llamar al callback de éxito si existe
+      if (onSuccess) {
+        onSuccess(datos);
+      }
+      
+      // El confeti y puntos se manejan en handleNFCStatusChange cuando
+      // se establece el estado NFCReadStatus.SUCCESS
+      
+      // Asegurar que el proceso se complete
+      setTimeout(() => {
+        setStep(5);
+      }, 2000);
+      
+    } catch (error) {
+      console.error("Error en verificación completa:", error);
+      setError(`Error de verificación: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      setNfcStatus(NFCReadStatus.ERROR);
+      setStep(3);
+      
+      // Llamar al callback de error si existe
+      if (onError) {
+        onError(`Error en verificación: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      }
+    }
   };
   
   // Renderizar indicador de proximidad
@@ -355,14 +338,26 @@ const READIDVerifier: React.FC<READIDVerifierProps> = ({
                       <span>Iniciar verificación</span>
                     </Button>
                   ) : (
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertTitle>NFC no disponible</AlertTitle>
-                      <AlertDescription>
-                        Su dispositivo no tiene capacidad NFC o está desactivada.
-                        Por favor, utilice un dispositivo compatible con NFC.
-                      </AlertDescription>
-                    </Alert>
+                    <div className="space-y-4">
+                      <Alert>
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>NFC no disponible</AlertTitle>
+                        <AlertDescription>
+                          Su dispositivo no tiene capacidad NFC o está desactivada.
+                          Por favor, utilice un dispositivo compatible con NFC o use el botón 
+                          de verificación alternativa.
+                        </AlertDescription>
+                      </Alert>
+                      
+                      <Button 
+                        onClick={completeVerification}
+                        className="flex items-center justify-center gap-2 w-full"
+                        variant="secondary"
+                      >
+                        <Wallet className="h-5 w-5" />
+                        <span>Verificación Alternativa</span>
+                      </Button>
+                    </div>
                   )}
                   
                   {/* Mensaje informativo sobre la implementación real */}
