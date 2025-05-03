@@ -62,14 +62,21 @@ export const VecinosAdminLayout = ({
           <div className="h-16 flex items-center px-6 border-b border-gray-200">
             <div className="flex items-center">
               <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 20 L65 20 L80 35 L80 80 L20 80 Z" fill="none" stroke="#2d219b" strokeWidth="4"/>
-                <path d="M65 20 L65 35 L80 35" fill="none" stroke="#2d219b" strokeWidth="4"/>
-                <path d="M35 45 L65 45" stroke="#2d219b" strokeWidth="4"/>
-                <path d="M35 55 L65 55" stroke="#2d219b" strokeWidth="4"/>
-                <path d="M35 65 L65 65" stroke="#2d219b" strokeWidth="4"/>
+                {/* House/Document base */}
+                <path d="M10 10 L55 10 L55 80 L10 80 Z" fill="none" stroke="#2d219b" strokeWidth="4"/>
+                
+                {/* Angled overlay */}
+                <path d="M25 80 L70 80 L70 35 L50 10 L25 10" fill="none" stroke="#2d219b" strokeWidth="4"/>
+                
+                {/* Upward arrow */}
+                <path d="M35 60 L55 40" stroke="#2d219b" strokeWidth="4"/>
+                <path d="M55 40 L45 40 L55 40 L55 50" stroke="#2d219b" strokeWidth="4"/>
+                
+                {/* Star */}
+                <path d="M30 45 L33 39 L27 35 L34 35 L37 28 L40 35 L47 35 L41 39 L44 45 L37 41 Z" fill="#2d219b"/>
               </svg>
               <span className="ml-2 text-xl font-bold text-[#2d219b]">
-                ABDHDA#PE
+                VecinoXpress
               </span>
             </div>
           </div>

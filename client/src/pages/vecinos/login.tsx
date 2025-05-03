@@ -57,7 +57,7 @@ export default function VecinosLogin() {
       // Mostrar mensaje de éxito
       toast({
         title: "Inicio de sesión exitoso",
-        description: "Bienvenido a ABDHDA#PE",
+        description: "Bienvenido a VecinoXpress",
       });
       
       // Redirigir al dashboard de Vecinos
@@ -82,9 +82,9 @@ export default function VecinosLogin() {
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
           <div className="flex flex-col items-center justify-center">
-            <img src={vecinoLogo} alt="ABDHDA#PE Logo" className="h-24 mb-2" />
+            <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-24 mb-2" />
             <div className="flex items-center mt-1">
-              <CardTitle className="text-2xl font-bold text-[#2d219b]">ABDHDA#PE</CardTitle>
+              <CardTitle className="text-2xl font-bold text-[#2d219b]">VecinoXpress</CardTitle>
             </div>
           </div>
           <CardDescription className="mt-2">Accede a tu cuenta de socio</CardDescription>
