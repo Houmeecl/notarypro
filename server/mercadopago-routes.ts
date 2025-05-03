@@ -23,20 +23,35 @@ mercadoPagoRouter.get("/public-key", (req: Request, res: Response) => {
 });
 
 // Ruta para crear una preferencia de pago
-mercadoPagoRouter.post("/create-preference", isAuthenticated, async (req: Request, res: Response) => {
+mercadoPagoRouter.post("/create-preference", async (req: Request, res: Response) => {
   try {
     const { items, backUrls, externalReference } = req.body;
     
-    if (!req.user) {
-      return res.status(401).json({ message: "Usuario no autenticado" });
-    }
+    // Determinar información de pago basado en si el usuario está autenticado o viene del POS
+    let payer;
     
-    // Obtener información del usuario para el pagador
-    const payer = {
-      email: req.user.email || '',
-      name: req.user.fullName || '',
-      identification: req.body.identification || undefined
-    };
+    if (req.isAuthenticated() && req.user) {
+      // Si hay usuario autenticado, usar su información
+      payer = {
+        email: req.user.email || '',
+        name: req.user.fullName || '',
+        identification: req.body.identification || undefined
+      };
+    } else if (req.body.customer) {
+      // Si viene del POS, usar la información del cliente
+      payer = {
+        email: req.body.customer.email || '',
+        name: req.body.customer.name || '',
+        identification: req.body.identification || undefined
+      };
+    } else {
+      // POS sin información de cliente
+      payer = {
+        email: '',
+        name: '',
+        identification: req.body.identification || undefined
+      };
+    }
     
     const preference = await MercadoPagoService.createPaymentPreference(
       items,

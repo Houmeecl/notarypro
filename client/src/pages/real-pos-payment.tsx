@@ -109,6 +109,76 @@ const RealPOSPayment: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
   
+  // Verificar parámetros de URL para pagos de MercadoPago
+  useEffect(() => {
+    // Obtener parámetros de la URL
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
+    const reference = params.get('reference');
+    
+    // Si hay parámetros de pago de MercadoPago, procesarlos
+    if (status && reference && reference.startsWith('TX-REAL-')) {
+      // Guardar ID de transacción
+      setTransactionId(reference);
+      
+      // Recuperar los datos del cliente si no están disponibles
+      if (!customer.name || !customer.email) {
+        try {
+          const savedCustomer = localStorage.getItem(`tx_customer_${reference}`);
+          if (savedCustomer) {
+            setCustomer(JSON.parse(savedCustomer));
+          }
+        } catch (e) {
+          console.error('Error recuperando datos del cliente:', e);
+        }
+      }
+      
+      // Recuperar los items del carrito si está vacío
+      if (cartItems.length === 0) {
+        try {
+          const savedCart = localStorage.getItem(`tx_cart_${reference}`);
+          if (savedCart) {
+            setCartItems(JSON.parse(savedCart));
+          }
+        } catch (e) {
+          console.error('Error recuperando items del carrito:', e);
+        }
+      }
+      
+      // Procesar según el estado
+      if (status === 'success' || status === 'approved') {
+        setIsCompleted(true);
+        toast({
+          title: 'Pago completado',
+          description: `Transacción ${reference} procesada exitosamente`,
+        });
+      } else if (status === 'pending') {
+        setActiveTab('payment');
+        setErrorMessage(
+          'Tu pago está en proceso de verificación. Una vez confirmado, ' +
+          'actualizaremos el estado de tu transacción. No es necesario realizar el pago nuevamente.'
+        );
+        toast({
+          title: 'Pago pendiente',
+          description: 'El pago está en proceso de verificación',
+          variant: 'default',
+        });
+      } else {
+        setActiveTab('payment');
+        setErrorMessage('El pago no pudo ser procesado. Por favor intente nuevamente o elija otro método de pago.');
+        toast({
+          title: 'Pago fallido',
+          description: 'No se pudo completar la transacción',
+          variant: 'destructive',
+        });
+      }
+      
+      // Limpiar parámetros de URL para evitar procesamiento duplicado
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  }, []);
+  
   // Agregar item al carrito
   const addToCart = (service: { id: string, name: string, price: number }) => {
     const existingItem = cartItems.find(item => item.id === service.id);
@@ -202,6 +272,102 @@ const RealPOSPayment: React.FC = () => {
       console.error('Error procesando el pago:', error);
       setErrorMessage('Error al procesar el pago. Intente nuevamente.');
       setPaymentStatus('failure');
+      
+      toast({
+        title: 'Error',
+        description: 'No se pudo completar la transacción',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+  
+  // Procesar pago con MercadoPago
+  const processPaymentWithMercadoPago = async () => {
+    if (cartItems.length === 0) {
+      setErrorMessage('No hay items en el carrito');
+      return;
+    }
+    
+    if (!customer.name || !customer.email) {
+      setErrorMessage('Por favor complete la información del cliente');
+      setActiveTab('customer');
+      return;
+    }
+    
+    setIsProcessing(true);
+    setErrorMessage(null);
+    
+    try {
+      // Preparar los items para MercadoPago
+      const mercadoPagoItems = cartItems.map(item => ({
+        title: item.name,
+        quantity: item.quantity,
+        unit_price: item.price,
+        currency_id: 'CLP'
+      }));
+      
+      // Generar identificador único para la transacción
+      const externalReference = `TX-REAL-${Date.now().toString()}`;
+      
+      // Guardar datos del cliente y carrito en localStorage para recuperación post-redirección
+      try {
+        localStorage.setItem(`tx_customer_${externalReference}`, JSON.stringify(customer));
+        localStorage.setItem(`tx_cart_${externalReference}`, JSON.stringify(cartItems));
+        localStorage.setItem(`tx_store_${externalReference}`, storeCode);
+      } catch (e) {
+        console.error('Error guardando datos del cliente:', e);
+      }
+      
+      // URLs de retorno para procesamiento de pago
+      const backUrls = {
+        success: `${window.location.origin}/real-pos-payment?status=success&reference=${externalReference}`,
+        failure: `${window.location.origin}/real-pos-payment?status=failure&reference=${externalReference}`,
+        pending: `${window.location.origin}/real-pos-payment?status=pending&reference=${externalReference}`
+      };
+      
+      // Crear la preferencia de pago
+      const response = await fetch('/api/mercadopago/create-preference', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          items: mercadoPagoItems,
+          backUrls,
+          externalReference,
+          customer: {
+            name: customer.name,
+            email: customer.email,
+            document: customer.document
+          },
+          identification: {
+            type: 'RUT',
+            number: customer.document
+          }
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Error al crear preferencia de pago');
+      }
+      
+      const preference = await response.json();
+      
+      // Guardar la referencia de la transacción
+      setTransactionId(externalReference);
+      
+      // Redirigir al usuario al checkout de MercadoPago
+      if (preference.init_point) {
+        window.location.href = preference.init_point;
+        return; // Terminar ejecución aquí ya que estamos redirigiendo
+      } else {
+        throw new Error('No se recibió URL de pago');
+      }
+    } catch (error) {
+      console.error('Error procesando el pago:', error);
+      setErrorMessage('Error al procesar el pago. Intente nuevamente.');
       
       toast({
         title: 'Error',
@@ -367,37 +533,65 @@ const RealPOSPayment: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="bg-[#2d219b]/5 p-4 rounded-lg border border-[#2d219b]/10">
-              <h3 className="font-medium text-[#2d219b] mb-2">Terminal de pago físico</h3>
+              <h3 className="font-medium text-[#2d219b] mb-2">Opciones de pago</h3>
               <p className="text-sm text-gray-600 mb-3">
-                Este modo utiliza un terminal real para procesar pagos con:
+                Seleccione el método de pago:
               </p>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline">Tarjeta de crédito</Badge>
-                <Badge variant="outline">Tarjeta de débito</Badge>
-                <Badge variant="outline">Prepago</Badge>
-                <Badge variant="outline">QR</Badge>
-              </div>
             </div>
             
-            <div className="text-center">
-              <p className="text-2xl font-bold mb-2">{formattedTotal}</p>
-              <p className="text-sm text-gray-500 mb-4">Total a pagar</p>
+            <div className="space-y-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold mb-2">{formattedTotal}</p>
+                <p className="text-sm text-gray-500 mb-4">Total a pagar</p>
+              </div>
               
-              <Button
-                size="lg"
-                className="w-full"
-                onClick={processPaymentWithTerminal}
-                disabled={isProcessing || terminalStatus !== 'connected'}
-              >
-                <CreditCard className="w-4 h-4 mr-2" />
-                Pagar con terminal
-              </Button>
+              {/* Opción de terminal físico */}
+              <div className="border rounded-lg p-4">
+                <div className="flex items-center mb-2">
+                  <Terminal className="w-5 h-5 mr-3 text-gray-600" />
+                  <div>
+                    <p className="font-medium">Pago con terminal físico</p>
+                    <p className="text-sm text-gray-500">Tarjeta de crédito, débito o QR en dispositivo físico</p>
+                  </div>
+                </div>
+                <Button
+                  className="w-full mt-3"
+                  onClick={processPaymentWithTerminal}
+                  disabled={isProcessing || terminalStatus !== 'connected'}
+                >
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Pagar con terminal
+                </Button>
+                
+                {terminalStatus !== 'connected' && (
+                  <p className="text-sm text-red-500 mt-2">
+                    El terminal de pago no está disponible
+                  </p>
+                )}
+              </div>
               
-              {terminalStatus !== 'connected' && (
-                <p className="text-sm text-red-500 mt-2">
-                  El terminal de pago no está disponible
-                </p>
-              )}
+              {/* Opción de MercadoPago */}
+              <div className="border rounded-lg p-4 border-blue-200 bg-blue-50">
+                <div className="flex items-center mb-2">
+                  <CreditCard className="w-5 h-5 mr-3 text-blue-500" />
+                  <div>
+                    <p className="font-medium">Pago con MercadoPago</p>
+                    <p className="text-sm text-gray-500">Tarjeta, transferencia o QR desde su celular</p>
+                  </div>
+                </div>
+                <div className="text-xs text-blue-700 mb-3">
+                  Recomendado - Funciona incluso sin terminal físico
+                </div>
+                <Button
+                  className="w-full"
+                  variant="outline"
+                  onClick={processPaymentWithMercadoPago}
+                  disabled={isProcessing}
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  Pagar con MercadoPago
+                </Button>
+              </div>
             </div>
           </div>
         );
@@ -425,6 +619,14 @@ const RealPOSPayment: React.FC = () => {
             </div>
           </div>
         </div>
+        
+        {/* Mensaje de error */}
+        {errorMessage && !isCompleted && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
+        )}
         
         {isCompleted ? (
           <div className="grid md:grid-cols-2 gap-6">
