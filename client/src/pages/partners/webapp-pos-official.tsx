@@ -356,9 +356,9 @@ const WebAppPOSOfficial = () => {
       
       // URLs de retorno para procesamiento de pago
       const backUrls = {
-        success: `${window.location.origin}/webapp-pos-official?status=success&reference=${externalReference}`,
-        failure: `${window.location.origin}/webapp-pos-official?status=failure&reference=${externalReference}`,
-        pending: `${window.location.origin}/webapp-pos-official?status=pending&reference=${externalReference}`
+        success: `${window.location.origin}/partners/webapp-pos-official?status=success&reference=${externalReference}`,
+        failure: `${window.location.origin}/partners/webapp-pos-official?status=failure&reference=${externalReference}`,
+        pending: `${window.location.origin}/partners/webapp-pos-official?status=pending&reference=${externalReference}`
       };
       
       // Crear la preferencia de pago
