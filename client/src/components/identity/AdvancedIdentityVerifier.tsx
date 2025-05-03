@@ -27,6 +27,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { CedulaChilenaData } from '@/lib/nfc-reader';
 import NFCMicroInteractions from './NFCMicroInteractions';
+import DocumentForensicsService from '@/lib/document-forensics';
 
 interface AdvancedIdentityVerifierProps {
   onSuccess?: (data: any) => void;
@@ -71,23 +72,85 @@ const AdvancedIdentityVerifier: React.FC<AdvancedIdentityVerifierProps> = ({
     };
   }, [isCameraActive]);
   
-  // Manejar cambio de documento
-  const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Manejar cambio de documento y realizar análisis forense
+  const handleDocumentChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setDocumentFile(file);
+      setLoading(true);
       
-      // Crear una vista previa
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target && event.target.result) {
-          setDocumentPreview(event.target.result as string);
+      try {
+        // Crear una vista previa
+        const reader = new FileReader();
+        const imagePromise = new Promise<string>((resolve) => {
+          reader.onload = (event) => {
+            if (event.target && event.target.result) {
+              resolve(event.target.result as string);
+            }
+          };
+        });
+        
+        reader.readAsDataURL(file);
+        const imageData = await imagePromise;
+        setDocumentPreview(imageData);
+        
+        // Si estamos en modo demo, simular un análisis forense
+        if (demoMode) {
+          // Simular un retraso para el análisis
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          
+          // Guardar los datos del documento
+          setVerificationData((prev: any) => ({
+            ...prev,
+            documentImage: imageData,
+            forensicsResults: {
+              document_detected: true,
+              mrz_detected: true,
+              mrz_confidence: 85,
+              uv_features_detected: true,
+              alterations_detected: false,
+              alterations_confidence: 5,
+              overall_authenticity: 92
+            }
+          }));
+        } else {
+          // En modo real, realizar el análisis forense usando la API
+          try {
+            const forensicsResults = await DocumentForensicsService.analyzeDocument(imageData);
+            
+            // Guardar los datos del análisis
+            setVerificationData((prev: any) => ({
+              ...prev,
+              documentImage: imageData,
+              forensicsResults: forensicsResults.results
+            }));
+            
+            // Mostrar alerta si la autenticidad es baja
+            if (forensicsResults.results.overall_authenticity < 60) {
+              toast({
+                title: "Advertencia de verificación",
+                description: "El documento muestra señales de posible alteración. Verifique su autenticidad.",
+                variant: "destructive"
+              });
+            }
+          } catch (error) {
+            console.error("Error en análisis forense:", error);
+            // Continuar incluso si el análisis forense falla
+            setVerificationData((prev: any) => ({
+              ...prev,
+              documentImage: imageData
+            }));
+          }
         }
-      };
-      reader.readAsDataURL(file);
-      
-      // Avanzar a la siguiente pestaña después de una breve pausa
-      setTimeout(() => setActiveTab('nfc'), 1500);
+        
+        // Avanzar a la siguiente pestaña
+        setTimeout(() => setActiveTab('nfc'), 500);
+      } catch (error) {
+        console.error("Error procesando documento:", error);
+        setError("Error al procesar el documento. Intente con otra imagen.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
   
@@ -370,12 +433,65 @@ const AdvancedIdentityVerifier: React.FC<AdvancedIdentityVerifierProps> = ({
               <div className="border-2 border-dashed rounded-lg p-6 text-center">
                 {documentPreview ? (
                   <div className="space-y-4">
-                    <img 
-                      src={documentPreview} 
-                      alt="Vista previa del documento" 
-                      className="max-h-48 mx-auto rounded"
-                    />
-                    <p className="text-sm text-gray-500">Documento cargado correctamente</p>
+                    <div className="relative">
+                      <img 
+                        src={documentPreview} 
+                        alt="Vista previa del documento" 
+                        className="max-h-48 mx-auto rounded"
+                      />
+                      {verificationData?.forensicsResults && (
+                        <div className="absolute top-0 right-0 -mr-3 -mt-3 bg-white rounded-full p-1 shadow-md">
+                          <div className={`h-7 w-7 rounded-full flex items-center justify-center ${
+                            verificationData.forensicsResults.overall_authenticity >= 85 
+                              ? 'bg-green-100 text-green-600' 
+                              : verificationData.forensicsResults.overall_authenticity >= 60
+                                ? 'bg-yellow-100 text-yellow-600'
+                                : 'bg-red-100 text-red-600'
+                          }`}>
+                            {verificationData.forensicsResults.overall_authenticity >= 85 ? (
+                              <CheckCircle className="h-4 w-4" />
+                            ) : verificationData.forensicsResults.overall_authenticity >= 60 ? (
+                              <AlertTriangle className="h-4 w-4" />
+                            ) : (
+                              <AlertCircle className="h-4 w-4" />
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {verificationData?.forensicsResults ? (
+                      <div className="text-xs border rounded-md p-2 bg-gray-50">
+                        <div className="font-medium mb-1">Análisis forense completado</div>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                          <div className="text-gray-600">Autenticidad:</div>
+                          <div className={`font-medium ${
+                            verificationData.forensicsResults.overall_authenticity >= 85 
+                              ? 'text-green-600' 
+                              : verificationData.forensicsResults.overall_authenticity >= 60
+                                ? 'text-yellow-600'
+                                : 'text-red-600'
+                          }`}>
+                            {verificationData.forensicsResults.overall_authenticity}%
+                          </div>
+                          
+                          <div className="text-gray-600">MRZ detectado:</div>
+                          <div className="font-medium">
+                            {verificationData.forensicsResults.mrz_detected ? 'Sí' : 'No'}
+                          </div>
+                          
+                          <div className="text-gray-600">Alteraciones:</div>
+                          <div className="font-medium">
+                            {verificationData.forensicsResults.alterations_detected ? 
+                              <span className="text-red-600">Detectadas</span> : 
+                              <span className="text-green-600">No detectadas</span>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">Documento cargado correctamente</p>
+                    )}
                   </div>
                 ) : (
                   <div 

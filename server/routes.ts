@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import { setupAuth } from "./auth";
 import { db } from "./db";
 import { users, partners } from "@shared/schema";
+import { documentForensicsRouter } from "./document-forensics-routes";
 import { eq } from "drizzle-orm";
 
 export function registerRoutes(app: Express): Server {
@@ -16,6 +17,9 @@ export function registerRoutes(app: Express): Server {
 
   // Rutas específicas para Vecinos
   app.use("/api/vecinos", vecinosRoutes);
+
+  // Rutas para análisis forense de documentos
+  app.use("/api/document-forensics", documentForensicsRouter);
 
   // Inicializar admins de prueba si no existen
   initializeTestAdmins().catch(error => {

@@ -3,8 +3,13 @@ import { spawn } from "child_process";
 import axios from "axios";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from 'url';
 
 export const documentForensicsRouter = Router();
+
+// Obtener el directorio actual para módulos ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Referencia al proceso de Flask en ejecución
 let flaskProcess: any = null;

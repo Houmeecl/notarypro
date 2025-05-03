@@ -63,6 +63,8 @@ import DocumentoEjemplo from "@/pages/documento-ejemplo";
 import VerificacionIdentidadDemo from "@/pages/verificacion-identidad-demo";
 import ReadIDVerificationPage from "@/pages/readid-verification";
 import VerificacionAvanzada from "@/pages/verificacion-avanzada";
+import VerificacionIdentidadQR from "@/pages/verificacion-identidad-qr";
+import VerificacionMovil from "@/pages/verificacion-movil";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
