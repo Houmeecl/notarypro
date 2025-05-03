@@ -9,6 +9,7 @@ import { setupAuth } from "./auth";
 import { db } from "./db";
 import { users, partners } from "@shared/schema";
 import { documentForensicsRouter } from "./document-forensics-routes";
+import { identityVerificationRouter } from "./identity-verification-routes";
 import { eq } from "drizzle-orm";
 
 export function registerRoutes(app: Express): Server {
@@ -20,6 +21,9 @@ export function registerRoutes(app: Express): Server {
 
   // Rutas para análisis forense de documentos
   app.use("/api/document-forensics", documentForensicsRouter);
+
+  // Rutas para verificación de identidad
+  app.use("/api/identity", identityVerificationRouter);
 
   // Inicializar admins de prueba si no existen
   initializeTestAdmins().catch(error => {

@@ -88,6 +88,16 @@ export default function EmergencyEntryPage() {
                 </Link>
               </li>
               <li>
+                <Link href="/iniciar-tramite" className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center bg-green-100 px-2 py-1 rounded">
+                  <span className="material-icons mr-1 text-sm">✨</span> Iniciar Trámite con QR (Nuevo)
+                </Link>
+              </li>
+              <li>
+                <Link href="/verificacion-selfie" className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center bg-green-100 px-2 py-1 rounded">
+                  <span className="material-icons mr-1 text-sm">✨</span> Verificación con Selfie (Nuevo)
+                </Link>
+              </li>
+              <li>
                 <Link href="/verificar-documento" className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
                   <span className="material-icons mr-1 text-sm">➡️</span> Verificar Documento
                 </Link>
