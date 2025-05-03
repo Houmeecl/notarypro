@@ -95,10 +95,21 @@ const LazyLoadingFallback = () => (
   </div>
 );
 
+// Cargar módulos Vecinos de forma dinámica
+const LazyVecinosIndex = React.lazy(() => import("@/pages/vecinos/index"));
+const LazyVecinosLogin = React.lazy(() => import("@/pages/vecinos/login"));
+const LazyVecinosRegistro = React.lazy(() => import("@/pages/vecinos/registro"));
+const LazyVecinosPosApp = React.lazy(() => import("@/pages/vecinos/pos-app"));
+const LazyVecinosDashboard = React.lazy(() => import("@/pages/vecinos/dashboard"));
+const LazyVecinosCuenta = React.lazy(() => import("@/pages/vecinos/cuenta"));
+const LazyVecinosRetiros = React.lazy(() => import("@/pages/vecinos/retiros"));
+const LazyVecinosSoporte = React.lazy(() => import("@/pages/vecinos/soporte"));
+const LazyVecinosFAQ = React.lazy(() => import("@/pages/vecinos/faq"));
+const LazyVerificacionMovil = React.lazy(() => import("@/pages/verificacion-identidad-movil"));
+
 function Router() {
   return (
-    <Suspense fallback={<LazyLoadingFallback />}>
-      <Switch>
+    <Switch>
       <Route path="/" component={LandingPage} />
       <Route path="/auth" component={AuthPage} />
       
@@ -172,16 +183,52 @@ function Router() {
       <Route path="/service-selection" component={ServiceSelectionPage} />
       <Route path="/quienes-somos" component={QuienesSomosPage} />
       
-      {/* Vecinos Xpress Pages */}
-      <Route path="/vecinos" component={React.lazy(() => import("@/pages/vecinos/index"))} />
-      <Route path="/vecinos/login" component={React.lazy(() => import("@/pages/vecinos/login"))} />
-      <Route path="/vecinos/registro" component={React.lazy(() => import("@/pages/vecinos/registro"))} />
-      <Route path="/vecinos/pos-app" component={React.lazy(() => import("@/pages/vecinos/pos-app"))} />
-      <Route path="/vecinos/dashboard" component={React.lazy(() => import("@/pages/vecinos/dashboard"))} />
-      <Route path="/vecinos/cuenta" component={React.lazy(() => import("@/pages/vecinos/cuenta"))} />
-      <Route path="/vecinos/retiros" component={React.lazy(() => import("@/pages/vecinos/retiros"))} />
-      <Route path="/vecinos/soporte" component={React.lazy(() => import("@/pages/vecinos/soporte"))} />
-      <Route path="/vecinos/faq" component={React.lazy(() => import("@/pages/vecinos/faq"))} />
+      {/* Vecinos Xpress Pages (lazy loaded) */}
+      <Route path="/vecinos" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyVecinosIndex />
+        </Suspense>
+      )} />
+      <Route path="/vecinos/login" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyVecinosLogin />
+        </Suspense>
+      )} />
+      <Route path="/vecinos/registro" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyVecinosRegistro />
+        </Suspense>
+      )} />
+      <Route path="/vecinos/pos-app" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyVecinosPosApp />
+        </Suspense>
+      )} />
+      <Route path="/vecinos/dashboard" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyVecinosDashboard />
+        </Suspense>
+      )} />
+      <Route path="/vecinos/cuenta" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyVecinosCuenta />
+        </Suspense>
+      )} />
+      <Route path="/vecinos/retiros" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyVecinosRetiros />
+        </Suspense>
+      )} />
+      <Route path="/vecinos/soporte" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyVecinosSoporte />
+        </Suspense>
+      )} />
+      <Route path="/vecinos/faq" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyVecinosFAQ />
+        </Suspense>
+      )} />
 
       {/* Partner pages */}
       <Route path="/partners/public-page" component={PartnersPublicPage} />
@@ -316,7 +363,11 @@ function Router() {
       
       {/* Validación de Identidad */}
       <Route path="/verificacion-identidad-demo" component={VerificacionIdentidadDemo} />
-      <Route path="/verificacion-identidad-movil" component={React.lazy(() => import("@/pages/verificacion-identidad-movil"))} />
+      <Route path="/verificacion-identidad-movil" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyVerificacionMovil />
+        </Suspense>
+      )} />
       
       {/* Demostración de Pagos con MercadoPago */}
       <Route path="/payment-demo" component={PaymentDemo} />
@@ -350,7 +401,6 @@ function Router() {
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
-    </Suspense>
   );
 }
 
