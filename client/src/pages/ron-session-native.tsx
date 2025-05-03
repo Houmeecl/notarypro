@@ -152,12 +152,16 @@ export default function RonSessionNativePage() {
     );
   }
   
+  // Parámetros configurables
+  const maxSessionDuration = 45; // 45 minutos de tiempo máximo por defecto para sesiones RON
+  
   return (
     <div className="h-screen w-full overflow-hidden">
       <VideoSession 
         sessionId={sessionId}
         isCertifier={isCertifier}
         onSessionEnd={handleSessionEnd}
+        maxDurationMinutes={maxSessionDuration}
       />
     </div>
   );

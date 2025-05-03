@@ -44,6 +44,7 @@ const VideoSession: React.FC<VideoSessionProps> = ({
   sessionId, 
   isCertifier = false,
   onSessionEnd,
+  maxDurationMinutes = 30, // 30 minutos por defecto
 }) => {
   const { toast } = useToast();
   const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -68,7 +69,7 @@ const VideoSession: React.FC<VideoSessionProps> = ({
   ]);
   const [isRecording, setIsRecording] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [sessionTimeLimit, setSessionTimeLimit] = useState(30 * 60); // 30 minutos por defecto
+  const [sessionTimeLimit, setSessionTimeLimit] = useState(maxDurationMinutes * 60); // Inicializar con el valor de la prop
   const [showTimeLimitWarning, setShowTimeLimitWarning] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
@@ -96,7 +97,7 @@ const VideoSession: React.FC<VideoSessionProps> = ({
   
   // Estado para el diálogo de configuración de tiempo límite
   const [showTimeLimitDialog, setShowTimeLimitDialog] = useState(false);
-  const [selectedTimeLimit, setSelectedTimeLimit] = useState(sessionTimeLimit / 60); // En minutos
+  const [selectedTimeLimit, setSelectedTimeLimit] = useState(maxDurationMinutes); // En minutos, usando directamente el valor de la prop
 
   // Simulador de tiempo transcurrido y control de límite de tiempo
   useEffect(() => {
@@ -446,7 +447,16 @@ const VideoSession: React.FC<VideoSessionProps> = ({
             <Camera className="h-5 w-5 mr-2 text-blue-400" />
           )}
           <span className="text-sm font-medium">
-            {isRecording ? `Grabando: ${formatTime(elapsedTime)}` : 'Preparando grabación...'}
+            {isRecording ? (
+              <span className="flex items-center">
+                Grabando: {formatTime(elapsedTime)} 
+                <span className="mx-2">|</span>
+                <Timer className="h-4 w-4 mr-1 text-amber-400" />
+                Límite: {formatTime(sessionTimeLimit)}
+              </span>
+            ) : (
+              'Preparando grabación...'
+            )}
           </span>
           <Badge variant="outline" className="ml-3 bg-blue-500/20 text-blue-200">
             Sesión: {sessionId}
@@ -475,10 +485,12 @@ const VideoSession: React.FC<VideoSessionProps> = ({
               variant="outline" 
               size="sm"
               onClick={() => setShowTimeLimitDialog(true)}
-              className="bg-indigo-900/30"
+              className={`bg-indigo-900/30 ${
+                elapsedTime > sessionTimeLimit - 10 * 60 ? 'animate-pulse border-amber-400' : ''
+              }`}
             >
-              <Clock className="h-4 w-4 mr-2" />
-              Tiempo máximo
+              <Timer className="h-4 w-4 mr-2" />
+              Configurar tiempo
             </Button>
           )}
           
