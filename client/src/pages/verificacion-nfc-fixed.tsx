@@ -32,6 +32,7 @@ import { useToast } from "@/hooks/use-toast";
 import NFCReader from '@/components/identity/NFCReader';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
+import { PageNavigation } from '@/components/navigation/PageNavigation';
 
 /**
  * Página unificada de verificación NFC
