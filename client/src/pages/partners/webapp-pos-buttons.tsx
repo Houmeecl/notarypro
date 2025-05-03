@@ -127,16 +127,44 @@ const WebAppPOSButtons = () => {
   
   // Handlers para los pasos del proceso
   const handleRegistrarCliente = () => {
+    // Validar datos del cliente antes de continuar
+    if (clienteInfo.nombre.trim().length < 3 || 
+        clienteInfo.rut.trim().length < 5 || 
+        clienteInfo.telefono.trim().length < 8) {
+      toast({
+        title: "Datos incompletos",
+        description: "Debes completar los datos del cliente para continuar",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setStep('documentos');
   };
   
   const handleSeleccionarDocumento = (docId: string) => {
     setTipoDocumento(docId);
+    
+    // Toast de selección exitosa
+    const doc = documentosDisponibles.find(d => d.id === docId);
+    if (doc) {
+      toast({
+        title: "Documento seleccionado",
+        description: `Has seleccionado: ${doc.nombre}`,
+      });
+    }
+    
     setStep('pago');
   };
   
   const handleSeleccionarPago = (metodo: string) => {
     setMetodoPago(metodo);
+    
+    // Toast de método de pago seleccionado
+    toast({
+      title: "Método de pago seleccionado",
+      description: `Método de pago: ${metodo.toUpperCase()}`,
+    });
     
     // Mostrar preview antes de continuar
     const docSeleccionado = documentosDisponibles.find(d => d.id === tipoDocumento);
@@ -179,10 +207,17 @@ const WebAppPOSButtons = () => {
       `;
       
       setDocumentPreview(htmlPreview);
+      // Mostrar preview del documento
+      setShowPreview(true);
+    } else {
+      // Si por alguna razón no hay documento seleccionado, mostrar error
+      toast({
+        title: "Error en el proceso",
+        description: "No se ha podido generar la vista previa del documento",
+        variant: "destructive",
+      });
+      setStep('documentos');
     }
-    
-    // Continuar al comprobante directamente (en un caso real, aquí se procesaría el pago)
-    setStep('comprobante');
   };
   
   // Para el panel de firma
@@ -398,6 +433,89 @@ const WebAppPOSButtons = () => {
       // Si no hay cámara disponible, siempre usar el código QR
       generarQR();
     }
+  };
+  
+  const procesarDocumento = async () => {
+    // Verificar que se haya seleccionado un documento
+    if (!tipoDocumento) {
+      toast({
+        title: "Error al procesar documento",
+        description: "Debes seleccionar un tipo de documento",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Obtener token de localStorage
+      const token = localStorage.getItem('vecinos_token');
+      
+      if (!token) {
+        toast({
+          title: "Error de autenticación",
+          description: "Debes iniciar sesión para procesar documentos",
+          variant: "destructive",
+        });
+        setLocation('/vecinos/login');
+        return;
+      }
+      
+      // Preparar datos para la API
+      const docSeleccionado = documentosDisponibles.find(d => d.id === tipoDocumento);
+      const data = {
+        documentType: tipoDocumento,
+        clientInfo: {
+          name: clienteInfo.nombre,
+          rut: clienteInfo.rut,
+          phone: clienteInfo.telefono,
+          email: clienteInfo.email
+        }
+      };
+      
+      // Llamar a la API de procesamiento de documentos
+      const response = await fetch('/api/vecinos/process-document', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al procesar el documento');
+      }
+      
+      const result = await response.json();
+      
+      // Mostrar confeti para celebrar
+      showConfetti();
+      
+      // Actualizar estado y mostrar comprobante
+      setProcesoCompletado(true);
+      setStep('comprobante');
+      
+      // Mostrar mensaje de éxito
+      toast({
+        title: "¡Documento procesado!",
+        description: `El documento ha sido procesado exitosamente. Comisión: $${result.commission}`,
+      });
+    } catch (error) {
+      console.error('Error al procesar documento:', error);
+      toast({
+        title: "Error al procesar documento",
+        description: error.message || "Ocurrió un error al procesar el documento",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  // Función para mostrar efecto de confeti
+  const showConfetti = () => {
+    // En una implementación real, aquí se usaría una biblioteca como react-confetti
+    // Para esta simulación, solo mostramos un mensaje
+    console.log('¡Confeti! 🎉');
   };
   
   const mostrarPanelCertificador = () => {
@@ -1099,7 +1217,7 @@ const WebAppPOSButtons = () => {
                 
                 {/* Botón finalizar */}
                 <button 
-                  onClick={() => setProcesoCompletado(true)}
+                  onClick={() => procesarDocumento()}
                   className="relative group"
                 >
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-blue-700 rounded-md blur opacity-75 group-hover:opacity-100 transition-all duration-300"></div>
