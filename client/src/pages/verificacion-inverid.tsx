@@ -241,9 +241,9 @@ const VerificacionInverID: React.FC = () => {
                         {verificationData.cedula?.nombres} {verificationData.cedula?.apellidos}
                       </div>
                       
-                      <div className="text-sm text-gray-600">RUN:</div>
+                      <div className="text-sm text-gray-600">RUT:</div>
                       <div className="text-sm font-medium">
-                        {verificationData.cedula?.run || '17.123.456-7'}
+                        {verificationData.cedula?.rut || '17.123.456-7'}
                       </div>
                       
                       <div className="text-sm text-gray-600">Nacionalidad:</div>
