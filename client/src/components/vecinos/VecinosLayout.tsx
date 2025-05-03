@@ -39,7 +39,7 @@ export default function VecinosLayout({
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header */}
-      <header className="bg-green-600 text-white shadow-md">
+      <header className="bg-gradient-to-r from-red-50 to-red-100 text-gray-900 shadow-md border-b border-gray-200">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
@@ -47,8 +47,8 @@ export default function VecinosLayout({
                 className="font-bold text-xl cursor-pointer flex items-center" 
                 onClick={() => setLocation(isLoggedIn ? "/vecinos/dashboard" : "/vecinos")}
               >
-                <span className="bg-white text-green-600 px-2 py-1 rounded-md mr-2 font-bold">VX</span>
-                <span>Vecinos Xpress</span>
+                <img src="/images/logo-notarypro-rojo.svg" alt="NotaryPro Logo" className="h-8 mr-3" />
+                <span className="text-red-600">Vecinos NotaryPro Express</span>
               </div>
               
               {isLoggedIn && showNavigation && (
@@ -56,7 +56,7 @@ export default function VecinosLayout({
                   <nav className="flex space-x-4">
                     <Button 
                       variant="link" 
-                      className="text-white"
+                      className="text-gray-700 hover:text-red-600"
                       onClick={() => setLocation("/vecinos/dashboard")}
                     >
                       <BarChart3 className="h-4 w-4 mr-2" />
@@ -64,7 +64,7 @@ export default function VecinosLayout({
                     </Button>
                     <Button 
                       variant="link" 
-                      className="text-white"
+                      className="text-gray-700 hover:text-red-600"
                       onClick={() => setLocation("/vecinos/pos-app")}
                     >
                       <FileText className="h-4 w-4 mr-2" />
@@ -72,15 +72,15 @@ export default function VecinosLayout({
                     </Button>
                     <Button 
                       variant="link" 
-                      className="text-white"
-                      onClick={() => window.open("/partners/webapp-pos-buttons", "_blank")}
+                      className="text-gray-700 hover:text-red-600"
+                      onClick={() => window.open("/partners/webapp-pos-official", "_blank")}
                     >
                       <Monitor className="h-4 w-4 mr-2" />
                       POS Web
                     </Button>
                     <Button 
                       variant="link" 
-                      className="text-white"
+                      className="text-gray-700 hover:text-red-600"
                       onClick={() => setLocation("/vecinos/retiros")}
                     >
                       <CreditCard className="h-4 w-4 mr-2" />
