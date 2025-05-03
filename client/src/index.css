@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  /* Enhanced NotaryPro Brand Colors */
+  /* Enhanced NotaryPro Brand Colors - Default for main platform */
   --background: 0 0% 100%;
   --foreground: 220 20% 20%;
   --muted: 210 20% 97%;
@@ -24,34 +24,42 @@
   --destructive-foreground: 60 9% 98%;
   --ring: 358 85% 52%;
   --radius: 0.75rem;
-
+  
+  /* Variables específicas para Vecino Xpress */
+  --vecino-primary: 250 87% 40%; /* Azul índigo/morado del logo #2e22aa */
+  --vecino-primary-foreground: 0 0% 100%;
+  --vecino-accent: 250 87% 90%;
+  --vecino-accent-foreground: 250 87% 40%;
+  --vecino-ring: 250 87% 40%;
+  
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
-  .dark {
-      --background: 240 10% 3.9%;
-      --foreground: 0 0% 98%;
-      --muted: 240 3.7% 15.9%;
-      --muted-foreground: 240 5% 64.9%;
-      --popover: 240 10% 3.9%;
-      --popover-foreground: 0 0% 98%;
-      --card: 240 10% 3.9%;
-      --card-foreground: 0 0% 98%;
-      --border: 240 3.7% 15.9%;
-      --input: 240 3.7% 15.9%;
-      --primary: 358 85% 52%; /* Keep NotaryPro Red in dark mode */
-      --primary-foreground: 0 0% 100%;
-      --secondary: 240 3.7% 15.9%;
-      --secondary-foreground: 0 0% 98%;
-      --accent: 240 3.7% 15.9%;
-      --accent-foreground: 0 0% 98%;
-      --destructive: 0 62.8% 30.6%;
-      --destructive-foreground: 0 0% 98%;
-      --ring: 358 85% 52%; /* NotaryPro Red */
-      --radius: 0.5rem;
-  }
+
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --primary: 358 85% 52%; /* Keep NotaryPro Red in dark mode */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 358 85% 52%; /* NotaryPro Red */
+  --radius: 0.5rem;
+}
 
 @layer base {
   * {
