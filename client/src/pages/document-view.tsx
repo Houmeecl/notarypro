@@ -259,14 +259,24 @@ export default function DocumentViewPage() {
     );
   }
 
+  // Definir las migas de pan para navegación
+  const breadcrumbItems = [
+    { label: 'Inicio', href: '/' },
+    { label: 'Mis Documentos', href: '/documents' },
+    { label: document.title, href: `/document-view/${documentId}` },
+  ];
+  
   return (
     <>
       <DocumentNavbar />
       <div className="container mx-auto py-8">
-        <Link href="/documents" className="flex items-center text-primary mb-6 hover:underline">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Volver a mis documentos
-        </Link>
+        {/* Componente de navegación con migas de pan y botón de volver */}
+        <PageNavigation 
+          items={breadcrumbItems} 
+          backTo="/documents"
+          backLabel="Volver a mis documentos"
+          className="mb-6"
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2">

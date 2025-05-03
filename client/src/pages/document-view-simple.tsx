@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import DocumentNavbar from "@/components/layout/DocumentNavbar";
+import { PageNavigation } from "@/components/navigation/PageNavigation";
 
 // Definición simple para el componente
 interface Document {
@@ -166,14 +167,24 @@ export default function DocumentViewSimplePage() {
     );
   }
 
+  // Definir las migas de pan para navegación
+  const breadcrumbItems = [
+    { label: 'Inicio', href: '/' },
+    { label: 'Documentos', href: '/documents' },
+    { label: document.title, href: `/document-view-simple/${documentId}` },
+  ];
+  
   return (
     <>
       <DocumentNavbar />
       <div className="container mx-auto py-8">
-        <Link href="/documents" className="flex items-center text-primary mb-6 hover:underline">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Volver a mis documentos
-        </Link>
+        {/* Componente de navegación con migas de pan y botón de volver */}
+        <PageNavigation 
+          items={breadcrumbItems} 
+          backTo="/documents"
+          backLabel="Volver a mis documentos"
+          className="mb-6"
+        />
 
         <Card className="mx-auto max-w-3xl">
           <CardHeader className="pb-4">
