@@ -56,14 +56,14 @@ const WebAppPOSButtons = () => {
           return;
         }
         
-        // Configurar headers con el token JWT
-        const headers = {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        };
-        
         // Obtener información del socio desde la API
-        const response = await apiRequest('GET', '/api/vecinos/partner-info', null, headers);
+        const response = await fetch('/api/vecinos/partner-info', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
         
         if (!response.ok) {
           throw new Error('No se pudo obtener la información del socio');
