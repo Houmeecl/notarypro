@@ -31,19 +31,36 @@ function hasRonAccess(req: Request, res: Response, next: any) {
 // Login para la plataforma RON - permite usar las mismas credenciales del sistema principal
 ronRouter.post("/login", async (req: Request, res: Response) => {
   try {
+    // Asegurarnos de que estamos recibiendo una solicitud JSON
+    if (!req.is('application/json')) {
+      return res.status(400).json({ message: "Se requiere Content-Type: application/json" });
+    }
+    
     const { username, password } = req.body;
+    
+    // Validar que tenemos username y password
+    if (!username || !password) {
+      return res.status(400).json({ message: "Se requiere usuario y contraseña" });
+    }
+    
+    console.log(`Intento de acceso RON para usuario: ${username}`);
     
     // Verificar si el usuario existe en el sistema principal
     const user = await storage.getUserByUsername(username);
     
     if (!user) {
+      console.log(`Usuario RON no encontrado: ${username}`);
       return res.status(401).json({ message: "Credenciales incorrectas" });
     }
     
     // Verificar la contraseña usando el método de hash y sal correcto
-    if (!(await comparePasswords(password, user.password))) {
+    const passwordValid = await comparePasswords(password, user.password);
+    if (!passwordValid) {
+      console.log(`Contraseña incorrecta para usuario RON: ${username}`);
       return res.status(401).json({ message: "Credenciales incorrectas" });
     }
+    
+    console.log(`Validación RON exitosa para: ${username}, rol: ${user.role}`);
     
     // Para usuarios normales, verificar si tienen permisos para acceder a la plataforma RON
     if (user.role !== 'certifier' && user.role !== 'lawyer' && user.role !== 'admin') {
@@ -56,13 +73,16 @@ ronRouter.post("/login", async (req: Request, res: Response) => {
       username: user.username,
       role: user.role,
       name: user.fullName || user.username,
-      region: "Metropolitana", // Esto podría venir de metadatos del usuario
+      region: user.region || "Metropolitana", 
       specialization: user.role === 'certifier' ? "Documentos generales" : "Legal",
-      avatarUrl: "https://randomuser.me/api/portraits/men/42.jpg" // En producción, se usaría el avatar real del usuario
+      avatarUrl: "https://randomuser.me/api/portraits/men/42.jpg"
     };
     
+    // Establecer explícitamente el tipo de contenido
+    res.setHeader('Content-Type', 'application/json');
     res.status(200).json(ronUserData);
   } catch (error) {
+    console.error("Error en login RON:", error);
     res.status(500).json({ message: "Error en el servidor: " + error.message });
   }
 });

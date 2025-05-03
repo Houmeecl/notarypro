@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Mic, MicOff, Video, VideoOff, UserCheck, Shield, MessagesSquare, Share2, Download, Lock, Upload, Mail, Clipboard, UserPlus, Clock, Timer, Settings } from 'lucide-react';
+import { Camera, Mic, MicOff, Video, VideoOff, UserCheck, Shield, MessagesSquare, Share2, Download, Lock, Upload, Mail, Clipboard, UserPlus, Clock, Timer, Settings, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
