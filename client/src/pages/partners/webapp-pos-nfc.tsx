@@ -481,27 +481,198 @@ const WebAppPOSNFC = () => {
     setShowCertifierPanel(true);
   };
   
-  // Componente para el panel de certificación
+  // Estado para seguimiento de documentos certificados
+  const [documentosCertificados, setDocumentosCertificados] = useState<string[]>([]);
+  
+  // Componente mejorado para el panel de certificación
   const CertificadorPanel = () => {
+    // Estado local para el panel de certificador
+    const [documentosEnRevision, setDocumentosEnRevision] = useState([
+      {
+        id: '123456',
+        nombre: documento?.nombre || 'Documento sin nombre',
+        cliente: clienteInfo.nombre,
+        rut: clienteInfo.rut,
+        fecha: new Date().toLocaleDateString(),
+        estado: 'pendiente'
+      }
+    ]);
+    
+    // Función para certificar un documento
+    const certificarDocumento = (id: string) => {
+      setDocumentosCertificados(prev => [...prev, id]);
+      setDocumentosEnRevision(prev => 
+        prev.map(doc => doc.id === id ? {...doc, estado: 'certificado'} : doc)
+      );
+      
+      // Mostrar toast de confirmación
+      toast({
+        title: "Documento certificado",
+        description: "El documento ha sido certificado correctamente y está listo para ser enviado al cliente.",
+      });
+    };
+    
+    // Función para enviar un documento certificado
+    const enviarDocumento = (id: string, metodo: 'email' | 'whatsapp') => {
+      toast({
+        title: "Documento enviado",
+        description: `El documento certificado ha sido enviado al cliente por ${metodo === 'email' ? 'correo electrónico' : 'WhatsApp'}.`,
+      });
+    };
+    
     return (
       <div className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Panel de Certificación</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Panel de Certificación</h2>
+          
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              setCertificadorMode(false);
+              setShowCertifierPanel(false);
+            }}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Volver al punto de venta
+          </Button>
+        </div>
         
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Documentos pendientes</CardTitle>
-            <CardDescription>
-              Documentos que requieren certificación por parte de un certificador autorizado
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-amber-50 p-4 rounded-md border border-amber-200 mb-4">
-              <p className="text-amber-800 text-sm">
-                No hay documentos pendientes de certificación en este momento
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Columna de documentos pendientes */}
+          <Card>
+            <CardHeader className="bg-zinc-50 border-b">
+              <div className="flex items-center gap-2">
+                <ClipboardList className="h-5 w-5 text-amber-600" />
+                <CardTitle className="text-lg">Documentos pendientes</CardTitle>
+              </div>
+              <CardDescription>
+                Documentos que requieren certificación por parte de un certificador autorizado
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-4">
+              {documentosEnRevision.filter(doc => doc.estado === 'pendiente').length === 0 ? (
+                <div className="bg-zinc-50 p-4 rounded-md border mb-4">
+                  <p className="text-zinc-600 text-sm">
+                    No hay documentos pendientes de certificación en este momento
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {documentosEnRevision
+                    .filter(doc => doc.estado === 'pendiente')
+                    .map(doc => (
+                      <div key={doc.id} className="bg-white p-4 rounded-lg border shadow-sm">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-medium">{doc.nombre}</h3>
+                            <p className="text-sm text-gray-600 mt-1">Cliente: {doc.cliente}</p>
+                            <div className="flex gap-3 text-xs text-gray-500 mt-2">
+                              <span>RUT: {doc.rut}</span>
+                              <span>Fecha: {doc.fecha}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center">
+                            <span className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full font-medium">
+                              Pendiente
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-4 flex justify-end">
+                          <Button
+                            size="sm"
+                            onClick={() => certificarDocumento(doc.id)}
+                          >
+                            <Shield className="h-4 w-4 mr-2" />
+                            Certificar
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  }
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          
+          {/* Columna de documentos certificados */}
+          <Card>
+            <CardHeader className="bg-zinc-50 border-b">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <CardTitle className="text-lg">Documentos certificados</CardTitle>
+              </div>
+              <CardDescription>
+                Documentos que han sido certificados y están listos para ser enviados
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-4">
+              {documentosEnRevision.filter(doc => doc.estado === 'certificado').length === 0 ? (
+                <div className="bg-zinc-50 p-4 rounded-md border mb-4">
+                  <p className="text-zinc-600 text-sm">
+                    No hay documentos certificados recientemente
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {documentosEnRevision
+                    .filter(doc => doc.estado === 'certificado')
+                    .map(doc => (
+                      <div key={doc.id} className="bg-white p-4 rounded-lg border shadow-sm">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-medium">{doc.nombre}</h3>
+                            <p className="text-sm text-gray-600 mt-1">Cliente: {doc.cliente}</p>
+                            <div className="flex gap-3 text-xs text-gray-500 mt-2">
+                              <span>RUT: {doc.rut}</span>
+                              <span>Fecha: {doc.fecha}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center">
+                            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
+                              Certificado
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-4 pt-3 border-t">
+                          <div className="text-sm font-medium mb-2">Enviar documento:</div>
+                          <div className="flex flex-wrap gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => enviarDocumento(doc.id, 'email')}
+                            >
+                              <Mail className="h-4 w-4 mr-1" />
+                              Email
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => enviarDocumento(doc.id, 'whatsapp')}
+                            >
+                              <MessageCircle className="h-4 w-4 mr-1" />
+                              WhatsApp
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                            >
+                              <Download className="h-4 w-4 mr-1" />
+                              Descargar
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  }
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   };
@@ -713,6 +884,96 @@ const WebAppPOSNFC = () => {
                   <div className="flex justify-between">
                     <span className="text-lg font-bold">Total</span>
                     <span className="text-lg font-bold">${Math.round(documento?.precio ? documento.precio * 1.19 : 0).toLocaleString()}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Nuevo panel de certificación y envío */}
+            <Card className="mb-6 overflow-hidden border-blue-100">
+              <div className="bg-blue-50 p-4 border-b border-blue-100">
+                <div className="flex items-center">
+                  <Shield className="h-5 w-5 text-blue-600 mr-2" />
+                  <h3 className="font-bold text-blue-800">Certificación y envío del documento</h3>
+                </div>
+              </div>
+              
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  {/* Estado de certificación */}
+                  <div className="flex items-center p-3 bg-amber-50 border border-amber-200 rounded-md">
+                    <div className="mr-3 bg-amber-100 p-2 rounded-full">
+                      <ClipboardList className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-sm font-medium text-amber-800">Pendiente de certificación</h4>
+                      <p className="text-xs text-amber-700 mt-0.5">
+                        El documento será enviado a un certificador para su validación
+                      </p>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={mostrarPanelCertificador}
+                      className="ml-2 border-amber-300 bg-amber-100 hover:bg-amber-200 text-amber-800"
+                    >
+                      Validar ahora
+                    </Button>
+                  </div>
+                  
+                  {/* Opciones de envío */}
+                  <div className="pt-3 border-t border-gray-100">
+                    <h4 className="text-sm font-medium mb-3">Enviar documento al cliente</h4>
+                    
+                    <div className="space-y-3">
+                      {/* Envío por email */}
+                      <div className="flex items-center gap-3">
+                        <Input 
+                          type="email" 
+                          placeholder="Email del cliente" 
+                          value={clienteInfo.email} 
+                          onChange={(e) => setClienteInfo({ ...clienteInfo, email: e.target.value })}
+                          className="flex-1"
+                        />
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            toast({
+                              title: "Documento enviado",
+                              description: `Se ha enviado el documento a: ${clienteInfo.email}`,
+                            });
+                          }}
+                          className="whitespace-nowrap"
+                        >
+                          Enviar por email
+                        </Button>
+                      </div>
+                      
+                      {/* Envío por WhatsApp */}
+                      <div className="flex items-center gap-3">
+                        <Input 
+                          type="tel" 
+                          placeholder="Teléfono (WhatsApp)" 
+                          value={clienteInfo.telefono} 
+                          onChange={(e) => setClienteInfo({ ...clienteInfo, telefono: e.target.value })}
+                          className="flex-1"
+                        />
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            toast({
+                              title: "Documento enviado",
+                              description: `Se ha enviado el documento por WhatsApp a: ${clienteInfo.telefono}`,
+                            });
+                          }}
+                          className="whitespace-nowrap"
+                        >
+                          Enviar por WhatsApp
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>
