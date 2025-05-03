@@ -898,10 +898,7 @@ const InverIDVerifier: React.FC<InverIDVerifierProps> = ({
             <Progress value={nfcProgress} className="h-2" />
             
             <div className="flex justify-center">
-              <NFCMicroInteractions
-                status={getMicroInteractionStatus()}
-                message={nfcMessage || "Acerque la cédula al lector NFC"}
-              />
+              <NFCMicroInteractions className="h-32 mb-4" />
             </div>
           </div>
         )}
