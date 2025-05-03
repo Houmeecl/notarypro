@@ -4,10 +4,11 @@ import {
   Check, ArrowLeft, CheckCircle2, Printer, UserPlus, FileText, 
   CreditCard, ChevronRight, FileSignature, UserCheck, Shield, 
   Camera, RefreshCw, Download, X, Fingerprint, ClipboardList,
-  CheckSquare, FileCheck, Home, User, LogOut, Wallet
+  CheckSquare, FileCheck, Home, User, LogOut, Wallet, Zap, PartyPopper
 } from 'lucide-react';
 import NFCIdentityReader from '@/components/identity/NFCIdentityReader';
-import { CedulaChilenaData, checkNFCAvailability } from '@/lib/nfc-reader';
+import NFCMicroInteractions from '@/components/micro-interactions/NFCMicroInteractions';
+import { CedulaChilenaData, checkNFCAvailability, NFCReadStatus } from '@/lib/nfc-reader';
 import { useLocation } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
