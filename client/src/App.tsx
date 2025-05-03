@@ -125,9 +125,15 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={() => {
-        // Redirigir a la página de entrada de emergencia temporalmente
-        window.location.href = "/emergency-entry";
-        return null;
+        // Importar directamente el componente de emergencia
+        const EmergencyEntry = React.lazy(() => import("@/pages/emergency-entry"));
+        return (
+          <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
+            <p className="text-xl">Cargando acceso de emergencia...</p>
+          </div>}>
+            <EmergencyEntry />
+          </Suspense>
+        );
       }} />
       <Route path="/vecinos-express" component={() => {
         window.location.href = "/partners/webapp-pos-official";
