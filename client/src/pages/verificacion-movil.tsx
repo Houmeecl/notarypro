@@ -89,7 +89,14 @@ const VerificacionMovil: React.FC = () => {
   // Iniciar la cámara
   const iniciarCamara = async (tipo: 'documento' | 'selfie') => {
     try {
+      // Asegurarse de detener cualquier stream anterior
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
+      
       setTipoCamara(tipo);
+      setIsCamaraActiva(false); // Reiniciar estado
       
       // Configurar opciones de cámara según el tipo
       const opciones = {
@@ -101,21 +108,34 @@ const VerificacionMovil: React.FC = () => {
         audio: false
       };
       
+      console.log('Solicitando acceso a la cámara...');
       const stream = await navigator.mediaDevices.getUserMedia(opciones);
+      console.log('Acceso a cámara concedido', stream);
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play();
-          setIsCamaraActiva(true);
+          console.log('Video metadata loaded, playing...');
+          if (videoRef.current) {
+            videoRef.current.play()
+              .then(() => {
+                console.log('Reproducción de video iniciada');
+                setIsCamaraActiva(true);
+              })
+              .catch(err => {
+                console.error('Error al reproducir video:', err);
+              });
+          }
         };
+      } else {
+        console.error('Referencia de video no disponible');
       }
     } catch (error) {
       console.error('Error al acceder a la cámara:', error);
       setError('No se pudo acceder a la cámara. Verifique los permisos de su navegador.');
       toast({
         title: 'Error de cámara',
-        description: 'No se pudo acceder a la cámara de su dispositivo',
+        description: 'No se pudo acceder a la cámara de su dispositivo. ' + (error instanceof Error ? error.message : ''),
         variant: 'destructive',
       });
     }
@@ -395,7 +415,14 @@ const VerificacionMovil: React.FC = () => {
                       <p className="font-medium">Capture su documento de identidad</p>
                       <div className="flex flex-col space-y-2">
                         <Button 
-                          onClick={() => iniciarCamara('documento')}
+                          onClick={() => {
+                            console.log('Botón de cámara presionado');
+                            toast({
+                              title: 'Iniciando cámara',
+                              description: 'Solicitando acceso a la cámara...',
+                            });
+                            iniciarCamara('documento');
+                          }}
                           className="w-full"
                           disabled={cargando}
                         >
@@ -473,7 +500,14 @@ const VerificacionMovil: React.FC = () => {
                         <div className="flex space-x-2">
                           <Button 
                             variant="outline" 
-                            onClick={() => iniciarCamara('selfie')}
+                            onClick={() => {
+                              console.log('Botón volver a capturar selfie presionado');
+                              toast({
+                                title: 'Reiniciando cámara',
+                                description: 'Solicitando acceso a la cámara frontal...',
+                              });
+                              iniciarCamara('selfie');
+                            }}
                             className="flex-1"
                             disabled={cargando}
                           >
@@ -496,7 +530,14 @@ const VerificacionMovil: React.FC = () => {
                       </div>
                       <p className="font-medium">Capture una selfie</p>
                       <Button 
-                        onClick={() => iniciarCamara('selfie')}
+                        onClick={() => {
+                          console.log('Botón de selfie presionado');
+                          toast({
+                            title: 'Iniciando cámara frontal',
+                            description: 'Solicitando acceso a la cámara frontal...',
+                          });
+                          iniciarCamara('selfie');
+                        }}
                         className="w-full"
                         disabled={cargando}
                       >
