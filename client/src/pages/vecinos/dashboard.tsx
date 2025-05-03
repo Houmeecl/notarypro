@@ -44,7 +44,7 @@ export default function VecinosDashboard() {
 
   useEffect(() => {
     // Redirección directa a la aplicación real (POS)
-    window.location.href = "/partners/webapp-pos";
+    window.location.href = "/partners/webapp-pos-official";
     return;
     
     // El código a continuación no se ejecutará debido al return
