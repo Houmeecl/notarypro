@@ -131,11 +131,23 @@ const VerificacionInverID: React.FC = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
+                  {demoMode && (
+                    <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <div className="flex items-center text-amber-700 mb-1">
+                        <PlayCircle className="h-5 w-5 text-amber-600 mr-2" />
+                        <span className="font-medium">Modo demostración activo</span>
+                      </div>
+                      <p className="text-sm text-amber-600">
+                        Está utilizando una simulación para fines demostrativos. Para usar la funcionalidad de verificación real, desactive el modo demostración.
+                      </p>
+                    </div>
+                  )}
                   <InverIDVerifier 
                     sessionId="demo-session-001"
                     onSuccess={handleSuccess}
                     onError={handleError}
                     onComplete={handleComplete}
+                    demoMode={demoMode}
                   />
                 </CardContent>
               </Card>
