@@ -1,303 +1,397 @@
-import { useState, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import READIDVerifier from '@/components/identity/READIDVerifier';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { Helmet } from 'react-helmet';
+import { useLocation } from 'wouter';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Button } from "@/components/ui/button";
 import { 
-  CreditCard, 
-  UserCheck, 
-  Shield, 
-  AlertTriangle, 
-  Info, 
-  ArrowLeft, 
-  Fingerprint 
+  Smartphone, CheckCircle, AlertCircle, 
+  Camera, User, FileCheck, ThumbsUp, ThumbsDown,
+  UserCheck, Copy, ChevronRight
 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { apiRequest } from '@/lib/queryClient';
-import { checkNFCAvailability } from '@/lib/nfc-reader';
-import { Link } from 'wouter';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  CedulaChilenaData, 
+  NFCReadStatus
+} from '@/lib/nfc-reader';
+import Confetti from 'react-confetti';
+import READIDVerifier from '@/components/identity/READIDVerifier';
 
-const VerificacionIdentidadREADID = () => {
-  const [identityVerified, setIdentityVerified] = useState(false);
-  const [showVerifier, setShowVerifier] = useState(false);
-  const [nfcAvailable, setNfcAvailable] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [personalData, setPersonalData] = useState<any>(null);
-  const [totalPoints, setTotalPoints] = useState(0);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const checkNFC = async () => {
-      try {
-        const result = await checkNFCAvailability();
-        setNfcAvailable(result.available);
-      } catch (error) {
-        console.error('Error al verificar NFC:', error);
-        setNfcAvailable(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    // Cargar puntos del usuario si está autenticado
-    const loadUserPoints = async () => {
-      try {
-        const response = await apiRequest('GET', '/api/micro-interactions/user/points');
-        if (response.ok) {
-          const data = await response.json();
-          setTotalPoints(data.totalPoints || 0);
-        }
-      } catch (error) {
-        console.error('Error al cargar puntos:', error);
-      }
-    };
-
-    checkNFC();
-    loadUserPoints();
-  }, []);
-
-  const handleStartVerification = () => {
-    setShowVerifier(true);
-  };
-
-  const handleVerificationSuccess = (data: any) => {
-    setPersonalData(data);
-    setIdentityVerified(true);
-    setShowVerifier(false);
-    
-    // Registrar los puntos ganados en el sistema de gamificación
-    const puntos = 150; // Puntos por verificar identidad con READID
-    
-    // Llamar al endpoint para registrar la interacción
-    apiRequest("POST", "/api/micro-interactions/record", {
-      type: "readid_verification",
-      points: puntos,
-      metadata: { description: "Verificación avanzada de identidad con READID" }
-    }).catch(err => console.error("Error al registrar micro-interacción:", err));
-    
-    // Actualizar el total de puntos
-    setTotalPoints(prev => prev + puntos);
-    
-    toast({
-      title: "¡Verificación exitosa! +150 puntos",
-      description: "Se ha verificado su identidad exitosamente con READID",
-      variant: "default",
-    });
-  };
-
-  const handleVerificationError = (error: Error) => {
-    toast({
-      title: "Error de verificación",
-      description: error.message,
-      variant: "destructive",
-    });
-    setShowVerifier(false);
-  };
-
-  const handleVerificationCancel = () => {
-    setShowVerifier(false);
-    toast({
-      title: "Verificación cancelada",
-      description: "Ha cancelado el proceso de verificación",
-    });
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full"></div>
-        <span className="ml-2 text-blue-600">Comprobando compatibilidad NFC...</span>
-      </div>
-    );
-  }
-
+// Componente para mostrar los datos extraídos de la cédula
+const CedulaDataDisplay = ({ data }: { data: CedulaChilenaData | null }) => {
+  if (!data) return null;
+  
   return (
-    <div className="container mx-auto px-4 py-10 max-w-4xl">
-      <div className="mb-6">
-        <Link href="/" className="text-blue-600 hover:text-blue-800 inline-flex items-center">
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Volver al inicio
-        </Link>
+    <div className="space-y-3 text-sm">
+      <div className="grid grid-cols-2 gap-1">
+        <div className="text-gray-500">Nombre completo:</div>
+        <div className="font-medium text-right">{data.nombres} {data.apellidos}</div>
       </div>
-      
-      <div className="flex flex-col md:flex-row gap-8">
-        <div className="flex-1">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold mb-2">Verificación de identidad avanzada READID</h1>
-            <p className="text-gray-500">
-              Utilice su cédula de identidad chilena con chip NFC para verificar su identidad de forma segura y rápida.
-            </p>
-          </div>
-          
-          {/* Estado de verificación */}
-          {identityVerified ? (
-            <Card className="mb-6 bg-green-50 border-green-200">
-              <CardHeader className="pb-2">
-                <div className="flex items-start">
-                  <div className="bg-green-100 p-2 rounded-full mr-4">
-                    <UserCheck className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-green-800">Identidad verificada</CardTitle>
-                    <CardDescription className="text-green-600">
-                      Se ha verificado su identidad exitosamente
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Nombre completo:</span>
-                    <span className="font-medium">{personalData?.nombres} {personalData?.apellidos}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">RUT:</span>
-                    <span className="font-medium">{personalData?.rut}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Fecha de nacimiento:</span>
-                    <span className="font-medium">{personalData?.fechaNacimiento}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Nacionalidad:</span>
-                    <span className="font-medium">{personalData?.nacionalidad}</span>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter className="bg-green-100/50 justify-between">
-                <div className="text-xs text-green-700 flex items-center">
-                  <Shield className="h-3 w-3 mr-1" />
-                  Verificado con estándar READID
-                </div>
-                <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">
-                  +150 puntos
-                </div>
-              </CardFooter>
-            </Card>
-          ) : (
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Verificación de identidad</CardTitle>
-                <CardDescription>
-                  Verificación mediante lectura NFC de cédula chilena.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {nfcAvailable ? (
-                  <div>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="bg-blue-100 p-2 rounded-full">
-                        <CreditCard className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium">NFC disponible</h3>
-                        <p className="text-sm text-gray-500">
-                          Su dispositivo es compatible con lectura NFC
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {showVerifier ? (
-                      <READIDVerifier 
-                        onSuccess={handleVerificationSuccess}
-                        onError={handleVerificationError}
-                        onCancel={handleVerificationCancel}
-                      />
-                    ) : (
-                      <Button 
-                        onClick={handleStartVerification} 
-                        className="w-full mt-4"
-                      >
-                        <Fingerprint className="mr-2 h-4 w-4" />
-                        Iniciar verificación READID
-                      </Button>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center py-4">
-                    <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto mb-3" />
-                    <h3 className="text-lg font-medium mb-2">NFC no disponible</h3>
-                    <p className="text-sm text-gray-500 mb-4">
-                      Su dispositivo no es compatible con NFC o está desactivado.
-                      Esta verificación requiere un dispositivo con NFC habilitado.
-                    </p>
-                    <Link href="/verificacion-identidad-movil">
-                      <Button variant="outline">
-                        Usar método alternativo
-                      </Button>
-                    </Link>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-          
-          {/* Historial de puntos */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Sus puntos de verificación</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-3">
-                <p className="text-gray-500 text-sm mb-1">Puntos acumulados</p>
-                <h3 className="text-3xl font-bold">{totalPoints}</h3>
-                {identityVerified && (
-                  <div className="mt-3 text-xs text-green-600 bg-green-50 rounded-full px-3 py-1 inline-block">
-                    +150 puntos por verificación READID
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        {/* Panel lateral de información */}
-        <div className="md:w-80">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Acerca de READID</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <h3 className="font-semibold flex items-center">
-                  <Shield className="h-4 w-4 mr-1 text-blue-600" />
-                  Verificación segura
-                </h3>
-                <p className="text-sm text-gray-500">
-                  READID utiliza tecnología NFC para leer el chip incorporado en su cédula de identidad de forma segura.
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <h3 className="font-semibold flex items-center">
-                  <Info className="h-4 w-4 mr-1 text-blue-600" />
-                  Cómo funciona
-                </h3>
-                <p className="text-sm text-gray-500">
-                  Al acercar su cédula, el chip es leído y verificado digitalmente para confirmar su identidad de forma segura.
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <h3 className="font-semibold flex items-center">
-                  <Fingerprint className="h-4 w-4 mr-1 text-blue-600" />
-                  Ventajas
-                </h3>
-                <ul className="text-sm text-gray-500 list-disc pl-5 space-y-1">
-                  <li>Verificación rápida en segundos</li>
-                  <li>Mayor seguridad que métodos tradicionales</li>
-                  <li>Proceso completamente digital</li>
-                  <li>Verificación con estándares legales</li>
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="grid grid-cols-2 gap-1">
+        <div className="text-gray-500">RUT:</div>
+        <div className="font-medium text-right">{data.rut}</div>
+      </div>
+      <div className="grid grid-cols-2 gap-1">
+        <div className="text-gray-500">Fecha de nacimiento:</div>
+        <div className="font-medium text-right">{data.fechaNacimiento}</div>
+      </div>
+      <div className="grid grid-cols-2 gap-1">
+        <div className="text-gray-500">Sexo:</div>
+        <div className="font-medium text-right">{data.sexo}</div>
+      </div>
+      <div className="grid grid-cols-2 gap-1">
+        <div className="text-gray-500">Nacionalidad:</div>
+        <div className="font-medium text-right">{data.nacionalidad}</div>
+      </div>
+      <div className="grid grid-cols-2 gap-1">
+        <div className="text-gray-500">Fecha emisión:</div>
+        <div className="font-medium text-right">{data.fechaEmision}</div>
+      </div>
+      <div className="grid grid-cols-2 gap-1">
+        <div className="text-gray-500">Fecha vencimiento:</div>
+        <div className="font-medium text-right">{data.fechaVencimiento}</div>
+      </div>
+      <div className="grid grid-cols-2 gap-1">
+        <div className="text-gray-500">N° Documento:</div>
+        <div className="font-medium text-right">{data.numeroDocumento}</div>
       </div>
     </div>
   );
 };
 
-export default VerificacionIdentidadREADID;
+// Componente para comparación facial con cámara
+const FaceComparison = ({ 
+  cedulaData, 
+  onComparisonComplete 
+}: { 
+  cedulaData: CedulaChilenaData | null,
+  onComparisonComplete: (success: boolean) => void 
+}) => {
+  const [cameraActive, setCameraActive] = useState(false);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [showInstructions, setShowInstructions] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  
+  // Iniciar cámara
+  const startCamera = useCallback(async () => {
+    if (!videoRef.current) return;
+    
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user' },
+        audio: false
+      });
+      
+      videoRef.current.srcObject = stream;
+      setCameraActive(true);
+      setShowInstructions(false);
+    } catch (error) {
+      console.error('Error accediendo a la cámara:', error);
+    }
+  }, []);
+  
+  // Capturar foto
+  const capturePhoto = useCallback(() => {
+    if (!videoRef.current || !canvasRef.current) return;
+    
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d');
+    
+    if (!context) return;
+    
+    // Establecer dimensiones del canvas
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Dibujar el video en el canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Convertir a base64
+    const imageData = canvas.toDataURL('image/jpeg');
+    setCapturedImage(imageData);
+    
+    // Detener la cámara
+    const stream = video.srcObject as MediaStream;
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
+    video.srcObject = null;
+    setCameraActive(false);
+  }, []);
+  
+  // Limpiar recursos cuando el componente se desmonta
+  useEffect(() => {
+    return () => {
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+  
+  if (!cedulaData) {
+    return (
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Datos no disponibles</AlertTitle>
+        <AlertDescription>
+          Primero debe leer los datos de la cédula con NFC.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+  
+  return (
+    <div className="space-y-4">
+      {showInstructions ? (
+        <div className="text-center p-4 bg-blue-50 rounded-lg">
+          <UserCheck className="h-10 w-10 text-blue-500 mx-auto mb-2" />
+          <h3 className="font-medium mb-2">Comparación facial requerida</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Para completar la verificación, necesitamos comparar la foto del documento con la persona.
+          </p>
+          <Button onClick={startCamera} className="gap-2">
+            <Camera className="h-4 w-4" /> Iniciar cámara
+          </Button>
+        </div>
+      ) : null}
+      
+      {cameraActive ? (
+        <div className="space-y-3">
+          <div className="relative rounded-lg overflow-hidden bg-gray-200 aspect-square max-w-xs mx-auto border-2 border-blue-300">
+            <video 
+              ref={videoRef} 
+              autoPlay 
+              playsInline 
+              muted 
+              className="w-full h-full object-cover"
+            />
+            {/* Guía visual */}
+            <div className="absolute inset-0 border-2 border-dashed border-primary border-opacity-60 m-8 rounded-full"></div>
+          </div>
+          
+          <div className="flex justify-center">
+            <Button onClick={capturePhoto} variant="default" className="gap-2">
+              <Camera className="h-4 w-4" /> Capturar foto
+            </Button>
+          </div>
+        </div>
+      ) : null}
+      
+      {capturedImage ? (
+        <div className="space-y-4">
+          <div className="text-center">
+            <h3 className="font-medium mb-2">Foto capturada</h3>
+            <div className="relative rounded-lg overflow-hidden bg-gray-100 aspect-square max-w-xs mx-auto border-2 border-green-300">
+              <img 
+                src={capturedImage} 
+                alt="Foto capturada" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3">
+            <Button 
+              onClick={() => {
+                setCapturedImage(null);
+                startCamera();
+              }} 
+              variant="outline"
+              className="gap-2"
+            >
+              <Camera className="h-4 w-4" /> Nueva foto
+            </Button>
+            <Button 
+              onClick={() => onComparisonComplete(true)} 
+              variant="default"
+              className="gap-2"
+            >
+              <CheckCircle className="h-4 w-4" /> Confirmar identidad
+            </Button>
+          </div>
+        </div>
+      ) : null}
+      
+      <canvas ref={canvasRef} className="hidden" />
+    </div>
+  );
+};
+
+// Componente principal
+const VerificacionIdentidadReadid: React.FC = () => {
+  // Estado para controlar el flujo de verificación
+  const [step, setStep] = useState<'nfc' | 'comparison' | 'complete'>('nfc');
+  const [cedulaData, setCedulaData] = useState<CedulaChilenaData | null>(null);
+  const [verificationSuccess, setVerificationSuccess] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [points, setPoints] = useState(0);
+
+  // Extraer el ID de sesión de la URL
+  const [, params] = useLocation();
+  const queryParams = new URLSearchParams(window.location.search);
+  const sessionId = queryParams.get('session') || '';
+  
+  // Manejar la lectura exitosa de NFC
+  const handleNFCSuccess = (data: CedulaChilenaData) => {
+    setCedulaData(data);
+    setStep('comparison');
+  };
+  
+  // Manejar el error en la lectura NFC
+  const handleNFCError = (error: string) => {
+    console.error('Error en lectura NFC:', error);
+  };
+  
+  // Manejar la comparación facial
+  const handleComparisonComplete = (success: boolean) => {
+    if (success) {
+      setVerificationSuccess(true);
+      setShowConfetti(true);
+      
+      // Otorgar puntos adicionales por verificación completa
+      const pointsEarned = 50; // Puntos adicionales por verificación facial
+      setPoints(pointsEarned);
+      
+      // Registrar interacción (puntos adicionales por verificación facial)
+      fetch('/api/micro-interactions/record', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          type: "facial_verification",
+          points: pointsEarned,
+          metadata: { description: "Verificación facial completada exitosamente" }
+        })
+      }).catch(err => console.error("Error al registrar interacción:", err));
+      
+      // Ocultar confeti después de 5 segundos
+      setTimeout(() => {
+        setShowConfetti(false);
+      }, 5000);
+    }
+    
+    setStep('complete');
+  };
+  
+  return (
+    <div className="container mx-auto px-4 py-6 relative">
+      <Helmet>
+        <title>READID - Verificación Avanzada</title>
+      </Helmet>
+      
+      {/* Confeti para celebrar la verificación exitosa */}
+      {showConfetti && <Confetti width={window.innerWidth} height={window.innerHeight} recycle={false} />}
+      
+      {step === 'nfc' && (
+        <READIDVerifier 
+          sessionId={sessionId}
+          onSuccess={handleNFCSuccess}
+          onError={handleNFCError}
+        />
+      )}
+      
+      {step === 'comparison' && (
+        <div className="max-w-md mx-auto">
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold">Comparación de identidad</h1>
+            <p className="text-gray-600">Verificación facial adicional</p>
+          </div>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Verificar identidad</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="photo" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="data">Datos NFC</TabsTrigger>
+                  <TabsTrigger value="photo">Capturar foto</TabsTrigger>
+                </TabsList>
+                <TabsContent value="data" className="pt-4">
+                  <CedulaDataDisplay data={cedulaData} />
+                </TabsContent>
+                <TabsContent value="photo" className="pt-4">
+                  <FaceComparison 
+                    cedulaData={cedulaData} 
+                    onComparisonComplete={handleComparisonComplete} 
+                  />
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      
+      {step === 'complete' && (
+        <div className="max-w-md mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-center">
+                {verificationSuccess ? '¡Verificación Completa!' : 'Verificación Rechazada'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <div className={`w-20 h-20 ${verificationSuccess ? 'bg-green-100' : 'bg-red-100'} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                {verificationSuccess ? (
+                  <CheckCircle className="h-10 w-10 text-green-600" />
+                ) : (
+                  <AlertCircle className="h-10 w-10 text-red-600" />
+                )}
+              </div>
+              
+              <h3 className="text-xl font-semibold mb-2">
+                {verificationSuccess ? '¡Verificación exitosa!' : 'No se pudo verificar la identidad'}
+              </h3>
+              
+              {verificationSuccess && (
+                <>
+                  <p className="text-gray-600 mb-6">
+                    La identidad ha sido verificada correctamente mediante NFC y comparación facial.
+                  </p>
+                  
+                  <div className="bg-blue-50 text-blue-800 p-4 rounded-lg mb-6">
+                    <p className="text-sm">
+                      <span className="font-semibold">¡Felicidades!</span> Has obtenido {points} puntos adicionales por 
+                      completar la verificación facial.
+                    </p>
+                  </div>
+                </>
+              )}
+              
+              {!verificationSuccess && (
+                <p className="text-gray-600 mb-6">
+                  La verificación facial no pudo ser completada. Por favor, intente nuevamente o 
+                  utilice un método alternativo de verificación.
+                </p>
+              )}
+              
+              <div className="grid grid-cols-2 gap-3">
+                <Button 
+                  onClick={() => window.close()} 
+                  variant="outline"
+                >
+                  Cerrar
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setCedulaData(null);
+                    setVerificationSuccess(false);
+                    setStep('nfc');
+                  }}
+                >
+                  Nueva verificación
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default VerificacionIdentidadReadid;

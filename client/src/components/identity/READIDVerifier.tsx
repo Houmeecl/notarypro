@@ -1,348 +1,610 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { 
-  CreditCard, 
   Smartphone, 
   CheckCircle, 
-  XCircle, 
+  AlertCircle, 
+  Wallet, 
+  Camera, 
+  Radio, 
+  Layers,
   Shield,
-  Fingerprint,
-  RefreshCw,
-  AlertCircle,
-  RotateCw
+  LucideCheck
 } from 'lucide-react';
-import { NFCReadStatus, readCedulaChilena, checkNFCAvailability } from '@/lib/nfc-reader';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { Progress } from '@/components/ui/progress';
+import Confetti from 'react-confetti';
+import { 
+  CedulaChilenaData, 
+  NFCReadStatus, 
+  NFCReaderType,
+  checkNFCAvailability,
+  readCedulaChilena,
+  validarRut,
+  formatearRut
+} from '@/lib/nfc-reader';
+import { apiRequest } from '@/lib/queryClient';
 
 interface READIDVerifierProps {
-  onSuccess: (cedulaData: any) => void;
-  onError: (error: Error) => void;
-  onCancel: () => void;
+  sessionId?: string;
+  onSuccess?: (data: CedulaChilenaData) => void;
+  onError?: (error: string) => void;
 }
 
 const READIDVerifier: React.FC<READIDVerifierProps> = ({ 
-  onSuccess, 
-  onError,
-  onCancel
+  sessionId = '', 
+  onSuccess,
+  onError
 }) => {
-  const [readStatus, setReadStatus] = useState<NFCReadStatus>(NFCReadStatus.INACTIVE);
-  const [statusMessage, setStatusMessage] = useState<string>('');
+  // Estados principales
+  const [step, setStep] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
-  const [readingSteps, setReadingSteps] = useState<string[]>([]);
-  const [nfcAvailable, setNfcAvailable] = useState<boolean>(false);
-  const { toast } = useToast();
-
-  // Detector de proximidad simulado
-  const [proximityLevel, setProximityLevel] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showConfetti, setShowConfetti] = useState<boolean>(false);
+  const [points, setPoints] = useState<number>(0);
   
-  // Efecto de verificación de NFC
+  // Estados para NFC
+  const [nfcAvailable, setNfcAvailable] = useState<boolean>(false);
+  const [nfcStatus, setNfcStatus] = useState<NFCReadStatus>(NFCReadStatus.INACTIVE);
+  const [nfcMessage, setNfcMessage] = useState<string>('');
+  const [nfcProximity, setNfcProximity] = useState<number>(0);
+  const [cedulaData, setCedulaData] = useState<CedulaChilenaData | null>(null);
+  
+  // Intervalos y timeouts
+  const proximityIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Verificar disponibilidad de NFC al montar el componente
   useEffect(() => {
-    const checkNFC = async () => {
-      try {
-        const result = await checkNFCAvailability();
-        setNfcAvailable(result.available);
-      } catch (error) {
-        setNfcAvailable(false);
-        console.error('Error al verificar NFC:', error);
-      }
-    };
+    async function checkNFC() {
+      const { available } = await checkNFCAvailability();
+      setNfcAvailable(available);
+    }
     
     checkNFC();
     
-    // Escuchar eventos de proximidad NFC
-    const handleProximityChange = (event: CustomEvent) => {
-      setProximityLevel(event.detail.level);
-    };
-    
-    window.addEventListener('nfc-proximity-change', handleProximityChange as EventListener);
-    
     return () => {
-      window.removeEventListener('nfc-proximity-change', handleProximityChange as EventListener);
+      // Limpiar intervalos al desmontar
+      if (proximityIntervalRef.current) {
+        clearInterval(proximityIntervalRef.current);
+      }
     };
   }, []);
-
-  // Iniciar la verificación
-  const startVerification = async () => {
-    if (!nfcAvailable) {
-      toast({
-        title: "NFC no disponible",
-        description: "Su dispositivo no tiene NFC o no está habilitado",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Resetear el estado
-    setReadStatus(NFCReadStatus.INACTIVE);
-    setStatusMessage('');
-    setProgress(0);
-    setReadingSteps([]);
-    
-    // Intentar hacer vibrar el dispositivo para señalar inicio
-    if (navigator.vibrate) {
-      navigator.vibrate(200);
-    }
-    
-    try {
-      // Simulación de proceso de verificación tipo READID
-      setReadStatus(NFCReadStatus.WAITING);
-      setStatusMessage('Preparando lector NFC...');
-      setReadingSteps([
-        'Iniciando proceso de verificación',
-        'Configurando parámetros de lectura'
-      ]);
-      
-      // Simular progreso de inicio
-      await simulateProgress(0, 20);
-      
-      // Comenzar a escuchar NFC
-      setStatusMessage('Esperando cédula chilena...');
-      setReadingSteps(prev => [...prev, 'Esperando acercar documento']);
-      
-      // Simulación de detección
-      await simulateProgress(20, 30);
-      
-      // Iniciar lectura real
-      const cedulaData = await readCedulaChilena(
-        (status, message) => {
-          setReadStatus(status);
-          if (message) setStatusMessage(message);
-          
-          // Actualizar pasos según el estado
-          if (status === NFCReadStatus.READING) {
-            setReadingSteps(prev => [...prev, 'Detectando chip NFC']);
-            setReadingSteps(prev => [...prev, 'Leyendo información personal']);
-          } else if (status === NFCReadStatus.SUCCESS) {
-            setReadingSteps(prev => [...prev, 'Validando firma digital']);
-            setReadingSteps(prev => [...prev, 'Verificación exitosa']);
-          }
-        }
-      );
-      
-      if (cedulaData) {
-        // Simulación final exitosa
-        setProgress(100);
-        setReadStatus(NFCReadStatus.SUCCESS);
-        setStatusMessage('Verificación exitosa. Datos leídos correctamente.');
-        
-        // Simular verificación de datos
-        setTimeout(() => {
-          onSuccess(cedulaData);
-        }, 1500);
-      } else {
-        throw new Error('No se pudieron leer datos de la cédula');
+  
+  // Actualizar progreso basado en el paso actual
+  useEffect(() => {
+    if (step === 0) setProgress(0);
+    else if (step === 1) setProgress(15);
+    else if (step === 2) setProgress(35);
+    else if (step === 3) setProgress(65);
+    else if (step === 4) setProgress(95);
+    else if (step === 5) setProgress(100);
+  }, [step]);
+  
+  // Simular cambios en la proximidad de la tarjeta durante la lectura
+  useEffect(() => {
+    if (nfcStatus === NFCReadStatus.WAITING) {
+      // Iniciar simulación de proximidad aleatoria
+      proximityIntervalRef.current = setInterval(() => {
+        const randomProximity = Math.floor(Math.random() * 80);
+        setNfcProximity(randomProximity);
+      }, 800);
+    } else if (nfcStatus === NFCReadStatus.READING) {
+      // Aumentar gradualmente la proximidad durante la lectura
+      if (proximityIntervalRef.current) {
+        clearInterval(proximityIntervalRef.current);
       }
-    } catch (error) {
-      console.error('Error en la lectura NFC:', error);
-      setReadStatus(NFCReadStatus.ERROR);
-      setStatusMessage(error instanceof Error ? error.message : 'Error desconocido');
-      setProgress(0);
       
-      // Notificar el error
-      onError(error instanceof Error ? error : new Error('Error desconocido'));
+      proximityIntervalRef.current = setInterval(() => {
+        setNfcProximity(prev => {
+          if (prev >= 95) {
+            if (proximityIntervalRef.current) {
+              clearInterval(proximityIntervalRef.current);
+            }
+            return 100;
+          } else {
+            return prev + 5;
+          }
+        });
+      }, 150);
+    } else if (nfcStatus === NFCReadStatus.SUCCESS) {
+      setNfcProximity(100);
+      if (proximityIntervalRef.current) {
+        clearInterval(proximityIntervalRef.current);
+      }
+    } else if (nfcStatus === NFCReadStatus.ERROR || nfcStatus === NFCReadStatus.INACTIVE) {
+      setNfcProximity(0);
+      if (proximityIntervalRef.current) {
+        clearInterval(proximityIntervalRef.current);
+      }
+    }
+    
+    return () => {
+      if (proximityIntervalRef.current) {
+        clearInterval(proximityIntervalRef.current);
+      }
+    };
+  }, [nfcStatus]);
+  
+  // Función para manejar la lectura NFC
+  const handleNFCStatusChange = (status: NFCReadStatus, message?: string) => {
+    setNfcStatus(status);
+    if (message) {
+      setNfcMessage(message);
+    }
+    
+    // Avanzar por los pasos
+    if (status === NFCReadStatus.WAITING) {
+      setStep(1);
+    } else if (status === NFCReadStatus.READING) {
+      setStep(2);
+    } else if (status === NFCReadStatus.SUCCESS) {
+      setStep(4);
+      // Mostrar confeti
+      setShowConfetti(true);
+      
+      // Otorgar puntos
+      const pointsEarned = 125 + Math.floor(Math.random() * 26); // 125-150 puntos
+      setPoints(pointsEarned);
+      
+      // Registrar interacción
+      apiRequest("POST", "/api/micro-interactions/record", {
+        type: "nfc_verification",
+        points: pointsEarned,
+        metadata: { description: "Verificación avanzada de identidad con NFC (READID)" }
+      }).catch(err => console.error("Error al registrar interacción:", err));
+      
+      // Ocultar confeti después de 5 segundos
+      setTimeout(() => {
+        setShowConfetti(false);
+      }, 5000);
+    } else if (status === NFCReadStatus.ERROR) {
+      setStep(3);
     }
   };
   
-  // Simulación de progreso para la UI
-  const simulateProgress = (from: number, to: number): Promise<void> => {
-    return new Promise(resolve => {
-      const duration = 1000; // 1 segundo
-      const steps = 10;
-      const increment = (to - from) / steps;
-      let current = from;
-      let step = 0;
+  // Iniciar lectura con NFC
+  const startNFCReading = async () => {
+    setLoading(true);
+    setCedulaData(null);
+    setError(null);
+    setStep(1);
+    setNfcStatus(NFCReadStatus.WAITING);
+    
+    try {
+      const data = await readCedulaChilena(handleNFCStatusChange);
       
-      const interval = setInterval(() => {
-        current += increment;
-        setProgress(Math.min(current, to));
-        step++;
+      if (data) {
+        setCedulaData(data);
         
-        if (step >= steps) {
-          clearInterval(interval);
-          resolve();
+        // Llamar al callback de éxito si existe
+        if (onSuccess) {
+          onSuccess(data);
         }
-      }, duration / steps);
-    });
+        
+        // Esperar un momento antes de completar
+        setTimeout(() => {
+          setStep(5);
+        }, 2000);
+      }
+    } catch (error: any) {
+      const errorMsg = `Error al leer cédula: ${error instanceof Error ? error.message : 'Error desconocido'}`;
+      setError(errorMsg);
+      setStep(3);
+      
+      // Llamar al callback de error si existe
+      if (onError) {
+        onError(errorMsg);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
-
+  
+  // Reiniciar el proceso
+  const resetProcess = () => {
+    setStep(0);
+    setProgress(0);
+    setError(null);
+    setCedulaData(null);
+    setNfcStatus(NFCReadStatus.INACTIVE);
+    setNfcMessage('');
+    setNfcProximity(0);
+  };
+  
+  // Simular una verificación exitosa (para testing)
+  const simulateSuccess = () => {
+    setNfcStatus(NFCReadStatus.SUCCESS);
+    setCedulaData({
+      nombres: "JUAN MANUEL",
+      apellidos: "PEREZ SOTO",
+      rut: "12345678-9",
+      fechaNacimiento: "1980-01-01",
+      nacionalidad: "CHILENA",
+      sexo: "MASCULINO",
+      fechaEmision: "2020-01-01",
+      fechaVencimiento: "2030-01-01",
+      numeroDocumento: "12345678",
+      numeroSerie: "A123456"
+    });
+    
+    // Mostrar confeti
+    setShowConfetti(true);
+    
+    // Otorgar puntos
+    const pointsEarned = 125 + Math.floor(Math.random() * 26); // 125-150 puntos
+    setPoints(pointsEarned);
+    
+    // Registrar interacción
+    apiRequest("POST", "/api/micro-interactions/record", {
+      type: "nfc_simulation",
+      points: pointsEarned,
+      metadata: { description: "Simulación de verificación NFC (READID)" }
+    }).catch(err => console.error("Error al registrar interacción:", err));
+    
+    // Ocultar confeti después de 5 segundos
+    setTimeout(() => {
+      setShowConfetti(false);
+      setStep(5);
+    }, 3000);
+  };
+  
+  // Renderizar indicador de proximidad
+  const renderProximityIndicator = () => {
+    const proximityClass = nfcProximity < 30 
+      ? "bg-red-500" 
+      : nfcProximity < 60 
+        ? "bg-yellow-500" 
+        : nfcProximity < 90 
+          ? "bg-green-500" 
+          : "bg-green-600";
+          
+    return (
+      <div className="w-full max-w-xs mx-auto mb-4">
+        <div className="flex justify-between text-xs mb-1">
+          <span>Lejos</span>
+          <span>Cerca</span>
+        </div>
+        <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+          <div 
+            className={`h-full ${proximityClass} transition-all duration-300`}
+            style={{ width: `${nfcProximity}%` }}
+          ></div>
+        </div>
+      </div>
+    );
+  };
+  
   return (
-    <div className="border rounded-xl p-6 bg-white shadow-lg max-w-md mx-auto">
-      <div className="text-center mb-6">
-        <div className="relative w-20 h-20 mx-auto mb-4">
-          <div className={`absolute inset-0 rounded-full ${
-            readStatus === NFCReadStatus.WAITING || readStatus === NFCReadStatus.READING 
-              ? 'bg-blue-100 animate-pulse' 
-              : readStatus === NFCReadStatus.SUCCESS 
-                ? 'bg-green-100' 
-                : readStatus === NFCReadStatus.ERROR 
-                  ? 'bg-red-100' 
-                  : 'bg-gray-100'
-          }`} />
-          <div className="absolute inset-0 flex items-center justify-center">
-            {readStatus === NFCReadStatus.INACTIVE && (
-              <Fingerprint className="h-10 w-10 text-gray-600" />
-            )}
-            {(readStatus === NFCReadStatus.WAITING || readStatus === NFCReadStatus.READING) && (
-              <motion.div 
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              >
-                <RotateCw className="h-10 w-10 text-blue-600" />
-              </motion.div>
-            )}
-            {readStatus === NFCReadStatus.SUCCESS && (
-              <CheckCircle className="h-10 w-10 text-green-600" />
-            )}
-            {readStatus === NFCReadStatus.ERROR && (
-              <XCircle className="h-10 w-10 text-red-600" />
-            )}
+    <div className="relative">
+      {/* Confeti para celebrar la verificación exitosa */}
+      {showConfetti && <Confetti width={window.innerWidth} height={window.innerHeight} recycle={false} />}
+      
+      <div className="max-w-md mx-auto">
+        {/* Header con logo READID y sesión */}
+        <div className="text-center mb-6">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Shield className="h-6 w-6 text-primary" />
+            <h1 className="text-2xl font-bold tracking-tight">READID</h1>
           </div>
+          <p className="text-gray-600 text-sm">Sistema avanzado de verificación de identidad</p>
+          {sessionId && <p className="text-xs text-gray-500 mt-1">Sesión: {sessionId}</p>}
         </div>
         
-        <h2 className="text-xl font-bold mb-1">
-          {readStatus === NFCReadStatus.INACTIVE && 'Verificación de identidad'}
-          {readStatus === NFCReadStatus.WAITING && 'Esperando cédula'}
-          {readStatus === NFCReadStatus.READING && 'Leyendo cédula'}
-          {readStatus === NFCReadStatus.SUCCESS && '¡Verificación exitosa!'}
-          {readStatus === NFCReadStatus.ERROR && 'Error de verificación'}
-        </h2>
-        
-        <p className="text-gray-500 text-sm mb-4">{statusMessage || 'Utilice su cédula chilena con chip NFC para verificar su identidad'}</p>
-      </div>
-      
-      {/* Indicador de progreso */}
-      {readStatus !== NFCReadStatus.INACTIVE && (
+        {/* Barra de progreso */}
         <div className="mb-6">
           <Progress value={progress} className="h-2" />
-          <p className="text-xs text-right text-gray-500 mt-1">{Math.round(progress)}% completado</p>
-        </div>
-      )}
-      
-      {/* Indicador de proximidad */}
-      {(readStatus === NFCReadStatus.WAITING || readStatus === NFCReadStatus.READING) && (
-        <div className="mb-6 bg-blue-50 p-4 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-blue-700">Intensidad de señal</span>
-            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-              {proximityLevel === 0 && 'Sin señal'}
-              {proximityLevel === 1 && 'Débil'}
-              {proximityLevel === 2 && 'Media'}
-              {proximityLevel === 3 && 'Fuerte'}
-            </span>
-          </div>
-          
-          <div className="flex gap-1 h-3">
-            <div className={`flex-1 rounded ${proximityLevel >= 1 ? 'bg-blue-400' : 'bg-gray-200'}`}></div>
-            <div className={`flex-1 rounded ${proximityLevel >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-            <div className={`flex-1 rounded ${proximityLevel >= 3 ? 'bg-blue-800' : 'bg-gray-200'}`}></div>
-          </div>
-          
-          <p className="text-xs text-center text-blue-500 mt-2">
-            {proximityLevel === 0 && 'Acerque la cédula al dispositivo'}
-            {proximityLevel === 1 && 'Señal detectada, mantenga la cédula estable'}
-            {proximityLevel === 2 && 'Buena señal, no mueva la cédula'}
-            {proximityLevel === 3 && 'Señal óptima, leyendo datos...'}
-          </p>
-        </div>
-      )}
-      
-      {/* Pasos de lectura */}
-      {readingSteps.length > 0 && (
-        <div className="mb-6 border rounded-lg p-4">
-          <h3 className="text-sm font-semibold mb-2">Pasos de verificación</h3>
-          <ul className="space-y-2">
-            {readingSteps.map((step, index) => (
-              <motion.li 
-                key={index}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
-                className="flex items-start gap-2 text-sm"
-              >
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>{step}</span>
-              </motion.li>
-            ))}
-          </ul>
-        </div>
-      )}
-      
-      {/* Consejos de lectura */}
-      {readStatus === NFCReadStatus.WAITING && (
-        <div className="mb-6 bg-yellow-50 border border-yellow-100 rounded-lg p-4">
-          <div className="flex items-start gap-2">
-            <AlertCircle className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="text-sm font-semibold text-yellow-700">Consejos para mejor lectura</h3>
-              <ul className="text-xs text-yellow-600 mt-1 space-y-1 list-disc pl-4">
-                <li>Mantenga la cédula sobre la parte trasera del teléfono</li>
-                <li>No mueva la cédula durante la lectura</li>
-                <li>Retire la cédula de su billetera o funda</li>
-                <li>Si usa funda en su teléfono, puede quitarla para mejor recepción</li>
-              </ul>
-            </div>
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>Inicio</span>
+            <span>Verificación</span>
+            <span>Completo</span>
           </div>
         </div>
-      )}
-      
-      {/* Botones de acción */}
-      <div className="flex gap-2">
-        {readStatus === NFCReadStatus.INACTIVE && (
-          <Button 
-            onClick={startVerification} 
-            className="flex-1 bg-blue-600 hover:bg-blue-700"
-          >
-            <CreditCard className="mr-2 h-4 w-4" />
-            Iniciar verificación
-          </Button>
-        )}
         
-        {(readStatus === NFCReadStatus.WAITING || readStatus === NFCReadStatus.READING) && (
-          <Button 
-            onClick={onCancel} 
-            variant="outline" 
-            className="flex-1"
-          >
-            Cancelar
-          </Button>
-        )}
-        
-        {(readStatus === NFCReadStatus.SUCCESS || readStatus === NFCReadStatus.ERROR) && (
-          <>
-            <Button 
-              onClick={startVerification} 
-              variant="outline" 
-              className="flex-1"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Reintentar
-            </Button>
-            
-            <Button 
-              onClick={onCancel} 
-              variant="ghost" 
-              className="flex-1"
-            >
-              Cerrar
-            </Button>
-          </>
-        )}
-      </div>
-      
-      {/* Pie de página con indicadores */}
-      <div className="mt-6 pt-4 border-t text-center">
-        <div className="flex justify-center items-center gap-4 text-xs text-gray-500">
-          <div className="flex items-center">
-            <Shield className="h-3 w-3 mr-1 text-gray-400" />
-            <span>Verificación segura</span>
-          </div>
-          <div className="flex items-center">
-            <Smartphone className="h-3 w-3 mr-1 text-gray-400" />
-            <span>Compatible READID</span>
-          </div>
-        </div>
+        <Card>
+          {/* Paso 0: Inicio */}
+          {step === 0 && (
+            <>
+              <CardHeader>
+                <CardTitle>Verificación de identidad</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center py-2">
+                  <div className="w-20 h-20 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Smartphone className="h-10 w-10 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-medium">Sistema READID</h3>
+                  <p className="text-gray-600 text-sm mb-4">
+                    Verificación avanzada mediante lectura NFC de cédula chilena
+                  </p>
+                </div>
+                
+                <div className="grid gap-3">
+                  {nfcAvailable ? (
+                    <Button 
+                      onClick={startNFCReading}
+                      className="flex items-center justify-center gap-2"
+                      size="lg"
+                    >
+                      <Wallet className="h-5 w-5" />
+                      <span>Iniciar verificación</span>
+                    </Button>
+                  ) : (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>NFC no disponible</AlertTitle>
+                      <AlertDescription>
+                        Su dispositivo no tiene capacidad NFC o está desactivada.
+                        Por favor, utilice un dispositivo compatible con NFC.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  
+                  {/* Botón para simulación (solo en desarrollo) */}
+                  <Button 
+                    onClick={simulateSuccess}
+                    variant="outline"
+                    className="text-xs"
+                    size="sm"
+                  >
+                    Simular verificación exitosa
+                  </Button>
+                </div>
+                
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </>
+          )}
+          
+          {/* Paso 1: Esperando cédula */}
+          {step === 1 && (
+            <>
+              <CardHeader>
+                <CardTitle>Esperando cédula</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center py-2">
+                  <div className="relative w-24 h-24 mx-auto mb-4">
+                    <div className="absolute inset-0 bg-blue-100 rounded-full animate-ping opacity-30"></div>
+                    <div className="absolute inset-4 bg-blue-200 rounded-full animate-ping opacity-50 delay-100"></div>
+                    <div className="absolute inset-8 bg-blue-300 rounded-full animate-ping opacity-70 delay-200"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Wallet className="h-12 w-12 text-primary" />
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-lg font-medium">Acerque su cédula al dispositivo</h3>
+                  <p className="text-gray-600 text-sm mb-4">
+                    Coloque el chip de su cédula cerca de la antena NFC de su teléfono
+                  </p>
+                </div>
+                
+                {/* Indicador de proximidad */}
+                {renderProximityIndicator()}
+                
+                <div className="bg-blue-50 rounded-lg p-4 text-blue-800 text-sm">
+                  <div className="flex items-start gap-2">
+                    <Radio className="h-5 w-5 mt-0.5 text-blue-600 animate-pulse" />
+                    <div>
+                      <p className="font-medium">Buscando señal NFC</p>
+                      <p className="text-blue-600">Moviendo lentamente la cédula cerca del dispositivo...</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <Button 
+                  onClick={resetProcess}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Cancelar
+                </Button>
+              </CardContent>
+            </>
+          )}
+          
+          {/* Paso 2: Leyendo cédula */}
+          {step === 2 && (
+            <>
+              <CardHeader>
+                <CardTitle>Leyendo cédula</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center py-2">
+                  <div className="relative w-24 h-24 mx-auto mb-4">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="h-full w-full rounded-full border-4 border-primary border-opacity-30 border-t-primary animate-spin"></div>
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Wallet className="h-12 w-12 text-primary" />
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-lg font-medium">Procesando información</h3>
+                  <p className="text-gray-600 text-sm mb-4">
+                    Mantenga la cédula inmóvil hasta que se complete la lectura
+                  </p>
+                </div>
+                
+                {/* Indicador de proximidad */}
+                {renderProximityIndicator()}
+                
+                {/* Estados de lectura */}
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <LucideCheck className="h-4 w-4 text-green-600" />
+                    <span>Conexión establecida con chip</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <LucideCheck className="h-4 w-4 text-green-600" />
+                    <span>Verificando certificado digital</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 rounded-full border-2 border-blue-600 border-t-transparent animate-spin"></div>
+                    <span>Leyendo datos personales...</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <div className="h-4 w-4 rounded-full border border-gray-300"></div>
+                    <span>Validando firma electrónica</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <div className="h-4 w-4 rounded-full border border-gray-300"></div>
+                    <span>Verificación completa</span>
+                  </div>
+                </div>
+                
+                <Button 
+                  onClick={resetProcess}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Cancelar
+                </Button>
+              </CardContent>
+            </>
+          )}
+          
+          {/* Paso 3: Error de lectura */}
+          {step === 3 && (
+            <>
+              <CardHeader>
+                <CardTitle className="text-destructive">Error de lectura</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center py-2">
+                  <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <AlertCircle className="h-10 w-10 text-red-600" />
+                  </div>
+                  
+                  <h3 className="text-lg font-medium text-red-600">Fallo en la lectura NFC</h3>
+                  <p className="text-gray-600 text-sm mb-4">
+                    {error || "No se pudo leer la cédula correctamente. Por favor intente nuevamente."}
+                  </p>
+                </div>
+                
+                <div className="bg-red-50 rounded-lg p-4 text-red-800 text-sm">
+                  <p className="font-medium">Sugerencias:</p>
+                  <ul className="list-disc list-inside space-y-1 mt-2">
+                    <li>Asegúrese de que su cédula tenga chip NFC</li>
+                    <li>Coloque la cédula directamente sobre la parte trasera del dispositivo</li>
+                    <li>Mantenga la cédula inmóvil durante la lectura</li>
+                    <li>Verifique que el NFC esté activado en su dispositivo</li>
+                  </ul>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <Button 
+                    onClick={resetProcess}
+                    variant="outline"
+                  >
+                    Volver al inicio
+                  </Button>
+                  <Button 
+                    onClick={startNFCReading}
+                  >
+                    Intentar nuevamente
+                  </Button>
+                </div>
+              </CardContent>
+            </>
+          )}
+          
+          {/* Paso 4: Lectura exitosa - Celebración */}
+          {step === 4 && (
+            <>
+              <CardHeader>
+                <CardTitle className="text-center text-green-600">¡Verificación Exitosa!</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="h-12 w-12 text-green-600" />
+                </div>
+                
+                <h3 className="text-xl font-semibold mb-2">¡+{points} puntos!</h3>
+                <p className="text-gray-600 mb-6">
+                  Su identidad ha sido verificada correctamente mediante el sistema READID.
+                </p>
+                
+                {/* Mostrar datos de la cédula */}
+                {cedulaData && (
+                  <div className="bg-gray-50 rounded-lg p-4 mb-4 text-left">
+                    <h4 className="font-medium mb-2 text-sm">Información verificada:</h4>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Nombre:</span>
+                        <span className="font-medium">{cedulaData.nombres} {cedulaData.apellidos}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">RUT:</span>
+                        <span className="font-medium">{cedulaData.rut}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Fecha de nacimiento:</span>
+                        <span className="font-medium">{cedulaData.fechaNacimiento}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                <p className="text-sm text-gray-500 mb-4">
+                  Espere mientras completamos el proceso...
+                </p>
+              </CardContent>
+            </>
+          )}
+          
+          {/* Paso 5: Verificación completada */}
+          {step === 5 && (
+            <>
+              <CardHeader>
+                <CardTitle className="text-center">Verificación Completa</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="h-10 w-10 text-green-600" />
+                </div>
+                
+                <h3 className="text-xl font-semibold mb-2">¡Verificación exitosa!</h3>
+                <p className="text-gray-600 mb-6">
+                  Su identidad ha sido verificada correctamente.
+                </p>
+                
+                <div className="bg-blue-50 text-blue-800 p-4 rounded-lg mb-6">
+                  <p className="text-sm">
+                    <span className="font-semibold">¡Felicidades!</span> Has obtenido {points} puntos por 
+                    completar la verificación con READID.
+                  </p>
+                </div>
+                
+                <p className="text-sm text-gray-500 mb-4">
+                  Puede cerrar esta ventana y continuar en su dispositivo principal.
+                </p>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <Button 
+                    onClick={resetProcess}
+                    variant="outline"
+                  >
+                    Nueva verificación
+                  </Button>
+                  <Button 
+                    onClick={() => window.close()} 
+                    variant="default"
+                  >
+                    Cerrar
+                  </Button>
+                </div>
+              </CardContent>
+            </>
+          )}
+        </Card>
       </div>
     </div>
   );

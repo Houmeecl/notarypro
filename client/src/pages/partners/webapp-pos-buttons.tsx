@@ -525,76 +525,133 @@ const WebAppPOSButtons = () => {
     
     // Crear una URL para la verificación móvil
     const verificationUrl = `${window.location.origin}/verificacion-identidad-movil?session=${sessionId}`;
+    const readidUrl = `${window.location.origin}/verificacion-identidad-readid?session=${sessionId}`;
     
-    // Crear un código QR para la verificación (simulado, en producción usaríamos una biblioteca real)
-    const generarQR = () => {
-      // En una implementación completa, usaríamos una biblioteca como qrcode
-      // En este caso, mostramos cómo se vería con un diálogo
-      const confirmed = window.confirm(
-        `Se ha generado un código QR con la URL: ${verificationUrl}\n\n` +
-        `Escanee este código con su teléfono móvil para completar la verificación.\n\n` +
-        `¿Desea simular una verificación exitosa?`
+    // Crear un diálogo para seleccionar el método de verificación
+    const seleccionarMetodo = () => {
+      // Simulamos un cuadro de diálogo personalizado (en producción sería un modal bonito)
+      const metodo = window.prompt(
+        "Seleccione el método de verificación:\n\n" +
+        "1. Sistema READID (recomendado)\n" +
+        "2. Lectura NFC simple\n" +
+        "3. Fotografía de documento\n" +
+        "4. Código QR para verificación móvil\n\n" +
+        "Ingrese el número de la opción deseada (1-4):"
       );
       
-      if (confirmed) {
-        // Simulamos una verificación exitosa
-        setIdentityVerified(true);
-        setShowCamera(false);
-        
-        toast({
-          title: "Identidad verificada",
-          description: "La identidad del cliente ha sido verificada mediante el proceso avanzado",
-          variant: "default",
-        });
+      switch (metodo) {
+        case "1": // READID
+          // Mostrar opciones para READID
+          const useREADID = window.confirm(
+            "El sistema READID proporcionará la verificación más segura.\n\n" +
+            "¿Desea abrir la interfaz READID en una nueva ventana o usar en este dispositivo?"
+          );
+          
+          if (useREADID) {
+            // En un entorno real, esto podría abrir en una ventana nueva o iframe
+            // Para simplificar, registramos puntos y simulamos verificación exitosa
+            
+            // Registrar interacción
+            apiRequest("POST", "/api/micro-interactions/record", {
+              type: "readid_verification",
+              points: 150,
+              metadata: { description: "Verificación avanzada de identidad con READID (POS)" }
+            }).catch(err => console.error("Error al registrar interacción:", err));
+            
+            // Confirmar si queremos simular verificación exitosa o abrir la URL
+            const openREADID = window.confirm(
+              "En un entorno de producción, esto abriría la interfaz READID.\n\n" +
+              "Seleccione ACEPTAR para abrir la interfaz READID en otra ventana " +
+              "o CANCELAR para simular una verificación exitosa."
+            );
+            
+            if (openREADID) {
+              // Abrir en nueva ventana
+              window.open(readidUrl, "_blank");
+              
+              // Simular que se completó la verificación después de un tiempo
+              setTimeout(() => {
+                setIdentityVerified(true);
+                toast({
+                  title: "¡Verificación READID completada! +150 puntos",
+                  description: "Identidad verificada mediante sistema READID avanzado",
+                  variant: "default",
+                });
+              }, 5000);
+            } else {
+              // Simular verificación exitosa
+              setIdentityVerified(true);
+              toast({
+                title: "¡Verificación READID completada! +150 puntos",
+                description: "Identidad verificada mediante sistema READID avanzado",
+                variant: "default",
+              });
+            }
+          } else {
+            // Volver a mostrar opciones
+            seleccionarMetodo();
+          }
+          break;
+          
+        case "2": // NFC simple
+          if (nfcAvailable) {
+            iniciarLecturaNFC();
+          } else {
+            toast({
+              title: "NFC no disponible",
+              description: "Este dispositivo no tiene NFC o está desactivado",
+              variant: "destructive",
+            });
+            // Volver a mostrar opciones
+            seleccionarMetodo();
+          }
+          break;
+          
+        case "3": // Fotografía
+          if (typeof navigator !== 'undefined' && navigator.mediaDevices) {
+            iniciarCamara();
+          } else {
+            toast({
+              title: "Cámara no disponible",
+              description: "Este dispositivo no tiene cámara o está desactivada",
+              variant: "destructive",
+            });
+            // Volver a mostrar opciones
+            seleccionarMetodo();
+          }
+          break;
+          
+        case "4": // QR
+          // Crear un código QR para la verificación (simulado, en producción usaríamos una biblioteca real)
+          window.confirm(
+            `Se ha generado un código QR con la URL: ${verificationUrl}\n\n` +
+            `Escanee este código con su teléfono móvil para completar la verificación.\n\n` +
+            `¿Desea simular una verificación exitosa?`
+          ) && (() => {
+            // Simulamos una verificación exitosa
+            setIdentityVerified(true);
+            setShowCamera(false);
+            toast({
+              title: "Identidad verificada",
+              description: "La identidad del cliente ha sido verificada mediante el proceso avanzado",
+              variant: "default",
+            });
+          })();
+          break;
+          
+        default:
+          // Si no se seleccionó una opción válida o se canceló
+          toast({
+            title: "Verificación cancelada",
+            description: "No se seleccionó ningún método de verificación",
+            variant: "destructive",
+          });
+          break;
       }
     };
     
-    // Mostrar opciones de verificación
-    if (nfcAvailable) {
-      // Si tenemos NFC disponible, ofrecer esa opción
-      const metodoVerificacion = window.confirm(
-        "Seleccione el método de verificación:\n\n" +
-        "- Aceptar: Utilizar lector NFC para cédula chilena\n" +
-        "- Cancelar: Utilizar otros métodos (cámara/QR)"
-      );
-      
-      if (metodoVerificacion) {
-        // Usar NFC
-        iniciarLecturaNFC();
-        return;
-      }
-    }
-    
-    // Si no eligió NFC o no está disponible, continuar con otros métodos
-    if (typeof navigator !== 'undefined' && navigator.mediaDevices) {
-      if (photoTaken) {
-        // Si ya tenemos una foto, verificar directamente
-        setIdentityVerified(true);
-        setShowCamera(false);
-        
-        toast({
-          title: "Identidad verificada",
-          description: "La identidad del cliente ha sido verificada correctamente",
-          variant: "default",
-        });
-      } else {
-        // Si no tenemos foto, ofrecer opciones
-        const useQR = window.confirm(
-          "¿Desea utilizar verificación avanzada con código QR? " +
-          "Esto permitirá al cliente usar su propio dispositivo para la verificación."
-        );
-        
-        if (useQR) {
-          generarQR();
-        } else {
-          // Iniciar cámara para verificación
-          iniciarCamara();
-        }
-      }
-    } else {
-      // Si no hay cámara disponible, siempre usar el código QR
-      generarQR();
-    }
+    // Iniciar el proceso de selección
+    seleccionarMetodo();
   };
   
   const procesarDocumento = async () => {
