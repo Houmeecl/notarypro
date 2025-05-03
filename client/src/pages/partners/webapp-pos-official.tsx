@@ -56,7 +56,6 @@ import { useLocation } from "wouter";
 
 // Componentes de identidad
 import NFCIdentityReader from "@/components/identity/NFCIdentityReader";
-import { NFCReadStatus } from "@/lib/nfc-reader";
 import NFCMicroInteractions from "@/components/micro-interactions/NFCMicroInteractions";
 import { CedulaChilenaData } from "@/lib/nfc-reader";
 import SignatureCanvas from "react-signature-canvas";
@@ -965,10 +964,9 @@ const WebAppPOSOfficial = () => {
                   />
                   
                   <NFCIdentityReader 
-                    onStatusChange={handleNFCStatusChange}
                     onSuccess={handleNFCSuccess}
+                    onCancel={() => setShowIdentityVerification(false)}
                     onError={handleNFCError}
-                    autoStart={true}
                   />
                 </div>
                 
