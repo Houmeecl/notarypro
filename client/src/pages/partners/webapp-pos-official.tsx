@@ -323,13 +323,78 @@ const WebAppPOSOfficial = () => {
     setIsProcessingPayment(true);
     
     try {
-      // En una implementación real, esto se conectaría con un procesador de pagos
-      // Para demostración, simulamos un proceso exitoso después de 2 segundos
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Integración con MercadoPago
+      // Preparar los items para el pago
+      const mercadoPagoItems = [
+        {
+          title: `Servicio de Documento - ${tiposDocumento.find(t => t.id === selectedDocumentType)?.nombre || 'Documento'}`,
+          quantity: 1,
+          unit_price: 5990,
+          currency_id: 'CLP'
+        }
+      ];
       
-      // Mostrar el panel de firma
-      setIsProcessingPayment(false);
-      setIsSignatureSheetOpen(true);
+      // Generar identificador único para la transacción
+      const externalReference = `TX-WEBAPP-${Date.now().toString()}`;
+      
+      // Guardar datos del cliente en localStorage para recuperación post-redirección
+      try {
+        // Guardar información que necesitaremos recuperar después de la redirección
+        localStorage.setItem(`tx_customer_${externalReference}`, JSON.stringify({
+          name: customerName,
+          email: customerEmail,
+          document: customerDocument
+        }));
+        
+        // También podemos guardar el estado de verificación y otros datos relevantes
+        localStorage.setItem(`tx_verification_${externalReference}`, JSON.stringify({
+          verificationPoints
+        }));
+      } catch (e) {
+        console.error('Error guardando datos para recuperación:', e);
+      }
+      
+      // URLs de retorno para procesamiento de pago
+      const backUrls = {
+        success: `${window.location.origin}/webapp-pos-official?status=success&reference=${externalReference}`,
+        failure: `${window.location.origin}/webapp-pos-official?status=failure&reference=${externalReference}`,
+        pending: `${window.location.origin}/webapp-pos-official?status=pending&reference=${externalReference}`
+      };
+      
+      // Crear la preferencia de pago
+      const response = await fetch('/api/payments/create-preference', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          items: mercadoPagoItems,
+          backUrls,
+          externalReference,
+          identification: {
+            type: 'RUT',
+            number: customerDocument
+          },
+          customer: {
+            name: customerName,
+            email: customerEmail
+          }
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Error al crear preferencia de pago');
+      }
+      
+      const preference = await response.json();
+      
+      // Redirigir al usuario al checkout de MercadoPago
+      if (preference.init_point) {
+        window.location.href = preference.init_point;
+        return; // Terminar ejecución aquí ya que estamos redirigiendo
+      } else {
+        throw new Error('No se recibió URL de pago');
+      }
       
     } catch (error) {
       console.error('Error procesando pago:', error);
