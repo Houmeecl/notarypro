@@ -33,7 +33,7 @@ const getStatusBadge = (status: string) => {
 
 export default function DocumentViewPage() {
   const { toast } = useToast();
-  const [, params] = useRoute("/documents/:documentId");
+  const [, params] = useRoute("/document-view/:documentId");
   const documentId = params?.documentId;
   const [previewHtml, setPreviewHtml] = useState<string>("");
 

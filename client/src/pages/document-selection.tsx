@@ -75,7 +75,9 @@ export default function DocumentSelectionPage() {
       });
       
       // Redirigir a una página de éxito o visualización del documento
-      navigate("/document-view/example");
+      // Generamos un ID único para el documento
+      const documentId = `doc-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+      navigate(`/document-view/${documentId}`);
     } catch (error) {
       toast({
         title: "Error",
