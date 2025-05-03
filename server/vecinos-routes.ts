@@ -8,6 +8,7 @@ import {
 } from "@shared/vecinos-schema";
 import { and, eq, like, desc } from "drizzle-orm";
 import { z } from "zod";
+import { vecinosStore } from "./vecinos-memory-store";
 
 // Crear router para rutas de Vecinos Xpress
 export const vecinosRouter = Router();
@@ -65,8 +66,8 @@ vecinosRouter.post("/login", async (req: Request, res: Response) => {
     const validatedData = loginSchema.parse(req.body);
     const { username, password } = validatedData;
     
-    // Buscar el socio en la base de datos
-    const [partner] = await db.select().from(partners).where(eq(partners.username, username));
+    // Buscar el socio en el almacenamiento en memoria
+    const partner = vecinosStore.getPartnerByUsername(username);
     
     if (!partner) {
       return res.status(401).json({ message: "Credenciales inválidas" });
@@ -97,9 +98,7 @@ vecinosRouter.post("/login", async (req: Request, res: Response) => {
     });
     
     // Actualizar fecha de último login
-    await db.update(partners)
-      .set({ lastLoginAt: new Date() })
-      .where(eq(partners.id, partner.id));
+    vecinosStore.updateLastLogin(partner.id);
     
     // Devolver información del socio y token
     return res.status(200).json({
@@ -213,8 +212,8 @@ vecinosRouter.get("/partner-info", isPartnerAuthenticated, async (req: Request, 
   try {
     const partnerId = req.vecinosUser!.id;
     
-    // Buscar el socio en la base de datos
-    const [partner] = await db.select().from(partners).where(eq(partners.id, partnerId));
+    // Buscar el socio en el almacenamiento en memoria
+    const partner = vecinosStore.getPartnerById(partnerId);
     
     if (!partner) {
       return res.status(404).json({ message: "Socio no encontrado" });
@@ -244,11 +243,8 @@ vecinosRouter.get("/documents", isPartnerAuthenticated, async (req: Request, res
   try {
     const partnerId = req.vecinosUser!.id;
     
-    // Buscar documentos del socio ordenados por fecha de creación (más recientes primero)
-    const partnerDocuments = await db.select()
-      .from(documents)
-      .where(eq(documents.partnerId, partnerId))
-      .orderBy(desc(documents.createdAt));
+    // Obtener documentos del socio usando el almacenamiento en memoria
+    const partnerDocuments = vecinosStore.getPartnerDocuments(partnerId);
     
     return res.status(200).json(partnerDocuments);
   } catch (error) {
@@ -262,11 +258,8 @@ vecinosRouter.get("/transactions", isPartnerAuthenticated, async (req: Request, 
   try {
     const partnerId = req.vecinosUser!.id;
     
-    // Buscar transacciones del socio ordenadas por fecha (más recientes primero)
-    const partnerTransactionsList = await db.select()
-      .from(partnerTransactions)
-      .where(eq(partnerTransactions.partnerId, partnerId))
-      .orderBy(desc(partnerTransactions.createdAt));
+    // Obtener transacciones del socio usando el almacenamiento en memoria
+    const partnerTransactionsList = vecinosStore.getPartnerTransactions(partnerId);
     
     return res.status(200).json(partnerTransactionsList);
   } catch (error) {
@@ -467,11 +460,8 @@ vecinosRouter.get("/notifications", isPartnerAuthenticated, async (req: Request,
   try {
     const partnerId = req.vecinosUser!.id;
     
-    // Buscar notificaciones del socio ordenadas por fecha (más recientes primero)
-    const notifications = await db.select()
-      .from(partnerNotifications)
-      .where(eq(partnerNotifications.partnerId, partnerId))
-      .orderBy(desc(partnerNotifications.createdAt));
+    // Obtener notificaciones del socio usando el almacenamiento en memoria
+    const notifications = vecinosStore.getPartnerNotifications(partnerId);
     
     return res.status(200).json(notifications);
   } catch (error) {
