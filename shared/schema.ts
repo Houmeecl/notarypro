@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, date, timestamp, jsonb, real } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, date, timestamp, jsonb, real, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { eq, and } from "drizzle-orm";
@@ -1313,3 +1313,35 @@ export const insertNotaryRegistryConnectionSchema = createInsertSchema(notaryReg
 
 export type NotaryRegistryConnection = typeof notaryRegistryConnections.$inferSelect;
 export type InsertNotaryRegistryConnection = z.infer<typeof insertNotaryRegistryConnectionSchema>;
+
+// API Identity Verification (Nueva tabla para la API de verificación de identidad)
+export const identity_verifications = pgTable("api_identity_verifications", {
+  id: serial("id").primaryKey(),
+  sessionId: varchar("session_id", { length: 128 }).notNull().unique(),
+  status: varchar("status", { length: 50 }).notNull().default("pending"), // pending, verified, failed, expired
+  requiredVerifications: text("required_verifications").notNull(), // JSON: ["document", "facial", "nfc"]
+  completedVerifications: text("completed_verifications"), // JSON: ["document", "facial"]
+  userData: text("user_data"), // JSON con datos proporcionados del usuario
+  documentData: text("document_data"), // JSON con datos extraídos del documento
+  facialData: text("facial_data"), // JSON con datos de verificación facial
+  nfcData: text("nfc_data"), // JSON con datos de verificación NFC
+  verificationResult: text("verification_result"), // JSON con resultado final
+  callbackUrl: text("callback_url").notNull(),
+  customBranding: text("custom_branding"), // JSON con personalizaciones de marca
+  apiKey: text("api_key"), // Clave API que hizo la solicitud
+  tokenExpiry: timestamp("token_expiry"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at"),
+});
+
+export type ApiIdentityVerification = typeof identity_verifications.$inferSelect;
+export type InsertApiIdentityVerification = typeof identity_verifications.$inferInsert;
+
+export const insertApiIdentityVerificationSchema = createInsertSchema(identity_verifications).pick({
+  sessionId: true,
+  status: true,
+  requiredVerifications: true,
+  callbackUrl: true,
+  apiKey: true,
+  tokenExpiry: true,
+});
