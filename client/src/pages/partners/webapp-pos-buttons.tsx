@@ -1249,10 +1249,10 @@ const WebAppPOSButtons = () => {
                 {/* Logo estilo NotaryPro */}
                 <div className="flex items-center">
                   <div className="bg-zinc-100 p-2 rounded-md shadow-md border border-zinc-300 mr-1 flex items-center">
-                    {/* Logo NotaryPro oficial en azul */}
+                    {/* Logo NotaryPro oficial en rojo */}
                     <svg width="30" height="30" viewBox="0 0 100 100" className="mr-2">
                       <path d="M30,10 L30,65 L10,50 L10,10 L30,10 Z M70,10 L70,50 L50,65 L50,10 L70,10 Z" 
-                            fill="#2563EB" strokeWidth="2" stroke="#2563EB" />
+                            fill="#E11D48" strokeWidth="2" stroke="#E11D48" />
                     </svg>
                     <h1 className="text-xl font-black text-zinc-900 tracking-tight">
                       NOTARY<span className="text-blue-600">PRO</span>
@@ -1260,10 +1260,10 @@ const WebAppPOSButtons = () => {
                   </div>
                   <div className="h-8 w-0.5 bg-zinc-600 mx-2"></div>
                   <div className="bg-zinc-700 p-2 rounded-md shadow-md border border-zinc-600 flex items-center">
-                    {/* Logo VecinosXpress rojo */}
+                    {/* Logo VecinosXpress azul con punta de pluma */}
                     <svg width="30" height="30" viewBox="0 0 100 100" className="mr-2">
-                      <path d="M30,10 L30,65 L10,50 L10,10 L30,10 Z M70,10 L70,50 L50,65 L50,10 L70,10 Z" 
-                            fill="#E11D48" strokeWidth="2" stroke="#E11D48" />
+                      <path d="M20,15 C25,10 35,15 35,30 C35,50 15,70 15,85 C15,90 20,90 25,85 C35,75 55,45 75,25 C85,15 85,15 80,20 C70,30 50,60 45,75 C40,90 50,90 60,80 C70,70 80,60 85,55"
+                            fill="none" stroke="#2563EB" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                     <h2 className="text-lg font-bold text-white tracking-tight">
                       VECINOS <span className="text-blue-400">XPRESS</span>
