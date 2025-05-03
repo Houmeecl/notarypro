@@ -7,7 +7,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { setupAuth } from "./auth";
 import { db } from "./db";
-import { users } from "@shared/schema";
+import { users, partners } from "@shared/schema";
 import { eq } from "drizzle-orm";
 
 export function registerRoutes(app: Express): Server {
@@ -182,29 +182,8 @@ async function initializeTestAdmins() {
         createdAt: new Date()
       }).returning();
       
-      // Verificar si ya existe el perfil de socio
-      const [existingPartner] = await db.select().from(partners).where(
-        eq(partners.userId, newUser.id)
-      );
-      
-      // Crear perfil de socio si no existe
-      if (!existingPartner) {
-        await db.insert(partners).values({
-          userId: newUser.id,
-          storeName: "Minimarket El Sol",
-          managerName: "John Doe",
-          region: "Metropolitana",
-          commune: "Providencia",
-          address: "Av. Providencia 1234, Santiago",
-          phone: "+56 9 1234 5678",
-          email: "demo@vecinoxpress.cl",
-          hasInternet: true,
-          hasDevice: true,
-          status: "active",
-          createdAt: new Date(),
-          updatedAt: new Date()
-        });
-      }
+      // Vamos a actualizar esta parte para enfocarnos en las credenciales primero
+      console.log("Usuario partner creado, ahora puedes iniciar sesión con demopartner/password123");
       
       console.log("Usuario demo partner inicializado correctamente");
     }
