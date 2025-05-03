@@ -429,6 +429,11 @@ export default function VecinosExpress() {
                 <div className="absolute -top-6 -left-6 w-24 h-24 bg-primary/20 rounded-full"></div>
                 <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/10 rounded-full"></div>
                 <div className="bg-white p-6 rounded-xl shadow-xl relative z-10">
+                  {/* Ilustración principal de notario/vecino atendiendo cliente */}
+                  <div className="mb-6 flex justify-center">
+                    <VecinosIllustrations.NeighborHelping />
+                  </div>
+                  
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col items-center bg-red-50 p-4 rounded-lg">
                       <DollarSign className="h-8 w-8 text-primary mb-2" />
@@ -466,6 +471,9 @@ export default function VecinosExpress() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 transition-all hover:shadow-lg">
+              <div className="flex justify-center mb-6">
+                <VecinosIllustrations.SellerVisiting />
+              </div>
               <div className="rounded-full bg-primary/10 w-16 h-16 flex items-center justify-center mb-4">
                 <span className="text-primary font-bold text-2xl">1</span>
               </div>
@@ -476,6 +484,9 @@ export default function VecinosExpress() {
             </div>
             
             <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 transition-all hover:shadow-lg">
+              <div className="flex justify-center mb-6">
+                <VecinosIllustrations.SupervisorManaging />
+              </div>
               <div className="rounded-full bg-primary/10 w-16 h-16 flex items-center justify-center mb-4">
                 <span className="text-primary font-bold text-2xl">2</span>
               </div>
@@ -486,6 +497,9 @@ export default function VecinosExpress() {
             </div>
             
             <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 transition-all hover:shadow-lg">
+              <div className="flex justify-center mb-6">
+                <VecinosIllustrations.CertifierReviewing />
+              </div>
               <div className="rounded-full bg-primary/10 w-16 h-16 flex items-center justify-center mb-4">
                 <span className="text-primary font-bold text-2xl">3</span>
               </div>
@@ -604,7 +618,7 @@ export default function VecinosExpress() {
                 </ul>
               </div>
               <div className="md:w-1/3 flex justify-center">
-                <img src={notaryProLogo} alt="Equipo NotaryPro" className="h-32" />
+                <VecinosIllustrations.PaymentSystem />
               </div>
             </div>
           </div>
