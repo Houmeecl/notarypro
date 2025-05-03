@@ -43,6 +43,11 @@ export default function VecinosDashboard() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Redirección directa a la aplicación real (POS)
+    window.location.href = "/partners/webapp-pos";
+    return;
+    
+    // El código a continuación no se ejecutará debido al return
     // Verificar si hay token almacenado
     const token = localStorage.getItem('vecinos_token');
     if (!token) {
