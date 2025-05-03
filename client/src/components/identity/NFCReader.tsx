@@ -95,46 +95,19 @@ const NFCReader: React.FC<NFCReaderProps> = ({ onSuccess, onError, demoMode = fa
     }
   };
   
-  // Lectura con Web NFC API (Chrome)
+  // Lectura con Web NFC API (Chrome) utilizando implementación avanzada
   const readWithWebNFC = async () => {
     try {
-      const ndef = new (window as any).NDEFReader();
-      await ndef.scan();
+      const { readWithWebNFC } = await import('@/lib/nfc-real');
       
-      ndef.addEventListener("reading", ({ message, serialNumber }: any) => {
-        // Procesar mensaje NDEF
-        const records = Array.from(message.records);
-        const textDecoder = new TextDecoder();
-        
-        // Extraer datos relevantes
-        let nfcData: any = {
-          chipId: serialNumber,
-          success: true
-        };
-        
-        records.forEach((record: any) => {
-          if (record.recordType === "text") {
-            const text = textDecoder.decode(record.data);
-            try {
-              const parsedData = JSON.parse(text);
-              nfcData = { ...nfcData, ...parsedData };
-            } catch (e) {
-              // Si no es JSON, guardar como texto plano
-              nfcData.rawText = text;
-            }
-          }
-        });
-        
-        setStatus('success');
-        setMessage('Lectura NFC completada con éxito');
-        onSuccess(nfcData);
-      });
+      setMessage('Acerque su documento al dispositivo...');
       
-      ndef.addEventListener("error", (error: any) => {
-        setStatus('error');
-        setMessage(`Error en la lectura NFC: ${error.message}`);
-        onError(`Error en la lectura NFC: ${error.message}`);
-      });
+      // Utilizar la implementación avanzada para leer con Web NFC API
+      const nfcData = await readWithWebNFC();
+      
+      setStatus('success');
+      setMessage('Lectura NFC completada con éxito');
+      onSuccess(nfcData);
       
     } catch (error: any) {
       // Si estamos en modo demo y falla, usamos simulación
@@ -148,58 +121,80 @@ const NFCReader: React.FC<NFCReaderProps> = ({ onSuccess, onError, demoMode = fa
     }
   };
   
-  // Implementaciones alternativas para diferentes APIs NFC
-  const readWithAlternativeNFC = () => {
-    // Implementación para API alternativa (Safari)
-    // Como fallback, usar simulación en modo demo
-    if (demoMode) {
-      simulateNFCRead();
-    } else {
-      setStatus('error');
-      setMessage('API NFC no implementada en este navegador');
-      onError('API NFC no implementada en este navegador');
-    }
-  };
-  
-  const readWithAndroidNFC = () => {
-    // Implementación para API Android
-    // Como fallback, usar simulación en modo demo
-    if (demoMode) {
-      simulateNFCRead();
-    } else {
-      setStatus('error');
-      setMessage('API NFC Android no implementada');
-      onError('API NFC Android no implementada');
-    }
-  };
-  
-  const readWithAndroidInterface = () => {
-    // Implementación para interfaz JavaScript-Android
+  // Implementación para API alternativa (Safari)
+  const readWithAlternativeNFC = async () => {
     try {
-      (window as any).androidInterface.readNFC((result: string) => {
-        try {
-          const nfcData = JSON.parse(result);
-          if (nfcData.success) {
-            setStatus('success');
-            setMessage('Lectura NFC completada con éxito');
-            onSuccess(nfcData);
-          } else {
-            throw new Error(nfcData.error || 'Error desconocido');
-          }
-        } catch (parseError) {
-          setStatus('error');
-          setMessage('Error al procesar los datos NFC');
-          onError('Error al procesar los datos NFC');
-        }
-      });
-    } catch (error) {
+      const { readWithAlternativeNFC } = await import('@/lib/nfc-real');
+      
+      setMessage('Acerque su documento al dispositivo...');
+      
+      // Utilizar la implementación avanzada para la API alternativa
+      const nfcData = await readWithAlternativeNFC();
+      
+      setStatus('success');
+      setMessage('Lectura NFC completada con éxito');
+      onSuccess(nfcData);
+      
+    } catch (error: any) {
       // Como fallback, usar simulación en modo demo
       if (demoMode) {
         simulateNFCRead();
       } else {
         setStatus('error');
-        setMessage('Error al comunicarse con la interfaz Android');
-        onError('Error al comunicarse con la interfaz Android');
+        setMessage(`API NFC alternativa: ${error.message}`);
+        onError(`API NFC alternativa: ${error.message}`);
+      }
+    }
+  };
+  
+  // Implementación para API Android
+  const readWithAndroidNFC = async () => {
+    try {
+      setMessage('Acerque su documento al dispositivo NFC...');
+      
+      // En una implementación real, usaríamos la API específica de Android
+      // Por ahora, intentamos con la interfaz web
+      const { readWithWebNFC } = await import('@/lib/nfc-real');
+      const nfcData = await readWithWebNFC();
+      
+      setStatus('success');
+      setMessage('Lectura NFC completada con éxito');
+      onSuccess(nfcData);
+      
+    } catch (error: any) {
+      // Como fallback, usar simulación en modo demo
+      if (demoMode) {
+        simulateNFCRead();
+      } else {
+        setStatus('error');
+        setMessage(`Error en API Android: ${error.message}`);
+        onError(`Error en API Android: ${error.message}`);
+      }
+    }
+  };
+  
+  // Interfaz JavaScript-Android utilizando implementación avanzada
+  const readWithAndroidInterface = async () => {
+    try {
+      const { readWithAndroidInterface } = await import('@/lib/nfc-real');
+      
+      setMessage('Acerque su documento al dispositivo...');
+      
+      // Utilizar la implementación avanzada para la interfaz JavaScript-Android
+      const nfcData = await readWithAndroidInterface();
+      
+      setStatus('success');
+      setMessage('Lectura NFC completada con éxito');
+      onSuccess(nfcData);
+      
+    } catch (error: any) {
+      // Como fallback, usar simulación en modo demo
+      if (demoMode) {
+        simulateNFCRead();
+      } else {
+        setStatus('error');
+        setMessage(`Error en interfaz Android: ${error.message}`);
+        onError(`Error en interfaz Android: ${error.message}`);
       }
     }
   };
