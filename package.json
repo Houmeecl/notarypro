@@ -53,6 +53,7 @@
     "@types/multer": "^1.4.12",
     "@types/qrcode": "^1.5.5",
     "@types/react-helmet": "^6.1.11",
+    "@types/uuid": "^10.0.0",
     "agora-access-token": "^2.0.4",
     "axios": "^1.9.0",
     "canvas-confetti": "^1.9.3",

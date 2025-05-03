@@ -4,8 +4,26 @@ import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from './db';
-import { identity_verifications, type IdentityVerification } from '@shared/schema';
-import jwt from 'jsonwebtoken';
+import { identity_verifications, type ApiIdentityVerification } from '@shared/schema';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+
+// Interfaces para identidad
+interface IdentityToken {
+  sessionId: string;
+  userData?: any;
+  requiredVerifications: string[];
+  callbackUrl: string;
+  [key: string]: any;
+}
+
+// Extender el tipo Request para incluir el usuario autenticado
+declare global {
+  namespace Express {
+    interface Request {
+      user?: IdentityToken;
+    }
+  }
+}
 
 // Configuración de multer para subida de archivos
 const storage = multer.diskStorage({
@@ -82,7 +100,7 @@ function validateIdentityToken(req: Request, res: Response, next: any) {
   
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'notarypro_identity_secret');
-    req.user = decoded;
+    req.user = decoded as IdentityToken;
     next();
   } catch (error) {
     return res.status(403).json({
