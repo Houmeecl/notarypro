@@ -1347,3 +1347,6 @@ export const insertApiIdentityVerificationSchema = createInsertSchema(identity_v
   apiKey: true,
   tokenExpiry: true,
 });
+
+// Exportación de los esquemas del sistema de gestión documental centralizado
+export * from './document-schema';

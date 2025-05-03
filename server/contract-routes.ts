@@ -1,220 +1,198 @@
 /**
- * Rutas API para la gestión de contratos digitales
+ * Módulo de Gestión de Contratos
  * 
- * Este módulo proporciona endpoints para listar, ver y generar contratos
- * con datos específicos del usuario.
+ * Este módulo proporciona funcionalidades para la generación, gestión y
+ * validación de contratos como parte del sistema de documentos.
  */
 
 import { Router, Request, Response } from "express";
 import * as fs from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+import { documents, documentTemplates } from "@shared/schema";
+import multer from "multer";
+
+// Configurar almacenamiento para archivos de contrato
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(process.cwd(), 'uploads', 'contracts');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, 'contract-' + uniqueSuffix + ext);
+  }
+});
+
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB max file size
+});
 
 export const contractRouter = Router();
 
-// Lista de contratos disponibles
-const contratos = [
-  {
-    id: "compraventa-vehiculo",
-    name: "Contrato de Compraventa de Vehículo",
-    filename: "compraventa_vehiculo.html"
-  },
-  {
-    id: "transferencia-vehiculo",
-    name: "Contrato de Transferencia de Vehículo",
-    filename: "transferencia_vehiculo.html"
-  }
-];
-
-// Definición de los campos necesarios para cada contrato
-const camposContratos: Record<string, any> = {
-  "compraventa-vehiculo": [
-    { name: "ciudad", label: "Ciudad", type: "text", required: true },
-    { name: "fecha", label: "Fecha", type: "date", required: true },
-    { name: "nombreVendedor", label: "Nombre completo del vendedor", type: "text", required: true },
-    { name: "nacionalidadVendedor", label: "Nacionalidad del vendedor", type: "text", required: true },
-    { name: "rutVendedor", label: "RUT del vendedor", type: "text", required: true },
-    { name: "domicilioVendedor", label: "Domicilio del vendedor", type: "text", required: true },
-    { name: "nombreComprador", label: "Nombre completo del comprador", type: "text", required: true },
-    { name: "nacionalidadComprador", label: "Nacionalidad del comprador", type: "text", required: true },
-    { name: "rutComprador", label: "RUT del comprador", type: "text", required: true },
-    { name: "domicilioComprador", label: "Domicilio del comprador", type: "text", required: true },
-    { name: "marcaVehiculo", label: "Marca del vehículo", type: "text", required: true },
-    { name: "modeloVehiculo", label: "Modelo del vehículo", type: "text", required: true },
-    { name: "añoVehiculo", label: "Año del vehículo", type: "number", required: true },
-    { name: "colorVehiculo", label: "Color del vehículo", type: "text", required: true },
-    { name: "numeroMotor", label: "Número de motor", type: "text", required: true },
-    { name: "numeroChasis", label: "Número de chasis", type: "text", required: true },
-    { name: "placaPatente", label: "Placa patente", type: "text", required: true },
-    { name: "precioVehiculo", label: "Precio de venta", type: "text", required: true },
-    { name: "formaPago", label: "Forma de pago", type: "text", required: true },
-    { name: "responsableTransferencia", label: "Responsable de la transferencia", type: "text", required: true },
-    { name: "ciudadDomicilio", label: "Ciudad de domicilio legal", type: "text", required: true }
-  ],
-  "transferencia-vehiculo": [
-    { name: "ciudad", label: "Ciudad", type: "text", required: true },
-    { name: "fecha", label: "Fecha", type: "date", required: true },
-    { name: "nombreCedente", label: "Nombre completo del cedente", type: "text", required: true },
-    { name: "nacionalidadCedente", label: "Nacionalidad del cedente", type: "text", required: true },
-    { name: "rutCedente", label: "RUT del cedente", type: "text", required: true },
-    { name: "domicilioCedente", label: "Domicilio del cedente", type: "text", required: true },
-    { name: "nombreCesionario", label: "Nombre completo del cesionario", type: "text", required: true },
-    { name: "nacionalidadCesionario", label: "Nacionalidad del cesionario", type: "text", required: true },
-    { name: "rutCesionario", label: "RUT del cesionario", type: "text", required: true },
-    { name: "domicilioCesionario", label: "Domicilio del cesionario", type: "text", required: true },
-    { name: "tipoVehiculo", label: "Tipo de vehículo", type: "text", required: true },
-    { name: "marcaVehiculo", label: "Marca del vehículo", type: "text", required: true },
-    { name: "modeloVehiculo", label: "Modelo del vehículo", type: "text", required: true },
-    { name: "añoVehiculo", label: "Año del vehículo", type: "number", required: true },
-    { name: "colorVehiculo", label: "Color del vehículo", type: "text", required: true },
-    { name: "numeroMotor", label: "Número de motor", type: "text", required: true },
-    { name: "numeroChasis", label: "Número de chasis", type: "text", required: true },
-    { name: "placaPatente", label: "Placa patente", type: "text", required: true },
-    { name: "numeroInscripcion", label: "Número de inscripción", type: "text", required: true },
-    { name: "precioTransferencia", label: "Precio de transferencia", type: "text", required: true },
-    { name: "formaPago", label: "Forma de pago", type: "text", required: true },
-    { name: "responsableTransferencia", label: "Responsable de la transferencia", type: "text", required: true },
-    { name: "ciudadDomicilio", label: "Ciudad de domicilio legal", type: "text", required: true }
-  ]
-};
-
-// Middleware para verificar autenticación (opcional)
+// Middleware para verificar autenticación
 function isAuthenticated(req: Request, res: Response, next: any) {
   if (req.isAuthenticated()) {
     return next();
   }
-  res.status(401).json({ error: 'Debe iniciar sesión para acceder a esta funcionalidad' });
+  res.status(401).json({ error: 'Acceso no autorizado' });
 }
 
 /**
- * Obtener lista de todos los contratos disponibles
- * GET /api/contracts
+ * Obtener plantillas de contrato disponibles
+ * GET /api/contracts/templates
  */
-contractRouter.get('/', async (req: Request, res: Response) => {
+contractRouter.get('/templates', async (req: Request, res: Response) => {
   try {
-    res.json({ contratos });
+    const templates = await db.select().from(documentTemplates).where(eq(documentTemplates.active, true));
+    res.json(templates);
   } catch (error) {
-    console.error('Error al obtener contratos:', error);
-    res.status(500).json({ error: 'Error al obtener la lista de contratos' });
+    console.error('Error al obtener plantillas de contrato:', error);
+    res.status(500).json({ error: 'Error al obtener plantillas de contrato' });
   }
 });
 
 /**
- * Obtener un contrato específico
- * GET /api/contracts/:id
+ * Obtener una plantilla específica
+ * GET /api/contracts/templates/:id
  */
-contractRouter.get('/:id', async (req: Request, res: Response) => {
+contractRouter.get('/templates/:id', async (req: Request, res: Response) => {
   try {
-    const contratoId = req.params.id;
-    const contrato = contratos.find(c => c.id === contratoId);
+    const { id } = req.params;
     
-    if (!contrato) {
-      return res.status(404).json({ error: 'Contrato no encontrado' });
+    const template = await db.select().from(documentTemplates).where(eq(documentTemplates.id, parseInt(id))).limit(1);
+    
+    if (template.length === 0) {
+      return res.status(404).json({ error: 'Plantilla no encontrada' });
     }
     
-    res.json({ contrato });
+    res.json(template[0]);
   } catch (error) {
-    console.error('Error al obtener contrato:', error);
-    res.status(500).json({ error: 'Error al obtener el contrato' });
+    console.error('Error al obtener plantilla:', error);
+    res.status(500).json({ error: 'Error al obtener plantilla' });
   }
 });
 
 /**
- * Obtener campos requeridos para un contrato específico
- * GET /api/contracts/:id/fields
+ * Generar un contrato a partir de una plantilla
+ * POST /api/contracts/generate
  */
-contractRouter.get('/:id/fields', async (req: Request, res: Response) => {
+contractRouter.post('/generate', isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const contratoId = req.params.id;
-    const campos = camposContratos[contratoId];
+    const { templateId, formData, title } = req.body;
     
-    if (!campos) {
-      return res.status(404).json({ error: 'Campos de contrato no encontrados' });
+    if (!templateId || !formData) {
+      return res.status(400).json({ error: 'Se requiere templateId y formData' });
     }
     
-    res.json({ fields: campos });
-  } catch (error) {
-    console.error('Error al obtener campos del contrato:', error);
-    res.status(500).json({ error: 'Error al obtener los campos del contrato' });
-  }
-});
-
-/**
- * Generar un contrato con datos específicos
- * POST /api/contracts/:id/generate
- */
-contractRouter.post('/:id/generate', async (req: Request, res: Response) => {
-  try {
-    const contratoId = req.params.id;
-    const contrato = contratos.find(c => c.id === contratoId);
+    // Obtener la plantilla
+    const template = await db.select().from(documentTemplates).where(eq(documentTemplates.id, templateId)).limit(1);
     
-    if (!contrato) {
-      return res.status(404).json({ error: 'Contrato no encontrado' });
+    if (template.length === 0) {
+      return res.status(404).json({ error: 'Plantilla no encontrada' });
     }
     
-    const campos = camposContratos[contratoId];
-    
-    // Verificar si todos los campos requeridos están presentes
-    const camposFaltantes = campos
-      .filter(campo => campo.required)
-      .filter(campo => !req.body[campo.name]);
-    
-    if (camposFaltantes.length > 0) {
-      return res.status(400).json({ 
-        error: 'Campos requeridos faltantes', 
-        campos: camposFaltantes.map(c => c.name) 
-      });
-    }
-    
-    // Generar código de verificación único
-    const verificationCode = generateVerificationCode();
-    
-    // Leer la plantilla del contrato
-    const templatePath = path.join(process.cwd(), 'docs', 'contratos', contrato.filename);
-    let templateContent = fs.readFileSync(templatePath, 'utf8');
+    // Generar contrato HTML con los datos del formulario
+    let contractHtml = template[0].htmlTemplate;
     
     // Reemplazar variables en la plantilla
-    const formData = req.body;
-    templateContent = templateContent.replace(/{{verificationCode}}/g, verificationCode);
-    templateContent = templateContent.replace(/{{fechaGeneracion}}/g, new Date().toLocaleDateString('es-CL'));
+    // Asumimos que las variables están en formato {{nombreVariable}}
+    contractHtml = contractHtml.replace(/\{\{([^}]+)\}\}/g, (match, field) => {
+      return formData[field] || '';
+    });
     
-    // Reemplazar todos los campos de datos
-    for (const key in formData) {
-      const regex = new RegExp(`{{${key}}}`, 'g');
-      templateContent = templateContent.replace(regex, formData[key]);
-    }
+    // Guardar el HTML generado en un archivo
+    const contractFileName = `contract-${Date.now()}.html`;
+    const contractFilePath = path.join(process.cwd(), 'docs', contractFileName);
     
-    // Generar archivo final
-    const outputFilename = `${contratoId}-${verificationCode}.html`;
-    const outputPath = path.join(process.cwd(), 'docs', 'contratos', 'generados', outputFilename);
+    fs.writeFileSync(contractFilePath, contractHtml);
     
-    // Crear directorio si no existe
-    const outputDir = path.join(process.cwd(), 'docs', 'contratos', 'generados');
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
+    // Registrar el contrato en la base de datos
+    const [document] = await db.insert(documents)
+      .values({
+        userId: req.user.id,
+        templateId,
+        title: title || `Contrato generado - ${new Date().toLocaleDateString('es-CL')}`,
+        formData,
+        status: 'draft',
+        filePath: contractFilePath,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })
+      .returning();
     
-    fs.writeFileSync(outputPath, templateContent);
-    
-    // Devolver URL del contrato generado
-    const contractUrl = `/docs/contratos/generados/${outputFilename}`;
-    
-    res.json({ 
-      message: 'Contrato generado correctamente',
-      contractUrl,
-      verificationCode
+    res.status(201).json({
+      message: 'Contrato generado exitosamente',
+      document,
+      contractUrl: `/docs/${contractFileName}`
     });
   } catch (error) {
     console.error('Error al generar contrato:', error);
-    res.status(500).json({ error: 'Error al generar el contrato' });
+    res.status(500).json({ error: 'Error al generar contrato' });
   }
 });
 
 /**
- * Generar un código de verificación único
- * @returns Código de verificación
+ * Subir un contrato firmado manualmente
+ * POST /api/contracts/:id/upload-signed
  */
-function generateVerificationCode(): string {
-  // Generar un código alfanumérico de 8 caracteres
-  return crypto.randomBytes(4).toString('hex').toUpperCase();
+contractRouter.post('/:id/upload-signed', isAuthenticated, upload.single('signedFile'), async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se ha proporcionado ningún archivo' });
+    }
+    
+    // Verificar que el documento existe
+    const doc = await db.select().from(documents).where(eq(documents.id, parseInt(id))).limit(1);
+    
+    if (doc.length === 0) {
+      return res.status(404).json({ error: 'Documento no encontrado' });
+    }
+    
+    // Actualizar la información del documento
+    await db.update(documents)
+      .set({
+        filePath: req.file.path,
+        status: 'signed',
+        signatureTimestamp: new Date(),
+        updatedAt: new Date()
+      })
+      .where(eq(documents.id, parseInt(id)));
+    
+    res.status(200).json({
+      message: 'Contrato firmado actualizado exitosamente',
+      filePath: req.file.path
+    });
+  } catch (error) {
+    console.error('Error al subir contrato firmado:', error);
+    res.status(500).json({ error: 'Error al subir contrato firmado' });
+  }
+});
+
+/**
+ * Función auxiliar para generar PDF a partir de HTML
+ * Esta función es un placeholder - en una implementación real
+ * se usaría una biblioteca como puppeteer o html-pdf
+ */
+async function generatePdfFromHtml(html: string, outputPath: string): Promise<boolean> {
+  // Este es un ejemplo simplificado
+  // En producción, deberías usar una biblioteca para convertir HTML a PDF
+  try {
+    // Aquí iría el código para generar el PDF
+    // Por ahora, simplemente guardamos el HTML
+    fs.writeFileSync(outputPath, html);
+    return true;
+  } catch (error) {
+    console.error('Error al generar PDF:', error);
+    return false;
+  }
 }

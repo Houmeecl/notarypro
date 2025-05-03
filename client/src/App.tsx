@@ -76,6 +76,8 @@ import DocumentViewPage from "@/pages/document-view";
 import DocumentViewSimplePage from "@/pages/document-view-simple";
 import DocumentsPage from "@/pages/documents";
 import DocumentProcessor from "@/pages/document-processor";
+import DocumentExplorerPage from "@/pages/document-explorer";
+import DocumentUploadPage from "@/pages/document-upload";
 
 // Partner pages
 import PartnersPublicPage from "@/pages/partners/public-page";

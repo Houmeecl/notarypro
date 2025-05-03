@@ -15,6 +15,8 @@ import { mercadoPagoRouter } from "./mercadopago-routes";
 import { ronRouter } from "./ron-routes";
 import { tuuPaymentRouter } from "./tuu-payment-routes";
 import { eq } from "drizzle-orm";
+import { documentManagementRouter } from "./document-management-routes";
+import { notaryDocumentRouter } from "./notary-document-routes";
 
 export function registerRoutes(app: Express): Server {
   // Configuración de autenticación para la aplicación principal
@@ -41,8 +43,15 @@ export function registerRoutes(app: Express): Server {
   // Rutas para pagos con Tuu Payments (POS)
   app.use("/api/tuu-payment", tuuPaymentRouter);
   
-  // Ruta para servir archivos estáticos (como los contratos)
+  // Sistema de Gestión Documental Unificado
+  app.use("/api/document-management", documentManagementRouter);
+  
+  // Sistema de Documentos Notariales
+  app.use("/api/notary-documents", notaryDocumentRouter);
+  
+  // Ruta para servir archivos estáticos (documentos y contratos)
   app.use("/docs", express.static(path.join(process.cwd(), "docs")));
+  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
   // Inicializar admins de prueba si no existen
   initializeTestAdmins().catch(error => {
