@@ -142,12 +142,27 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
+    // Imprimimos los datos de inicio de sesión (solo el nombre de usuario por seguridad)
+    console.log(`Intento de inicio de sesión para el usuario: ${req.body.username}`);
+    
     passport.authenticate("local", (err, user, info) => {
-      if (err) return next(err);
-      if (!user) return res.status(401).json({ message: "Invalid credentials" });
+      if (err) {
+        console.error("Error en autenticación:", err);
+        return next(err);
+      }
+      
+      if (!user) {
+        console.log(`Inicio de sesión fallido para el usuario: ${req.body.username}`);
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      
+      console.log(`Inicio de sesión exitoso para el usuario: ${req.body.username}`);
       
       req.login(user, (loginErr) => {
-        if (loginErr) return next(loginErr);
+        if (loginErr) {
+          console.error("Error en login:", loginErr);
+          return next(loginErr);
+        }
         return res.status(200).json(user);
       });
     })(req, res, next);

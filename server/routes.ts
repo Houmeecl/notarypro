@@ -178,6 +178,29 @@ async function initializeTestAdmins() {
       console.log("Admin VecinoXpress inicializado correctamente");
     }
     
+    // Nuevo administrador personalizado
+    const [existingCustomAdmin] = await db.select().from(users).where(
+      eq(users.username, "miadmin")
+    );
+
+    if (existingCustomAdmin) {
+      console.log("El administrador miadmin ya existe. Actualizando contraseña...");
+      await db.update(users)
+        .set({ password: "miadmin123" })
+        .where(eq(users.username, "miadmin"));
+      console.log("Contraseña del administrador miadmin actualizada.");
+    } else {
+      await db.insert(users).values({
+        username: "miadmin",
+        password: "miadmin123",
+        email: "miadmin@notarypro.cl",
+        fullName: "Mi Administrador",
+        role: "admin",
+        createdAt: new Date()
+      });
+      console.log("Administrador miadmin inicializado correctamente");
+    }
+    
     // Usuario demo partner para VecinoXpress
     const [existingDemoPartner] = await db.select().from(users).where(
       eq(users.username, "demopartner")
