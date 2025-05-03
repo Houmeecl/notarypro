@@ -72,6 +72,7 @@ import DocumentCategoriesPage from "@/pages/document-categories";
 import DocumentTemplatesPage from "@/pages/document-templates";
 import DocumentFormPage from "@/pages/document-form";
 import DocumentViewPage from "@/pages/document-view";
+import DocumentViewSimplePage from "@/pages/document-view-simple";
 import DocumentsPage from "@/pages/documents";
 import DocumentProcessor from "@/pages/document-processor";
 
@@ -238,6 +239,7 @@ function Router() {
         allowedRoles={["user", "certifier", "admin"]} 
       />
       <Route path="/documents/:documentId" component={DocumentViewPage} />
+      <Route path="/document-view-simple/:documentId" component={DocumentViewSimplePage} />
       <ProtectedRoute 
         path="/document-processor" 
         component={DocumentProcessor} 
