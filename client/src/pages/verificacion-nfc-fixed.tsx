@@ -23,11 +23,13 @@ import {
   Smartphone,
   QrCode,
   Shield,
-  AlertTriangle
+  AlertTriangle,
+  ExternalLink
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import NFCReader from '@/components/identity/NFCReader';
 import { motion, AnimatePresence } from 'framer-motion';
+import { QRCodeSVG } from 'qrcode.react';
 
 /**
  * Página unificada de verificación NFC
@@ -649,7 +651,40 @@ const VerificacionNFC: React.FC = () => {
             )}
           </CardContent>
           
-          <CardFooter className="px-6 py-4 border-t">
+          <CardFooter className="px-6 py-4 border-t flex flex-col space-y-4">
+            {/* Añadir código QR para acceso móvil */}
+            <div className="w-full border-b border-gray-100 pb-4">
+              <div className="text-center mb-3">
+                <h3 className="text-sm font-medium text-[#2d219b]">Acceso Móvil</h3>
+                <p className="text-xs text-gray-500">Escanee este código QR para abrir en un dispositivo móvil</p>
+              </div>
+              
+              <div className="flex justify-center">
+                <div className="border rounded-lg p-3 bg-white">
+                  <QRCodeSVG 
+                    value={`${window.location.origin}/verificacion-nfc${location.includes('?') ? location.substring(location.indexOf('?')) : '?demo=true'}`}
+                    size={150}
+                    bgColor={"#ffffff"}
+                    fgColor={"#2d219b"}
+                    level={"M"}
+                    includeMargin={false}
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-center mt-3">
+                <a 
+                  href={`${window.location.origin}/verificacion-nfc${location.includes('?') ? location.substring(location.indexOf('?')) : '?demo=true'}`}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-xs flex items-center text-[#2d219b] font-medium"
+                >
+                  <ExternalLink className="h-3 w-3 mr-1" />
+                  Abrir en nueva ventana
+                </a>
+              </div>
+            </div>
+            
             <div className="w-full flex justify-end">
               {!verificacionCompletada && (
                 <Button variant="outline" size="sm" onClick={() => navigate('/')}>
