@@ -64,6 +64,7 @@
 }
 
 @layer utilities {
+  /* Animación de brillo */
   @keyframes shine {
     0% {
       transform: translateX(-100%) skewX(-20deg);
@@ -75,6 +76,11 @@
 
   .animate-shine {
     animation: shine 1.5s ease-in-out infinite;
+  }
+  
+  /* Animación de rotación lenta para NFC */
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
   }
 }
 

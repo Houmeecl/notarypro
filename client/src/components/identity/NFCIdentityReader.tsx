@@ -79,7 +79,7 @@ const NFCIdentityReader: React.FC<NFCIdentityReaderProps> = ({ onSuccess, onCanc
       }
     } catch (error) {
       setStatus(NFCReadStatus.ERROR);
-      setStatusMessage(`Error: ${error.message}`);
+      setStatusMessage(`Error: ${error instanceof Error ? error.message : 'Error desconocido'}`);
       setIsReading(false);
     }
   }, [nfcAvailable, readerType, handleNFCStatusChange, onSuccess]);

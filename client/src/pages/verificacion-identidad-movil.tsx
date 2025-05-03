@@ -439,6 +439,161 @@ const VerificacionIdentidadMovil: React.FC = () => {
               </CardContent>
             </>
           )}
+          
+          {/* Paso 6: Lectura NFC en progreso */}
+          {step === 6 && (
+            <>
+              <CardHeader>
+                <CardTitle>Leyendo cédula con NFC</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                  {nfcStatus === NFCReadStatus.WAITING || nfcStatus === NFCReadStatus.READING ? (
+                    <>
+                      <div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center mb-4">
+                        <Wallet className="h-12 w-12 text-blue-500 animate-pulse" />
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        {nfcStatus === NFCReadStatus.WAITING ? 'Esperando cédula' : 'Leyendo chip'}
+                      </h3>
+                      <p className="text-sm text-gray-600 text-center mb-4">
+                        {nfcMessage || 'Acerque su cédula al lector NFC del dispositivo'}
+                      </p>
+                      
+                      {/* Animación */}
+                      <div className="relative w-48 h-48 mb-4">
+                        <div className="absolute inset-0 border-4 border-dashed border-blue-300 rounded-full animate-spin-slow"></div>
+                        <div className="absolute inset-8 border-4 border-blue-400 rounded-full"></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="h-12 w-20 bg-white rounded-lg shadow-md transform translate-y-2">
+                            <div className="w-full h-2 bg-gray-200 rounded-t-lg"></div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <p className="text-xs text-gray-500">
+                        No mueva la cédula hasta que se complete la lectura
+                      </p>
+                    </>
+                  ) : nfcStatus === NFCReadStatus.ERROR ? (
+                    <>
+                      <div className="w-24 h-24 rounded-full bg-red-50 flex items-center justify-center mb-4">
+                        <AlertCircle className="h-12 w-12 text-red-500" />
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        Error de lectura
+                      </h3>
+                      <p className="text-sm text-gray-600 text-center mb-4">
+                        {nfcMessage || 'No se pudo leer la cédula correctamente'}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-24 h-24 rounded-full bg-gray-50 flex items-center justify-center mb-4">
+                        <Wallet className="h-12 w-12 text-gray-400" />
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        Lector NFC
+                      </h3>
+                      <p className="text-sm text-gray-600 text-center">
+                        Iniciando lectura...
+                      </p>
+                    </>
+                  )}
+                </div>
+                
+                <Button 
+                  onClick={() => setStep(0)} 
+                  variant="outline"
+                  className="w-full"
+                >
+                  Cancelar y volver
+                </Button>
+                
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </>
+          )}
+          
+          {/* Paso 7: Confirmación de datos NFC */}
+          {step === 7 && cedulaData && (
+            <>
+              <CardHeader>
+                <CardTitle>Datos de la cédula</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Alert className="mb-4 bg-green-50 border-green-200">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                  <AlertTitle className="text-green-800">Lectura exitosa</AlertTitle>
+                  <AlertDescription className="text-green-700">
+                    Se ha leído correctamente la información del chip NFC
+                  </AlertDescription>
+                </Alert>
+                
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">RUT</p>
+                      <p className="text-base font-semibold">{formatearRut(cedulaData.rut)}</p>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">Nombre completo</p>
+                      <p className="text-base font-semibold">{cedulaData.nombres} {cedulaData.apellidos}</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-gray-500">Fecha de nacimiento</p>
+                        <p className="text-base font-semibold">{cedulaData.fechaNacimiento}</p>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-gray-500">Nacionalidad</p>
+                        <p className="text-base font-semibold">{cedulaData.nacionalidad}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-gray-500">Fecha de emisión</p>
+                        <p className="text-base font-semibold">{cedulaData.fechaEmision}</p>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-gray-500">Fecha de expiración</p>
+                        <p className="text-base font-semibold">{cedulaData.fechaExpiracion}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3 mt-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setCedulaData(null);
+                      setStep(0);
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button 
+                    onClick={handleSubmitVerification} 
+                    disabled={loading}
+                  >
+                    {loading ? 'Enviando...' : 'Confirmar identidad'}
+                  </Button>
+                </div>
+              </CardContent>
+            </>
+          )}
         </Card>
       </div>
     </div>

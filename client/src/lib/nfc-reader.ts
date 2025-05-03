@@ -139,7 +139,7 @@ export async function readCedulaChilena(
       return null;
     }
   } catch (error) {
-    statusCallback(NFCReadStatus.ERROR, `Error al leer la cédula: ${error.message}`);
+    statusCallback(NFCReadStatus.ERROR, `Error al leer la cédula: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     return null;
   }
 }
@@ -287,7 +287,7 @@ async function readWithAndroidBridge(
           fotografia: data.fotografia
         });
       } catch (error) {
-        reject(new Error(`Error al procesar datos del puente nativo: ${error.message}`));
+        reject(new Error(`Error al procesar datos del puente nativo: ${error instanceof Error ? error.message : 'Error desconocido'}`));
       }
     });
   });
