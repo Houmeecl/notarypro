@@ -132,29 +132,84 @@ const VerificacionNFC: React.FC = () => {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
       
-      // Solicitar acceso a la cámara
-      const stream = await navigator.mediaDevices.getUserMedia({
+      // Solicitar acceso a la cámara con opciones para mejor compatibilidad
+      const constraints = {
         video: {
           facingMode: tipo === 'selfie' ? 'user' : 'environment',
           width: { ideal: 1280 },
           height: { ideal: 720 }
         }
-      });
+      };
       
-      streamRef.current = stream;
+      console.log(`Intentando acceder a cámara con modo: ${tipo === 'selfie' ? 'user' : 'environment'}`);
+      
+      try {
+        // Primer intento con opciones ideales
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        streamRef.current = stream;
+      } catch (initialError) {
+        console.warn('Error con configuración inicial de cámara, intentando con opciones reducidas:', initialError);
+        
+        // Segundo intento con opciones más básicas
+        const fallbackConstraints = {
+          video: true
+        };
+        
+        const stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+        streamRef.current = stream;
+        
+        toast({
+          title: 'Cámara en modo básico',
+          description: 'Usando configuración básica de cámara. La calidad podría ser menor.',
+        });
+      }
       
       // Asignar stream al elemento de video
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+      if (videoRef.current && streamRef.current) {
+        videoRef.current.srcObject = streamRef.current;
+        
+        // Asegurarse de que el video se reproduzca automáticamente
+        videoRef.current.onloadedmetadata = () => {
+          if (videoRef.current) {
+            videoRef.current.play()
+              .catch(e => console.error("Error reproduciendo video:", e));
+          }
+        };
       }
       
       setIsCamaraActiva(true);
       
     } catch (err) {
       console.error('Error al acceder a la cámara:', err);
+      
+      // Si estamos en modo demo, permitir avanzar sin cámara
+      if (modoDemo) {
+        toast({
+          title: 'Modo Demo - Simulando cámara',
+          description: 'En modo demo, puede continuar sin necesidad de cámara real.',
+        });
+        
+        if (tipo === 'documento') {
+          // Simulamos que se tomó una foto del documento
+          const mockImageUrl = 'data:image/jpeg;base64,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';
+          setDocumentoFile(new File([new Blob()], 'mock-documento.jpg', { type: 'image/jpeg' }));
+          setDocumentoPreview(mockImageUrl);
+          setProgreso(65);
+        } else {
+          // Simulamos que se tomó un selfie
+          const mockImageUrl = 'data:image/jpeg;base64,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';
+          setFotoFile(new File([new Blob()], 'mock-selfie.jpg', { type: 'image/jpeg' }));
+          setFotoPreview(mockImageUrl);
+          setProgreso(90);
+        }
+        
+        setIsCamaraActiva(false);
+        return;
+      }
+      
       toast({
         title: 'Error de cámara',
-        description: 'No se pudo acceder a la cámara de su dispositivo.',
+        description: 'No se pudo acceder a la cámara de su dispositivo. Intente con otro navegador o verifique los permisos.',
         variant: 'destructive',
       });
     }
@@ -331,7 +386,7 @@ const VerificacionNFC: React.FC = () => {
                           variant: 'destructive',
                         });
                       }}
-                      demoMode={true} // Habilitar para pruebas
+                      demoMode={modoDemo !== null ? modoDemo : true} // Usar parámetro demo de URL o habilitar por defecto
                     />
                   </div>
                 </TabsContent>

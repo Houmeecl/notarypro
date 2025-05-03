@@ -239,11 +239,16 @@ const NFCReader: React.FC<NFCReaderProps> = ({ onSuccess, onError, demoMode = fa
               variant="outline" 
               className="mt-4"
               onClick={() => {
-                setStatus('idle');
-                setMessage('Presione el botón para iniciar la lectura');
+                if (demoMode) {
+                  // En modo demo, podemos simular la lectura directamente
+                  simulateNFCRead();
+                } else {
+                  setStatus('idle');
+                  setMessage('Presione el botón para iniciar la lectura');
+                }
               }}
             >
-              Intentar nuevamente
+              {demoMode ? 'Simular lectura NFC' : 'Intentar nuevamente'}
             </Button>
           </div>
         );
@@ -251,12 +256,12 @@ const NFCReader: React.FC<NFCReaderProps> = ({ onSuccess, onError, demoMode = fa
       default:
         return (
           <div className="text-center py-6">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Smartphone className="w-8 h-8 text-gray-600" />
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Smartphone className="w-8 h-8 text-[#2d219b]" />
             </div>
-            <p className="font-medium text-gray-700 mb-2">Lector NFC</p>
+            <p className="font-medium text-[#2d219b] mb-2">Lector NFC</p>
             <p className="text-sm text-gray-600 mb-4">{message}</p>
-            <Button onClick={readNFC}>
+            <Button onClick={readNFC} className="bg-[#2d219b] hover:bg-[#221a7c]">
               {demoMode ? 'Iniciar lectura (Demo)' : 'Iniciar lectura NFC'}
             </Button>
           </div>
