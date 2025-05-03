@@ -125,12 +125,23 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={() => {
-        window.location.href = "/partners/webapp-pos-official";
+        // Redirigir a la página de entrada de emergencia temporalmente
+        window.location.href = "/emergency-entry";
         return null;
       }} />
       <Route path="/vecinos-express" component={() => {
         window.location.href = "/partners/webapp-pos-official";
         return null;
+      }} />
+      {/* Página de entrada de emergencia */}
+      <Route path="/emergency-entry" component={() => {
+        // Importar dinámicamente para evitar problemas de carga
+        const EmergencyEntry = React.lazy(() => import("@/pages/emergency-entry"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <EmergencyEntry />
+          </Suspense>
+        );
       }} />
       <Route path="/landing" component={LandingPage} />
       <Route path="/auth" component={AuthPage} />
@@ -591,26 +602,31 @@ function App() {
 
   // Iniciar la conexión WebSocket cuando se monta el componente
   useEffect(() => {
-    // Iniciar la conexión WebSocket, pero no bloquear la aplicación si falla
-    try {
-      webSocketService.connect();
-    } catch (error) {
-      console.error("Error al iniciar WebSocket, continuando sin él:", error);
-    }
+    // Iniciar la conexión WebSocket con un retardo para permitir que la aplicación cargue primero
+    const wsTimeoutId = setTimeout(() => {
+      try {
+        webSocketService.connect();
+        console.log("Conexión WebSocket iniciada exitosamente");
+      } catch (error) {
+        console.error("Error al iniciar WebSocket, continuando sin él:", error);
+        // No bloqueamos la carga de la aplicación si falla el WebSocket
+      }
+    }, 2000);
 
     // Configurar un timeout para verificar si la aplicación carga
-    const timeoutId = setTimeout(() => {
+    const loadTimeoutId = setTimeout(() => {
       // Este código nunca debería ejecutarse si la aplicación carga normalmente
       const appRoot = document.getElementById("root");
       if (appRoot && appRoot.children.length <= 1) {
         console.log("Detectado posible fallo de carga, intentando recuperar...");
         setLoadingFailed(true);
       }
-    }, 5000);
+    }, 8000);
 
     // Limpiar conexión cuando se desmonta
     return () => {
-      clearTimeout(timeoutId);
+      clearTimeout(wsTimeoutId);
+      clearTimeout(loadTimeoutId);
       try {
         webSocketService.disconnect();
       } catch (error) {

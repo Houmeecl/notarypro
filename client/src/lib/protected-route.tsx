@@ -11,6 +11,15 @@ export function ProtectedRoute({
   component: () => React.JSX.Element;
   allowedRoles?: string[];
 }) {
+  // MODO DE DESARROLLO - Acceso sin restricciones temporalmente
+  // IMPORTANTE: En producción, este código debe eliminarse
+  const BYPASS_AUTH = true;
+  
+  if (BYPASS_AUTH) {
+    // En modo desarrollo, simplemente renderizamos el componente
+    return <Route path={path} component={Component} />;
+  }
+  
   const { user, isLoading } = useAuth();
 
   // Componente para renderizar cuando no hay autenticación
