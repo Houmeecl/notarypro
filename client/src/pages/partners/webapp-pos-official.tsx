@@ -113,14 +113,14 @@ const WebAppPOSOfficial = () => {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [isSignatureSheetOpen, setIsSignatureSheetOpen] = useState(false);
   const [documentProcessed, setDocumentProcessed] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [showVerificationQR, setShowVerificationQR] = useState(false);
   const [receiptData, setReceiptData] = useState<any>(null);
   const [nfcMessage, setNfcMessage] = useState('');
   const [isReadIDModalOpen, setIsReadIDModalOpen] = useState(false);
   const [readIDStep, setReadIDStep] = useState(0);
   const [showFacialCompare, setShowFacialCompare] = useState(false);
   const [validationProgress, setValidationProgress] = useState(0);
-  const [verificationCode, setVerificationCode] = useState('');
-  const [showVerificationQR, setShowVerificationQR] = useState(false);
   
   const sigCanvas = useRef<SignatureCanvas | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -498,27 +498,7 @@ const WebAppPOSOfficial = () => {
     }
   };
 
-  // Generar código de verificación único
-  const generateVerificationCode = () => {
-    // Generar un código de 6 caracteres alfanuméricos
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code = '';
-    
-    // Generar primeros 3 caracteres (letras)
-    for (let i = 0; i < 3; i++) {
-      code += chars.charAt(Math.floor(Math.random() * 26)); // Solo letras (primeros 26 caracteres)
-    }
-    
-    // Añadir guión
-    code += '-';
-    
-    // Generar últimos 3 caracteres (números)
-    for (let i = 0; i < 3; i++) {
-      code += chars.charAt(26 + Math.floor(Math.random() * 10)); // Solo números (últimos 10 caracteres)
-    }
-    
-    return code;
-  };
+  // La función generateVerificationCode se ha movido más abajo en el archivo
 
   // Procesar documento (simulado)
   const processDocument = async (signatureImage: string) => {
@@ -709,6 +689,24 @@ const WebAppPOSOfficial = () => {
     }
   };
 
+  // Generar código de verificación único en formato XXX-000
+  const generateVerificationCode = (): string => {
+    // Caracteres para la parte de letras (prefijo)
+    const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // Sin I, O para evitar confusión
+    
+    // Generar 3 letras aleatorias
+    let prefix = '';
+    for (let i = 0; i < 3; i++) {
+      prefix += letters.charAt(Math.floor(Math.random() * letters.length));
+    }
+    
+    // Generar 3 dígitos aleatorios (000-999)
+    const digits = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    
+    // Formato XXX-000
+    return `${prefix}-${digits}`;
+  };
+
   // Registrar verificación exitosa (usando datos reales)
   const completeVerification = (method: "NFC" | "READID" | "FOTOCAPTURA") => {
     // Asignar puntos según el método
@@ -749,6 +747,11 @@ const WebAppPOSOfficial = () => {
         }
       }).catch(err => console.error(`Error al registrar interacción de ${method}:`, err));
     }
+    
+    // Generar código de verificación para verificación móvil
+    const newCode = generateVerificationCode();
+    setVerificationCode(newCode);
+    setShowVerificationQR(true);
     
     setVerificationPoints(prev => prev + points);
     setIdentityVerified(true);
