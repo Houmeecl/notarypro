@@ -333,11 +333,12 @@ function Router() {
         </Suspense>
       )} />
       <Route path="/vecinos/pos-app" component={WebAppPOS} />
-      {/* Redirección directa al POS web desde el dashboard */}
-      <Route path="/vecinos/dashboard" component={() => {
-        window.location.href = "/partners/webapp-pos-official";
-        return null;
-      }} />
+      {/* Dashboard de Vecinos (versión normal) */}
+      <Route path="/vecinos/dashboard" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyVecinosDashboard />
+        </Suspense>
+      )} />
       <Route path="/vecinos/cuenta" component={() => (
         <Suspense fallback={<LazyLoadingFallback />}>
           <LazyVecinosCuenta />
@@ -440,27 +441,12 @@ function Router() {
       {/* POS Web Oficial - Verificación con NFC y otros servicios */}
       <Route path="/partners/webapp-pos-official" component={WebAppPOSOfficial} />
 
-      {/* Redirigir todas las versiones anteriores del POS a la versión oficial */}
-      <Route path="/partners/webapp-pos" component={() => {
-        window.location.href = "/partners/webapp-pos-official";
-        return null;
-      }} />
-      <Route path="/partners/webapp-pos-alternativa" component={() => {
-        window.location.href = "/partners/webapp-pos-official";
-        return null;
-      }} />
-      <Route path="/partners/webapp-pos-buttons" component={() => {
-        window.location.href = "/partners/webapp-pos-official";
-        return null;
-      }} />
-      <Route path="/partners/webapp-pos-nfc" component={() => {
-        window.location.href = "/partners/webapp-pos-official";
-        return null;
-      }} />
-      <Route path="/partners/webapp-pos-tramite" component={() => {
-        window.location.href = "/partners/webapp-pos-official";
-        return null;
-      }} />
+      {/* Versiones del POS web */}
+      <Route path="/partners/webapp-pos" component={WebAppPOS} />
+      <Route path="/partners/webapp-pos-alternativa" component={WebAppPOS} />
+      <Route path="/partners/webapp-pos-buttons" component={WebAppPOS} />
+      <Route path="/partners/webapp-pos-nfc" component={WebAppPOS} />
+      <Route path="/partners/webapp-pos-tramite" component={WebAppPOS} />
 
       {/* SDK Demo y otras herramientas para partners */}
       <Route path="/partners/sdk-demo" component={SdkDemo} />
