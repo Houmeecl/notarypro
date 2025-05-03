@@ -237,6 +237,18 @@ const VerificacionIdentidadMovil: React.FC = () => {
                       </div>
                     </div>
                   </Button>
+                  
+                  <Button 
+                    onClick={() => window.location.href = '/verificacion-identidad-readid'}
+                    className="flex justify-start items-center h-auto py-4 px-5"
+                    variant="default"
+                  >
+                    <Smartphone className="h-8 w-8 mr-4 text-white" />
+                    <div className="text-left">
+                      <div className="font-semibold">Sistema READID</div>
+                      <div className="text-sm text-gray-100">Verificación avanzada con sistema READID (recomendado)</div>
+                    </div>
+                  </Button>
                 </div>
                 
                 {error && (

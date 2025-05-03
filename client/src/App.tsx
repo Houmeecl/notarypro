@@ -371,6 +371,11 @@ function Router() {
           <LazyVerificacionMovil />
         </Suspense>
       )} />
+      <Route path="/verificacion-identidad-readid" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyVerificacionREADID />
+        </Suspense>
+      )} />
       
       {/* Demostración de Pagos con MercadoPago */}
       <Route path="/payment-demo" component={PaymentDemo} />
