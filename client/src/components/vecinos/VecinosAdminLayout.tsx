@@ -123,6 +123,12 @@ export const VecinosAdminLayout = ({
                   href="/vecinos/admin/settings"
                   active={location === "/vecinos/admin/settings"}
                 />
+                <NavItem 
+                  icon={<Users size={20} />} 
+                  label="Gestión de Usuarios" 
+                  href="/vecinos/admin/users"
+                  active={location === "/vecinos/admin/users"}
+                />
               </nav>
             </div>
             

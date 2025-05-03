@@ -175,6 +175,9 @@ const VecinosAdminIndexPage = () => {
               <Link href="/vecinos/admin/express-dashboard">
                 <Button>Dashboard Express</Button>
               </Link>
+              <Link href="/vecinos/admin/users">
+                <Button variant="outline">Gestión de usuarios</Button>
+              </Link>
             </CardFooter>
           </Card>
           

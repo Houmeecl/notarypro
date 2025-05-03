@@ -115,6 +115,8 @@ const LazyVecinosAdmin = React.lazy(() => import("@/pages/vecinos/admin/index"))
 const LazyVecinosAdminPartners = React.lazy(() => import("@/pages/vecinos/admin/partners"));
 const LazyVecinosAdminSellerForms = React.lazy(() => import("@/pages/vecinos/admin/seller-forms"));
 const LazyVecinosAdminExpressDashboard = React.lazy(() => import("@/pages/vecinos/admin/express-dashboard"));
+const LazyVecinosAdminUsersManagement = React.lazy(() => import("@/pages/vecinos/admin/users-management"));
+const LazyVecinosCertifierValidation = React.lazy(() => import("@/pages/vecinos/certifier-validation"));
 const LazyVerificacionMovil = React.lazy(() => import("@/pages/verificacion-identidad-movil"));
 const LazyVerificacionREADID = React.lazy(() => import("@/pages/verificacion-identidad-readid"));
 
@@ -278,6 +280,14 @@ function Router() {
         )}
       />
       <Route 
+        path="/vecinos-admin" 
+        component={() => (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <LazyVecinosAdmin />
+          </Suspense>
+        )}
+      />
+      <Route 
         path="/vecinos/admin/partners"
         component={() => (
           <Suspense fallback={<LazyLoadingFallback />}>
@@ -298,6 +308,22 @@ function Router() {
         component={() => (
           <Suspense fallback={<LazyLoadingFallback />}>
             <LazyVecinosAdminExpressDashboard />
+          </Suspense>
+        )}
+      />
+      <Route 
+        path="/vecinos/admin/users"
+        component={() => (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <LazyVecinosAdminUsersManagement />
+          </Suspense>
+        )}
+      />
+      <Route 
+        path="/vecinos/certifier"
+        component={() => (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <LazyVecinosCertifierValidation />
           </Suspense>
         )}
       />
