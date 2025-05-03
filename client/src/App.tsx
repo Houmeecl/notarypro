@@ -22,6 +22,9 @@ import LandingPage from "@/pages/landing-page";
 import AuthPage from "@/pages/auth-page";
 import UserDashboard from "@/pages/user-dashboard";
 import CertifierDashboard from "@/pages/certifier-dashboard";
+import CertificationDashboard from "@/pages/certification-dashboard";
+import SupervisorDashboard from "@/pages/supervisor-dashboard";
+import SellerDashboard from "@/pages/seller-dashboard";
 import LawyerDashboard from "@/pages/lawyer-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
 import CoursePage from "@/pages/course-page";
@@ -148,6 +151,25 @@ function Router() {
         path="/certifier-dashboard" 
         component={CertifierDashboard} 
         allowedRoles={["certifier", "admin"]} 
+      />
+      <ProtectedRoute 
+        path="/certification-dashboard" 
+        component={CertificationDashboard} 
+        allowedRoles={["certifier", "admin"]} 
+      />
+      
+      {/* Supervisor routes */}
+      <ProtectedRoute 
+        path="/supervisor/dashboard" 
+        component={SupervisorDashboard} 
+        allowedRoles={["supervisor", "admin"]} 
+      />
+      
+      {/* Seller routes */}
+      <ProtectedRoute 
+        path="/seller/dashboard" 
+        component={SellerDashboard} 
+        allowedRoles={["seller", "admin"]} 
       />
       
       {/* Admin routes */}
