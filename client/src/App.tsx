@@ -587,6 +587,17 @@ function Router() {
         );
       }} />
       
+      {/* Versión fixed explícita (para acceso directo) */}
+      <Route path="/verificacion-nfc-fixed" component={() => {
+        // Importar dinámicamente el componente (versión corregida y más completa)
+        const VerificacionNFC = React.lazy(() => import("@/pages/verificacion-nfc-fixed"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <VerificacionNFC />
+          </Suspense>
+        );
+      }} />
+      
       {/* 2. Verificación con Demo vía QR (Alternativa) */}
       <Route path="/verificacion-identidad" component={VerificacionIdentidadDemo} />
       <Route path="/readid-verification" component={ReadIDVerificationPage} />
