@@ -111,6 +111,7 @@ const LazyVecinosRetiros = React.lazy(() => import("@/pages/vecinos/retiros"));
 const LazyVecinosSoporte = React.lazy(() => import("@/pages/vecinos/soporte"));
 const LazyVecinosFAQ = React.lazy(() => import("@/pages/vecinos/faq"));
 const LazyVecinosPaymentDemo = React.lazy(() => import("@/pages/vecinos/payment-demo"));
+const LazyVecinosAdmin = React.lazy(() => import("@/pages/vecinos/admin/index"));
 const LazyVerificacionMovil = React.lazy(() => import("@/pages/verificacion-identidad-movil"));
 const LazyVerificacionREADID = React.lazy(() => import("@/pages/verificacion-identidad-readid"));
 
@@ -263,6 +264,17 @@ function Router() {
           <LazyVecinosPaymentDemo />
         </Suspense>
       )} />
+      
+      {/* Vecinos Admin Dashboard */}
+      <ProtectedRoute 
+        path="/vecinos/admin" 
+        component={() => (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <LazyVecinosAdmin />
+          </Suspense>
+        )}
+        allowedRoles={["admin", "partner"]} 
+      />
 
       {/* Partner pages */}
       <Route path="/partners/public-page" component={PartnersPublicPage} />

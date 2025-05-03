@@ -1,7 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 // Componente de ilustración de vecino atendiendo clientes
 export const NeighborHelping = () => {
+  const [moveAngle, setMoveAngle] = useState(0);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMoveAngle(prev => (prev + 1) % 360);
+    }, 100);
+    
+    return () => clearInterval(interval);
+  }, []);
+  
+  // Cálculo para el efecto de mecerse suavemente
+  const offsetY = Math.sin(moveAngle * Math.PI / 180) * 2;
+  
   return (
     <svg
       width="240"
@@ -9,7 +22,8 @@ export const NeighborHelping = () => {
       viewBox="0 0 240 200"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="mx-auto"
+      className="mx-auto transition-transform duration-300"
+      style={{ transform: `translateY(${offsetY}px)` }}
     >
       {/* Fondo */}
       <rect x="20" y="160" width="200" height="20" rx="10" fill="#E5E7EB" />
