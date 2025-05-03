@@ -28,6 +28,8 @@ import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { POS_CONSTANTS, realPOSConfig, getPOSConfig } from '@/lib/pos-config';
 import { Badge } from '@/components/ui/badge';
+import { PageNavigation } from '@/components/navigation/PageNavigation';
+import TuuPOSPayment from '@/components/payments/TuuPOSPayment';
 import { useAuth } from '@/hooks/use-auth';
 import IdentityVerification, { VerificationResult } from '@/components/identity/IdentityVerification';
 
@@ -54,6 +56,13 @@ const RealPOSPayment: React.FC = () => {
   const { toast } = useToast();
   const [location, navigate] = useLocation();
   const { user } = useAuth();
+  
+  // Definir las migas de pan para navegación
+  const breadcrumbItems = [
+    { label: 'Inicio', href: '/' },
+    { label: 'POS Menu', href: '/pos-menu' },
+    { label: 'POS Real', href: '/real-pos-payment' },
+  ];
   
   // Estados para el POS
   const [activeTab, setActiveTab] = useState('services');

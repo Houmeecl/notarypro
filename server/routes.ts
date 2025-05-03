@@ -13,6 +13,7 @@ import { identityVerificationRouter } from "./identity-verification-routes";
 import { contractRouter } from "./contract-routes";
 import { mercadoPagoRouter } from "./mercadopago-routes";
 import { ronRouter } from "./ron-routes";
+import { tuuPaymentRouter } from "./tuu-payment-routes";
 import { eq } from "drizzle-orm";
 
 export function registerRoutes(app: Express): Server {
@@ -36,6 +37,9 @@ export function registerRoutes(app: Express): Server {
   
   // Rutas para plataforma RON
   app.use("/api/ron", ronRouter);
+  
+  // Rutas para pagos con Tuu Payments (POS)
+  app.use("/api/tuu-payment", tuuPaymentRouter);
   
   // Ruta para servir archivos estáticos (como los contratos)
   app.use("/docs", express.static(path.join(process.cwd(), "docs")));
