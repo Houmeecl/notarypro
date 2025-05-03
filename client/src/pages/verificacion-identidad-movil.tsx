@@ -3,8 +3,17 @@ import { Helmet } from 'react-helmet';
 import { useLocation } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
-import { Smartphone, CheckCircle, AlertCircle } from 'lucide-react';
+import { Smartphone, CheckCircle, AlertCircle, Wallet, Camera } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { 
+  CedulaChilenaData, 
+  NFCReadStatus, 
+  NFCReaderType,
+  checkNFCAvailability,
+  readCedulaChilena,
+  validarRut,
+  formatearRut
+} from '@/lib/nfc-reader';
 
 const VerificacionIdentidadMovil: React.FC = () => {
   // Extraer el ID de sesión de la URL
@@ -12,10 +21,16 @@ const VerificacionIdentidadMovil: React.FC = () => {
   const queryParams = new URLSearchParams(window.location.search);
   const sessionId = queryParams.get('session') || '';
   
-  const [step, setStep] = useState<number>(1);
+  const [step, setStep] = useState<number>(0); // 0 = selección método, 1-4 = fotografía, 6-7 = NFC, 5 = completado
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  
+  // Estados para NFC
+  const [nfcAvailable, setNfcAvailable] = useState<boolean>(false);
+  const [nfcStatus, setNfcStatus] = useState<NFCReadStatus>(NFCReadStatus.INACTIVE);
+  const [nfcMessage, setNfcMessage] = useState<string>('');
+  const [cedulaData, setCedulaData] = useState<CedulaChilenaData | null>(null);
   
   // Refs para la cámara
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -100,6 +115,44 @@ const VerificacionIdentidadMovil: React.FC = () => {
     };
   }, [step]);
   
+  // Verificar disponibilidad de NFC al montar el componente
+  useEffect(() => {
+    async function checkNFC() {
+      const { available } = await checkNFCAvailability();
+      setNfcAvailable(available);
+    }
+    
+    checkNFC();
+  }, []);
+  
+  // Función para manejar la lectura NFC
+  const handleNFCStatusChange = (status: NFCReadStatus, message?: string) => {
+    setNfcStatus(status);
+    if (message) {
+      setNfcMessage(message);
+    }
+  };
+  
+  // Iniciar lectura con NFC
+  const startNFCReading = async () => {
+    setLoading(true);
+    setCedulaData(null);
+    setStep(6); // Paso de lectura NFC
+    
+    try {
+      const data = await readCedulaChilena(handleNFCStatusChange);
+      
+      if (data) {
+        setCedulaData(data);
+        setStep(7); // Paso de confirmación NFC
+      }
+    } catch (error) {
+      setError(`Error al leer cédula: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   // Manejar envío de verificación
   const handleSubmitVerification = () => {
     setLoading(true);
@@ -146,6 +199,57 @@ const VerificacionIdentidadMovil: React.FC = () => {
         </div>
         
         <Card>
+          {/* Paso 0: Selección de método */}
+          {step === 0 && (
+            <>
+              <CardHeader>
+                <CardTitle>Método de verificación</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p>Seleccione el método para verificar su identidad:</p>
+                
+                <div className="grid gap-4">
+                  <Button 
+                    onClick={() => setStep(1)}
+                    className="flex justify-start items-center h-auto py-4 px-5"
+                    variant="outline"
+                  >
+                    <Camera className="h-8 w-8 mr-4 text-blue-500" />
+                    <div className="text-left">
+                      <div className="font-semibold">Fotografía del documento</div>
+                      <div className="text-sm text-gray-600">Capture fotos de su documento de identidad y selfie</div>
+                    </div>
+                  </Button>
+                  
+                  <Button 
+                    onClick={startNFCReading}
+                    className="flex justify-start items-center h-auto py-4 px-5"
+                    variant="outline"
+                    disabled={!nfcAvailable}
+                  >
+                    <Wallet className="h-8 w-8 mr-4 text-green-500" />
+                    <div className="text-left">
+                      <div className="font-semibold">Lectura NFC del chip</div>
+                      <div className="text-sm text-gray-600">
+                        {nfcAvailable 
+                          ? "Acerque su cédula al lector NFC del dispositivo" 
+                          : "Su dispositivo no tiene capacidad NFC o está desactivada"}
+                      </div>
+                    </div>
+                  </Button>
+                </div>
+                
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </>
+          )}
+        
           {/* Paso 1: Capturar documento */}
           {step === 1 && (
             <>
