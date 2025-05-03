@@ -137,13 +137,13 @@ const WebAppPOSOfficial = () => {
           if (decoded.exp * 1000 < Date.now()) {
             // Token expirado
             localStorage.removeItem('vecinosPartnerToken');
-            navigate('/partners/webapp-login');
+            setLocation('/partners/webapp-login');
             return;
           }
         } catch (err) {
           console.error('Error decodificando token:', err);
           localStorage.removeItem('vecinosPartnerToken');
-          navigate('/partners/webapp-login');
+          setLocation('/partners/webapp-login');
           return;
         }
 
@@ -169,7 +169,7 @@ const WebAppPOSOfficial = () => {
     };
 
     loadPartnerInfo();
-  }, [navigate, toast]);
+  }, [setLocation, toast]);
 
   // Verificar disponibilidad de cámara
   useEffect(() => {
