@@ -36,7 +36,7 @@ const QRVerification: React.FC<QRVerificationProps> = ({
     
     // Construir URL completa para el código QR
     const baseUrl = window.location.origin;
-    const verificationUrl = `${baseUrl}/verificacion-movil?session=${verificationId}`;
+    const verificationUrl = `${baseUrl}/verificacion-nfc-movil?session=${verificationId}`;
     
     setQrData(verificationUrl);
     
@@ -173,7 +173,7 @@ const QRVerification: React.FC<QRVerificationProps> = ({
     // Generar nuevo ID de verificación
     const verificationId = generateUniqueId();
     const baseUrl = window.location.origin;
-    const verificationUrl = `${baseUrl}/verificacion-movil?session=${verificationId}`;
+    const verificationUrl = `${baseUrl}/verificacion-nfc-movil?session=${verificationId}`;
     setQrData(verificationUrl);
     
     // Reiniciar simulación o polling
