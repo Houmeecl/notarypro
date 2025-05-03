@@ -59,12 +59,12 @@ export default function VecinosLogin() {
         description: "Bienvenido a Vecinos Xpress",
       });
       
-      // Redirigir según el dispositivo, pero ir directamente al POS web sin pedir local
+      // Redirigir según el dispositivo
       if (activeTab === "mobile") {
         setLocation("/vecinos/pos-app");
       } else {
-        // Ir directamente al POS web en lugar del dashboard
-        setLocation("/partners/webapp-pos-buttons");
+        // Ir al dashboard del vecino
+        setLocation("/vecinos/dashboard");
       }
     },
     onError: (error: Error) => {

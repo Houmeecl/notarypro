@@ -72,10 +72,10 @@ export default function POSAppPage() {
           <div className="pt-4 border-t text-center">
             <Button
               variant="link"
-              onClick={() => setLocation('/partners/webapp-pos-buttons')}
+              onClick={() => setLocation('/vecinos/dashboard')}
               className="text-blue-600"
             >
-              Usar la versión web del POS
+              Ir al dashboard del socio
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
