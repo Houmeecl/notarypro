@@ -115,9 +115,10 @@ class WebSocketService {
     this.failCount++;
     console.log(`Intento fallido de conexión: ${this.failCount}`);
     
-    // Después de 3 intentos fallidos, desactivar WebSocket
-    if (this.failCount >= 3) {
-      console.log("Demasiados intentos fallidos, desactivando WebSocket");
+    // Después de solo 1 intento fallido, desactivar WebSocket 
+    // para evitar bucles de reconexión que afecten la experiencia
+    if (this.failCount >= 1) {
+      console.log("Desactivando WebSocket para evitar problemas de conexión");
       this.disableConnection();
     } else {
       this.scheduleReconnect();

@@ -14,7 +14,7 @@ import { MicroInteractionDisplay } from "@/components/micro-interactions/MicroIn
 import { ProtectedRoute } from "./lib/protected-route";
 import { webSocketService } from "./lib/websocket";
 import React, { useEffect, useState, Suspense } from "react";
-import { WebSocketDebugger } from "@/components/utils/WebSocketDebugger";
+// WebSocketDebugger desactivado para mejorar la estabilidad
 import { Loader2 } from "lucide-react";
 
 // Pages
@@ -742,8 +742,14 @@ function App() {
     // Iniciar la conexión WebSocket con un retardo para permitir que la aplicación cargue primero
     const wsTimeoutId = setTimeout(() => {
       try {
-        webSocketService.connect();
-        console.log("Conexión WebSocket iniciada exitosamente");
+        // Solo intentar conectar en entornos de producción o 
+        // cuando no estamos experimentando problemas de conectividad
+        if (import.meta.env.PROD || !window.location.host.includes('replit')) {
+          webSocketService.connect();
+          console.log("Conexión WebSocket iniciada exitosamente");
+        } else {
+          console.log("WebSocket desactivado en entorno de desarrollo para mejorar estabilidad");
+        }
       } catch (error) {
         console.error("Error al iniciar WebSocket, continuando sin él:", error);
         // No bloqueamos la carga de la aplicación si falla el WebSocket
@@ -802,8 +808,7 @@ function App() {
                 <MicroInteractionDisplay />
                 <OnboardingPopup />
                 <HelpButton />
-                {/* WebSocketDebugger desactivado temporalmente mientras resolvemos problemas */}
-                {/* <WebSocketDebugger /> */}
+                {/* WebSocketDebugger completamente desactivado para evitar problemas de conectividad */}
                 <Router />
               </TooltipProvider>
             </ThemeProvider>
