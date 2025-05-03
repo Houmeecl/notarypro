@@ -4,7 +4,8 @@ import {
   Check, ArrowLeft, CheckCircle2, Printer, UserPlus, FileText, 
   CreditCard, ChevronRight, FileSignature, UserCheck, Shield, 
   Camera, RefreshCw, Download, X, Fingerprint, ClipboardList,
-  CheckSquare, FileCheck, Home, User, LogOut, Wallet
+  CheckSquare, FileCheck, Home, User, LogOut, Wallet, 
+  Mail, MessageCircle
 } from 'lucide-react';
 import NFCIdentityReader from '@/components/identity/NFCIdentityReader';
 import { CedulaChilenaData, checkNFCAvailability } from '@/lib/nfc-reader';
@@ -487,10 +488,11 @@ const WebAppPOSNFC = () => {
   // Componente mejorado para el panel de certificación
   const CertificadorPanel = () => {
     // Estado local para el panel de certificador
+    const docSeleccionado = documentosDisponibles.find(d => d.id === tipoDocumento);
     const [documentosEnRevision, setDocumentosEnRevision] = useState([
       {
         id: '123456',
-        nombre: documento?.nombre || 'Documento sin nombre',
+        nombre: docSeleccionado?.nombre || 'Documento sin nombre',
         cliente: clienteInfo.nombre,
         rut: clienteInfo.rut,
         fecha: new Date().toLocaleDateString(),
@@ -600,7 +602,7 @@ const WebAppPOSNFC = () => {
           <Card>
             <CardHeader className="bg-zinc-50 border-b">
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+                <CheckCircle2 className="h-5 w-5 text-green-600" />
                 <CardTitle className="text-lg">Documentos certificados</CardTitle>
               </div>
               <CardDescription>
@@ -980,9 +982,22 @@ const WebAppPOSNFC = () => {
             </Card>
             
             <div className="flex justify-between">
-              <Button variant="outline" onClick={() => setStep('inicio')}>
+              <Button variant="outline" onClick={() => {
+                // Reiniciar completamente el estado para un nuevo cliente/documento
+                setStep('inicio');
+                setIdentityVerified(false);
+                setPhotoTaken(false);
+                setClienteInfo({
+                  nombre: '',
+                  rut: '',
+                  email: '',
+                  telefono: ''
+                });
+                setTipoDocumento('');
+                setMetodoPago('');
+              }}>
                 <Home className="h-4 w-4 mr-2" />
-                Volver al inicio
+                Nuevo proceso
               </Button>
               
               <div className="space-x-2">
