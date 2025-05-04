@@ -84,14 +84,71 @@ export default function CursoCertificador() {
     }
   };
 
-  const handleSubmitPayment = () => {
-    // Here would be the integration with the payment gateway
-    // After successful payment, credentials would be sent
-    toast({
-      title: "Pago simulado exitoso",
-      description: "Se han enviado las credenciales a su correo electrónico",
-      variant: "default",
-    });
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  
+  const handleSubmitPayment = async () => {
+    try {
+      setPaymentLoading(true);
+      setPaymentError(null);
+      
+      // Crear preferencia de pago usando la API de MercadoPago
+      const response = await fetch('/api/payments/create-preference', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items: [
+            {
+              title: 'Curso de Certificación Profesional',
+              description: 'Acceso completo al curso de certificación profesional',
+              quantity: 1,
+              unit_price: 390000, // 390.000 CLP
+              currency_id: 'CLP'
+            }
+          ],
+          backUrls: {
+            success: `${window.location.origin}/payment-success?course=certifier&email=${encodeURIComponent(formData.email)}`,
+            failure: `${window.location.origin}/payment-error?course=certifier`,
+            pending: `${window.location.origin}/payment-pending?course=certifier`
+          },
+          externalReference: `certifier-course-${formData.email}`,
+          customer: {
+            email: formData.email,
+            name: formData.fullName
+          }
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al procesar el pago');
+      }
+      
+      const paymentData = await response.json();
+      
+      // Si tenemos la URL de inicio de pago, redirigir al usuario
+      if (paymentData.init_point) {
+        window.location.href = paymentData.init_point;
+      } else {
+        toast({
+          title: "Error al procesar el pago",
+          description: "No se pudo obtener el enlace de pago. Intente nuevamente.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error al procesar el pago:', error);
+      setPaymentError(error instanceof Error ? error.message : 'Error desconocido al procesar el pago');
+      toast({
+        title: "Error al procesar el pago",
+        description: error instanceof Error ? error.message : 'Error desconocido al procesar el pago',
+        variant: "destructive",
+      });
+    } finally {
+      setPaymentLoading(false);
+    }
   };
 
   return (
@@ -751,8 +808,24 @@ export default function CursoCertificador() {
                       Continuar
                     </Button>
                   ) : (
-                    <Button onClick={handleSubmitPayment}>
-                      Realizar Pago
+                    <Button 
+                      onClick={handleSubmitPayment} 
+                      disabled={paymentLoading}
+                      className="relative"
+                    >
+                      {paymentLoading ? (
+                        <>
+                          <span className="opacity-0">Realizar Pago</span>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          </div>
+                        </>
+                      ) : (
+                        "Realizar Pago"
+                      )}
                     </Button>
                   )}
                 </CardFooter>
