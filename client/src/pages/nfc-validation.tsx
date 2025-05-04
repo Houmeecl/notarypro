@@ -3,8 +3,11 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, CheckCircle, Info, Smartphone } from 'lucide-react';
+import { AlertCircle, CheckCircle, Info, Smartphone, User } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { apiRequest } from '@/lib/queryClient';
 
 const NFCValidationPage: React.FC = () => {
   const { toast } = useToast();
@@ -15,6 +18,10 @@ const NFCValidationPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [tabletInfo, setTabletInfo] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("instrucciones");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Detectar si estamos en una tablet Lenovo
   useEffect(() => {
@@ -32,6 +39,22 @@ const NFCValidationPage: React.FC = () => {
     };
     
     setTabletInfo(deviceInfo);
+  }, []);
+
+  // Verificar si el usuario ya está logueado
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      try {
+        const response = await apiRequest('GET', '/api/user');
+        if (response.ok) {
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        console.error("Error al verificar estado de login:", error);
+      }
+    };
+    
+    checkLoggedIn();
   }, []);
 
   // Detectar soporte NFC
@@ -54,6 +77,54 @@ const NFCValidationPage: React.FC = () => {
 
     checkNfcSupport();
   }, []);
+  
+  // Función para iniciar sesión
+  const handleLogin = async () => {
+    if (!username || !password) {
+      toast({
+        variant: "destructive",
+        title: "Error de validación",
+        description: "Por favor, ingresa usuario y contraseña",
+      });
+      return;
+    }
+    
+    setIsLoggingIn(true);
+    setError(null);
+    
+    try {
+      const response = await apiRequest('POST', '/api/login', { 
+        username, 
+        password 
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        setIsLoggedIn(true);
+        toast({
+          title: "Inicio de sesión exitoso",
+          description: `Bienvenido, ${userData.username}`,
+        });
+      } else {
+        const errorData = await response.json().catch(() => null);
+        setError(errorData?.message || "Credenciales incorrectas");
+        toast({
+          variant: "destructive",
+          title: "Error de inicio de sesión",
+          description: "Usuario o contraseña incorrectos",
+        });
+      }
+    } catch (error) {
+      setError("Error de conexión al servidor");
+      toast({
+        variant: "destructive",
+        title: "Error de conexión",
+        description: "No se pudo conectar con el servidor",
+      });
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
 
   const startNfcScan = async () => {
     if (!nfcSupported || !nfcEnabled) {
@@ -146,7 +217,70 @@ const NFCValidationPage: React.FC = () => {
     <div className="container max-w-4xl mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-6 text-center text-primary">Validación NFC para Tablet Lenovo</h1>
       
-      <Tabs defaultValue="instrucciones" value={activeTab} onValueChange={setActiveTab} className="w-full">
+      {!isLoggedIn ? (
+        <Card className="p-6">
+          <h2 className="text-2xl font-semibold mb-4">Iniciar sesión</h2>
+          <p className="mb-4 text-gray-600">Para acceder a la verificación NFC, inicia sesión con tus credenciales</p>
+          
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Usuario</Label>
+              <Input 
+                id="username" 
+                type="text" 
+                placeholder="Tu nombre de usuario" 
+                value={username} 
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Contraseña</Label>
+              <Input 
+                id="password" 
+                type="password" 
+                placeholder="Tu contraseña" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            
+            <Button 
+              className="w-full" 
+              onClick={handleLogin}
+              disabled={isLoggingIn}
+            >
+              {isLoggingIn ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  Iniciando sesión...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Iniciar sesión
+                </span>
+              )}
+            </Button>
+          </div>
+          
+          <div className="mt-4 pt-4 border-t text-sm text-gray-500">
+            <p>Credenciales por defecto:</p>
+            <ul className="list-disc pl-5 mt-1">
+              <li><strong>Usuario:</strong> miadmin</li>
+              <li><strong>Contraseña:</strong> miadmin123</li>
+            </ul>
+          </div>
+        </Card>
+      ) : (
+        <Tabs defaultValue="instrucciones" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-3 mb-6">
           <TabsTrigger value="instrucciones">Instrucciones</TabsTrigger>
           <TabsTrigger value="verificacion">Verificación</TabsTrigger>
@@ -368,6 +502,7 @@ const NFCValidationPage: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
+      )}
     </div>
   );
 };
