@@ -3,7 +3,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, CheckCircle, Info, Smartphone, User } from 'lucide-react';
+import { AlertCircle, CheckCircle, Info, Smartphone, User, Gavel, ScrollText, FileCheck } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -215,12 +215,15 @@ const NFCValidationPage: React.FC = () => {
 
   return (
     <div className="container max-w-4xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-6 text-center text-primary">Validación NFC para Tablet Lenovo</h1>
+      <div className="text-center mb-6">
+        <h1 className="text-3xl font-bold text-primary">Notaría VecinoXpress</h1>
+        <p className="text-gray-600 mt-2">Sistema oficial de validación de identidad notarial</p>
+      </div>
       
       {!isLoggedIn ? (
         <Card className="p-6">
-          <h2 className="text-2xl font-semibold mb-4">Iniciar sesión</h2>
-          <p className="mb-4 text-gray-600">Para acceder a la verificación NFC, inicia sesión con tus credenciales</p>
+          <h2 className="text-2xl font-semibold mb-4">Acceso de Notarios y Personal Autorizado</h2>
+          <p className="mb-4 text-gray-600">Este sistema de validación notarial requiere autenticación para garantizar la seguridad en el proceso de verificación de identidad</p>
           
           {error && (
             <Alert variant="destructive" className="mb-4">
@@ -281,16 +284,31 @@ const NFCValidationPage: React.FC = () => {
         </Card>
       ) : (
         <Tabs defaultValue="instrucciones" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-3 mb-6">
-          <TabsTrigger value="instrucciones">Instrucciones</TabsTrigger>
-          <TabsTrigger value="verificacion">Verificación</TabsTrigger>
-          <TabsTrigger value="diagnostico">Diagnóstico</TabsTrigger>
-        </TabsList>
+        <div className="flex justify-between items-center mb-6">
+          <TabsList className="grid grid-cols-3">
+            <TabsTrigger value="instrucciones">Instrucciones</TabsTrigger>
+            <TabsTrigger value="verificacion">Verificación</TabsTrigger>
+            <TabsTrigger value="diagnostico">Diagnóstico</TabsTrigger>
+          </TabsList>
+          
+          <Button 
+            variant="outline" 
+            onClick={() => setIsLoggedIn(false)}
+            size="sm"
+            className="flex gap-2 items-center"
+          >
+            <User className="h-4 w-4" />
+            Cerrar sesión
+          </Button>
+        </div>
         
         {/* Pestaña de instrucciones */}
         <TabsContent value="instrucciones">
           <Card className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">Guía de uso NFC</h2>
+            <div className="flex items-center gap-2 mb-4">
+              <Gavel className="h-6 w-6 text-primary" />
+              <h2 className="text-2xl font-semibold">Guía para Verificación Notarial</h2>
+            </div>
             
             <div className="mb-6">
               <h3 className="text-xl font-medium mb-2">Preparación</h3>
@@ -333,7 +351,10 @@ const NFCValidationPage: React.FC = () => {
         {/* Pestaña de verificación */}
         <TabsContent value="verificacion">
           <Card className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">Verificación NFC</h2>
+            <div className="flex items-center gap-2 mb-4">
+              <ScrollText className="h-6 w-6 text-primary" />
+              <h2 className="text-2xl font-semibold">Verificación de Identidad Notarial</h2>
+            </div>
             
             {nfcSupported === false && (
               <Alert variant="destructive" className="mb-4">
@@ -431,7 +452,10 @@ const NFCValidationPage: React.FC = () => {
         {/* Pestaña de diagnóstico */}
         <TabsContent value="diagnostico">
           <Card className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">Diagnóstico del dispositivo</h2>
+            <div className="flex items-center gap-2 mb-4">
+              <FileCheck className="h-6 w-6 text-primary" />
+              <h2 className="text-2xl font-semibold">Diagnóstico de Sistema Notarial</h2>
+            </div>
             
             <div className="mb-6">
               <h3 className="text-xl font-medium mb-2">Estado NFC</h3>
