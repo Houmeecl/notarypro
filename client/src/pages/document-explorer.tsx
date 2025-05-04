@@ -517,7 +517,7 @@ export default function DocumentExplorer() {
       <CategoryDialog 
         open={showCategoryDialog}
         onOpenChange={setShowCategoryDialog}
-        selectedCategory={selectedCategory}
+        selectedCategory={selectedCategoryForEdit}
         mode={editMode}
       />
       

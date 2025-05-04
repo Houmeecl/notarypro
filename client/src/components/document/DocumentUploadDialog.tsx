@@ -1,6 +1,10 @@
-import { useState, useRef } from "react";
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+
 import {
   Dialog,
   DialogContent,
@@ -9,9 +13,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -20,8 +31,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Upload, FileText, X, AlertCircle } from "lucide-react";
-import { DocumentCategory } from "@shared/document-schema";
+import { 
+  Upload, 
+  Loader2, 
+  FileUp, 
+  File, 
+  AlertTriangle,
+  Tag as TagIcon
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+
+// Tipo para categorías de documentos
+type DocumentCategory = {
+  id: number;
+  name: string;
+  description?: string;
+  color?: string;
+  icon?: string;
+  parentId?: number;
+};
+
+// Schema de validación para documentos
+const documentSchema = z.object({
+  title: z.string().min(2, "El título debe tener al menos 2 caracteres"),
+  description: z.string().optional(),
+  categoryId: z.string().min(1, "Debes seleccionar una categoría"),
+  status: z.string().optional(),
+  tags: z.string().optional(),
+});
 
 interface DocumentUploadDialogProps {
   open: boolean;
@@ -29,330 +66,385 @@ interface DocumentUploadDialogProps {
 }
 
 export function DocumentUploadDialog({ open, onOpenChange }: DocumentUploadDialogProps) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [categoryId, setCategoryId] = useState("");
-  const [tags, setTags] = useState("");
-  const [file, setFile] = useState<File | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [dragActive, setDragActive] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const { toast } = useToast();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [tags, setTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState<string>("");
+  
   const queryClient = useQueryClient();
-
-  // Consultar categorías de documentos
+  const { toast } = useToast();
+  
+  // Cargar categorías de documentos
   const { data: categories } = useQuery({
     queryKey: ["/api/document-management/categories"],
     queryFn: async () => {
       const res = await fetch("/api/document-management/categories");
       if (!res.ok) throw new Error("Error al cargar categorías");
       return res.json();
+    }
+  });
+  
+  // Configurar formulario
+  const form = useForm({
+    resolver: zodResolver(documentSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      categoryId: "",
+      status: "active",
+      tags: "",
     },
   });
-
+  
+  // Resetear formulario cuando se cierra el diálogo
+  React.useEffect(() => {
+    if (!open) {
+      form.reset();
+      setSelectedFile(null);
+      setFilePreview(null);
+      setTags([]);
+      setNewTag("");
+    }
+  }, [open, form]);
+  
   // Mutación para subir documento
-  const uploadDocumentMutation = useMutation({
+  const uploadMutation = useMutation({
     mutationFn: async (formData: FormData) => {
       const response = await fetch("/api/document-management/documents", {
         method: "POST",
         body: formData,
       });
-
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Error al subir el documento");
+        const error = await response.json();
+        throw new Error(error.message || "Error al subir documento");
       }
-
+      
       return response.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/document-management/documents"] });
       toast({
         title: "Documento subido",
-        description: "El documento se ha subido exitosamente",
+        description: "El documento ha sido subido exitosamente",
       });
-
-      // Cerrar el diálogo y refrescar datos
       onOpenChange(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/document-management/documents"] });
-
-      // Resetear formulario
-      resetForm();
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: "Error al subir documento",
         description: error.message,
         variant: "destructive",
       });
     },
   });
-
-  const resetForm = () => {
-    setTitle("");
-    setDescription("");
-    setCategoryId("");
-    setTags("");
-    setFile(null);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!file) {
-      toast({
-        title: "Error",
-        description: "Debe seleccionar un archivo",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!title) {
-      toast({
-        title: "Error",
-        description: "El título es obligatorio",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!categoryId) {
-      toast({
-        title: "Error",
-        description: "Debe seleccionar una categoría",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("categoryId", categoryId);
-    formData.append("tags", tags);
-    formData.append("file", file);
-
-    try {
-      await uploadDocumentMutation.mutateAsync(formData);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
+  
+  // Manejar cambio de archivo
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      
+      // Generar vista previa para imágenes y PDFs
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          setFilePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      } else if (file.type === "application/pdf") {
+        setFilePreview("/pdf-icon.png"); // Ícono de PDF (crear este archivo en /public)
+      } else {
+        setFilePreview(null);
+      }
     }
   };
-
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
+  
+  // Manejar envío del formulario
+  const onSubmit = (data: z.infer<typeof documentSchema>) => {
+    if (!selectedFile) {
+      toast({
+        title: "Error al subir documento",
+        description: "Debes seleccionar un archivo",
+        variant: "destructive",
+      });
+      return;
     }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleFileRemove = () => {
-    setFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  const getFileSize = (size: number) => {
-    if (size < 1024) {
-      return `${size} B`;
-    } else if (size < 1024 * 1024) {
-      return `${(size / 1024).toFixed(2)} KB`;
-    } else {
-      return `${(size / (1024 * 1024)).toFixed(2)} MB`;
-    }
-  };
-
-  const getFileIcon = (fileName: string) => {
-    const extension = fileName.split(".").pop()?.toLowerCase();
     
-    switch (extension) {
-      case "pdf":
-        return <FileText className="h-10 w-10 text-red-500" />;
-      case "doc":
-      case "docx":
-        return <FileText className="h-10 w-10 text-blue-500" />;
-      case "xls":
-      case "xlsx":
-        return <FileText className="h-10 w-10 text-green-500" />;
-      case "jpg":
-      case "jpeg":
-      case "png":
-        return <FileText className="h-10 w-10 text-purple-500" />;
-      default:
-        return <FileText className="h-10 w-10 text-gray-500" />;
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("title", data.title);
+    formData.append("description", data.description || "");
+    formData.append("categoryId", data.categoryId);
+    formData.append("status", data.status || "active");
+    
+    // Agregar etiquetas al FormData
+    if (tags.length > 0) {
+      formData.append("tags", JSON.stringify(tags));
+    }
+    
+    uploadMutation.mutate(formData);
+  };
+  
+  // Manejar etiquetas
+  const addTag = () => {
+    if (newTag.trim() && !tags.includes(newTag.trim())) {
+      setTags([...tags, newTag.trim()]);
+      setNewTag("");
     }
   };
-
+  
+  const removeTag = (tag: string) => {
+    setTags(tags.filter(t => t !== tag));
+  };
+  
+  // Mostrar formato de archivo y tamaño
+  const getFileInfo = () => {
+    if (!selectedFile) return null;
+    
+    const sizeInMB = (selectedFile.size / (1024 * 1024)).toFixed(2);
+    const isLargeFile = parseFloat(sizeInMB) > 5; // Advertir si es > 5MB
+    
+    return (
+      <div className="text-sm text-gray-500 mt-1 flex items-center">
+        <File className="h-4 w-4 mr-1" />
+        {selectedFile.name} ({sizeInMB} MB)
+        {isLargeFile && (
+          <span className="flex items-center text-amber-600 ml-2">
+            <AlertTriangle className="h-4 w-4 mr-1" />
+            Archivo grande
+          </span>
+        )}
+      </div>
+    );
+  };
+  
+  // Mostrar vista previa de archivo
+  const renderFilePreview = () => {
+    if (!filePreview) return null;
+    
+    if (filePreview.startsWith("data:image")) {
+      return (
+        <div className="mt-2 border rounded-md overflow-hidden">
+          <img 
+            src={filePreview} 
+            alt="Vista previa" 
+            className="max-h-48 object-contain mx-auto"
+          />
+        </div>
+      );
+    }
+    
+    return (
+      <div className="mt-2 border rounded-md p-4 flex items-center justify-center bg-gray-50">
+        <File className="h-12 w-12 text-indigo-600" />
+      </div>
+    );
+  };
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Upload className="h-5 w-5" />
-            Subir nuevo documento
-          </DialogTitle>
+          <DialogTitle>Subir Documento</DialogTitle>
           <DialogDescription>
-            Complete los detalles y suba un archivo para crear un nuevo documento.
+            Sube un nuevo documento al sistema
           </DialogDescription>
         </DialogHeader>
-
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="title">Título del documento *</Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Ej: Contrato de Arrendamiento"
-                required
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="description">Descripción</Label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Breve descripción del documento"
-                rows={3}
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="category">Categoría *</Label>
-              <Select value={categoryId} onValueChange={setCategoryId} required>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar categoría" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories?.map((category: DocumentCategory) => (
-                    <SelectItem key={category.id} value={category.id.toString()}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="tags">Etiquetas</Label>
-              <Input
-                id="tags"
-                value={tags}
-                onChange={(e) => setTags(e.target.value)}
-                placeholder="Separadas por comas, ej: urgente, contrato, personal"
-              />
-              <div className="text-xs text-gray-500">
-                Ingrese etiquetas separadas por comas para facilitar la búsqueda posterior
-              </div>
-            </div>
-
-            <div className="grid gap-2">
-              <Label>Archivo *</Label>
-              <div
-                className={`border-2 border-dashed rounded-lg p-6 transition-colors ${
-                  dragActive
-                    ? "border-indigo-500 bg-indigo-50"
-                    : "border-gray-300 hover:border-indigo-400"
-                }`}
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                style={{ cursor: "pointer" }}
-              >
+        
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Selección de archivo */}
+            <div className="space-y-2">
+              <FormLabel>Archivo</FormLabel>
+              <div className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-indigo-400 transition-colors bg-gray-50" onClick={() => document.getElementById("file-upload")?.click()}>
+                <div className="flex flex-col items-center justify-center space-y-2">
+                  <FileUp className="h-8 w-8 text-gray-400" />
+                  <div className="text-sm text-gray-500">
+                    <span className="font-semibold text-indigo-600">
+                      Haz clic para seleccionar
+                    </span> o arrastra y suelta
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (max. 10MB)
+                  </div>
+                </div>
                 <input
-                  ref={fileInputRef}
-                  type="file"
                   id="file-upload"
-                  onChange={handleFileChange}
+                  type="file"
                   className="hidden"
+                  onChange={handleFileChange}
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
                 />
-                
-                {file ? (
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      {getFileIcon(file.name)}
-                      <div>
-                        <p className="font-medium text-gray-700">{file.name}</p>
-                        <p className="text-xs text-gray-500">{getFileSize(file.size)}</p>
-                      </div>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleFileRemove();
-                      }}
-                    >
-                      <X className="h-4 w-4" />
-                      <span className="sr-only">Quitar archivo</span>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <Upload className="h-10 w-10 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm font-medium text-gray-700">
-                      Arrastre y suelte un archivo aquí, o haga clic para seleccionar
-                    </p>
-                    <p className="text-xs text-gray-500 mt-2">
-                      Se aceptan archivos PDF, Word, Excel e imágenes
-                    </p>
-                  </div>
-                )}
               </div>
+              {getFileInfo()}
+              {renderFilePreview()}
             </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting || !file}
-              className="bg-indigo-600 hover:bg-indigo-700"
-            >
-              {isSubmitting ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                <Upload className="h-4 w-4 mr-2" />
+            
+            {/* Título */}
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Título</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Título del documento" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-              Subir documento
-            </Button>
-          </DialogFooter>
-        </form>
+            />
+            
+            {/* Descripción */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descripción</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Descripción del documento" 
+                      {...field} 
+                      value={field.value || ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            {/* Categoría */}
+            <FormField
+              control={form.control}
+              name="categoryId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Categoría</FormLabel>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona una categoría" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categories?.map((category: DocumentCategory) => (
+                        <SelectItem 
+                          key={category.id} 
+                          value={category.id.toString()}
+                        >
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            {/* Estado */}
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Estado</FormLabel>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona un estado" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="active">Activo</SelectItem>
+                      <SelectItem value="draft">Borrador</SelectItem>
+                      <SelectItem value="pending">Pendiente</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            {/* Etiquetas */}
+            <div className="space-y-2">
+              <FormLabel>Etiquetas</FormLabel>
+              <div className="flex items-center">
+                <Input
+                  placeholder="Agregar etiqueta"
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addTag();
+                    }
+                  }}
+                  className="flex-1"
+                />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={addTag}
+                  className="ml-2"
+                >
+                  <TagIcon className="h-4 w-4 mr-1" /> Agregar
+                </Button>
+              </div>
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {tags.map((tag, index) => (
+                    <Badge key={index} className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200">
+                      {tag}
+                      <span 
+                        className="ml-1 cursor-pointer" 
+                        onClick={() => removeTag(tag)}
+                      >
+                        ×
+                      </span>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => onOpenChange(false)}
+                className="mr-2"
+              >
+                Cancelar
+              </Button>
+              <Button 
+                type="submit"
+                disabled={uploadMutation.isPending || !selectedFile}
+                className="bg-indigo-600 hover:bg-indigo-700"
+              >
+                {uploadMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Subiendo...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Subir Documento
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

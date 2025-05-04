@@ -7,7 +7,9 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: 'https',
     cleartext: true,
-    url: 'http://localhost:5000',
+    // URL que utilizará la app para conectarse al servidor
+    // En producción, se debe configurar la URL del servidor real
+    url: 'https://app.vecinoxpress.cl',
     initialPath: '/vecinos/login'
   },
   plugins: {
@@ -21,11 +23,18 @@ const config: CapacitorConfig = {
   },
   android: {
     flavor: 'vecinoexpress',
+    // Optimizaciones para tablet Lenovo
+    minSdkVersion: 24, // Compatible con Android 7.0+
+    targetSdkVersion: 33, // Android 13
     buildOptions: {
       keystorePath: './my-release-key.keystore',
       keystorePassword: 'vecinos123',
       keystoreAlias: 'vecinoxpress',
-      keystoreAliasPassword: 'vecinos123'
+      keystoreAliasPassword: 'vecinos123',
+      // Habilitar estas opciones para reducir el tamaño de la APK
+      minifyEnabled: true,
+      shrinkResources: true,
+      proguardKeepAttributes: "Signature,Exceptions,InnerClasses,*Annotation*"
     }
   }
 };

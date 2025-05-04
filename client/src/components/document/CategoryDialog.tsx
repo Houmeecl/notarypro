@@ -1,25 +1,61 @@
-import { useState, useEffect } from "react";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Loader2, Plus, Folder, FolderEdit, Trash } from "lucide-react";
-import { DocumentCategory } from "@shared/document-schema";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
+  FolderPlus, 
+  Loader2, 
+  Palette, 
+  FolderArchive, 
+  FolderCheck, 
+  FolderInput 
+} from "lucide-react";
+
+// Schema de validación para categorías
+const categorySchema = z.object({
+  name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
+  description: z.string().optional(),
+  color: z.string().optional(),
+  icon: z.string().optional(),
+  parentId: z.string().optional(),
+});
+
+export type CategoryFormValues = z.infer<typeof categorySchema>;
 
 interface CategoryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  selectedCategory?: DocumentCategory | null;
+  selectedCategory?: any | null;
   mode: "create" | "edit";
 }
 
@@ -27,70 +63,60 @@ export function CategoryDialog({
   open, 
   onOpenChange, 
   selectedCategory, 
-  mode 
+  mode = "create" 
 }: CategoryDialogProps) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [icon, setIcon] = useState("");
-  const [color, setColor] = useState("#2d219b"); // Color indigo por defecto
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   
-  // Cargar datos si estamos en modo edición
-  useEffect(() => {
-    if (mode === "edit" && selectedCategory) {
-      setName(selectedCategory.name);
-      setDescription(selectedCategory.description || "");
-      setIcon(selectedCategory.icon || "");
-      setColor(selectedCategory.color || "#2d219b");
-    } else {
-      // Resetear formulario en modo creación
-      setName("");
-      setDescription("");
-      setIcon("");
-      setColor("#2d219b");
+  // Obtener categorías para seleccionar categoría padre
+  const categories = queryClient.getQueryData<any[]>(["/api/document-management/categories"]) || [];
+  
+  // Configurar formulario
+  const form = useForm<CategoryFormValues>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: {
+      name: selectedCategory?.name || "",
+      description: selectedCategory?.description || "",
+      color: selectedCategory?.color || "#3E63DD",
+      icon: selectedCategory?.icon || "folder",
+      parentId: selectedCategory?.parentId?.toString() || "",
+    },
+  });
+  
+  // Resetear formulario cuando cambia el modo o la categoría seleccionada
+  React.useEffect(() => {
+    if (open) {
+      form.reset({
+        name: selectedCategory?.name || "",
+        description: selectedCategory?.description || "",
+        color: selectedCategory?.color || "#3E63DD",
+        icon: selectedCategory?.icon || "folder",
+        parentId: selectedCategory?.parentId?.toString() || "",
+      });
     }
-  }, [mode, selectedCategory, open]);
+  }, [selectedCategory, open, form, mode]);
   
   // Mutación para crear categoría
-  const createCategoryMutation = useMutation({
-    mutationFn: async (categoryData: any) => {
-      const response = await fetch("/api/document-management/categories", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(categoryData),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Error al crear la categoría");
-      }
-      
+  const createMutation = useMutation({
+    mutationFn: async (data: CategoryFormValues) => {
+      const response = await apiRequest(
+        "POST", 
+        "/api/document-management/categories", 
+        data
+      );
       return response.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/document-management/categories"] });
       toast({
         title: "Categoría creada",
-        description: "La categoría se ha creado exitosamente",
+        description: "La categoría ha sido creada exitosamente",
       });
-      
-      // Cerrar el diálogo y refrescar datos
       onOpenChange(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/document-management/categories"] });
-      
-      // Resetear formulario
-      setName("");
-      setDescription("");
-      setIcon("");
-      setColor("#2d219b");
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: "Error al crear categoría",
         description: error.message,
         variant: "destructive",
       });
@@ -98,36 +124,26 @@ export function CategoryDialog({
   });
   
   // Mutación para actualizar categoría
-  const updateCategoryMutation = useMutation({
-    mutationFn: async ({ id, categoryData }: { id: number; categoryData: any }) => {
-      const response = await fetch(`/api/document-management/categories/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(categoryData),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Error al actualizar la categoría");
-      }
-      
+  const updateMutation = useMutation({
+    mutationFn: async (data: CategoryFormValues) => {
+      const response = await apiRequest(
+        "PUT", 
+        `/api/document-management/categories/${selectedCategory.id}`, 
+        data
+      );
       return response.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/document-management/categories"] });
       toast({
         title: "Categoría actualizada",
-        description: "La categoría se ha actualizado exitosamente",
+        description: "La categoría ha sido actualizada exitosamente",
       });
-      
-      // Cerrar el diálogo y refrescar datos
       onOpenChange(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/document-management/categories"] });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: "Error al actualizar categoría",
         description: error.message,
         variant: "destructive",
       });
@@ -135,196 +151,247 @@ export function CategoryDialog({
   });
   
   // Mutación para eliminar categoría
-  const deleteCategoryMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await fetch(`/api/document-management/categories/${id}`, {
-        method: "DELETE",
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || errorData.message || "Error al eliminar la categoría");
-      }
-      
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest(
+        "DELETE", 
+        `/api/document-management/categories/${selectedCategory.id}`,
+      );
       return response.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/document-management/categories"] });
       toast({
         title: "Categoría eliminada",
-        description: "La categoría se ha eliminado exitosamente",
+        description: "La categoría ha sido eliminada exitosamente",
       });
-      
-      // Cerrar el diálogo y refrescar datos
       onOpenChange(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/document-management/categories"] });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: "Error al eliminar categoría",
         description: error.message,
         variant: "destructive",
       });
     },
   });
   
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const onSubmit = (data: CategoryFormValues) => {
+    // Convertir el parentId a número si existe
+    if (data.parentId) {
+      data.parentId = data.parentId.toString();
+    }
     
-    const categoryData = {
-      name,
-      description,
-      icon,
-      color,
-    };
-    
-    try {
-      if (mode === "create") {
-        await createCategoryMutation.mutateAsync(categoryData);
-      } else if (mode === "edit" && selectedCategory) {
-        await updateCategoryMutation.mutateAsync({ 
-          id: selectedCategory.id, 
-          categoryData 
-        });
-      }
-    } finally {
-      setIsSubmitting(false);
+    if (mode === "create") {
+      createMutation.mutate(data);
+    } else {
+      updateMutation.mutate(data);
     }
   };
   
-  const handleDelete = async () => {
-    if (!selectedCategory) return;
-    
-    if (window.confirm(`¿Está seguro de eliminar la categoría "${selectedCategory.name}"? Esta acción no se puede deshacer.`)) {
-      setIsSubmitting(true);
-      try {
-        await deleteCategoryMutation.mutateAsync(selectedCategory.id);
-      } finally {
-        setIsSubmitting(false);
-      }
+  const handleDelete = () => {
+    if (confirm("¿Estás seguro de que deseas eliminar esta categoría? Esta acción no se puede deshacer.")) {
+      deleteMutation.mutate();
     }
+  };
+  
+  // Opciones de iconos
+  const iconOptions = [
+    { value: "folder", label: "Carpeta", icon: <FolderPlus className="h-4 w-4" /> },
+    { value: "folder-archive", label: "Archivo", icon: <FolderArchive className="h-4 w-4" /> },
+    { value: "folder-check", label: "Certificados", icon: <FolderCheck className="h-4 w-4" /> },
+    { value: "folder-input", label: "Documentos", icon: <FolderInput className="h-4 w-4" /> },
+  ];
+  
+  // Obtener icono según valor
+  const getIconByValue = (value: string) => {
+    const option = iconOptions.find(option => option.value === value);
+    return option?.icon || <FolderPlus className="h-4 w-4" />;
   };
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            {mode === "create" ? (
-              <>
-                <Plus className="h-5 w-5" />
-                Crear nueva categoría
-              </>
-            ) : (
-              <>
-                <FolderEdit className="h-5 w-5" />
-                Editar categoría
-              </>
-            )}
+          <DialogTitle>
+            {mode === "create" ? "Crear nueva categoría" : "Editar categoría"}
           </DialogTitle>
           <DialogDescription>
             {mode === "create" 
-              ? "Complete los detalles para crear una nueva categoría de documentos."
-              : "Actualice los detalles de la categoría seleccionada."}
+              ? "Crea una categoría para organizar documentos"
+              : "Edita los detalles de la categoría seleccionada"}
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Nombre de la categoría *</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Ej: Documentos Legales"
-                required
-              />
-            </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nombre</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nombre de la categoría" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             
-            <div className="grid gap-2">
-              <Label htmlFor="description">Descripción</Label>
-              <Input
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Breve descripción de la categoría"
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descripción</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Descripción breve de la categoría" 
+                      {...field} 
+                      value={field.value || ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             
-            <div className="grid gap-2">
-              <Label htmlFor="icon">Ícono (nombre de Lucide)</Label>
-              <Input
-                id="icon"
-                value={icon}
-                onChange={(e) => setIcon(e.target.value)}
-                placeholder="Ej: file-text, folder, shield"
-              />
-              <div className="text-xs text-gray-500">
-                Ingrese el nombre de un ícono de Lucide-React. Ver lista en <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">lucide.dev</a>
-              </div>
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="color">Color (hex)</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="color"
-                  type="text"
-                  value={color}
-                  onChange={(e) => setColor(e.target.value)}
-                  placeholder="#2d219b"
-                />
-                <div 
-                  className="w-10 h-10 rounded-md border" 
-                  style={{ backgroundColor: color || "#2d219b" }}
-                />
-              </div>
-            </div>
-          </div>
-          
-          <DialogFooter className="flex justify-between">
-            {mode === "edit" && (
-              <Button 
-                type="button" 
-                variant="destructive" 
-                onClick={handleDelete}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <Trash className="h-4 w-4 mr-2" />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="color"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      <div className="flex items-center">
+                        <Palette className="h-4 w-4 mr-2" />
+                        Color
+                      </div>
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="color" {...field} value={field.value || "#3E63DD"} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-                Eliminar
-              </Button>
-            )}
-            <div className="flex gap-2">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => onOpenChange(false)}
-                disabled={isSubmitting}
-              >
-                Cancelar
-              </Button>
-              <Button 
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-indigo-600 hover:bg-indigo-700"
-              >
-                {isSubmitting ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : mode === "create" ? (
-                  <Plus className="h-4 w-4 mr-2" />
-                ) : (
-                  <FolderEdit className="h-4 w-4 mr-2" />
+              />
+              
+              <FormField
+                control={form.control}
+                name="icon"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Icono</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                      value={field.value || "folder"}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue 
+                            placeholder="Seleccionar icono" 
+                            defaultValue="folder"
+                          >
+                            <div className="flex items-center">
+                              {getIconByValue(field.value || "folder")}
+                              <span className="ml-2">
+                                {iconOptions.find(
+                                  option => option.value === (field.value || "folder")
+                                )?.label || "Carpeta"}
+                              </span>
+                            </div>
+                          </SelectValue>
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {iconOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            <div className="flex items-center">
+                              {option.icon}
+                              <span className="ml-2">{option.label}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
                 )}
-                {mode === "create" ? "Crear categoría" : "Guardar cambios"}
-              </Button>
+              />
             </div>
-          </DialogFooter>
-        </form>
+            
+            <FormField
+              control={form.control}
+              name="parentId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Categoría padre</FormLabel>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    value={field.value || ""} 
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar categoría padre (opcional)" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="">Ninguna (categoría principal)</SelectItem>
+                      {categories
+                        .filter(cat => cat.id !== selectedCategory?.id)
+                        .map((category) => (
+                        <SelectItem 
+                          key={category.id} 
+                          value={category.id.toString()}
+                        >
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <DialogFooter className="flex justify-between">
+              {mode === "edit" && (
+                <Button 
+                  type="button" 
+                  variant="destructive" 
+                  onClick={handleDelete}
+                  disabled={deleteMutation.isPending}
+                >
+                  {deleteMutation.isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Eliminar
+                </Button>
+              )}
+              <div className="flex space-x-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => onOpenChange(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit"
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                  className="bg-indigo-600 hover:bg-indigo-700"
+                >
+                  {(createMutation.isPending || updateMutation.isPending) && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  {mode === "create" ? "Crear categoría" : "Actualizar categoría"}
+                </Button>
+              </div>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
