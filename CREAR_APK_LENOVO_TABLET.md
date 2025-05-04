@@ -2,6 +2,8 @@
 
 Esta guía explica cómo crear una APK optimizada para tablets Lenovo con soporte NFC.
 
+> **IMPORTANTE**: La solución web tiene limitaciones con NFC en tablets Lenovo. Crear una APK nativa es la única opción confiable para funcionalidad NFC completa.
+
 ## Requisitos previos
 
 1. Node.js instalado en tu computadora
