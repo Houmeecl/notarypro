@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
     androidScheme: 'https',
     cleartext: true,
     url: 'http://localhost:5000',
-    initialPath: '/vecinos-express'
+    initialPath: '/vecinos/login'
   },
   plugins: {
     SplashScreen: {
