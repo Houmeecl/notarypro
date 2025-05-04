@@ -1,67 +1,61 @@
-# Instrucciones para activar el modo tablet en VecinoXpress
+# Guía para activar modo tablet con NFC
 
-## Acceso web en la tablet Lenovo
+## Configuración en la tablet Lenovo
 
-Para optimizar la experiencia al usar la aplicación web directamente en la tablet Lenovo, puedes seguir estos pasos:
+### Activar NFC en la tablet
 
-1. Abre Chrome en la tablet Lenovo
-2. Ve a la URL: https://app.vecinoxpress.cl/verificacion-nfc
-3. Inicia sesión con:
-   - Usuario: `miadmin`
-   - Contraseña: `miadmin123`
+1. Ve a **Configuración**
+2. Busca **Conexiones** o **Conectividad**
+3. Activa el interruptor **NFC**
+4. Si existe una opción **Lector/Escritor de tarjetas**, actívala también
 
-## Activar NFC en la tablet
+### Configurar el navegador Chrome
 
-1. Desliza hacia abajo desde la parte superior de la pantalla para abrir el panel de ajustes rápidos
-2. Mantén presionado el ícono de NFC (o busca NFC en Configuración)
-3. Asegúrate de que NFC esté activado
+1. Abre **Chrome**
+2. Ve a **chrome://flags** en la barra de direcciones
+3. Busca **Web NFC**
+4. Cámbialo a **Enabled**
+5. Reinicia Chrome cuando se te solicite
 
-## Modo tablet para dispositivos POS
+### Verificar compatibilidad NFC
 
-Para activar el modo tablet específico para POS:
+1. Abre Chrome
+2. Ve a esta URL de prueba: **https://webnfc-test.web.app/**
+3. Toca en **Leer etiqueta NFC**
+4. Acerca una cédula chilena al lector NFC
+5. Si detecta la lectura, significa que el NFC está funcionando correctamente
 
-1. Después de iniciar sesión, ve a:
-   - Menú > Configuración > Modo Dispositivo
-   - O accede directamente a: https://app.vecinoxpress.cl/pos-menu
+## Crear acceso directo a la aplicación
 
-2. En el menú POS, selecciona "Iniciar Sesión POS"
+### Usando APK Creator
 
-3. Cuando te solicite un código de dispositivo, usa uno de estos:
-   - `POS-001`: Terminal POS estándar
-   - `TABLET-001`: Modo tablet para verificación
-   - `KIOSK-001`: Modo kiosco para firma autónoma
+Sigue las instrucciones en **CREAR_APK_CON_APKCREATOR.md**
 
-## Verificar identidad con NFC
+### Usando Chrome (sin APK)
 
-Para verificar una cédula chilena usando NFC:
+1. Abre Chrome
+2. Ve a nuestra URL: **https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/verificacion-nfc**
+3. Toca el menú (tres puntos)
+4. Selecciona **Añadir a pantalla de inicio**
+5. Confirma el nombre (**VecinoXpress**) y añade el acceso directo
 
-1. En la aplicación, selecciona la opción "Verificar Identidad" o "Leer NFC"
+## Modo de prueba rápida para NFC
 
-2. Cuando aparezca la pantalla de lectura:
-   - Acerca la cédula a la parte trasera de la tablet
-   - Mantén la cédula inmóvil hasta que se complete la lectura
+Si necesitas probar rápidamente el lector NFC:
 
-3. Si la lectura es exitosa, verás los datos personales extraídos del chip
+1. Instala alguna de estas aplicaciones desde Google Play Store:
+   - **NFC Tools**
+   - **NFC TagInfo**
+   - **NFC TagWriter**
 
-## Acceso sin conexión
+2. Abre la aplicación y sigue las instrucciones para leer una etiqueta NFC
+3. Acerca una cédula u otra tarjeta con NFC
+4. La aplicación debería mostrar información sobre la tarjeta
 
-En caso de que tengas problemas de conexión:
+## Consejos para usar NFC en tablets Lenovo
 
-1. La aplicación tiene modo sin conexión para verificación NFC
-2. Los datos se sincronizarán cuando la conexión se restablezca
-3. Puedes seguir procesando verificaciones mientras tanto
-
-## Solución de problemas
-
-### Si el NFC no funciona:
-
-1. Asegúrate de que el NFC esté activado en la tablet
-2. Verifica la posición de la antena NFC (normalmente en la parte central o superior trasera)
-3. Prueba con diferentes posiciones de la cédula
-4. Reinicia la aplicación y el navegador
-
-### Si la aplicación no responde:
-
-1. Cierra y vuelve a abrir el navegador
-2. Borra el caché: Configuración > Aplicaciones > Chrome > Almacenamiento > Borrar caché
-3. Intenta con otro navegador compatible con NFC (Firefox)
+- **Posición del lector**: Cada modelo de tablet tiene el lector NFC en una posición diferente. Prueba distintas zonas de la parte trasera.
+- **Mantén la cédula inmóvil**: Evita mover la cédula durante la lectura.
+- **Elimina interferencias**: Quita fundas protectoras y evita superficies metálicas.
+- **Batería suficiente**: Asegúrate de que la tablet tenga al menos 15% de batería.
+- **Activar modo depuración**: Si tienes problemas persistentes, activa el modo desarrollador y la depuración USB para ver registros detallados.

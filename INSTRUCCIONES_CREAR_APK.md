@@ -1,113 +1,58 @@
-# Guía para Crear APK de VecinoXpress para Tablets Lenovo
+# Instrucciones para crear APK en Tablet Lenovo
 
-Este documento proporciona instrucciones detalladas para generar una APK optimizada para tablets Lenovo con soporte NFC, para ser utilizada con la plataforma VecinoXpress.
+## Opción 1: Usar APK Creator (Más rápido)
 
-## Requisitos previos
+Esta es la opción recomendada si tu tablet tiene la aplicación APK Creator preinstalada.
 
-Antes de comenzar, asegúrate de tener instalados:
+### Pasos básicos:
 
-1. Node.js (14.x o superior)
-2. Android Studio 
-3. Android SDK (API 24 o superior)
-4. Java Development Kit (JDK 11 recomendado)
-5. ADB (Android Debug Bridge)
+1. Abre **APK Creator** en la tablet
+2. Selecciona **Crear nueva APK** o **Nueva aplicación**
+3. Selecciona tipo **Aplicación Web** o **WebView**
+4. Ingresa esta URL: 
+   ```
+   https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/verificacion-nfc
+   ```
+5. Configura el nombre: **VecinoXpress NFC**
+6. Activa los permisos:
+   - ✓ Internet
+   - ✓ Acceso a la red
+   - ✓ NFC
+   - ✓ Cámara
+7. Selecciona **Compilar APK**
+8. Instala la APK generada
 
-## Pasos para generar la APK
+**Instrucciones detalladas en:** `CREAR_APK_CON_APKCREATOR.md`
 
-### 1. Preparar el entorno Android
+## Opción 2: Usar el navegador (Sin APK)
 
-Ejecuta el script `prepare-android.sh` para configurar el proyecto Android:
+Si no puedes crear la APK, puedes usar el navegador:
 
-```bash
-chmod +x prepare-android.sh
-./prepare-android.sh
-```
+1. Abre **Chrome** en la tablet
+2. Ve a:
+   ```
+   https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/verificacion-nfc
+   ```
+3. Inicia sesión con:
+   - Usuario: **miadmin**
+   - Contraseña: **miadmin123**
+4. Crea un acceso directo:
+   - Toca el menú (tres puntos)
+   - Selecciona **Añadir a pantalla de inicio**
 
-Este script realiza las siguientes tareas:
-- Inicializa el proyecto de Android con Capacitor (si no existe)
-- Configura los colores y temas de la aplicación
-- Establece permisos necesarios como NFC
-- Configura el AndroidManifest.xml con las opciones correctas
+## Configuración NFC
 
-### 2. Construir la APK optimizada para Tablets Lenovo
+Para que NFC funcione correctamente:
 
-Hay dos opciones para construir la APK:
+1. Activa NFC en la tablet:
+   - **Configuración > Conexiones > NFC**
+2. Posiciona la cédula correctamente:
+   - Coloca la cédula contra la parte trasera de la tablet
+   - Mueve lentamente hasta encontrar la posición exacta del lector
+   - Mantén inmóvil por 2-3 segundos
+3. Si hay problemas:
+   - Asegúrate que la tablet tenga permisos de NFC
+   - Quita cualquier funda o protector
+   - Evita superficies metálicas
 
-#### Opción 1: APK estándar
-
-Ejecuta el script `build-android.sh`:
-
-```bash
-chmod +x build-android.sh
-./build-android.sh
-```
-
-Este script:
-- Construye la aplicación web en modo producción
-- Optimiza los archivos eliminando sourcemaps
-- Sincroniza con Capacitor
-- Configura opciones para reducir tamaño
-- Genera la APK en `android/app/build/outputs/apk/release/app-release.apk`
-
-#### Opción 2: APK optimizada para tablets Lenovo (Recomendada)
-
-Ejecuta el script `build-lenovo-tablet.sh`:
-
-```bash
-chmod +x build-lenovo-tablet.sh
-./build-lenovo-tablet.sh
-```
-
-Este script incluye optimizaciones específicas para tablets Lenovo:
-- Detecta automáticamente si hay una tablet conectada por USB
-- Aplica configuraciones optimizadas para tablets Lenovo
-- Configura soporte NFC específico
-- Optimiza el tamaño y rendimiento de la APK
-- Genera la APK en `builds/VecinoXpress_Lenovo_vX.X.X_YYYYMMDD.apk`
-- Ofrece instalar directamente en la tablet si está conectada
-
-## Instalación en la tablet
-
-### Si usaste build-lenovo-tablet.sh y la tablet está conectada:
-El script te preguntará si deseas instalar directamente en la tablet. Responde 's' para instalar.
-
-### Instalación manual:
-1. Conecta la tablet Lenovo vía USB
-2. Activa la depuración USB en la tablet
-3. Ejecuta el siguiente comando:
-
-```bash
-# Para la APK estándar:
-adb install android/app/build/outputs/apk/release/app-release.apk
-
-# Para la APK optimizada para Lenovo:
-adb install builds/VecinoXpress_Lenovo_v*.apk
-```
-
-## Configuración de la aplicación
-
-Al iniciar la aplicación en la tablet:
-
-1. La aplicación se conectará al servidor configurado en `capacitor.config.ts`
-2. Se iniciará en la ruta `/vecinos/login` 
-3. Asegúrate de que las credenciales de prueba estén configuradas en el servidor
-
-## Solución de problemas
-
-### Error de NFC
-Si la aplicación no detecta el NFC, verifica:
-- Que el NFC esté activado en la tablet
-- Que los permisos de NFC estén concedidos a la aplicación
-- Que la tablet soporte NFC (requisito imprescindible)
-
-### Problemas de conexión
-Si la aplicación no se conecta al servidor:
-- Verifica la configuración URL en `capacitor.config.ts`
-- Asegúrate de que la tablet tenga acceso a internet
-- Verifica que el servidor esté en funcionamiento
-
-### Errores de construcción
-Si el proceso de construcción falla:
-- Verifica que Android Studio y las herramientas de línea de comandos estén correctamente instalados
-- Asegúrate de que JAVA_HOME y ANDROID_HOME estén correctamente configurados
-- Verifica que Capacitor esté correctamente instalado con `npx cap doctor`
+**Instrucciones detalladas en:** `VERIFICACION_NFC_TABLETS_LENOVO.md`
