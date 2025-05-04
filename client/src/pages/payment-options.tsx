@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Terminal, Globe, Smartphone, CheckCircle, XCircle } from "lucide-react";
 
@@ -192,6 +193,7 @@ export default function PaymentOptions() {
 
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8">
+      <Toaster />
       <h1 className="text-3xl font-bold text-center mb-2 text-[#2d219b]">
         Opciones de Pago - VecinoXpress
       </h1>
