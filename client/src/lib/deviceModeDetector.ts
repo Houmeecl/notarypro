@@ -27,7 +27,7 @@ export interface DeviceModeConfig {
 const DEFAULT_CONFIG: DeviceModeConfig = {
   mode: DeviceMode.AUTO,
   demoDeviceIds: ['demo-pos-', 'demo-tablet-', 'demo-device-'],
-  realDeviceIds: ['pos-real-', 'pos-', 'nPOS-', 'P2mini-8766wb', 'p2mini', 'sunmi', 'v2pro', 'v2', 'sunmiv2pro'],
+  realDeviceIds: ['pos-real-', 'pos-', 'nPOS-', 'P2mini-8766wb', 'p2mini', 'sunmi', 'v2pro', 'v2', 'sunmiv2pro', 'tuu', 'TUU-POS', 'TUUPOS'],
   forceDemoParameter: 'demo',
   forceRealParameter: 'real'
 };
@@ -109,9 +109,17 @@ export function useDeviceMode() {
                      userAgent.includes('v2 pro') || 
                      userAgent.includes('v2pro') ||
                      userAgent.includes('sm-');
+                     
+      // Verificar si es un POS TUU
+      const isTuu = userAgent.includes('tuu') ||
+                   userAgent.includes('TUU') ||
+                   userAgent.includes('t2');
       
-      if (isP2mini || isSunmi) {
-        console.log('Detectado dispositivo POS real:', isP2mini ? 'P2mini' : 'Sunmi V2 Pro');
+      if (isP2mini || isSunmi || isTuu) {
+        console.log('Detectado dispositivo POS real:', 
+          isP2mini ? 'P2mini' : 
+          isSunmi ? 'Sunmi V2 Pro' : 
+          'TUU POS');
         setIsDemo(false);  // Este es un dispositivo real
         return;
       }
@@ -249,9 +257,17 @@ export function checkIsDemoMode(): boolean {
                  userAgent.includes('v2 pro') || 
                  userAgent.includes('v2pro') ||
                  userAgent.includes('sm-');
+                 
+  // Verificar si es un POS TUU
+  const isTuu = userAgent.includes('tuu') ||
+               userAgent.includes('TUU') ||
+               userAgent.includes('t2');
                     
-  if (isP2mini || isSunmi) {
-    console.log('Detector sincrónico: Encontrado dispositivo POS real:', isP2mini ? 'P2mini' : 'Sunmi V2 Pro');
+  if (isP2mini || isSunmi || isTuu) {
+    console.log('Detector sincrónico: Encontrado dispositivo POS real:', 
+      isP2mini ? 'P2mini' : 
+      isSunmi ? 'Sunmi V2 Pro' : 
+      'TUU POS');
     return false;  // Este es un dispositivo real
   }
   
