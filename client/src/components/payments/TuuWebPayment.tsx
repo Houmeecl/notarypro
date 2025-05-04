@@ -62,8 +62,8 @@ export default function TuuWebPayment({
         clientName,
         clientEmail,
         clientRut,
-        successUrl: successUrl || window.location.origin + "/payment-options?status=success",
-        cancelUrl: cancelUrl || window.location.origin + "/payment-options?status=cancel",
+        successUrl: successUrl || window.location.origin + "/payment-success?tuu=true",
+        cancelUrl: cancelUrl || window.location.origin + "/payment-cancel?tuu=true",
         metadata: {
           ...metadata,
           paymentMethod: "web",

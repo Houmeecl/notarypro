@@ -116,7 +116,13 @@ export default function TuuMobilePayment({
   // Redireccionar a la URL de pago (si es que hay una)
   const handleRedirectToPayment = () => {
     if (paymentData && paymentData.paymentUrl) {
-      window.location.href = paymentData.paymentUrl;
+      // Agregar un parámetro adicional para identificar la redirección desde Tuu
+      const paymentUrl = new URL(paymentData.paymentUrl);
+      // Si la URL es interna, añadimos tuu=true para que el controlador de redirección sepa de dónde viene
+      if (paymentUrl.origin === window.location.origin) {
+        paymentUrl.searchParams.append('tuu', 'true');
+      }
+      window.location.href = paymentUrl.toString();
     }
   };
 

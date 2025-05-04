@@ -42,36 +42,40 @@ export default function PaymentOptions() {
 
   // Obtener el estado de la URL si existe
   useEffect(() => {
-    // Comprobar si hay parámetros de consulta para el estado del pago
-    const urlParams = new URLSearchParams(window.location.search);
-    const status = urlParams.get("status");
+    try {
+      // Comprobar si hay parámetros de consulta para el estado del pago
+      const urlParams = new URLSearchParams(window.location.search);
+      const status = urlParams.get("status");
 
-    if (status === "success") {
-      setPaymentStatus("success");
-      toast({
-        title: "Pago exitoso",
-        description: "El pago ha sido completado con éxito",
-      });
-    } else if (status === "canceled" || status === "cancelled") {
-      setPaymentStatus("canceled");
-      toast({
-        title: "Pago cancelado",
-        description: "El pago ha sido cancelado",
-        variant: "destructive",
-      });
-    } else if (status === "error" || status === "failed") {
-      setPaymentStatus("error");
-      toast({
-        title: "Error en el pago",
-        description: "Ocurrió un error al procesar el pago",
-        variant: "destructive",
-      });
-    }
+      if (status === "success") {
+        setPaymentStatus("success");
+        toast({
+          title: "Pago exitoso",
+          description: "El pago ha sido completado con éxito",
+        });
+      } else if (status === "canceled" || status === "cancelled") {
+        setPaymentStatus("canceled");
+        toast({
+          title: "Pago cancelado",
+          description: "El pago ha sido cancelado",
+          variant: "destructive",
+        });
+      } else if (status === "error" || status === "failed") {
+        setPaymentStatus("error");
+        toast({
+          title: "Error en el pago",
+          description: "Ocurrió un error al procesar el pago",
+          variant: "destructive",
+        });
+      }
 
-    // Limpiar los parámetros de la URL
-    if (status) {
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
+      // Limpiar los parámetros de la URL
+      if (status) {
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+      }
+    } catch (error) {
+      console.error("Error al procesar parámetros de URL:", error);
     }
   }, [toast]);
 
