@@ -3,16 +3,22 @@ INSTRUCCIONES PARA INSTALACIÓN EN TABLET LENOVO
 
 CONTENIDO DEL PAQUETE:
 ---------------------
-1. vecinoxpress-nfc.apk - Aplicación principal para instalar
-2. Carpeta config/ - Archivos de configuración
-3. Archivos de documentación (*.md) - Guías detalladas
+1. Carpeta config/ - Archivos de configuración
+2. Archivos de documentación (*.md) - Guías detalladas
 
-INSTALACIÓN RÁPIDA:
+ALTERNATIVAS DE ACCESO:
+----------------------
+A. APK (PRÓXIMAMENTE)
+B. ACCESO DIRECTO WEB (RECOMENDADO AHORA)
+
+INSTALACIÓN RÁPIDA (MÉTODO WEB):
 ------------------
-1. Conecta el pendrive a la tablet
-2. Copia vecinoxpress-nfc.apk a la tablet
-3. Instala la APK (permite fuentes desconocidas si es necesario)
-4. Abre la aplicación e inicia sesión con:
+1. Abre Chrome en la tablet
+2. Ve a esta URL:
+   https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/nfc-validation
+3. Para diagnóstico, o a:
+   https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/verificacion-nfc
+4. Inicia sesión con:
    Usuario: miadmin
    Contraseña: miadmin123
 
@@ -29,10 +35,14 @@ Si tienes problemas, consulta los archivos:
 - SOLUCIONAR_PROBLEMAS_NFC_LENOVO.md
 - VERIFICACION_NFC_TABLETS_LENOVO.md
 
-ALTERNATIVA WEB:
----------------
-También puedes usar la aplicación web en:
-https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/verificacion-nfc
+ACCESO DIRECTO EN PANTALLA DE INICIO:
+----------------------------------
+1. Abre Chrome y ve a la URL:
+   https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/nfc-validation
+2. Toca el menú (tres puntos arriba a la derecha)
+3. Selecciona "Añadir a pantalla de inicio"
+4. Nombra el acceso directo "VecinoXpress NFC"
+5. Ahora tendrás un ícono en la pantalla principal
 
 SOPORTE:
 -------

@@ -640,6 +640,16 @@ function Router() {
         );
       }} />
       
+      {/* Herramienta de validación y diagnóstico de NFC para tablets Lenovo */}
+      <Route path="/nfc-validation" component={() => {
+        const NFCValidation = React.lazy(() => import("@/pages/nfc-validation"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <NFCValidation />
+          </Suspense>
+        );
+      }} />
+      
       {/* 2. Verificación con Demo vía QR (Alternativa) */}
       <Route path="/verificacion-identidad" component={VerificacionIdentidadDemo} />
       <Route path="/readid-verification" component={ReadIDVerificationPage} />
