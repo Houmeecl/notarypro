@@ -69,6 +69,10 @@ import DocumentoEjemplo from "@/pages/documento-ejemplo";
 import VerificacionIdentidadDemo from "@/pages/verificacion-identidad-demo";
 import ReadIDVerificationPage from "@/pages/readid-verification";
 import AccesoDirecto from "@/pages/acceso-directo";
+// Nuevas páginas para gestión de POS
+import POSMenuPage from "@/pages/pos-menu";
+import POSSessionPage from "@/pages/pos-session";
+import RegisterPOSDevicePage from "@/pages/register-pos-device";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";

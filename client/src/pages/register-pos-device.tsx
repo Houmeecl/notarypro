@@ -1,53 +1,71 @@
 import React from 'react';
 import { useLocation } from 'wouter';
-import { useToast } from '@/hooks/use-toast';
-import { useMutation } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Loader2, ArrowLeft, Save } from 'lucide-react';
-import { useAuth } from '@/hooks/use-auth';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Save, ChevronLeft, Loader2, Terminal } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-// Esquema de validación para el formulario
+// Esquema de validación para el formulario de registro de dispositivo
 const deviceFormSchema = z.object({
   deviceCode: z.string()
     .min(3, { message: 'El código debe tener al menos 3 caracteres' })
-    .max(20, { message: 'El código no puede exceder 20 caracteres' })
-    .regex(/^[A-Za-z0-9\-]+$/, { message: 'Solo se permiten letras, números y guiones' }),
+    .max(20, { message: 'El código no debe exceder 20 caracteres' })
+    .regex(/^[A-Z0-9\-]+$/, { 
+      message: 'El código debe contener solo letras mayúsculas, números y guiones' 
+    }),
   deviceName: z.string()
-    .min(2, { message: 'El nombre debe tener al menos 2 caracteres' })
-    .max(100, { message: 'El nombre no puede exceder 100 caracteres' }),
+    .min(3, { message: 'El nombre debe tener al menos 3 caracteres' })
+    .max(50, { message: 'El nombre no debe exceder 50 caracteres' }),
   deviceType: z.string()
-    .min(1, { message: 'Seleccione un tipo de dispositivo' }),
+    .min(1, { message: 'Debe seleccionar un tipo de dispositivo' }),
   deviceModel: z.string().optional(),
-  storeId: z.number().optional(),
   location: z.string().optional(),
+  notes: z.string().optional(),
+  isDemo: z.boolean().default(false),
   isActive: z.boolean().default(true),
-  isDemo: z.boolean().default(false)
 });
 
 type DeviceFormValues = z.infer<typeof deviceFormSchema>;
 
 export default function RegisterPOSDevicePage() {
-  const [_, navigate] = useLocation();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  // Verificar si el usuario tiene permisos para registrar dispositivos
-  if (!user || (user.role !== 'admin' && user.role !== 'manager')) {
-    navigate('/pos-menu');
-    return null;
-  }
-
-  // Configurar el formulario
+  // Configurar formulario con validación Zod
   const form = useForm<DeviceFormValues>({
     resolver: zodResolver(deviceFormSchema),
     defaultValues: {
@@ -56,82 +74,160 @@ export default function RegisterPOSDevicePage() {
       deviceType: '',
       deviceModel: '',
       location: '',
+      notes: '',
+      isDemo: false,
       isActive: true,
-      isDemo: false
-    }
+    },
   });
 
-  // Mutación para crear un nuevo dispositivo
+  // Mutación para registrar dispositivo
   const registerDeviceMutation = useMutation({
     mutationFn: async (data: DeviceFormValues) => {
-      const response = await apiRequest('POST', '/api/pos-management/devices', data);
-      if (!response.ok) {
-        const errorData = await response.json();
+      const res = await apiRequest('POST', '/api/pos-management/devices', data);
+      if (!res.ok) {
+        const errorData = await res.json();
         throw new Error(errorData.error || 'Error al registrar dispositivo');
       }
-      return response.json();
+      return await res.json();
     },
     onSuccess: () => {
       toast({
         title: 'Dispositivo registrado',
-        description: 'El dispositivo ha sido registrado correctamente',
+        description: 'El dispositivo ha sido registrado exitosamente',
       });
-      // Redireccionar al menú de POS
-      navigate('/pos-menu');
+      // Actualizar caché de dispositivos
+      queryClient.invalidateQueries({ queryKey: ['/api/pos-management/devices'] });
+      // Redirigir a la lista de dispositivos
+      setLocation('/pos-menu');
     },
     onError: (error: Error) => {
       toast({
-        title: 'Error al registrar dispositivo',
-        description: error.message,
         variant: 'destructive',
+        title: 'Error',
+        description: error.message,
       });
     },
   });
 
-  // Handler para envío del formulario
-  const onSubmit = (data: DeviceFormValues) => {
-    // Si se proporcionó storeId como string, convertir a número
-    if (data.storeId && typeof data.storeId === 'string') {
-      data.storeId = parseInt(data.storeId as unknown as string);
-    }
-    
-    registerDeviceMutation.mutate(data);
+  // Manejar envío del formulario
+  const onSubmit = (values: DeviceFormValues) => {
+    registerDeviceMutation.mutate(values);
+  };
+
+  // Opciones para el tipo de dispositivo
+  const deviceTypeOptions = [
+    { value: 'pos', label: 'Terminal POS' },
+    { value: 'tablet', label: 'Tablet' },
+    { value: 'mobile', label: 'Móvil' },
+    { value: 'kiosk', label: 'Quiosco' },
+  ];
+
+  // Generar código de dispositivo predeterminado
+  const generateDeviceCode = () => {
+    const prefix = form.getValues('deviceType')?.toUpperCase() || 'POS';
+    const randomDigits = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const suggestedCode = `${prefix}-${randomDigits}`;
+    form.setValue('deviceCode', suggestedCode);
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-indigo-800">
-          Registrar nuevo dispositivo POS
-        </h1>
-        <Button
-          variant="outline"
-          onClick={() => navigate('/pos-menu')}
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="flex items-center mb-6">
+        <Button 
+          variant="ghost" 
+          className="mr-2 p-1"
+          onClick={() => setLocation('/pos-menu')}
         >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Volver
+          <ChevronLeft className="h-5 w-5" />
         </Button>
+        <h1 className="text-2xl font-bold">Registrar Nuevo Dispositivo</h1>
       </div>
 
-      <Card className="max-w-2xl mx-auto bg-white shadow-md border-indigo-100">
+      <Card>
         <CardHeader>
-          <CardTitle>Información del dispositivo</CardTitle>
+          <CardTitle>Información del Dispositivo</CardTitle>
           <CardDescription>
-            Completa los detalles para registrar un nuevo dispositivo POS en el sistema
+            Complete los detalles para registrar un nuevo dispositivo en el sistema
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Tipo de dispositivo */}
+                <FormField
+                  control={form.control}
+                  name="deviceType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tipo de Dispositivo*</FormLabel>
+                      <Select 
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          // Si el código está vacío, sugerir uno
+                          if (!form.getValues('deviceCode')) {
+                            setTimeout(generateDeviceCode, 100);
+                          }
+                        }} 
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccione un tipo" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {deviceTypeOptions.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Modelo del dispositivo */}
+                <FormField
+                  control={form.control}
+                  name="deviceModel"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Modelo</FormLabel>
+                      <FormControl>
+                        <Input placeholder="P2mini-8766wb, Sunmi V2 Pro, etc." {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        El modelo específico del dispositivo (opcional)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Código del dispositivo */}
                 <FormField
                   control={form.control}
                   name="deviceCode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Código del dispositivo*</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Ej. POS-TUU-001" {...field} />
-                      </FormControl>
+                      <FormLabel>Código del Dispositivo*</FormLabel>
+                      <div className="flex gap-2">
+                        <FormControl>
+                          <Input placeholder="POS-001" {...field} />
+                        </FormControl>
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={generateDeviceCode}
+                        >
+                          Generar
+                        </Button>
+                      </div>
                       <FormDescription>
                         Código único para identificar el dispositivo
                       </FormDescription>
@@ -140,14 +236,15 @@ export default function RegisterPOSDevicePage() {
                   )}
                 />
 
+                {/* Nombre del dispositivo */}
                 <FormField
                   control={form.control}
                   name="deviceName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nombre*</FormLabel>
+                      <FormLabel>Nombre del Dispositivo*</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ej. Terminal Central" {...field} />
+                        <Input placeholder="Terminal Principal" {...field} />
                       </FormControl>
                       <FormDescription>
                         Nombre descriptivo del dispositivo
@@ -156,130 +253,141 @@ export default function RegisterPOSDevicePage() {
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="deviceType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tipo de dispositivo*</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Seleccionar tipo" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="tuu">Tuu POS</SelectItem>
-                          <SelectItem value="sunmi">Sunmi</SelectItem>
-                          <SelectItem value="p2mini">P2Mini</SelectItem>
-                          <SelectItem value="android">Android genérico</SelectItem>
-                          <SelectItem value="other">Otro</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="deviceModel"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Modelo</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Ej. V2 Pro" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        Modelo específico del dispositivo (opcional)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ubicación</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Ej. Tienda Central" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        Donde se encuentra el dispositivo (opcional)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="flex flex-col space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="isActive"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                        <div className="space-y-0.5">
-                          <FormLabel>Activo</FormLabel>
-                          <FormDescription>
-                            Dispositivo disponible para uso
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="isDemo"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                        <div className="space-y-0.5">
-                          <FormLabel>Modo demo</FormLabel>
-                          <FormDescription>
-                            Activar para uso en pruebas
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
               </div>
 
-              <div className="flex justify-end pt-4">
-                <Button
-                  type="submit"
-                  className="bg-indigo-600 hover:bg-indigo-700"
-                  disabled={registerDeviceMutation.isPending}
-                >
-                  {registerDeviceMutation.isPending ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Save className="mr-2 h-4 w-4" />
+              {/* Ubicación */}
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ubicación</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Sucursal Centro, Mostrador 1, etc." {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Ubicación física del dispositivo (opcional)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Notas */}
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notas</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Información adicional sobre este dispositivo" 
+                        className="resize-none" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Separator />
+
+              <div className="flex flex-col md:flex-row gap-6">
+                {/* Modo Demo */}
+                <FormField
+                  control={form.control}
+                  name="isDemo"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Modo Demo</FormLabel>
+                        <FormDescription>
+                          Marque esta opción si el dispositivo es para pruebas
+                        </FormDescription>
+                      </div>
+                    </FormItem>
                   )}
-                  Registrar dispositivo
+                />
+
+                {/* Activo */}
+                <FormField
+                  control={form.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Activo</FormLabel>
+                        <FormDescription>
+                          Marque esta opción si el dispositivo está listo para usarse
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="flex justify-end space-x-4 pt-4">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setLocation('/pos-menu')}
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit"
+                  disabled={registerDeviceMutation.isPending}
+                  className="min-w-[120px]"
+                >
+                  {registerDeviceMutation.isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Registrar Dispositivo
                 </Button>
               </div>
             </form>
           </Form>
+        </CardContent>
+      </Card>
+
+      {/* Sección de ayuda */}
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle className="text-lg">Información Adicional</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-sm font-medium mb-2">Códigos de Dispositivo</h3>
+              <p className="text-sm text-muted-foreground">
+                Los códigos de dispositivo deben seguir el formato TIPO-NNN, donde 
+                TIPO es el tipo de dispositivo (POS, TABLET, etc.) y NNN es un 
+                número secuencial.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-sm font-medium mb-2">Modo Demo</h3>
+              <p className="text-sm text-muted-foreground">
+                Los dispositivos en modo demo están claramente marcados en la 
+                interfaz y las transacciones realizadas con ellos no afectan 
+                a los sistemas reales.
+              </p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
