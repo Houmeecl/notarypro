@@ -21,6 +21,7 @@ import DemoModeBanner from "@/components/ui/DemoModeBanner";
 // Pages
 import LandingPage from "@/pages/landing-page";
 import AuthPage from "@/pages/auth-page";
+import TestingRealMode from "@/pages/testing-real-mode";
 import UserDashboard from "@/pages/user-dashboard";
 import CertifierDashboard from "@/pages/certifier-dashboard";
 import CertificationDashboard from "@/pages/certification-dashboard";
@@ -171,6 +172,9 @@ function Router() {
       }} />
       <Route path="/landing" component={LandingPage} />
       <Route path="/auth" component={AuthPage} />
+      
+      {/* Página de prueba para modo real */}
+      <Route path="/testing-real-mode" component={TestingRealMode} />
 
       {/* User routes */}
       <ProtectedRoute 
