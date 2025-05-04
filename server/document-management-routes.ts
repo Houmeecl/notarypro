@@ -163,6 +163,24 @@ documentManagementRouter.get('/documents/search', async (req: Request, res: Resp
 });
 
 /**
+ * Obtener documentos recientes
+ * GET /api/document-management/documents/recent
+ */
+documentManagementRouter.get('/documents/recent', async (req: Request, res: Response) => {
+  try {
+    const recentDocs = await db.select()
+      .from(documents)
+      .orderBy(desc(documents.createdAt))
+      .limit(20);
+    
+    res.json(recentDocs);
+  } catch (error) {
+    console.error('Error al obtener documentos recientes:', error);
+    res.status(500).json({ error: 'Error al obtener documentos recientes' });
+  }
+});
+
+/**
  * Obtener un documento específico con sus versiones
  * GET /api/document-management/documents/:id
  */
@@ -428,6 +446,162 @@ documentManagementRouter.get('/verify/:code', async (req: Request, res: Response
   } catch (error) {
     console.error('Error al verificar documento:', error);
     res.status(500).json({ error: 'Error al verificar documento' });
+  }
+});
+
+/**
+ * Crear una nueva categoría de documentos
+ * POST /api/document-management/categories
+ */
+documentManagementRouter.post('/categories', isAuthenticated, async (req: Request, res: Response) => {
+  try {
+    if (!req.user?.role || !['admin', 'certifier'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'No tiene permisos para crear categorías' });
+    }
+    
+    const { name, description, icon, color, parentId } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({ error: 'El nombre de la categoría es obligatorio' });
+    }
+    
+    // Validar si ya existe una categoría con el mismo nombre
+    const existingCategory = await db.select()
+      .from(documentCategories)
+      .where(eq(documentCategories.name, name))
+      .limit(1);
+    
+    if (existingCategory.length > 0) {
+      return res.status(409).json({ error: 'Ya existe una categoría con este nombre' });
+    }
+    
+    // Crear la categoría
+    const [newCategory] = await db.insert(documentCategories)
+      .values({
+        name,
+        description: description || null,
+        icon: icon || null,
+        color: color || null,
+        parentId: parentId ? parseInt(parentId) : null,
+        metadata: JSON.stringify({
+          createdBy: req.user.id,
+          createdByUsername: req.user.username
+        })
+      })
+      .returning();
+    
+    res.status(201).json(newCategory);
+  } catch (error) {
+    console.error('Error al crear categoría:', error);
+    res.status(500).json({ error: 'Error al crear categoría' });
+  }
+});
+
+/**
+ * Actualizar una categoría existente
+ * PUT /api/document-management/categories/:id
+ */
+documentManagementRouter.put('/categories/:id', isAuthenticated, async (req: Request, res: Response) => {
+  try {
+    if (!req.user?.role || !['admin', 'certifier'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'No tiene permisos para editar categorías' });
+    }
+    
+    const { id } = req.params;
+    const { name, description, icon, color, parentId } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({ error: 'El nombre de la categoría es obligatorio' });
+    }
+    
+    // Verificar que la categoría existe
+    const category = await db.select()
+      .from(documentCategories)
+      .where(eq(documentCategories.id, parseInt(id)))
+      .limit(1);
+    
+    if (category.length === 0) {
+      return res.status(404).json({ error: 'Categoría no encontrada' });
+    }
+    
+    // Validar si ya existe otra categoría con el mismo nombre (que no sea la misma que estamos editando)
+    const existingCategory = await db.select()
+      .from(documentCategories)
+      .where(
+        and(
+          eq(documentCategories.name, name),
+          not(eq(documentCategories.id, parseInt(id)))
+        )
+      )
+      .limit(1);
+    
+    if (existingCategory.length > 0) {
+      return res.status(409).json({ error: 'Ya existe otra categoría con este nombre' });
+    }
+    
+    // Actualizar la categoría
+    const [updatedCategory] = await db.update(documentCategories)
+      .set({
+        name,
+        description: description || null,
+        icon: icon || null,
+        color: color || null,
+        parentId: parentId ? parseInt(parentId) : null,
+        updatedAt: new Date()
+      })
+      .where(eq(documentCategories.id, parseInt(id)))
+      .returning();
+    
+    res.status(200).json(updatedCategory);
+  } catch (error) {
+    console.error('Error al actualizar categoría:', error);
+    res.status(500).json({ error: 'Error al actualizar categoría' });
+  }
+});
+
+/**
+ * Eliminar una categoría
+ * DELETE /api/document-management/categories/:id
+ */
+documentManagementRouter.delete('/categories/:id', isAuthenticated, async (req: Request, res: Response) => {
+  try {
+    if (!req.user?.role || !['admin'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'Solo los administradores pueden eliminar categorías' });
+    }
+    
+    const { id } = req.params;
+    
+    // Verificar que la categoría existe
+    const category = await db.select()
+      .from(documentCategories)
+      .where(eq(documentCategories.id, parseInt(id)))
+      .limit(1);
+    
+    if (category.length === 0) {
+      return res.status(404).json({ error: 'Categoría no encontrada' });
+    }
+    
+    // Verificar si hay documentos asociados a esta categoría
+    const documentsInCategory = await db.select()
+      .from(documents)
+      .where(eq(documents.categoryId, parseInt(id)))
+      .limit(1);
+    
+    if (documentsInCategory.length > 0) {
+      return res.status(400).json({ 
+        error: 'No se puede eliminar esta categoría porque tiene documentos asociados',
+        message: 'Debe reasignar o eliminar primero los documentos de esta categoría'
+      });
+    }
+    
+    // Eliminar la categoría
+    await db.delete(documentCategories)
+      .where(eq(documentCategories.id, parseInt(id)));
+    
+    res.status(200).json({ message: 'Categoría eliminada correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar categoría:', error);
+    res.status(500).json({ error: 'Error al eliminar categoría' });
   }
 });
 

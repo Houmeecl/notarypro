@@ -82,9 +82,13 @@ export default function DocumentExplorer() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("");
+  const [showCategoryDialog, setShowCategoryDialog] = useState(false);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("date-desc");
   
   // Consultar categorías de documentos
-  const { data: categories } = useQuery({
+  const { data: categories, refetch: refetchCategories } = useQuery({
     queryKey: ["/api/document-management/categories"],
     queryFn: async () => {
       const res = await fetch("/api/document-management/categories");
@@ -98,7 +102,8 @@ export default function DocumentExplorer() {
     queryKey: [
       "/api/document-management/documents", 
       selectedCategory,
-      searchTerm
+      searchTerm,
+      sortBy
     ],
     queryFn: async () => {
       let url;
