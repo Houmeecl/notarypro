@@ -7,7 +7,7 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { 
   Tabs, 
@@ -26,6 +26,11 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
+import { CategoryDialog } from "@/components/document/CategoryDialog";
+import { DocumentUploadDialog } from "@/components/document/DocumentUploadDialog";
 import {
   FileText,
   FileCheck,
@@ -40,10 +45,29 @@ import {
   Shield,
   ShieldCheck,
   User,
-  BadgeDollarSign
+  BadgeDollarSign,
+  FolderPlus,
+  ArrowUpDown,
+  Filter as FilterIcon,
+  BookOpen,
+  AlertTriangle,
+  Share,
+  Copy,
+  Edit,
+  Trash,
+  MoreHorizontal,
+  FolderInput
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Obtener el icono correcto según el tipo de documento
 const getDocumentIcon = (documentType: string) => {
@@ -80,12 +104,14 @@ const getStatusColor = (status: string) => {
 
 export default function DocumentExplorer() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [showCategoryDialog, setShowCategoryDialog] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("date-desc");
+  const [selectedCategoryForEdit, setSelectedCategoryForEdit] = useState<any>(null);
+  const [editMode, setEditMode] = useState<"create" | "edit">("create");
   
   // Consultar categorías de documentos
   const { data: categories, refetch: refetchCategories } = useQuery({
@@ -101,7 +127,7 @@ export default function DocumentExplorer() {
   const { data: documents, isLoading, refetch } = useQuery({
     queryKey: [
       "/api/document-management/documents", 
-      selectedCategory,
+      categoryFilter,
       searchTerm,
       sortBy
     ],
@@ -110,8 +136,8 @@ export default function DocumentExplorer() {
       
       if (searchTerm) {
         url = `/api/document-management/documents/search?q=${encodeURIComponent(searchTerm)}`;
-      } else if (selectedCategory) {
-        url = `/api/document-management/documents/category/${selectedCategory}`;
+      } else if (categoryFilter) {
+        url = `/api/document-management/documents/category/${categoryFilter}`;
       } else {
         // Por defecto cargamos documentos recientes
         url = `/api/document-management/documents/recent`;
@@ -151,6 +177,45 @@ export default function DocumentExplorer() {
     refetch();
   };
   
+  // Permisos
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const isCertifier = user?.role === "certifier";
+  const canManageCategories = isAdmin || isCertifier;
+  
+  // Funciones para manejo de categorías
+  const handleAddCategory = () => {
+    setEditMode("create");
+    setSelectedCategoryForEdit(null);
+    setShowCategoryDialog(true);
+  };
+  
+  const handleEditCategory = (category: any) => {
+    setEditMode("edit");
+    setSelectedCategoryForEdit(category);
+    setShowCategoryDialog(true);
+  };
+  
+  // Función para ordenar documentos
+  const sortedDocuments = React.useMemo(() => {
+    if (!filteredDocuments) return [];
+    
+    const docs = [...filteredDocuments];
+    
+    switch (sortBy) {
+      case "date-desc":
+        return docs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      case "date-asc":
+        return docs.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      case "name-asc":
+        return docs.sort((a, b) => a.title.localeCompare(b.title));
+      case "name-desc":
+        return docs.sort((a, b) => b.title.localeCompare(a.title));
+      default:
+        return docs;
+    }
+  }, [filteredDocuments, sortBy]);
+  
   return (
     <div className="container mx-auto py-6">
       <div className="flex items-center justify-between mb-6">
@@ -162,11 +227,23 @@ export default function DocumentExplorer() {
             Accede a todos tus documentos desde un solo lugar
           </p>
         </div>
-        <Link href="/document-upload">
-          <Button className="bg-indigo-600 hover:bg-indigo-700">
-            <Plus className="mr-2 h-4 w-4" /> Nuevo Documento
+        <div className="flex gap-2">
+          {canManageCategories && (
+            <Button 
+              variant="outline" 
+              onClick={handleAddCategory}
+              className="border-indigo-600 text-indigo-600 hover:bg-indigo-50"
+            >
+              <FolderPlus className="mr-2 h-4 w-4" /> Nueva Categoría
+            </Button>
+          )}
+          <Button 
+            className="bg-indigo-600 hover:bg-indigo-700"
+            onClick={() => setShowUploadDialog(true)}
+          >
+            <Plus className="mr-2 h-4 w-4" /> Subir Documento
           </Button>
-        </Link>
+        </div>
       </div>
       
       <div className="grid gap-6 mb-8">
@@ -190,8 +267,8 @@ export default function DocumentExplorer() {
                 />
               </div>
               <Select
-                value={selectedCategory}
-                onValueChange={setSelectedCategory}
+                value={categoryFilter}
+                onValueChange={setCategoryFilter}
               >
                 <SelectTrigger className="w-[200px]">
                   <SelectValue placeholder="Categoría" />
@@ -435,6 +512,20 @@ export default function DocumentExplorer() {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      {/* Diálogo para crear/editar categorías */}
+      <CategoryDialog 
+        open={showCategoryDialog}
+        onOpenChange={setShowCategoryDialog}
+        selectedCategory={selectedCategory}
+        mode={editMode}
+      />
+      
+      {/* Diálogo para subir documentos */}
+      <DocumentUploadDialog 
+        open={showUploadDialog}
+        onOpenChange={setShowUploadDialog}
+      />
     </div>
   );
 }
