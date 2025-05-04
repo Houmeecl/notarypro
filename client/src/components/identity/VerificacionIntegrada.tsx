@@ -19,7 +19,7 @@ type VerificationStep = 'qr' | 'nfc' | 'cedula' | 'complete';
 const VerificacionIntegrada: React.FC<VerificacionIntegradaProps> = ({
   onComplete,
   onError,
-  demoMode = true
+  demoMode = false // Usar modo real por defecto
 }) => {
   const [currentStep, setCurrentStep] = useState<VerificationStep>('qr');
   const [progress, setProgress] = useState(0);

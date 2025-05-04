@@ -25,7 +25,7 @@ export interface DeviceModeConfig {
 
 // Configuración por defecto
 const DEFAULT_CONFIG: DeviceModeConfig = {
-  mode: DeviceMode.AUTO,
+  mode: DeviceMode.REAL, // Forzar modo real para toda la aplicación
   demoDeviceIds: ['demo-pos-', 'demo-tablet-', 'demo-device-'],
   realDeviceIds: ['pos-real-', 'pos-', 'nPOS-', 'P2mini-8766wb', 'p2mini', 'sunmi', 'v2pro', 'v2', 'sunmiv2pro', 'tuu', 'TUU-POS', 'TUUPOS'],
   forceDemoParameter: 'demo',

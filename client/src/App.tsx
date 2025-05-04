@@ -587,11 +587,13 @@ function Router() {
       {/* RON Platform (Independent Access) */}
       <Route path="/ron-login" component={RonLoginPage} />
       <Route path="/ron-platform" component={RonPlatform} />
-      {/* Redirección directa a la interfaz de Zoom/Meet sin pasar por opciones */}
-      <Route path="/ron-session/:id?" component={RonSessionExternal} />
+      {/* Ruta para la selección entre sistema integrado o externo */}
+      <Route path="/ron-session-option/:id?" component={RonSessionOption} />
+      {/* Sistema integrado (opción por defecto) */}
+      <Route path="/ron-session/:id?" component={RonSession} />
       <Route path="/ron-session-native/:sessionId" component={RonSessionNativePage} />
-      {/* Las siguientes rutas se mantienen para compatibilidad pero no se utilizan */}
-      <Route path="/ron-session-integrated/:id?" component={RonSession} />
+      {/* Sistema externo (Zoom/Meet) como alternativa */}
+      <Route path="/ron-session-external/:id?" component={RonSessionExternal} />
 
       {/* Ayuda Legal */}
       <ProtectedRoute 

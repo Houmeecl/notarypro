@@ -97,7 +97,7 @@ export interface RemoteConfig {
 // Configuración predeterminada
 const defaultConfig: RemoteConfig = {
   payment: {
-    demoModeEnabled: false,
+    demoModeEnabled: false, // Modo real activado
     maxRetries: 3,
     retryTimeout: 5000
   },
