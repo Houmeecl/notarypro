@@ -57,6 +57,8 @@ import ShareAchievementPage from "@/pages/share-achievement";
 import RonLoginPage from "@/pages/ron-login";
 import RonPlatform from "@/pages/ron-platform";
 import RonSession from "@/pages/ron-session";
+import RonSessionOption from "@/pages/ron-session-option";
+import RonSessionExternal from "@/pages/ron-session-external";
 import AyudaLegal from "@/pages/ayuda-legal";
 import IntegracionesDemo from "@/pages/integraciones-demo";
 import IntegracionesApiIdentidad from "@/pages/integraciones-api-identidad";
@@ -585,8 +587,11 @@ function Router() {
       {/* RON Platform (Independent Access) */}
       <Route path="/ron-login" component={RonLoginPage} />
       <Route path="/ron-platform" component={RonPlatform} />
-      <Route path="/ron-session/:id?" component={RonSession} />
+      {/* Redirección directa a la interfaz de Zoom/Meet sin pasar por opciones */}
+      <Route path="/ron-session/:id?" component={RonSessionExternal} />
       <Route path="/ron-session-native/:sessionId" component={RonSessionNativePage} />
+      {/* Las siguientes rutas se mantienen para compatibilidad pero no se utilizan */}
+      <Route path="/ron-session-integrated/:id?" component={RonSession} />
 
       {/* Ayuda Legal */}
       <ProtectedRoute 
