@@ -63,7 +63,7 @@ async function ensureFlaskServerRunning(): Promise<boolean> {
     // Esperar a que el servidor Flask esté listo
     let attempts = 0;
     const maxAttempts = 10;
-    
+
     while (attempts < maxAttempts) {
       try {
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -75,7 +75,7 @@ async function ensureFlaskServerRunning(): Promise<boolean> {
         console.log(`Esperando a que Flask esté listo... (intento ${attempts}/${maxAttempts})`);
       }
     }
-    
+
     console.error("No se pudo iniciar Flask después de varios intentos");
     return false;
   } catch (error) {
@@ -116,12 +116,12 @@ documentForensicsRouter.post("/analyze", async (req: Request, res: Response) => 
     return res.status(200).json(response.data);
   } catch (error) {
     console.error("Error en análisis forense de documento:", error);
-    
+
     // Si el error es de la API de Flask
     if (axios.isAxiosError(error) && error.response) {
       return res.status(error.response.status).json(error.response.data);
     }
-    
+
     return res.status(500).json({ 
       error: "Error en el servicio de análisis forense",
       message: error instanceof Error ? error.message : "Error desconocido" 
