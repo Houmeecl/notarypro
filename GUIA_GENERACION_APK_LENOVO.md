@@ -1,230 +1,227 @@
-# Guía de Generación de APK para Tablets Lenovo
+# Guía para generar APK en Tablet Lenovo con Terminal
 
-## Requisitos previos
+Esta guía está diseñada para generar una APK directamente en la tablet Lenovo, sin necesidad de una computadora externa.
 
-Antes de comenzar, asegúrate de tener instalado en tu computadora local:
+## Prerrequisitos
 
-- **Node.js** (versión 16 o superior)
-- **Android Studio** (última versión estable)
-- **Java Development Kit (JDK)** (versión 11 o superior)
-- **Android SDK** (API 24 o superior, para compatibilidad con Android 7.0+)
-- **Git** (para clonar el repositorio)
+- Tablet Lenovo con Android 7.0 o superior
+- Aplicación "Termux" instalada (disponible en Google Play o F-Droid)
+- Espacio libre (mínimo 2GB)
+- Conexión a Internet estable
 
-## Pasos para la generación de la APK
+## Instalación y configuración de Termux
 
-### 1. Clonar y preparar el repositorio
+1. **Instalar Termux** desde Play Store o F-Droid
+
+2. **Abrir Termux** y ejecutar los siguientes comandos:
 
 ```bash
-# Clonar el repositorio (reemplaza URL_DEL_REPOSITORIO con la URL correcta)
-git clone URL_DEL_REPOSITORIO vecinoxpress
-cd vecinoxpress
+# Actualizar repositorios
+pkg update
+
+# Instalar paquetes necesarios
+pkg install git nodejs-lts openjdk-17 gradle
+
+# Verificar instalaciones
+node --version
+java --version
+gradle --version
+
+# Configurar directorio de trabajo
+mkdir -p ~/vecinoxpress
+cd ~/vecinoxpress
+```
+
+## Clonar el repositorio y preparar el entorno
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/tu-usuario/vecinoxpress.git .
 
 # Instalar dependencias
 npm install
+
+# Crear archivo de entorno
+echo "NODE_ENV=production" > .env
 ```
 
-### 2. Configurar las variables de entorno
-
-Crea un archivo `.env` con las variables necesarias:
-
-```
-# Variables de entorno para la generación de APK
-DATABASE_URL=postgres://usuario:contraseña@host:puerto/basededatos
-MERCADOPAGO_ACCESS_TOKEN=tu_token_de_mercadopago
-MERCADOPAGO_PUBLIC_KEY=tu_clave_publica_de_mercadopago
-SENDGRID_API_KEY=tu_clave_de_sendgrid
-OPENAI_API_KEY=tu_clave_de_openai
-```
-
-### 3. Modificar la configuración de Capacitor
-
-Edita el archivo `capacitor.config.ts` para asegurarte de que contenga la configuración correcta para tablets Lenovo:
-
-```typescript
-import type { CapacitorConfig } from '@capacitor/cli';
-
-const config: CapacitorConfig = {
-  appId: 'cl.vecinoxpress.pos',
-  appName: 'VecinoXpress',
-  webDir: './client/dist',
-  server: {
-    androidScheme: 'https',
-    cleartext: true,
-    // URL que utilizará la app para conectarse al servidor
-    // En producción, se debe configurar la URL del servidor real
-    url: 'https://app.vecinoxpress.cl',
-    initialPath: '/vecinos/login'
-  },
-  plugins: {
-    SplashScreen: {
-      launchAutoHide: false,
-      backgroundColor: "#2d219b",
-      showSpinner: true,
-      spinnerColor: "#ffffff",
-      androidSpinnerStyle: "large"
-    }
-  },
-  android: {
-    flavor: 'vecinoexpress',
-    // Optimizaciones para tablet Lenovo
-    minSdkVersion: 24, // Compatible con Android 7.0+
-    targetSdkVersion: 33, // Android 13
-    buildOptions: {
-      keystorePath: './my-release-key.keystore',
-      keystorePassword: 'vecinos123',
-      keystoreAlias: 'vecinoxpress',
-      keystoreAliasPassword: 'vecinos123',
-      // Habilitar estas opciones para reducir el tamaño de la APK
-      minifyEnabled: true,
-      shrinkResources: true,
-      proguardKeepAttributes: "Signature,Exceptions,InnerClasses,*Annotation*"
-    }
-  }
-};
-
-export default config;
-```
-
-### 4. Crear el keystore para firmar la APK (si no existe)
+## Generar APK simplificada
 
 ```bash
-keytool -genkey -v -keystore my-release-key.keystore -alias vecinoxpress -keyalg RSA -keysize 2048 -validity 10000 -storepass vecinos123 -keypass vecinos123
-```
-
-### 5. Preparar el proyecto Android
-
-```bash
-# Construir la aplicación web
+# Construir proyecto web
 npm run build
 
-# Si es la primera vez, agrega la plataforma Android
+# Configurar Capacitor
+npm install @capacitor/cli @capacitor/android
+npx cap init VecinoXpress cl.vecinoxpress.pos --web-dir=client/dist
+
+# Crear configuración específica
+cat > capacitor.config.json << EOL
+{
+  "appId": "cl.vecinoxpress.pos",
+  "appName": "VecinoXpress",
+  "webDir": "client/dist",
+  "server": {
+    "androidScheme": "https",
+    "url": "https://app.vecinoxpress.cl",
+    "initialPath": "/verificacion-nfc"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false,
+      "backgroundColor": "#2d219b",
+      "showSpinner": true
+    }
+  },
+  "android": {
+    "minSdkVersion": 24
+  }
+}
+EOL
+
+# Agregar plataforma Android
 npx cap add android
 
-# Sincronizar los archivos con Capacitor
+# Sincronizar archivos
 npx cap sync android
-```
 
-### 6. Configurar permisos NFC y otras optimizaciones para tablets Lenovo
-
-Edita el archivo `android/app/src/main/AndroidManifest.xml` para añadir los permisos NFC:
-
-```xml
-<!-- Asegúrate de que estos permisos estén presentes en el manifest -->
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.NFC" />
-<uses-feature android:name="android.hardware.nfc" android:required="true" />
-```
-
-Edita el archivo `android/app/build.gradle` para habilitar la optimización de APK:
-
-```gradle
-// En la sección android -> buildTypes -> release, asegúrate de tener:
-release {
-    minifyEnabled true
-    shrinkResources true
-    proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-}
-```
-
-### 7. Construir la APK
-
-#### Opción 1: Mediante Android Studio (recomendado)
-
-1. Abre la carpeta `android` con Android Studio
-2. Espera a que el proyecto sincronice
-3. Selecciona Build > Build Bundle(s) / APK(s) > Build APK(s)
-4. La APK generada se ubicará en `android/app/build/outputs/apk/release/app-release.apk`
-
-#### Opción 2: Desde la línea de comandos
-
-```bash
+# Generar APK (modo debug)
 cd android
-./gradlew assembleRelease
-cd ..
+chmod +x gradlew
+./gradlew assembleDebug
+
+# La APK estará en:
+echo "APK generada en: ~/vecinoxpress/android/app/build/outputs/apk/debug/app-debug.apk"
 ```
 
-La APK generada estará disponible en `android/app/build/outputs/apk/release/app-release.apk`
-
-### 8. Instalar la APK en la tablet Lenovo
-
-Conecta la tablet Lenovo mediante USB y habilita la depuración USB en la tablet.
+## Instalar la APK generada
 
 ```bash
-# Verificar que la tablet está conectada
-adb devices
-
-# Instalar la APK
-adb install -r android/app/build/outputs/apk/release/app-release.apk
+# Instalar la APK (requiere permitir instalar desde fuentes desconocidas)
+cd ~/vecinoxpress
+cp android/app/build/outputs/apk/debug/app-debug.apk /sdcard/Download/VecinoXpress.apk
 ```
 
-## Resolución de problemas comunes
+Luego:
+1. Abre el administrador de archivos
+2. Navega a la carpeta "Download"
+3. Toca en "VecinoXpress.apk" para instalar
 
-### Error: "Could not find tools.jar"
+## Alternativa: Generar APK con Termux:API
 
-Este error ocurre cuando el JDK no está correctamente configurado.
+Si tienes problemas con la forma anterior, puedes usar Termux:API:
 
-Solución: Asegúrate de que la variable de entorno JAVA_HOME está configurada correctamente.
-
+1. **Instalar Termux:API**:
 ```bash
-export JAVA_HOME=/ruta/a/tu/jdk
+pkg install termux-api
 ```
 
-### Error: "SDK location not found"
-
-Este error ocurre cuando Android Studio no puede encontrar el SDK de Android.
-
-Solución: Crea un archivo `local.properties` en la carpeta `android` con:
-
-```
-sdk.dir=/ruta/a/tu/android/sdk
-```
-
-### Error: "Execution failed for task ':app:processReleaseManifest'"
-
-Este error puede ocurrir por problemas de configuración en el AndroidManifest.xml.
-
-Solución: Revisa que no haya duplicados de permisos o características en el AndroidManifest.xml.
-
-### Error en la lectura NFC
-
-Si la aplicación no puede leer tarjetas NFC:
-
-1. Verifica que el NFC esté activado en la tablet
-2. Asegúrate de que la app tiene permisos de NFC
-3. Revisa los logs de la aplicación con:
-
+2. **Crear script para simplificar**:
 ```bash
-adb logcat | grep -i nfc
+cat > build-apk.sh << 'EOL'
+#!/bin/bash
+
+# Configuración
+APP_NAME="VecinoXpress"
+APP_PACKAGE="cl.vecinoxpress.pos"
+WEB_DIR="client/dist"
+
+# Función para mostrar progreso
+show_progress() {
+  termux-toast "Paso $1 de 5: $2"
+  echo "=== Paso $1 de 5: $2 ==="
+}
+
+# Paso 1: Construir aplicación web
+show_progress 1 "Construyendo aplicación web"
+npm run build
+
+# Paso 2: Inicializar Capacitor si no existe
+show_progress 2 "Configurando Capacitor"
+if [ ! -f "capacitor.config.json" ]; then
+  npx cap init "$APP_NAME" "$APP_PACKAGE" --web-dir="$WEB_DIR"
+  
+  # Crear configuración personalizada
+  cat > capacitor.config.json << EOLC
+{
+  "appId": "${APP_PACKAGE}",
+  "appName": "${APP_NAME}",
+  "webDir": "${WEB_DIR}",
+  "server": {
+    "androidScheme": "https",
+    "url": "https://app.vecinoxpress.cl",
+    "initialPath": "/verificacion-nfc"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false,
+      "backgroundColor": "#2d219b"
+    }
+  }
+}
+EOLC
+fi
+
+# Paso 3: Configurar Android
+show_progress 3 "Configurando Android"
+npx cap add android
+npx cap sync android
+
+# Paso 4: Configurar permisos NFC
+show_progress 4 "Agregando permisos NFC"
+MANIFEST_FILE="android/app/src/main/AndroidManifest.xml"
+if grep -q "android.permission.NFC" "$MANIFEST_FILE"; then
+  echo "Permisos NFC ya configurados"
+else
+  # Agregar permisos NFC antes del cierre de manifest
+  sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.NFC" \/>\n    <uses-feature android:name="android.hardware.nfc" android:required="true" \/>' "$MANIFEST_FILE"
+fi
+
+# Paso 5: Construir APK
+show_progress 5 "Generando APK"
+cd android
+chmod +x gradlew
+./gradlew assembleDebug
+
+# Copiar APK a descargas
+APK_PATH="app/build/outputs/apk/debug/app-debug.apk"
+if [ -f "$APK_PATH" ]; then
+  cp "$APK_PATH" /sdcard/Download/VecinoXpress.apk
+  termux-notification --title "APK Generada" --content "VecinoXpress.apk está en tu carpeta de Descargas"
+  echo "✅ APK generada exitosamente en /sdcard/Download/VecinoXpress.apk"
+else
+  termux-notification --title "Error" --content "No se pudo generar la APK"
+  echo "❌ Error al generar la APK"
+fi
+EOL
+
+# Hacer ejecutable el script
+chmod +x build-apk.sh
+
+# Ejecutar script
+./build-apk.sh
 ```
 
-## Configuración específica para tablet Lenovo Tab M10 o similares
+## Solución de problemas comunes
 
-Para tablets Lenovo Tab M10 (o modelos similares), es posible que necesites estas configuraciones adicionales:
+- **Error "No se puede abrir archivo JAR"**: Verifica la instalación de Java:
+  ```bash
+  pkg reinstall openjdk-17
+  ```
 
-1. **Optimizaciones de pantalla**: Edita el archivo `android/app/src/main/res/values/styles.xml` para añadir:
+- **Error "Memoria insuficiente"**: Cierra otras aplicaciones y agrega memoria swap:
+  ```bash
+  pkg install tsu
+  sudo swapon /sdcard/swapfile
+  ```
 
-```xml
-<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-    <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
-</style>
-```
+- **Error de permisos NFC**: La APK debe ser firmada correctamente y solicitar permisos NFC. Verifica el archivo AndroidManifest.xml antes de compilar.
 
-2. **Activar modo tablet**: Edita el archivo `android/app/src/main/res/values/strings.xml` para añadir:
+## Alternativa a APK: Progressive Web App (PWA)
 
-```xml
-<string name="is_tablet_mode">true</string>
-```
+Si la generación de APK es complicada, considera usar la aplicación como PWA:
 
-3. **Asegurar rotación de pantalla**: Añade esta línea en `android/app/src/main/AndroidManifest.xml` dentro de la actividad principal:
-
-```xml
-android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
-```
-
-## Notas importantes
-
-1. **Acceso al servidor**: La APK se conectará al servidor configurado en `capacitor.config.ts`. Asegúrate de que la URL sea la correcta.
-
-2. **Requerimiento de NFC**: Esta aplicación requiere NFC para funcionar correctamente. Verifica que las tablets Lenovo seleccionadas cuenten con soporte NFC.
-
-3. **Seguridad del Keystore**: Guarda el archivo keystore en un lugar seguro, ya que lo necesitarás para futuras actualizaciones de la APK.
+1. Abre Chrome en la tablet
+2. Visita `https://app.vecinoxpress.cl/verificacion-nfc`
+3. Toca en menú (tres puntos) > "Añadir a pantalla de inicio"
+4. Acepta permisos de NFC cuando la aplicación lo solicite
