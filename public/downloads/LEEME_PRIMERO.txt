@@ -1,0 +1,40 @@
+INSTRUCCIONES PARA INSTALACIÓN EN TABLET LENOVO
+=============================================
+
+CONTENIDO DEL PAQUETE:
+---------------------
+1. vecinoxpress-nfc.apk - Aplicación principal para instalar
+2. Carpeta config/ - Archivos de configuración
+3. Archivos de documentación (*.md) - Guías detalladas
+
+INSTALACIÓN RÁPIDA:
+------------------
+1. Conecta el pendrive a la tablet
+2. Copia vecinoxpress-nfc.apk a la tablet
+3. Instala la APK (permite fuentes desconocidas si es necesario)
+4. Abre la aplicación e inicia sesión con:
+   Usuario: miadmin
+   Contraseña: miadmin123
+
+CONFIGURACIÓN NFC:
+-----------------
+1. Ve a Configuración > Conexiones > NFC
+2. Activa NFC
+3. Abre la aplicación VecinoXpress NFC
+4. Sigue las instrucciones en pantalla
+
+SOLUCIÓN DE PROBLEMAS:
+---------------------
+Si tienes problemas, consulta los archivos:
+- SOLUCIONAR_PROBLEMAS_NFC_LENOVO.md
+- VERIFICACION_NFC_TABLETS_LENOVO.md
+
+ALTERNATIVA WEB:
+---------------
+También puedes usar la aplicación web en:
+https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/verificacion-nfc
+
+SOPORTE:
+-------
+Para ayuda adicional, contacta a:
+soporte@vecinoxpress.cl
