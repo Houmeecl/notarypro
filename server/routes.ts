@@ -17,6 +17,7 @@ import { tuuPaymentRouter } from "./tuu-payment-routes";
 import { eq } from "drizzle-orm";
 import { documentManagementRouter } from "./document-management-routes";
 import { notaryDocumentRouter } from "./notary-document-routes";
+import { posManagementRouter } from "./pos-management-routes";
 
 export function registerRoutes(app: Express): Server {
   // Configuración de autenticación para la aplicación principal
@@ -48,6 +49,9 @@ export function registerRoutes(app: Express): Server {
   
   // Sistema de Documentos Notariales
   app.use("/api/notary-documents", notaryDocumentRouter);
+  
+  // Sistema de Gestión de Dispositivos POS
+  app.use("/api/pos-management", posManagementRouter);
   
   // Ruta para servir archivos estáticos (documentos y contratos)
   app.use("/docs", express.static(path.join(process.cwd(), "docs")));
