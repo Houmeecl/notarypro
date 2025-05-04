@@ -16,6 +16,7 @@ import { webSocketService } from "./lib/websocket";
 import React, { useEffect, useState, Suspense } from "react";
 // WebSocketDebugger desactivado para mejorar la estabilidad
 import { Loader2 } from "lucide-react";
+import DemoModeBanner from "@/components/ui/DemoModeBanner";
 
 // Pages
 import LandingPage from "@/pages/landing-page";
@@ -838,6 +839,7 @@ function App() {
                 <MicroInteractionDisplay />
                 <OnboardingPopup />
                 <HelpButton />
+                <DemoModeBanner variant="prominent" position="top" dismissible={true} />
                 {/* WebSocketDebugger completamente desactivado para evitar problemas de conectividad */}
                 <Router />
               </TooltipProvider>
