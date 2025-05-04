@@ -1,3 +1,4 @@
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -27,5 +28,16 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      external: ["puppeteer", "ws", "bufferutil"]
+    }
   },
+  optimizeDeps: {
+    exclude: ['@puppeteer/browsers', 'puppeteer', 'ws', 'bufferutil']
+  },
+  server: {
+    fs: {
+      strict: false
+    }
+  }
 });
