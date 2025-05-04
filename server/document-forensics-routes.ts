@@ -1,3 +1,4 @@
+
 import { Router, Request, Response } from "express";
 import { spawn } from "child_process";
 import axios from "axios";
@@ -22,6 +23,22 @@ const FLASK_URL = `http://localhost:${FLASK_PORT}`;
 const FLASK_SCRIPT_PATH = path.join(__dirname, "document-forensics.py");
 
 /**
+ * Detiene el servidor Flask si está en ejecución
+ */
+function stopFlaskServer() {
+  if (flaskProcess !== null) {
+    console.log("Deteniendo servidor Flask existente...");
+    try {
+      // En Linux, envía SIGTERM para cierre limpio
+      flaskProcess.kill('SIGTERM');
+    } catch (error) {
+      console.error("Error al detener servidor Flask:", error);
+    }
+    flaskProcess = null;
+  }
+}
+
+/**
  * Inicia el servidor de Flask si no está en ejecución
  */
 async function ensureFlaskServerRunning(): Promise<boolean> {
@@ -33,12 +50,7 @@ async function ensureFlaskServerRunning(): Promise<boolean> {
       return true;
     } catch (error) {
       console.log("Servidor Flask no responde, reiniciando...");
-      try {
-        flaskProcess.kill();
-      } catch (killError) {
-        console.error("Error al matar proceso Flask existente:", killError);
-      }
-      flaskProcess = null;
+      stopFlaskServer();
     }
   }
 
@@ -131,17 +143,16 @@ documentForensicsRouter.post("/analyze", async (req: Request, res: Response) => 
 
 // Finalizar el proceso de Flask cuando se cierre la aplicación
 process.on("exit", () => {
-  if (flaskProcess) {
-    console.log("Cerrando servidor Flask...");
-    flaskProcess.kill();
-  }
+  stopFlaskServer();
 });
 
 // Manejo de señales de terminación para limpiar recursos
 process.on("SIGINT", () => {
+  stopFlaskServer();
   process.exit();
 });
 
 process.on("SIGTERM", () => {
+  stopFlaskServer();
   process.exit();
 });

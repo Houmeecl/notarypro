@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -12,6 +13,8 @@ import io
 import json
 import random
 import re
+import signal
+import sys
 from datetime import datetime
 from flask import Flask, request, jsonify
 import numpy as np
@@ -23,6 +26,14 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+
+# Manejar señales de terminación para salir correctamente
+def signal_handler(sig, frame):
+    logger.info("Recibida señal de terminación, cerrando servidor Flask...")
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 
 @app.route('/', methods=['GET'])
 def health_check():
@@ -190,5 +201,11 @@ def calculate_authenticity_score(document_detected, mrz_detected, mrz_confidence
     return max(0, min(100, score))
 
 if __name__ == '__main__':
-    logger.info("Iniciando servidor Flask para análisis forense de documentos...")
-    app.run(host='0.0.0.0', port=5001)
+    try:
+        logger.info("Iniciando servidor Flask para análisis forense de documentos...")
+        # Asegurarse de escuchar en 0.0.0.0 para que sea accesible desde el exterior
+        # y asegurarse de usar un puerto diferente al 5000 para evitar conflictos
+        app.run(host='0.0.0.0', port=5001, threaded=True)
+    except KeyboardInterrupt:
+        logger.info("Servidor detenido manualmente")
+        sys.exit(0)
