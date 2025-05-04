@@ -19,6 +19,57 @@ import { useToast } from "@/hooks/use-toast";
 import { useDeviceMode } from '@/lib/deviceModeDetector';
 import { getRemoteConfigValue } from '@/lib/remoteConfig';
 
+// Utilidad para el registro de errores
+class ErrorLogger {
+  private static instance: ErrorLogger;
+  private logs: Array<{timestamp: number; type: string; message: string; stack?: string}> = [];
+  private maxLogs: number = 50;
+
+  private constructor() {
+    // Capturar errores no manejados
+    window.addEventListener('error', (event) => {
+      this.logError('unhandled', event.message, event.error?.stack);
+    });
+    
+    // Capturar promesas rechazadas no manejadas
+    window.addEventListener('unhandledrejection', (event) => {
+      this.logError('promise', event.reason.message || 'Promesa rechazada', event.reason.stack);
+    });
+  }
+
+  public static getInstance(): ErrorLogger {
+    if (!ErrorLogger.instance) {
+      ErrorLogger.instance = new ErrorLogger();
+    }
+    return ErrorLogger.instance;
+  }
+
+  public logError(type: string, message: string, stack?: string): void {
+    this.logs.unshift({
+      timestamp: Date.now(),
+      type,
+      message,
+      stack
+    });
+    
+    // Limitar el número de logs almacenados
+    if (this.logs.length > this.maxLogs) {
+      this.logs = this.logs.slice(0, this.maxLogs);
+    }
+    
+    // También registrar en la consola para facilitar depuración
+    console.error(`[${type}]`, message, stack);
+  }
+  
+  public getLogs(): Array<{timestamp: number; type: string; message: string; stack?: string}> {
+    return [...this.logs];
+  }
+  
+  public clearLogs(): void {
+    this.logs = [];
+  }
+}
+
 const TestingRealMode: React.FC = () => {
   const { toast } = useToast();
   const { isDemo, deviceId, setRealMode } = useDeviceMode();
@@ -28,6 +79,25 @@ const TestingRealMode: React.FC = () => {
   const [qrData, setQrData] = useState<any>(null);
   const [qrError, setQrError] = useState<string | null>(null);
   const [nfcSupported, setNfcSupported] = useState<boolean | null>(null);
+  const [errorLogs, setErrorLogs] = useState<Array<{timestamp: number; type: string; message: string; stack?: string}>>([]);
+  
+  // Inicializar el logger de errores
+  const errorLogger = ErrorLogger.getInstance();
+  
+  // Actualizar los logs periódicamente
+  useEffect(() => {
+    const getLatestLogs = () => {
+      setErrorLogs(errorLogger.getLogs());
+    };
+    
+    // Actualizar logs inmediatamente
+    getLatestLogs();
+    
+    // Actualizar periódicamente
+    const interval = setInterval(getLatestLogs, 2000);
+    
+    return () => clearInterval(interval);
+  }, []);
   
   // Verificar el soporte de NFC en el dispositivo
   useEffect(() => {
@@ -86,14 +156,33 @@ const TestingRealMode: React.FC = () => {
     });
   };
   
-  // Manejar error de lectura NFC
+  // Manejar error de lectura NFC con más detalles
   const handleNfcError = (error: string) => {
+    console.error("Error detallado NFC:", error);
     setNfcError(error);
     setNfcData(null);
     
+    // Analizar el error para mostrar información más detallada
+    let errorMessage = error;
+    let errorDetails = "";
+    
+    if (error.includes("NDEFReader")) {
+      errorDetails = "El navegador no soporta la API Web NFC. Esto es normal en navegadores de escritorio.";
+    } else if (error.includes("NotAllowedError")) {
+      errorDetails = "El usuario no ha concedido permiso para acceder al NFC. Verifique los permisos.";
+    } else if (error.includes("NotSupportedError")) {
+      errorDetails = "Este dispositivo no soporta NFC o el hardware está desactivado.";
+    } else if (error.includes("NetworkError")) {
+      errorDetails = "Error de red al comunicarse con el servicio NFC.";
+    } else if (error.includes("timeout")) {
+      errorDetails = "La lectura NFC ha excedido el tiempo máximo de espera.";
+    } else if (error.includes("AbortError")) {
+      errorDetails = "La operación NFC fue cancelada por el usuario o el sistema.";
+    }
+    
     toast({
       title: "Error en lectura NFC",
-      description: error,
+      description: errorDetails || error,
       variant: "destructive",
     });
   };
@@ -109,14 +198,36 @@ const TestingRealMode: React.FC = () => {
     });
   };
   
-  // Manejar error de lectura QR
+  // Manejar error de lectura QR con más detalles
   const handleQrError = (error: string) => {
+    console.error("Error detallado QR:", error);
     setQrError(error);
     setQrData(null);
     
+    // Analizar el error para mostrar información más detallada
+    let errorDetails = "";
+    
+    if (error.includes("getUserMedia") || error.includes("NotAllowedError")) {
+      errorDetails = "No se han otorgado permisos para acceder a la cámara. Verifique la configuración de permisos.";
+    } else if (error.includes("NotFoundError")) {
+      errorDetails = "No se ha encontrado una cámara en este dispositivo.";
+    } else if (error.includes("NotReadableError")) {
+      errorDetails = "La cámara está siendo utilizada por otra aplicación o no está disponible.";
+    } else if (error.includes("OverconstrainedError")) {
+      errorDetails = "La resolución solicitada no es compatible con esta cámara.";
+    } else if (error.includes("SecurityError")) {
+      errorDetails = "El uso de la cámara ha sido bloqueado por políticas de seguridad.";
+    } else if (error.includes("AbortError")) {
+      errorDetails = "La operación de escaneo QR fue cancelada.";
+    } else if (error.includes("timeout")) {
+      errorDetails = "Tiempo de espera agotado para el escaneo QR.";
+    } else if (error.includes("NetworkError")) {
+      errorDetails = "Error de red al procesar el código QR.";
+    }
+    
     toast({
       title: "Error en lectura QR",
-      description: error,
+      description: errorDetails || error,
       variant: "destructive",
     });
   };
@@ -186,6 +297,10 @@ const TestingRealMode: React.FC = () => {
               <TabsTrigger value="verification">
                 <ShieldCheck className="h-4 w-4 mr-2" />
                 Verificación Completa
+              </TabsTrigger>
+              <TabsTrigger value="errors" className="text-red-600">
+                <AlertCircle className="h-4 w-4 mr-2" />
+                Errores
               </TabsTrigger>
             </TabsList>
             
@@ -475,9 +590,76 @@ const TestingRealMode: React.FC = () => {
                     description: error,
                     variant: "destructive",
                   });
+                  
+                  // Registrar el error en el logger
+                  errorLogger.logError('verification', error);
                 }}
                 demoMode={false} // Forzar modo real
               />
+            </TabsContent>
+            
+            {/* TAB: ERRORES */}
+            <TabsContent value="errors" className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-medium text-[#2d219b]">Registro de Errores</h2>
+                <Button 
+                  onClick={() => {
+                    errorLogger.clearLogs();
+                    setErrorLogs([]);
+                    toast({
+                      title: "Registro de errores limpiado",
+                      description: "Se han borrado todos los errores registrados",
+                    });
+                  }}
+                  variant="outline"
+                  size="sm"
+                >
+                  <AlertCircle className="h-4 w-4 mr-2" />
+                  Limpiar registros
+                </Button>
+              </div>
+              
+              {errorLogs.length === 0 ? (
+                <Alert className="bg-gray-50">
+                  <CheckCircle className="h-4 w-4" />
+                  <AlertTitle>No hay errores registrados</AlertTitle>
+                  <AlertDescription>
+                    No se han detectado errores durante esta sesión. Si ocurre algún error, aparecerá aquí.
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-500">
+                    Se han detectado {errorLogs.length} errores durante esta sesión.
+                  </p>
+                  
+                  {errorLogs.map((log, index) => (
+                    <Card key={index} className="border-red-200">
+                      <CardHeader className="pb-2 bg-red-50">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center">
+                            <AlertCircle className="h-4 w-4 text-red-600 mr-2" />
+                            <CardTitle className="text-sm font-medium text-red-600">
+                              Error tipo: {log.type}
+                            </CardTitle>
+                          </div>
+                          <span className="text-xs text-gray-500">
+                            {new Date(log.timestamp).toLocaleTimeString()}
+                          </span>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        <p className="text-sm mb-2">{log.message}</p>
+                        {log.stack && (
+                          <pre className="bg-gray-50 p-2 rounded text-xs overflow-auto max-h-32 border border-gray-200">
+                            {log.stack}
+                          </pre>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </CardContent>
