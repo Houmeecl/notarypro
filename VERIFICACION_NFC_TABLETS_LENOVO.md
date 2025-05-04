@@ -1,153 +1,132 @@
-# Guía de Verificación de Funcionalidad NFC en Tablets Lenovo
+# Guía de verificación NFC para tablets Lenovo
 
-Esta guía detalla los pasos para verificar que la funcionalidad NFC esté operando correctamente en las tablets Lenovo después de instalar la APK de VecinoXpress.
+## Conexión directa a la aplicación
 
-## Requisitos previos
+Si la tablet Lenovo tiene acceso a internet, puedes usar la aplicación web directamente:
 
-- Tablet Lenovo con soporte NFC (Tab M10, M8 Plus o similar)
-- APK de VecinoXpress instalada
-- Cédula de identidad chilena con chip NFC
-- Conexión a internet activa
-
-## Verificación del hardware NFC
-
-### 1. Verificar que el NFC esté activado en la tablet
-
-1. Ve a **Configuración** > **Conexiones** o **Configuración** > **Dispositivos conectados**
-2. Busca la opción **NFC** y asegúrate de que esté activada
-3. Si no encuentras la opción NFC, es posible que la tablet no tenga esta característica
-
-### 2. Prueba básica de NFC del sistema
-
-1. Descarga e instala una aplicación básica de lectura NFC (como "NFC Tools") desde Google Play Store
-2. Abre la aplicación
-3. Acerca una tarjeta o cédula con NFC a la parte trasera de la tablet
-4. La aplicación debe detectar la tarjeta y mostrar alguna información básica
-5. Si esto funciona, significa que el hardware NFC de la tablet está operativo
-
-## Verificación en la aplicación VecinoXpress
-
-### 1. Acceder a la sección de prueba NFC
-
-1. Abre la aplicación VecinoXpress
-2. Inicia sesión con las credenciales de prueba:
+1. Abre Chrome en la tablet
+2. Accede a la URL: `https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/verificacion-nfc`
+3. Inicia sesión con:
    - Usuario: `miadmin`
    - Contraseña: `miadmin123`
-3. Navega a la sección **Verificación NFC** o **Testing Real Mode**
+4. Acepta los permisos de NFC cuando se soliciten
+5. Sigue las instrucciones en pantalla para verificar una cédula chilena
 
-### 2. Realizar la prueba de lectura NFC
+## Generar APK que apunte a Replit
 
-1. En la sección de verificación, presiona el botón "Iniciar Verificación" o "Leer NFC"
-2. La aplicación mostrará una pantalla indicando que acerques la cédula al lector NFC
-3. Acerca una cédula chilena a la parte trasera de la tablet (donde se encuentra la antena NFC)
-4. Mantén la cédula cerca sin movimiento durante algunos segundos
-5. La aplicación debería mostrar mensajes de progreso:
-   - "Estableciendo conexión con el chip..."
-   - "Leyendo datos personales..."
-   - "Verificando firma digital..."
-   - "Procesando información..."
+Para crear una APK que use la URL de Replit, sigue estos pasos:
 
-### 3. Verificar la información leída
+### En computadora con Android Studio
 
-Si la lectura es exitosa, la aplicación mostrará:
+1. Clona el repositorio
+2. Edita el archivo `capacitor.config.ts`:
 
-1. Datos básicos de la cédula:
-   - RUT
-   - Nombres
-   - Apellidos
-   - Fecha de nacimiento
-   - Fecha de emisión del documento
-   - Fecha de expiración
-   - Sexo
-   - Nacionalidad
+```typescript
+import type { CapacitorConfig } from '@capacitor/cli';
 
-2. Si está disponible, también mostrará:
-   - Fotografía (en algunos modelos)
-   - Número de documento
-   - Número de serie del chip
+const config: CapacitorConfig = {
+  appId: 'cl.vecinoxpress.pos',
+  appName: 'VecinoXpress',
+  webDir: './client/dist',
+  server: {
+    androidScheme: 'https', 
+    cleartext: true,
+    // Apunta directamente a la aplicación en Replit
+    url: 'https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev',
+    initialPath: '/verificacion-nfc'
+  },
+  plugins: {
+    SplashScreen: {
+      launchAutoHide: false,
+      backgroundColor: "#2d219b",
+      showSpinner: true,
+      spinnerColor: "#ffffff",
+      androidSpinnerStyle: "large"
+    }
+  },
+  android: {
+    minSdkVersion: 24
+  }
+};
 
-### 4. Prueba completa del flujo de verificación
-
-1. Intenta completar un flujo completo de verificación:
-   - Inicia el proceso de verificación de identidad
-   - Captura una foto del documento (frontal)
-   - Captura una selfie
-   - Realiza la lectura NFC
-   - Completa el proceso de verificación
-
-2. Al finalizar, verifica que la aplicación indique que la verificación fue exitosa
-
-## Resolución de problemas
-
-### Problema: No se detecta la cédula
-
-**Posibles causas y soluciones:**
-
-1. **NFC desactivado:**
-   - Verifica que el NFC esté activado en la configuración de la tablet
-
-2. **Posición incorrecta:**
-   - La ubicación de la antena NFC varía según el modelo de tablet
-   - Prueba diferentes áreas en la parte trasera de la tablet
-   - Normalmente se encuentra en la parte central o superior trasera
-
-3. **Interferencia:**
-   - Retira cualquier funda o protector metálico
-   - Aléjate de otros dispositivos electrónicos
-
-4. **Cédula dañada:**
-   - Intenta con otra cédula para descartar problemas con el chip
-
-### Problema: La aplicación se cierra durante la lectura
-
-**Posibles causas y soluciones:**
-
-1. **Permisos insuficientes:**
-   - Verifica que la aplicación tenga todos los permisos necesarios
-   - Ve a Configuración > Aplicaciones > VecinoXpress > Permisos
-
-2. **Memoria insuficiente:**
-   - Cierra otras aplicaciones en segundo plano
-   - Reinicia la tablet
-
-3. **Problemas de la aplicación:**
-   - Verifica si hay actualizaciones disponibles
-   - Desinstala y vuelve a instalar la aplicación
-
-### Problema: La lectura es incompleta o incorrecta
-
-**Posibles causas y soluciones:**
-
-1. **Movimiento durante la lectura:**
-   - Mantén la cédula inmóvil durante todo el proceso
-   - Usa una superficie estable
-
-2. **Chip dañado:**
-   - Si la cédula ha sufrido daños físicos, es posible que el chip no funcione correctamente
-   - Prueba con otra cédula
-
-3. **Problemas de implementación:**
-   - Verifica si hay logs de error en la aplicación
-   - Reporta el problema con el detalle de la cédula utilizada
-
-## Registro de pruebas
-
-Mantén un registro de las pruebas realizadas con el siguiente formato:
-
-```
-Fecha de prueba: [FECHA]
-Modelo de tablet: [MODELO]
-Versión de Android: [VERSIÓN]
-Versión de la APK: [VERSIÓN]
-Resultado: [EXITOSO/FALLIDO]
-Notas: [OBSERVACIONES]
+export default config;
 ```
 
-## Contacto para soporte
+3. Construye la aplicación web:
+```bash
+npm run build
+```
 
-Si encuentras problemas persistentes con la funcionalidad NFC:
+4. Prepara para Android:
+```bash
+npx cap add android
+npx cap sync android
+```
 
-1. Captura capturas de pantalla del error
-2. Anota el mensaje exacto del error
-3. Registra el modelo exacto de la tablet Lenovo
-4. Contacta al equipo de soporte técnico a través de la sección de soporte de la aplicación o envía un correo a [correo de soporte]
+5. Abre en Android Studio:
+```bash
+npx cap open android
+```
+
+6. En Android Studio, construye la APK:
+   - Build > Build Bundle(s) / APK(s) > Build APK(s)
+
+7. Transfiere la APK a la tablet e instálala
+
+## Uso de NFC en tablets Lenovo
+
+### Activar NFC en la tablet
+
+1. Ve a Configuración (Settings)
+2. Busca "Conexiones" o "Conectividad" (Connections)
+3. Activa el interruptor NFC
+4. Si hay una opción "Lector/Escritor de tarjetas" o "Lector NFC", asegúrate de que también esté activada
+
+### Posición correcta para la cédula
+
+La ubicación del lector NFC varía según el modelo de tablet:
+
+- **Lenovo Tab M8/M10**: El lector NFC está generalmente en la parte trasera central
+- **Lenovo Yoga Tab**: El lector suele estar cerca del logotipo de Lenovo en la parte trasera
+- **Lenovo Tab P11/P12**: El lector está usualmente en la parte superior trasera
+
+Para mejor lectura:
+1. Coloca la cédula plana contra la parte trasera de la tablet
+2. Mueve lentamente la cédula hasta encontrar la posición exacta del lector
+3. Mantén la cédula inmóvil durante la lectura (2-3 segundos)
+4. No separes la cédula hasta que la aplicación confirme la lectura exitosa
+
+### Solución de problemas comunes
+
+- **NFC no detecta la cédula**: 
+  - Verifica que NFC esté activado en la tablet
+  - Asegúrate de que la cédula sea compatible con NFC (modelos nuevos)
+  - Prueba diferentes posiciones en la parte trasera de la tablet
+  
+- **Error "No se puede acceder a NFC"**:
+  - Reinicia la tablet
+  - Ve a Configuración > Aplicaciones > Chrome > Permisos, y asegúrate de que NFC esté permitido
+  
+- **Lectura inconsistente**:
+  - Limpia la parte trasera de la tablet y la cédula
+  - Quita cualquier funda o protector de la tablet
+  - Evita interferencias (no coloques la tablet sobre superficies metálicas)
+
+## Modo sin conexión
+
+Para verificación NFC sin internet:
+
+1. Accede primero a la aplicación con conexión a internet
+2. Una vez cargada, puedes desconectar el WiFi
+3. El lector NFC seguirá funcionando para verificar la validez de la cédula
+4. Reconecta para sincronizar los resultados de verificación
+
+## Crear acceso directo en pantalla de inicio
+
+Para una experiencia más similar a una app nativa:
+
+1. En Chrome, accede a la URL de la aplicación
+2. Toca el menú (tres puntos) en la esquina superior derecha
+3. Selecciona "Añadir a pantalla de inicio" o "Instalar aplicación"
+4. Confirma la acción
+5. Ahora tendrás un ícono en la pantalla de inicio que abrirá la aplicación en modo pantalla completa
