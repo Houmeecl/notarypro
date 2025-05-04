@@ -11,9 +11,21 @@ import { Card } from "@/components/ui/card";
 
 export default function PaymentSuccess() {
   useEffect(() => {
+    // Obtener parámetros de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const course = urlParams.get('course');
+    const email = urlParams.get('email');
+    
     // Redirigir automáticamente después de 3 segundos
     const timer = setTimeout(() => {
-      window.location.href = "/payment-options?status=success";
+      // Redirigir basado en el tipo de pago completado
+      if (course === 'certifier') {
+        // Si es un pago del curso de certificador, redirigir al dashboard con email como parámetro
+        window.location.href = `/certification-dashboard?registered=true${email ? `&email=${email}` : ''}`;
+      } else {
+        // Para otros tipos de pagos, usar la redirección estándar
+        window.location.href = "/payment-options?status=success";
+      }
     }, 3000);
     
     // Limpieza del temporizador si el componente se desmonta
@@ -37,10 +49,22 @@ export default function PaymentSuccess() {
             </p>
           </div>
           <button
-            onClick={() => window.location.href = "/payment-options"}
+            onClick={() => {
+              const urlParams = new URLSearchParams(window.location.search);
+              const course = urlParams.get('course');
+              const email = urlParams.get('email');
+              
+              if (course === 'certifier') {
+                window.location.href = `/certification-dashboard?registered=true${email ? `&email=${email}` : ''}`;
+              } else {
+                window.location.href = "/payment-options";
+              }
+            }}
             className="px-4 py-2 bg-[#2d219b] text-white rounded-md hover:bg-[#2d219b]/90 transition-colors"
           >
-            Volver a Opciones de Pago
+            {new URLSearchParams(window.location.search).get('course') === 'certifier' 
+              ? "Ir al Panel de Certificador" 
+              : "Volver a Opciones de Pago"}
           </button>
         </div>
       </Card>
