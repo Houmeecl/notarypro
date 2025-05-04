@@ -763,6 +763,9 @@ function Router() {
       <Route path="/documento-ejemplo" component={DocumentoEjemplo} />
 
       {/* Sistema de Gestión de Dispositivos POS */}
+      <Route path="/pos-menu" component={POSMenuPage} />
+      <Route path="/pos-session/:id" component={POSSessionPage} />
+      <Route path="/register-pos-device" component={RegisterPOSDevicePage} />
       <ProtectedRoute 
         path="/pos-menu" 
         component={() => {

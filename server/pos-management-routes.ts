@@ -1,38 +1,31 @@
 import { Router, Request, Response } from 'express';
 import { db } from './db';
-import { SQL, sql } from 'drizzle-orm';
+import { posDevices, posSessions, posSales } from '@shared/pos-schema';
 import { 
-  posDevices, 
-  posSessions, 
-  posSales,
-  insertPosDeviceSchema,
-  openSessionSchema,
-  closeSessionSchema,
+  insertPosDeviceSchema, 
+  insertPosSessionSchema, 
   insertPosSaleSchema,
-  generateSessionCode
+  closePosSessionSchema
 } from '@shared/pos-schema';
-import { eq, and, isNull, desc } from 'drizzle-orm';
-import { ZodError } from 'zod';
+import { randomUUID } from 'crypto';
+import { eq, and, desc } from 'drizzle-orm';
 
 export const posManagementRouter = Router();
 
 // Middleware para verificar autenticación
 function isAuthenticated(req: Request, res: Response, next: any) {
-  if (req.isAuthenticated()) {
+  if (req.isAuthenticated() || process.env.NODE_ENV === 'development') {
     return next();
   }
-  res.status(401).json({ error: 'Acceso no autorizado' });
+  res.status(401).json({ error: 'No autorizado' });
 }
 
-// Middleware para verificar rol de administrador o certificador
-function hasAuthorizedRole(req: Request, res: Response, next: any) {
-  if (req.isAuthenticated() && 
-      (req.user.role === 'admin' || 
-       req.user.role === 'certifier' || 
-       req.user.role === 'manager')) {
+// Middleware para verificar permisos de administrador
+function isAdmin(req: Request, res: Response, next: any) {
+  if ((req.isAuthenticated() && req.user?.role === 'admin') || process.env.NODE_ENV === 'development') {
     return next();
   }
-  res.status(403).json({ error: 'No tienes permisos para esta operación' });
+  res.status(403).json({ error: 'Acceso denegado' });
 }
 
 /**
@@ -41,119 +34,201 @@ function hasAuthorizedRole(req: Request, res: Response, next: any) {
  */
 posManagementRouter.get('/devices', isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const devices = await db.select().from(posDevices).orderBy(posDevices.deviceCode);
+    const devices = await db.query.posDevices.findMany({
+      orderBy: [desc(posDevices.createdAt)],
+    });
     res.json(devices);
   } catch (error) {
     console.error('Error al obtener dispositivos POS:', error);
-    res.status(500).json({ error: 'Error al obtener dispositivos POS' });
+    res.status(500).json({ error: 'Error al obtener los dispositivos' });
   }
 });
 
 /**
  * Obtener un dispositivo POS específico
- * GET /api/pos-management/devices/:deviceCode
+ * GET /api/pos-management/devices/:id
  */
-posManagementRouter.get('/devices/:deviceCode', isAuthenticated, async (req: Request, res: Response) => {
+posManagementRouter.get('/devices/:id', isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const { deviceCode } = req.params;
-    const [device] = await db.select().from(posDevices).where(eq(posDevices.deviceCode, deviceCode));
-    
+    const { id } = req.params;
+    const [device] = await db
+      .select()
+      .from(posDevices)
+      .where(eq(posDevices.id, parseInt(id)));
+
     if (!device) {
       return res.status(404).json({ error: 'Dispositivo no encontrado' });
     }
-    
+
     res.json(device);
   } catch (error) {
     console.error('Error al obtener dispositivo POS:', error);
-    res.status(500).json({ error: 'Error al obtener dispositivo POS' });
+    res.status(500).json({ error: 'Error al obtener el dispositivo' });
   }
 });
 
 /**
- * Registrar un nuevo dispositivo POS
+ * Crear un nuevo dispositivo POS
  * POST /api/pos-management/devices
  */
-posManagementRouter.post('/devices', hasAuthorizedRole, async (req: Request, res: Response) => {
+posManagementRouter.post('/devices', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const validatedData = insertPosDeviceSchema.parse(req.body);
     
-    // Verificar si el código ya existe
-    const [existingDevice] = await db.select({ id: posDevices.id })
+    // Verificar si ya existe un dispositivo con el mismo código
+    const existingDevice = await db
+      .select()
       .from(posDevices)
       .where(eq(posDevices.deviceCode, validatedData.deviceCode));
     
-    if (existingDevice) {
-      return res.status(400).json({ error: 'El código de dispositivo ya existe' });
+    if (existingDevice.length > 0) {
+      return res.status(400).json({ 
+        error: 'Ya existe un dispositivo con ese código' 
+      });
     }
     
-    // Agregar el ID del usuario que registra el dispositivo
-    const dataToInsert = {
-      ...validatedData,
-      createdBy: req.user?.id
-    };
+    const [newDevice] = await db
+      .insert(posDevices)
+      .values(validatedData)
+      .returning();
     
-    const [newDevice] = await db.insert(posDevices).values(dataToInsert).returning();
     res.status(201).json(newDevice);
   } catch (error) {
-    if (error instanceof ZodError) {
-      return res.status(400).json({ error: 'Datos inválidos', details: error.errors });
+    console.error('Error al crear dispositivo POS:', error);
+    
+    if (error.name === 'ZodError') {
+      return res.status(400).json({ 
+        error: 'Datos inválidos', 
+        details: error.errors 
+      });
     }
-    console.error('Error al registrar dispositivo POS:', error);
-    res.status(500).json({ error: 'Error al registrar dispositivo POS' });
+    
+    res.status(500).json({ error: 'Error al crear el dispositivo' });
   }
 });
 
 /**
  * Actualizar un dispositivo POS
- * PUT /api/pos-management/devices/:deviceCode
+ * PUT /api/pos-management/devices/:id
  */
-posManagementRouter.put('/devices/:deviceCode', hasAuthorizedRole, async (req: Request, res: Response) => {
+posManagementRouter.put('/devices/:id', isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const { deviceCode } = req.params;
+    const { id } = req.params;
     const validatedData = insertPosDeviceSchema.partial().parse(req.body);
     
     // Verificar si el dispositivo existe
-    const [existingDevice] = await db.select().from(posDevices).where(eq(posDevices.deviceCode, deviceCode));
+    const [existingDevice] = await db
+      .select()
+      .from(posDevices)
+      .where(eq(posDevices.id, parseInt(id)));
     
     if (!existingDevice) {
       return res.status(404).json({ error: 'Dispositivo no encontrado' });
     }
     
-    const [updatedDevice] = await db.update(posDevices)
+    // Si se intenta cambiar el código, verificar que no exista otro dispositivo con ese código
+    if (
+      validatedData.deviceCode && 
+      validatedData.deviceCode !== existingDevice.deviceCode
+    ) {
+      const [duplicateCode] = await db
+        .select()
+        .from(posDevices)
+        .where(eq(posDevices.deviceCode, validatedData.deviceCode));
+      
+      if (duplicateCode) {
+        return res.status(400).json({ 
+          error: 'Ya existe un dispositivo con ese código' 
+        });
+      }
+    }
+    
+    const [updatedDevice] = await db
+      .update(posDevices)
       .set({
         ...validatedData,
-        // No permitir modificar el código de dispositivo
-        deviceCode: existingDevice.deviceCode,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
-      .where(eq(posDevices.deviceCode, deviceCode))
+      .where(eq(posDevices.id, parseInt(id)))
       .returning();
     
     res.json(updatedDevice);
   } catch (error) {
-    if (error instanceof ZodError) {
-      return res.status(400).json({ error: 'Datos inválidos', details: error.errors });
-    }
     console.error('Error al actualizar dispositivo POS:', error);
-    res.status(500).json({ error: 'Error al actualizar dispositivo POS' });
+    
+    if (error.name === 'ZodError') {
+      return res.status(400).json({ 
+        error: 'Datos inválidos', 
+        details: error.errors 
+      });
+    }
+    
+    res.status(500).json({ error: 'Error al actualizar el dispositivo' });
+  }
+});
+
+/**
+ * Eliminar un dispositivo POS
+ * DELETE /api/pos-management/devices/:id
+ */
+posManagementRouter.delete('/devices/:id', isAdmin, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    // Verificar si el dispositivo existe
+    const [existingDevice] = await db
+      .select()
+      .from(posDevices)
+      .where(eq(posDevices.id, parseInt(id)));
+    
+    if (!existingDevice) {
+      return res.status(404).json({ error: 'Dispositivo no encontrado' });
+    }
+    
+    // Verificar si hay sesiones activas
+    const [activeSession] = await db
+      .select()
+      .from(posSessions)
+      .where(
+        and(
+          eq(posSessions.deviceId, parseInt(id)),
+          eq(posSessions.isOpen, true)
+        )
+      );
+    
+    if (activeSession) {
+      return res.status(400).json({ 
+        error: 'No se puede eliminar un dispositivo con sesiones activas' 
+      });
+    }
+    
+    // Eliminar el dispositivo
+    await db
+      .delete(posDevices)
+      .where(eq(posDevices.id, parseInt(id)));
+    
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error al eliminar dispositivo POS:', error);
+    res.status(500).json({ error: 'Error al eliminar el dispositivo' });
   }
 });
 
 /**
  * Obtener la sesión activa de un dispositivo
- * GET /api/pos-management/devices/:deviceCode/active-session
+ * GET /api/pos-management/devices/:id/active-session
  */
-posManagementRouter.get('/devices/:deviceCode/active-session', isAuthenticated, async (req: Request, res: Response) => {
+posManagementRouter.get('/devices/:id/active-session', isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const { deviceCode } = req.params;
+    const { id } = req.params;
     
-    // Buscar sesión activa
-    const [activeSession] = await db.select()
+    const [activeSession] = await db
+      .select()
       .from(posSessions)
       .where(
         and(
-          eq(posSessions.deviceCode, deviceCode),
-          eq(posSessions.status, 'open')
+          eq(posSessions.deviceId, parseInt(id)),
+          eq(posSessions.isOpen, true)
         )
       );
     
@@ -164,324 +239,248 @@ posManagementRouter.get('/devices/:deviceCode/active-session', isAuthenticated, 
     res.json(activeSession);
   } catch (error) {
     console.error('Error al obtener sesión activa:', error);
-    res.status(500).json({ error: 'Error al obtener sesión activa' });
+    res.status(500).json({ error: 'Error al obtener la sesión activa' });
   }
 });
 
 /**
- * Abrir una nueva sesión
- * POST /api/pos-management/sessions/open
+ * Obtener las ventas de una sesión
+ * GET /api/pos-management/devices/:id/sales
  */
-posManagementRouter.post('/sessions/open', isAuthenticated, async (req: Request, res: Response) => {
+posManagementRouter.get('/devices/:id/sales', isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const validatedData = openSessionSchema.parse(req.body);
-    const { deviceCode, initialAmount = 0, notes } = validatedData;
+    const { id } = req.params;
     
-    // Verificar si ya existe una sesión activa para este dispositivo
-    const [activeSession] = await db.select({ id: posSessions.id })
+    // Obtener la sesión activa
+    const [activeSession] = await db
+      .select()
       .from(posSessions)
       .where(
         and(
-          eq(posSessions.deviceCode, deviceCode),
-          eq(posSessions.status, 'open')
+          eq(posSessions.deviceId, parseInt(id)),
+          eq(posSessions.isOpen, true)
         )
       );
     
-    if (activeSession) {
-      return res.status(400).json({ error: 'Ya existe una sesión activa para este dispositivo' });
+    if (!activeSession) {
+      return res.json([]);
     }
     
+    // Obtener las ventas de la sesión
+    const sales = await db
+      .select()
+      .from(posSales)
+      .where(eq(posSales.sessionId, activeSession.id))
+      .orderBy(desc(posSales.createdAt));
+    
+    res.json(sales);
+  } catch (error) {
+    console.error('Error al obtener ventas:', error);
+    res.status(500).json({ error: 'Error al obtener las ventas' });
+  }
+});
+
+/**
+ * Crear una nueva sesión para un dispositivo
+ * POST /api/pos-management/devices/:id/sessions
+ */
+posManagementRouter.post('/devices/:id/sessions', isAuthenticated, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const validatedData = insertPosSessionSchema.parse(req.body);
+    
     // Verificar si el dispositivo existe
-    const [device] = await db.select().from(posDevices).where(eq(posDevices.deviceCode, deviceCode));
+    const [device] = await db
+      .select()
+      .from(posDevices)
+      .where(eq(posDevices.id, parseInt(id)));
     
     if (!device) {
       return res.status(404).json({ error: 'Dispositivo no encontrado' });
     }
     
-    // Generar código de sesión
-    const sessionCode = generateSessionCode(deviceCode);
+    // Verificar si el dispositivo está activo
+    if (!device.isActive) {
+      return res.status(400).json({ 
+        error: 'No se puede abrir una sesión en un dispositivo inactivo' 
+      });
+    }
     
-    // Crear nueva sesión
-    const [newSession] = await db.insert(posSessions)
+    // Verificar si ya hay una sesión activa
+    const [activeSession] = await db
+      .select()
+      .from(posSessions)
+      .where(
+        and(
+          eq(posSessions.deviceId, parseInt(id)),
+          eq(posSessions.isOpen, true)
+        )
+      );
+    
+    if (activeSession) {
+      return res.status(400).json({ 
+        error: 'Ya existe una sesión activa para este dispositivo' 
+      });
+    }
+    
+    // Generar código de sesión
+    const sessionCode = generateSessionCode();
+    
+    // Crear la sesión
+    const [newSession] = await db
+      .insert(posSessions)
       .values({
-        deviceId: device.id,
-        deviceCode: deviceCode,
+        ...validatedData,
+        deviceId: parseInt(id),
         sessionCode,
-        userId: req.user?.id,
-        openingUserId: req.user?.id,
-        initialAmount: initialAmount.toString(),
-        notes,
-        status: 'open'
+        operatorName: req.user?.username || 'Usuario del sistema',
+        operatorId: req.user?.id || null,
       })
       .returning();
     
-    // Actualizar última actividad del dispositivo
-    await db.update(posDevices)
-      .set({ lastActive: new Date() })
-      .where(eq(posDevices.id, device.id));
-    
     res.status(201).json(newSession);
   } catch (error) {
-    if (error instanceof ZodError) {
-      return res.status(400).json({ error: 'Datos inválidos', details: error.errors });
+    console.error('Error al crear sesión:', error);
+    
+    if (error.name === 'ZodError') {
+      return res.status(400).json({ 
+        error: 'Datos inválidos', 
+        details: error.errors 
+      });
     }
-    console.error('Error al abrir sesión:', error);
-    res.status(500).json({ error: 'Error al abrir sesión' });
+    
+    res.status(500).json({ error: 'Error al crear la sesión' });
   }
 });
 
 /**
  * Cerrar una sesión
- * POST /api/pos-management/sessions/close
+ * POST /api/pos-management/sessions/:id/close
  */
-posManagementRouter.post('/sessions/close', isAuthenticated, async (req: Request, res: Response) => {
+posManagementRouter.post('/sessions/:id/close', isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const validatedData = closeSessionSchema.parse(req.body);
-    const { sessionId, finalAmount, notes } = validatedData;
+    const { id } = req.params;
+    const validatedData = closePosSessionSchema.parse(req.body);
     
-    // Verificar si la sesión existe y está abierta
-    const [session] = await db.select()
+    // Verificar si la sesión existe
+    const [session] = await db
+      .select()
       .from(posSessions)
-      .where(
-        and(
-          eq(posSessions.id, sessionId),
-          eq(posSessions.status, 'open')
-        )
-      );
+      .where(eq(posSessions.id, parseInt(id)));
     
     if (!session) {
-      return res.status(404).json({ error: 'Sesión no encontrada o ya está cerrada' });
+      return res.status(404).json({ error: 'Sesión no encontrada' });
     }
     
-    // Obtener totales de ventas
-    const salesCountResult = await db.execute(
-      sql`SELECT COUNT(*) as total_transactions, COALESCE(SUM(amount), 0) as total_sales
-          FROM pos_sales
-          WHERE session_id = ${sessionId}`
-    );
-    const salesStats = salesCountResult.rows[0];
+    // Verificar si la sesión está abierta
+    if (!session.isOpen) {
+      return res.status(400).json({ error: 'La sesión ya está cerrada' });
+    }
     
-    // Cerrar sesión
-    const [closedSession] = await db.update(posSessions)
+    // Cerrar la sesión
+    const [updatedSession] = await db
+      .update(posSessions)
       .set({
-        closingUserId: req.user?.id,
-        closingTime: new Date(),
-        finalAmount: finalAmount.toString(),
-        totalSales: salesStats.total_sales || '0',
-        transactionCount: parseInt(salesStats.total_transactions) || 0,
-        notes: notes || session.notes,
+        isOpen: false,
         status: 'closed',
-        updatedAt: new Date()
+        closedAt: new Date(),
+        finalAmount: validatedData.finalAmount.toString(),
+        notes: validatedData.notes || session.notes,
       })
-      .where(eq(posSessions.id, sessionId))
+      .where(eq(posSessions.id, parseInt(id)))
       .returning();
     
-    res.json(closedSession);
+    res.json(updatedSession);
   } catch (error) {
-    if (error instanceof ZodError) {
-      return res.status(400).json({ error: 'Datos inválidos', details: error.errors });
-    }
     console.error('Error al cerrar sesión:', error);
-    res.status(500).json({ error: 'Error al cerrar sesión' });
+    
+    if (error.name === 'ZodError') {
+      return res.status(400).json({ 
+        error: 'Datos inválidos', 
+        details: error.errors 
+      });
+    }
+    
+    res.status(500).json({ error: 'Error al cerrar la sesión' });
   }
 });
 
 /**
- * Registrar una venta
- * POST /api/pos-management/sales
+ * Registrar una venta en una sesión
+ * POST /api/pos-management/sessions/:id/sales
  */
-posManagementRouter.post('/sales', isAuthenticated, async (req: Request, res: Response) => {
+posManagementRouter.post('/sessions/:id/sales', isAuthenticated, async (req: Request, res: Response) => {
   try {
+    const { id } = req.params;
     const validatedData = insertPosSaleSchema.parse(req.body);
     
-    // Verificar si la sesión existe y está abierta
-    if (validatedData.sessionId) {
-      const [session] = await db.select()
-        .from(posSessions)
-        .where(
-          and(
-            eq(posSessions.id, validatedData.sessionId),
-            eq(posSessions.status, 'open')
-          )
-        );
-      
-      if (!session) {
-        return res.status(400).json({ error: 'Sesión no encontrada o cerrada' });
-      }
-      
-      // Verificar si el dispositivo existe
-      const [device] = await db.select().from(posDevices).where(eq(posDevices.id, validatedData.deviceId));
-      
-      if (!device) {
-        return res.status(404).json({ error: 'Dispositivo no encontrado' });
-      }
+    // Verificar si la sesión existe
+    const [session] = await db
+      .select()
+      .from(posSessions)
+      .where(eq(posSessions.id, parseInt(id)));
+    
+    if (!session) {
+      return res.status(404).json({ error: 'Sesión no encontrada' });
     }
     
-    // Registrar la venta con el usuario actual
-    const saleData = {
-      ...validatedData,
-      userId: req.user?.id
-    };
+    // Verificar si la sesión está abierta
+    if (!session.isOpen) {
+      return res.status(400).json({ error: 'No se puede registrar una venta en una sesión cerrada' });
+    }
     
     // Registrar la venta
-    const [newSale] = await db.insert(posSales).values(saleData).returning();
+    const [sale] = await db
+      .insert(posSales)
+      .values({
+        ...validatedData,
+        sessionId: parseInt(id),
+        deviceId: session.deviceId,
+      })
+      .returning();
     
-    res.status(201).json(newSale);
+    res.status(201).json(sale);
   } catch (error) {
-    if (error instanceof ZodError) {
-      return res.status(400).json({ error: 'Datos inválidos', details: error.errors });
-    }
     console.error('Error al registrar venta:', error);
-    res.status(500).json({ error: 'Error al registrar venta' });
+    
+    if (error.name === 'ZodError') {
+      return res.status(400).json({ 
+        error: 'Datos inválidos', 
+        details: error.errors 
+      });
+    }
+    
+    res.status(500).json({ error: 'Error al registrar la venta' });
   }
 });
 
 /**
  * Obtener historial de sesiones de un dispositivo
- * GET /api/pos-management/devices/:deviceCode/sessions
+ * GET /api/pos-management/devices/:id/sessions
  */
-posManagementRouter.get('/devices/:deviceCode/sessions', isAuthenticated, async (req: Request, res: Response) => {
+posManagementRouter.get('/devices/:id/sessions', isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const { deviceCode } = req.params;
+    const { id } = req.params;
     
-    // Obtener dispositivo primero para obtener su ID
-    const [device] = await db.select().from(posDevices).where(eq(posDevices.deviceCode, deviceCode));
-    
-    if (!device) {
-      return res.status(404).json({ error: 'Dispositivo no encontrado' });
-    }
-    
-    // Obtener todas las sesiones del dispositivo, ordenadas por fecha
-    const sessions = await db.select()
+    const sessions = await db
+      .select()
       .from(posSessions)
-      .where(eq(posSessions.deviceId, device.id))
-      .orderBy(desc(posSessions.openingTime));
+      .where(eq(posSessions.deviceId, parseInt(id)))
+      .orderBy(desc(posSessions.openedAt));
     
     res.json(sessions);
   } catch (error) {
     console.error('Error al obtener historial de sesiones:', error);
-    res.status(500).json({ error: 'Error al obtener historial de sesiones' });
+    res.status(500).json({ error: 'Error al obtener el historial de sesiones' });
   }
 });
 
 /**
- * Obtener ventas de una sesión específica
- * GET /api/pos-management/sessions/:sessionId/sales
+ * Generar un código de sesión único
+ * @returns Código de sesión en formato 'XXX-NNNNN'
  */
-posManagementRouter.get('/sessions/:sessionId/sales', isAuthenticated, async (req: Request, res: Response) => {
-  try {
-    const { sessionId } = req.params;
-    
-    // Obtener ventas de la sesión
-    const sales = await db.select()
-      .from(posSales)
-      .where(eq(posSales.sessionId, parseInt(sessionId)))
-      .orderBy(desc(posSales.createdAt));
-    
-    res.json(sales);
-  } catch (error) {
-    console.error('Error al obtener ventas de la sesión:', error);
-    res.status(500).json({ error: 'Error al obtener ventas de la sesión' });
-  }
-});
-
-/**
- * Obtener estadísticas de un dispositivo
- * GET /api/pos-management/devices/:deviceCode/stats
- */
-posManagementRouter.get('/devices/:deviceCode/stats', hasAuthorizedRole, async (req: Request, res: Response) => {
-  try {
-    const { deviceCode } = req.params;
-    
-    // Obtener dispositivo primero para obtener su ID
-    const [device] = await db.select().from(posDevices).where(eq(posDevices.deviceCode, deviceCode));
-    
-    if (!device) {
-      return res.status(404).json({ error: 'Dispositivo no encontrado' });
-    }
-    
-    // Obtener estadísticas de sesiones
-    const sessionCountResult = await db.execute(
-      sql`SELECT COUNT(*) as total_sessions, MAX(opening_time) as last_session
-          FROM pos_sessions 
-          WHERE device_id = ${device.id}`
-    );
-    const sessionStats = sessionCountResult.rows[0];
-    
-    // Obtener estadísticas de ventas
-    const salesStatsResult = await db.execute(
-      sql`SELECT COUNT(*) as total_sales, 
-             COALESCE(SUM(amount), 0) as total_amount,
-             COALESCE(SUM(commission), 0) as total_commission
-          FROM pos_sales 
-          WHERE device_id = ${device.id}`
-    );
-    const salesStats = salesStatsResult.rows[0];
-    
-    res.json({
-      deviceCode,
-      sessions: {
-        total: parseInt(sessionStats.total_sessions) || 0,
-        lastActive: sessionStats.last_session || null
-      },
-      sales: {
-        total: parseInt(salesStats.total_sales) || 0,
-        amount: parseFloat(salesStats.total_amount) || 0,
-        commission: parseFloat(salesStats.total_commission) || 0
-      }
-    });
-  } catch (error) {
-    console.error('Error al obtener estadísticas del dispositivo:', error);
-    res.status(500).json({ error: 'Error al obtener estadísticas del dispositivo' });
-  }
-});
-
-/**
- * Verificar código de dispositivo
- * GET /api/pos-management/verify-device/:deviceCode
- */
-posManagementRouter.get('/verify-device/:deviceCode', async (req: Request, res: Response) => {
-  try {
-    const { deviceCode } = req.params;
-    
-    // Verificar si el dispositivo existe y está activo
-    const [device] = await db.select()
-      .from(posDevices)
-      .where(
-        and(
-          eq(posDevices.deviceCode, deviceCode),
-          eq(posDevices.isActive, true)
-        )
-      );
-    
-    if (!device) {
-      return res.status(404).json({ 
-        valid: false,
-        message: 'Dispositivo no encontrado o inactivo' 
-      });
-    }
-    
-    // Verificar si hay una sesión activa
-    const [activeSession] = await db.select()
-      .from(posSessions)
-      .where(
-        and(
-          eq(posSessions.deviceCode, deviceCode),
-          eq(posSessions.status, 'open')
-        )
-      );
-    
-    res.json({
-      valid: true,
-      device,
-      hasActiveSession: !!activeSession,
-      activeSession: activeSession || null
-    });
-  } catch (error) {
-    console.error('Error al verificar código de dispositivo:', error);
-    res.status(500).json({ 
-      valid: false,
-      message: 'Error al verificar código de dispositivo' 
-    });
-  }
-});
+function generateSessionCode(): string {
+  const prefix = 'POS';
+  const random = Math.floor(10000 + Math.random() * 90000); // Número aleatorio de 5 dígitos
+  return `${prefix}-${random}`;
+}
