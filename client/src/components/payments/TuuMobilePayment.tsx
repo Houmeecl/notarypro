@@ -79,8 +79,13 @@ export default function TuuMobilePayment({
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al procesar el pago móvil");
+        try {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Error al procesar el pago móvil");
+        } catch (jsonError) {
+          // Si hay un error al parsear la respuesta, es probable que sea un error de conexión
+          throw new Error("No se pudo conectar con el servicio de pagos móviles. Por favor, intente más tarde.");
+        }
       }
 
       const data = await response.json();

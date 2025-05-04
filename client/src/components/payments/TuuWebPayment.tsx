@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Globe, CreditCard, QrCode } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 interface TuuWebPaymentProps {
   amount: number;
@@ -39,6 +41,7 @@ export default function TuuWebPayment({
 }: TuuWebPaymentProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   // Crear una sesión de pago web y redirigir
   const handleCreateWebPayment = async () => {
@@ -79,8 +82,13 @@ export default function TuuWebPayment({
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al crear la sesión de pago");
+        try {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Error al crear la sesión de pago");
+        } catch (jsonError) {
+          // Si hay un error al parsear la respuesta, es probable que sea un error de conexión
+          throw new Error("No se pudo conectar con el servicio de pagos. Por favor, intente más tarde.");
+        }
       }
 
       const responseData = await response.json();
