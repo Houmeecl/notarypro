@@ -733,14 +733,14 @@ function Router() {
 
       {/* Páginas de retorno para los pagos (MercadoPago y Tuu) */}
       <Route path="/payment-success" component={() => {
-        // Redireccionar a la página de opciones de pago con parámetros (preferencia a Tuu)
-        const currentUrl = new URL(window.location.href);
-        const tuu = currentUrl.searchParams.get("tuu");
-        const redirectUrl = tuu === "true" ? "/payment-options" : "/payment-demo"; 
-        window.location.replace(redirectUrl + "?status=success");
-        return <div className="min-h-screen flex items-center justify-center">
-          <p className="text-xl">Redireccionando...</p>
-        </div>;
+        const PaymentSuccess = React.lazy(() => import("@/pages/payment-success"));
+        return (
+          <Suspense fallback={<div className="flex items-center justify-center h-screen">
+            <p className="text-xl">Cargando confirmación de pago...</p>
+          </div>}>
+            <PaymentSuccess />
+          </Suspense>
+        );
       }} />
       <Route path="/payment-failure" component={() => {
         // Redireccionar a la página de opciones de pago con parámetros (preferencia a Tuu)

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { 
@@ -92,6 +92,10 @@ export default function CertificationDashboard() {
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  
+  // Verificar si el usuario viene de realizar un pago exitoso
+  const [showRegisteredMessage, setShowRegisteredMessage] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
   // Consulta para obtener los documentos pendientes de certificación
   const { data: pendingDocuments, isLoading } = useQuery({
@@ -145,6 +149,30 @@ export default function CertificationDashboard() {
     }
   });
 
+  // Verificar parámetros de URL al cargar el componente
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const registered = searchParams.get('registered');
+    const email = searchParams.get('email');
+    
+    if (registered === 'true') {
+      setShowRegisteredMessage(true);
+      if (email) {
+        setRegisteredEmail(email);
+      }
+      
+      // Mostrar notificación de bienvenida
+      toast({
+        title: "¡Bienvenido al Panel de Certificador!",
+        description: "Su pago ha sido procesado correctamente. Ya puede comenzar a certificar documentos.",
+        variant: "default",
+      });
+      
+      // Limpiar la URL para que al refrescar no muestre el mensaje de nuevo
+      window.history.replaceState({}, document.title, "/certification-dashboard");
+    }
+  }, [toast]);
+  
   // Si hay datos simulados, úsalos para pruebas en desarrollo
   const documents = pendingDocuments || [];
 
@@ -294,6 +322,40 @@ export default function CertificationDashboard() {
         
         {/* Content */}
         <main className="flex-1 overflow-auto p-6 bg-gray-50">
+          {/* Mensaje de bienvenida después del pago */}
+          {showRegisteredMessage && (
+            <div className="mb-6 p-4 border border-green-200 bg-green-50 rounded-lg">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-green-800">
+                    ¡Bienvenido al Panel de Certificador!
+                  </h3>
+                  <div className="mt-2 text-sm text-green-700">
+                    <p>
+                      Su pago ha sido procesado correctamente y ahora tiene acceso completo a las funcionalidades de certificación.
+                      {registeredEmail && (
+                        <span> Se ha registrado con el correo: <strong>{registeredEmail}</strong>.</span>
+                      )}
+                    </p>
+                  </div>
+                  <div className="mt-4">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-green-700 bg-green-100 hover:bg-green-200 border-green-300"
+                      onClick={() => setShowRegisteredMessage(false)}
+                    >
+                      Entendido
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <div className="max-w-full mx-auto bg-white rounded-xl shadow-sm overflow-hidden">
             {isLoading ? (
               <div className="flex justify-center items-center h-64">
