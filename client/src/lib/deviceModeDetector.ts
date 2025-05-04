@@ -27,7 +27,7 @@ export interface DeviceModeConfig {
 const DEFAULT_CONFIG: DeviceModeConfig = {
   mode: DeviceMode.AUTO,
   demoDeviceIds: ['demo-pos-', 'demo-tablet-', 'demo-device-'],
-  realDeviceIds: ['pos-real-', 'pos-', 'nPOS-'],
+  realDeviceIds: ['pos-real-', 'pos-', 'nPOS-', 'P2mini-8766wb', 'p2mini', 'sunmi', 'v2pro', 'v2', 'sunmiv2pro'],
   forceDemoParameter: 'demo',
   forceRealParameter: 'real'
 };
@@ -96,6 +96,26 @@ export function useDeviceMode() {
         return;
       }
       
+      // Verificar User-Agent para modelo específico de POS
+      const userAgent = navigator.userAgent.toLowerCase();
+      
+      // Verificar específicamente si es un P2mini-8766wb o Android 9
+      const isP2mini = userAgent.includes('p2mini') || 
+                      userAgent.includes('8766wb') || 
+                      userAgent.includes('android 9');
+                      
+      // Verificar específicamente si es un Sunmi V2 Pro
+      const isSunmi = userAgent.includes('sunmi') || 
+                     userAgent.includes('v2 pro') || 
+                     userAgent.includes('v2pro') ||
+                     userAgent.includes('sm-');
+      
+      if (isP2mini || isSunmi) {
+        console.log('Detectado dispositivo POS real:', isP2mini ? 'P2mini' : 'Sunmi V2 Pro');
+        setIsDemo(false);  // Este es un dispositivo real
+        return;
+      }
+      
       // Modo AUTO - detectar por ID de dispositivo
       const isDemoDevice = config.demoDeviceIds.some(prefix => deviceId.startsWith(prefix));
       const isRealDevice = config.realDeviceIds.some(prefix => deviceId.startsWith(prefix));
@@ -107,7 +127,6 @@ export function useDeviceMode() {
       } else {
         // Si no podemos determinar por ID, verificar si estamos en un emulador/simulador/desktop
         // Esta es una heurística simple, podría mejorarse
-        const userAgent = navigator.userAgent.toLowerCase();
         const isEmulator = userAgent.includes('emulator') || 
                           userAgent.includes('android studio') ||
                           userAgent.includes('sdk') ||
@@ -215,6 +234,25 @@ export function checkIsDemoMode(): boolean {
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has('demo')) {
     return true;
+  }
+  
+  // Verificar User-Agent para modelo específico de POS
+  const userAgent = navigator.userAgent.toLowerCase();
+  
+  // Verificar específicamente si es un P2mini-8766wb o Android 9
+  const isP2mini = userAgent.includes('p2mini') || 
+                    userAgent.includes('8766wb') || 
+                    userAgent.includes('android 9');
+                    
+  // Verificar específicamente si es un Sunmi V2 Pro
+  const isSunmi = userAgent.includes('sunmi') || 
+                 userAgent.includes('v2 pro') || 
+                 userAgent.includes('v2pro') ||
+                 userAgent.includes('sm-');
+                    
+  if (isP2mini || isSunmi) {
+    console.log('Detector sincrónico: Encontrado dispositivo POS real:', isP2mini ? 'P2mini' : 'Sunmi V2 Pro');
+    return false;  // Este es un dispositivo real
   }
   
   // Cargar configuración
