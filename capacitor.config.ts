@@ -2,11 +2,13 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'cl.vecinoxpress.pos',
-  appName: 'VecinoXpress POS',
+  appName: 'VecinoXpress',
   webDir: './client/dist',
   server: {
     androidScheme: 'https',
-    cleartext: true
+    cleartext: true,
+    url: 'http://localhost:5000',
+    initialPath: '/vecinos-express'
   },
   plugins: {
     SplashScreen: {
@@ -18,6 +20,7 @@ const config: CapacitorConfig = {
     }
   },
   android: {
+    flavor: 'vecinoexpress',
     buildOptions: {
       keystorePath: './my-release-key.keystore',
       keystorePassword: 'vecinos123',
