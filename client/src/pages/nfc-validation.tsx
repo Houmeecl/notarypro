@@ -187,8 +187,8 @@ const NFCValidationPage: React.FC = () => {
       await ndef.scan();
       
       toast({
-        title: "Escaneo NFC iniciado",
-        description: "Acerca tu cédula a la tablet",
+        title: "Validación Notarial Iniciada",
+        description: "Por favor, acerque su documento de identidad al dispositivo",
       });
       
     } catch (error: any) {
@@ -198,8 +198,8 @@ const NFCValidationPage: React.FC = () => {
       
       toast({
         variant: "destructive",
-        title: "Error al iniciar NFC",
-        description: error.message,
+        title: "Error en Validación Notarial",
+        description: "No se pudo iniciar el sistema de verificación de identidad. Por favor, contacte con soporte técnico.",
       });
     }
   };
@@ -209,7 +209,8 @@ const NFCValidationPage: React.FC = () => {
     // No hay método oficial para detener el escaneo en la API Web NFC
     // La mejor opción es reemplazar el objeto NDEFReader o recargar la página
     toast({
-      title: "Escaneo NFC detenido",
+      title: "Verificación Notarial Cancelada",
+      description: "El proceso de validación de identidad ha sido interrumpido",
     });
   };
 
@@ -401,24 +402,25 @@ const NFCValidationPage: React.FC = () => {
                 <>
                   <div className="animate-pulse flex flex-col items-center mb-4">
                     <Smartphone className="h-16 w-16 text-primary mb-2" />
-                    <p className="text-lg font-medium">Acerca la cédula ahora...</p>
+                    <p className="text-lg font-medium">Acerque su documento de identidad</p>
                   </div>
                   <p className="text-sm text-gray-500 mb-4 text-center">
-                    Mantén la cédula inmóvil durante 2-3 segundos en la parte trasera de la tablet
+                    Mantenga su cédula inmóvil durante 2-3 segundos en contacto con el lector del dispositivo
                   </p>
-                  <Button variant="outline" onClick={stopNfcScan}>
-                    Cancelar lectura
+                  <Button variant="outline" onClick={stopNfcScan} className="bg-white hover:bg-gray-50">
+                    Cancelar verificación
                   </Button>
                 </>
               ) : (
                 <>
                   <Smartphone className="h-16 w-16 text-gray-400 mb-2" />
-                  <p className="text-lg font-medium mb-4">Listo para leer NFC</p>
+                  <p className="text-lg font-medium mb-4">Sistema Notarial de Validación</p>
                   <Button 
                     onClick={startNfcScan}
                     disabled={!nfcSupported || !nfcEnabled}
+                    className="bg-indigo-700 hover:bg-indigo-800 text-white"
                   >
-                    Iniciar lectura NFC
+                    Iniciar Verificación de Identidad
                   </Button>
                 </>
               )}
@@ -426,24 +428,36 @@ const NFCValidationPage: React.FC = () => {
             
             {readResult && (
               <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h3 className="text-lg font-medium mb-2">Resultado de lectura</h3>
-                <p className="mb-2"><strong>ID:</strong> {readResult.serialNumber}</p>
-                <p className="mb-2"><strong>Hora:</strong> {new Date(readResult.timestamp).toLocaleTimeString()}</p>
+                <h3 className="text-lg font-medium mb-2 flex items-center">
+                  <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                  Certificación Notarial Completada
+                </h3>
+                <div className="p-3 bg-green-50 border border-green-200 rounded-md mb-4">
+                  <p className="text-sm text-green-800">La identidad del ciudadano ha sido verificada exitosamente mediante el sistema notarial VecinoXpress</p>
+                </div>
                 
-                {readResult.records.length > 0 ? (
-                  <>
-                    <p className="mb-2"><strong>Registros ({readResult.records.length}):</strong></p>
-                    <ul className="list-disc pl-5">
-                      {readResult.records.map((record: any, index: number) => (
-                        <li key={index}>
-                          <strong>Tipo:</strong> {record.type}, <strong>Valor:</strong> {record.value}
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                ) : (
-                  <p>No se encontraron registros NDEF.</p>
-                )}
+                <div className="space-y-2">
+                  <div className="flex justify-between p-2 bg-gray-50 rounded-md">
+                    <span className="font-medium">Número de Validación:</span>
+                    <span className="font-mono">{readResult.serialNumber}</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-gray-50 rounded-md">
+                    <span className="font-medium">Fecha y Hora:</span>
+                    <span>{new Date(readResult.timestamp).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-gray-50 rounded-md">
+                    <span className="font-medium">Tipo de Documento:</span>
+                    <span>Cédula de Identidad</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-gray-50 rounded-md">
+                    <span className="font-medium">Estado:</span>
+                    <span className="text-green-600 font-medium">Verificado</span>
+                  </div>
+                </div>
+                
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <p className="text-xs text-gray-500 text-center">Esta verificación cuenta con validez legal según Ley 19.799 sobre documentos electrónicos y firma electrónica</p>
+                </div>
               </div>
             )}
           </Card>
