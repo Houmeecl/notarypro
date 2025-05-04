@@ -86,7 +86,13 @@ posManagementRouter.post('/devices', hasAuthorizedRole, async (req: Request, res
       return res.status(400).json({ error: 'El código de dispositivo ya existe' });
     }
     
-    const [newDevice] = await db.insert(posDevices).values(validatedData).returning();
+    // Agregar el ID del usuario que registra el dispositivo
+    const dataToInsert = {
+      ...validatedData,
+      createdBy: req.user?.id
+    };
+    
+    const [newDevice] = await db.insert(posDevices).values(dataToInsert).returning();
     res.status(201).json(newDevice);
   } catch (error) {
     if (error instanceof ZodError) {
@@ -117,7 +123,8 @@ posManagementRouter.put('/devices/:deviceCode', hasAuthorizedRole, async (req: R
       .set({
         ...validatedData,
         // No permitir modificar el código de dispositivo
-        deviceCode: existingDevice.deviceCode
+        deviceCode: existingDevice.deviceCode,
+        updatedAt: new Date()
       })
       .where(eq(posDevices.deviceCode, deviceCode))
       .returning();
@@ -197,9 +204,11 @@ posManagementRouter.post('/sessions/open', isAuthenticated, async (req: Request,
     // Crear nueva sesión
     const [newSession] = await db.insert(posSessions)
       .values({
-        deviceCode,
+        deviceId: device.id,
+        deviceCode: deviceCode,
         sessionCode,
-        openingUserId: req.user.id,
+        userId: req.user?.id,
+        openingUserId: req.user?.id,
         initialAmount: initialAmount.toString(),
         notes,
         status: 'open'
@@ -209,7 +218,7 @@ posManagementRouter.post('/sessions/open', isAuthenticated, async (req: Request,
     // Actualizar última actividad del dispositivo
     await db.update(posDevices)
       .set({ lastActive: new Date() })
-      .where(eq(posDevices.deviceCode, deviceCode));
+      .where(eq(posDevices.id, device.id));
     
     res.status(201).json(newSession);
   } catch (error) {
@@ -245,23 +254,24 @@ posManagementRouter.post('/sessions/close', isAuthenticated, async (req: Request
     }
     
     // Obtener totales de ventas
-    const [salesStats] = await db.select({
-      totalTransactions: db.fn.count(),
-      totalSales: db.sql`SUM(${posSales.amount})`
-    })
-    .from(posSales)
-    .where(eq(posSales.sessionId, sessionId));
+    const salesCountResult = await db.execute(
+      sql`SELECT COUNT(*) as total_transactions, COALESCE(SUM(amount), 0) as total_sales
+          FROM pos_sales
+          WHERE session_id = ${sessionId}`
+    );
+    const salesStats = salesCountResult.rows[0];
     
     // Cerrar sesión
     const [closedSession] = await db.update(posSessions)
       .set({
-        closingUserId: req.user.id,
+        closingUserId: req.user?.id,
         closingTime: new Date(),
         finalAmount: finalAmount.toString(),
-        totalTransactions: salesStats.totalTransactions || 0,
-        totalSales: salesStats.totalSales?.toString() || '0',
+        totalSales: salesStats.total_sales || '0',
+        transactionCount: parseInt(salesStats.total_transactions) || 0,
+        notes: notes || session.notes,
         status: 'closed',
-        notes: notes || session.notes
+        updatedAt: new Date()
       })
       .where(eq(posSessions.id, sessionId))
       .returning();
@@ -283,22 +293,14 @@ posManagementRouter.post('/sessions/close', isAuthenticated, async (req: Request
 posManagementRouter.post('/sales', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const validatedData = insertPosSaleSchema.parse(req.body);
-    const { deviceCode, sessionId } = validatedData;
     
-    // Verificar si el dispositivo existe
-    const [device] = await db.select().from(posDevices).where(eq(posDevices.deviceCode, deviceCode));
-    
-    if (!device) {
-      return res.status(404).json({ error: 'Dispositivo no encontrado' });
-    }
-    
-    // Si se proporciona un ID de sesión, verificar que exista y esté abierta
-    if (sessionId) {
+    // Verificar si la sesión existe y está abierta
+    if (validatedData.sessionId) {
       const [session] = await db.select()
         .from(posSessions)
         .where(
           and(
-            eq(posSessions.id, sessionId),
+            eq(posSessions.id, validatedData.sessionId),
             eq(posSessions.status, 'open')
           )
         );
@@ -306,10 +308,23 @@ posManagementRouter.post('/sales', isAuthenticated, async (req: Request, res: Re
       if (!session) {
         return res.status(400).json({ error: 'Sesión no encontrada o cerrada' });
       }
+      
+      // Verificar si el dispositivo existe
+      const [device] = await db.select().from(posDevices).where(eq(posDevices.id, validatedData.deviceId));
+      
+      if (!device) {
+        return res.status(404).json({ error: 'Dispositivo no encontrado' });
+      }
     }
     
+    // Registrar la venta con el usuario actual
+    const saleData = {
+      ...validatedData,
+      userId: req.user?.id
+    };
+    
     // Registrar la venta
-    const [newSale] = await db.insert(posSales).values(validatedData).returning();
+    const [newSale] = await db.insert(posSales).values(saleData).returning();
     
     res.status(201).json(newSale);
   } catch (error) {
@@ -329,10 +344,17 @@ posManagementRouter.get('/devices/:deviceCode/sessions', isAuthenticated, async 
   try {
     const { deviceCode } = req.params;
     
+    // Obtener dispositivo primero para obtener su ID
+    const [device] = await db.select().from(posDevices).where(eq(posDevices.deviceCode, deviceCode));
+    
+    if (!device) {
+      return res.status(404).json({ error: 'Dispositivo no encontrado' });
+    }
+    
     // Obtener todas las sesiones del dispositivo, ordenadas por fecha
     const sessions = await db.select()
       .from(posSessions)
-      .where(eq(posSessions.deviceCode, deviceCode))
+      .where(eq(posSessions.deviceId, device.id))
       .orderBy(desc(posSessions.openingTime));
     
     res.json(sessions);
@@ -371,33 +393,41 @@ posManagementRouter.get('/devices/:deviceCode/stats', hasAuthorizedRole, async (
   try {
     const { deviceCode } = req.params;
     
+    // Obtener dispositivo primero para obtener su ID
+    const [device] = await db.select().from(posDevices).where(eq(posDevices.deviceCode, deviceCode));
+    
+    if (!device) {
+      return res.status(404).json({ error: 'Dispositivo no encontrado' });
+    }
+    
     // Obtener estadísticas de sesiones
-    const [sessionStats] = await db.select({
-      totalSessions: db.fn.count(),
-      lastSession: db.sql`MAX(${posSessions.openingTime})`
-    })
-    .from(posSessions)
-    .where(eq(posSessions.deviceCode, deviceCode));
+    const sessionCountResult = await db.execute(
+      sql`SELECT COUNT(*) as total_sessions, MAX(opening_time) as last_session
+          FROM pos_sessions 
+          WHERE device_id = ${device.id}`
+    );
+    const sessionStats = sessionCountResult.rows[0];
     
     // Obtener estadísticas de ventas
-    const [salesStats] = await db.select({
-      totalSales: db.fn.count(),
-      totalAmount: db.sql`SUM(${posSales.amount})`,
-      totalCommission: db.sql`SUM(${posSales.commission})`
-    })
-    .from(posSales)
-    .where(eq(posSales.deviceCode, deviceCode));
+    const salesStatsResult = await db.execute(
+      sql`SELECT COUNT(*) as total_sales, 
+             COALESCE(SUM(amount), 0) as total_amount,
+             COALESCE(SUM(commission), 0) as total_commission
+          FROM pos_sales 
+          WHERE device_id = ${device.id}`
+    );
+    const salesStats = salesStatsResult.rows[0];
     
     res.json({
       deviceCode,
       sessions: {
-        total: sessionStats.totalSessions || 0,
-        lastActive: sessionStats.lastSession || null
+        total: parseInt(sessionStats.total_sessions) || 0,
+        lastActive: sessionStats.last_session || null
       },
       sales: {
-        total: salesStats.totalSales || 0,
-        amount: salesStats.totalAmount || 0,
-        commission: salesStats.totalCommission || 0
+        total: parseInt(salesStats.total_sales) || 0,
+        amount: parseFloat(salesStats.total_amount) || 0,
+        commission: parseFloat(salesStats.total_commission) || 0
       }
     });
   } catch (error) {

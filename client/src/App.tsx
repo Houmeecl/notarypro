@@ -758,6 +758,46 @@ function Router() {
       {/* Documento Ejemplo */}
       <Route path="/documento-ejemplo" component={DocumentoEjemplo} />
 
+      {/* Sistema de Gestión de Dispositivos POS */}
+      <ProtectedRoute 
+        path="/pos-menu" 
+        component={() => {
+          const POSMenuPage = React.lazy(() => import("@/pages/pos-menu"));
+          return (
+            <Suspense fallback={<LazyLoadingFallback />}>
+              <POSMenuPage />
+            </Suspense>
+          );
+        }} 
+        allowedRoles={["user", "certifier", "admin", "manager", "partner"]} 
+      />
+      
+      <ProtectedRoute 
+        path="/pos-session/:deviceCode" 
+        component={() => {
+          const POSSessionPage = React.lazy(() => import("@/pages/pos-session"));
+          return (
+            <Suspense fallback={<LazyLoadingFallback />}>
+              <POSSessionPage />
+            </Suspense>
+          );
+        }} 
+        allowedRoles={["user", "certifier", "admin", "manager", "partner"]} 
+      />
+      
+      <ProtectedRoute 
+        path="/register-pos-device" 
+        component={() => {
+          const RegisterPOSDevicePage = React.lazy(() => import("@/pages/register-pos-device"));
+          return (
+            <Suspense fallback={<LazyLoadingFallback />}>
+              <RegisterPOSDevicePage />
+            </Suspense>
+          );
+        }} 
+        allowedRoles={["admin", "manager"]} 
+      />
+
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
