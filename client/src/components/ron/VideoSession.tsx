@@ -333,57 +333,115 @@ const VideoSession: React.FC<VideoSessionProps> = ({
   
   // Iniciar proceso de verificación de identidad
   const startVerification = () => {
-    setShowVerificationDialog(true);
-    setVerificationStep(1);
+    try {
+      setShowVerificationDialog(true);
+      setVerificationStep(1);
+      console.log("Diálogo de verificación abierto");
+    } catch (error) {
+      console.error("Error al iniciar verificación:", error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo iniciar el proceso de verificación.',
+        variant: 'destructive'
+      });
+    }
   };
   
   // Avanzar en el proceso de verificación
   const advanceVerification = () => {
-    if (verificationStep < 3) {
-      setVerificationStep(prev => prev + 1);
-    } else {
-      completeVerification();
+    try {
+      if (verificationStep < 3) {
+        setVerificationStep(prev => prev + 1);
+        console.log("Avanzando a paso:", verificationStep + 1);
+      } else {
+        completeVerification();
+      }
+    } catch (error) {
+      console.error("Error al avanzar verificación:", error);
+      toast({
+        title: 'Error',
+        description: 'Ocurrió un problema al avanzar en la verificación.',
+        variant: 'destructive'
+      });
     }
   };
   
   // Completar la verificación
   const completeVerification = () => {
-    setIdentityVerified(true);
-    setShowVerificationDialog(false);
-    
-    // Actualizar el estado del participante remoto
-    setParticipants(prev => 
-      prev.map(p => 
-        p.id === 'remote-1' ? {...p, isVerified: true} : p
-      )
-    );
-    
-    addSystemMessage('Identidad verificada correctamente.');
-    
-    toast({
-      title: 'Verificación completada',
-      description: 'La identidad ha sido verificada correctamente.',
-      variant: 'default'
-    });
+    try {
+      setIdentityVerified(true);
+      setShowVerificationDialog(false);
+      
+      // Actualizar el estado del participante remoto
+      setParticipants(prev => 
+        prev.map(p => 
+          p.id === 'remote-1' ? {...p, isVerified: true} : p
+        )
+      );
+      
+      addSystemMessage('Identidad verificada correctamente.');
+      
+      toast({
+        title: 'Verificación completada',
+        description: 'La identidad ha sido verificada correctamente.',
+        variant: 'default'
+      });
+      
+      console.log("Verificación completada con éxito");
+    } catch (error) {
+      console.error("Error al completar verificación:", error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo completar la verificación.',
+        variant: 'destructive'
+      });
+    }
   };
   
   // Manejar subida de documentos
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setSelectedFile(e.target.files[0]);
+    try {
+      if (e.target.files && e.target.files.length > 0) {
+        setSelectedFile(e.target.files[0]);
+        console.log("Archivo seleccionado:", e.target.files[0].name);
+      }
+    } catch (error) {
+      console.error("Error al seleccionar archivo:", error);
+      toast({
+        title: 'Error al seleccionar archivo',
+        description: 'No se pudo cargar el archivo seleccionado.',
+        variant: 'destructive'
+      });
     }
   };
   
   // Compartir documento
   const shareDocument = () => {
-    if (selectedFile) {
-      addSystemMessage(`Documento compartido: ${selectedFile.name}`);
-      setShowShareDocumentDialog(false);
-      setSelectedFile(null);
-      
+    try {
+      if (selectedFile) {
+        addSystemMessage(`Documento compartido: ${selectedFile.name}`);
+        setShowShareDocumentDialog(false);
+        setSelectedFile(null);
+        
+        toast({
+          title: 'Documento compartido',
+          description: 'El documento ha sido compartido con todos los participantes.',
+        });
+        
+        console.log("Documento compartido exitosamente");
+      } else {
+        toast({
+          title: 'Seleccione un archivo',
+          description: 'Debe seleccionar un archivo para compartir.',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      console.error("Error al compartir documento:", error);
       toast({
-        title: 'Documento compartido',
-        description: 'El documento ha sido compartido con todos los participantes.',
+        title: 'Error al compartir',
+        description: 'No se pudo compartir el documento.',
+        variant: 'destructive'
       });
     }
   };
