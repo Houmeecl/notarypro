@@ -10,7 +10,8 @@ import {
   CreditCard,
   HelpCircle,
   Info,
-  Video
+  Video,
+  Mail
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -99,10 +100,19 @@ export default function MainNavbar() {
           </Link>
           <Link href="/contacto">
             <a className="px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-100 flex items-center">
-              <HelpCircle className="h-4 w-4 mr-2" />
+              <Mail className="h-4 w-4 mr-2" />
               Contacto
             </a>
           </Link>
+          <a 
+            href="/documentacion-tecnica.html" 
+            className="px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-100 flex items-center"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            Documentación
+          </a>
         </nav>
 
         {/* Perfil de usuario para escritorio */}
@@ -112,9 +122,9 @@ export default function MainNavbar() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 h-9 w-9 rounded-full p-0">
                   <Avatar className="h-9 w-9">
-                    <AvatarImage src={user.avatarUrl || undefined} alt={user.username} />
+                    <AvatarImage src={user?.avatarUrl || undefined} alt={user?.username || ""} />
                     <AvatarFallback>
-                      {user.username?.substring(0, 2).toUpperCase() || "CD"}
+                      {user?.username?.substring(0, 2).toUpperCase() || "CD"}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -175,14 +185,14 @@ export default function MainNavbar() {
                   <>
                     <div className="flex items-center gap-2">
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src={user.avatarUrl || undefined} alt={user.username} />
+                        <AvatarImage src={user?.avatarUrl || undefined} alt={user?.username || ""} />
                         <AvatarFallback>
-                          {user.username?.substring(0, 2).toUpperCase() || "CD"}
+                          {user?.username?.substring(0, 2).toUpperCase() || "CD"}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="text-sm font-medium">{user.username}</p>
-                        <p className="text-xs text-muted-foreground">{user.role}</p>
+                        <p className="text-sm font-medium">{user?.username}</p>
+                        <p className="text-xs text-muted-foreground">{user?.role}</p>
                       </div>
                     </div>
                     <Separator />
@@ -225,6 +235,17 @@ export default function MainNavbar() {
                     <span>Contacto</span>
                   </a>
                 </Link>
+                
+                <a 
+                  href="/documentacion-tecnica.html"
+                  className="flex items-center gap-2 py-2"
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <FileText className="h-4 w-4" />
+                  <span>Documentación</span>
+                </a>
                 
                 <Separator />
                 
