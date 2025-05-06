@@ -291,7 +291,7 @@ export default function EtokenDiagnostico() {
                       <p className="text-xs text-gray-600">Descargue los controladores oficiales para su dispositivo eToken</p>
                     </div>
                     <a 
-                      href="https://supportportal.thalesgroup.com/csm?id=kb_article_view&sys_kb_id=3892fb0ddb9324503dbb03c1ca961987" 
+                      href="https://thalesdocs.com/sas/latest/extern/agents/007-000706-001_SafeNet_Agent_for_TokenValidator_Proxy_3.0.1_Install_Config_Guide_RevB.pdf" 
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors inline-flex items-center"
