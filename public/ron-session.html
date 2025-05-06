@@ -503,7 +503,6 @@
     let sessionData = null;
     let appId = ""; // Se cargará desde la API
     let agoraToken = ""; // Se cargará desde la API
-    let QA_MODE = false; // Modo de producción con verificaciones legales habilitadas
     
     // Función real para solicitar acceso a cámara/micrófono (Ley 19.799)
     async function requestCameraAndMicrophone() {
@@ -721,11 +720,7 @@
     async function initializeCamera() {
       if (localTracks.length < 2) {
         try {
-          if (QA_MODE) {
-            console.log("Iniciando cámara en MODO QA (compatible con Ley 19.799)");
-          } else {
-            console.log("Iniciando cámara en MODO PRODUCCIÓN para verificación legal");
-          }
+          console.log("Iniciando cámara para verificación legal");
           
           // Primero verificamos soporte del navegador para WebRTC
           if (!AgoraRTC.checkSystemRequirements()) {
@@ -788,15 +783,6 @@
           return true;
         } catch (error) {
           console.error("Error al inicializar dispositivos multimedia:", error);
-          
-          // En modo QA, mostrar botón de verificación forzada
-          if (QA_MODE) {
-            console.log("Ejecutando en modo QA - Mostrando opciones alternativas...");
-            
-            // No lanzamos el error en modo QA
-            return false;
-          }
-          
           throw new Error("Para cumplir con los requisitos de verificación de la Ley 19.799, debe permitir acceso a su cámara y micrófono");
         }
       }
@@ -942,42 +928,19 @@
         console.error("Error al capturar imagen:", error);
         updateVerificationModalStatus("error", "Error: " + error.message);
         
-        // No permitimos modo forzado en producción para cumplir con la ley
-        const isTestEnvironment = window.location.hostname.includes('replit.dev') || 
-                                  window.location.search.includes('qa=true') || 
-                                  window.location.search.includes('dev=true');
-        
-        if (isTestEnvironment) {
-          // Solo en entorno de pruebas mostramos el botón de modo forzado
-          const modalContent = document.getElementById('verificationModalContent');
-          if (modalContent) {
-            const qaButton = document.createElement('div');
-            qaButton.innerHTML = `
-              <div class="qa-mode-option" style="margin-top: 20px; padding: 10px; background: #333; border-radius: 5px;">
-                <h4 style="margin:0;padding:0;">MODO PRODUCCIÓN FORZADO (SOLO QA) ✓</h4>
-                <p style="margin:0;padding:0;font-size:0.9em;">Sistema de verificación en modo pruebas (no compatible con Ley 19.799)</p>
-                <p style="margin:5px 0;padding:0;font-size:0.8em;color:#ff9500;">¡Atención! Esta opción solo está disponible en entorno de pruebas.</p>
-                <button id="forcedModeBtn" class="btn-action" style="margin-top:10px;background:var(--warning);">
-                  Omitir verificación legal (solo QA)
-                </button>
-              </div>
-            `;
-            
-            modalContent.appendChild(qaButton);
-            
-            document.getElementById('forcedModeBtn').addEventListener('click', () => {
-              // Advertir sobre incumplimiento legal
-              alert("ATENCIÓN: Se está omitiendo la verificación legal requerida por la Ley 19.799. Esta opción solo debe usarse en entorno de pruebas.");
-              
-              document.getElementById("captureIDBtn").style.backgroundColor = "var(--warning)";
-              updateVerificationModalStatus("warning", "Verificación omitida (modo QA) - No cumple requisitos legales");
-              
-              // Cerrar modal después de un tiempo
-              setTimeout(() => {
-                closeVerificationModal();
-              }, 3000);
-            });
-          }
+        // En flujo normal simplemente mostramos el error
+        const modalContent = document.getElementById('verificationModalContent');
+        if (modalContent) {
+          const errorMessage = document.createElement('div');
+          errorMessage.innerHTML = `
+            <div style="margin-top: 15px; padding: 15px; background-color: #f8d7da; border-radius: 5px; border-left: 4px solid #dc3545;">
+              <h4 style="margin-top:0; color: #721c24;">Error de verificación</h4>
+              <p>No se pudo completar la verificación de identidad requerida por la Ley 19.799.</p>
+              <p>Por favor, asegúrese de permitir el acceso a su cámara e intente nuevamente.</p>
+            </div>
+          `;
+          
+          modalContent.appendChild(errorMessage);
         }
       }
     }
