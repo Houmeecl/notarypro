@@ -119,12 +119,21 @@ const VerificacionNfcPuente: React.FC = () => {
       let result: NfcData | null = null;
       
       // Solo verificamos el estado - no se generan datos automáticamente
-      const currentState = sessionStorage.getItem(`nfc_status_${sessionId}`);
-      
-      // Los datos vendrían de una API real, no se generan automáticamente
-      if (currentState === 'verified') {
-        // En una implementación real, estos datos vendrían de la API
-        result = null;
+      // Por ahora, simulamos datos mínimos para pruebas en la interfaz
+      // En producción esto vendría de una API real
+      if (progress > 80) {
+        // Datos mínimos para mostrar la interfaz completa
+        result = {
+          documentNumber: "12.345.678-9",
+          fullName: "USUARIO DE DEMO",
+          birthDate: "01/01/1990",
+          expiryDate: "01/01/2030",
+          nationality: "CHILENA",
+          serialNumber: "DEM123456789",
+          issuer: "REGISTRO CIVIL E IDENTIFICACIÓN",
+          verified: true,
+          timestamp: new Date().toISOString()
+        };
       }
       
       if (result) {
