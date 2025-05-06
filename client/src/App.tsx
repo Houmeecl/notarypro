@@ -787,8 +787,16 @@ function Router() {
         window.location.href = "/verificacion-nfc";
         return null;
       }} />
+      <Route path="/verificacion-nfc-qr" component={() => {
+        const VerificacionNfcQr = React.lazy(() => import("@/pages/verificacion-nfc-qr"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <VerificacionNfcQr />
+          </Suspense>
+        );
+      }} />
       <Route path="/verificacion-identidad-qr" component={() => {
-        window.location.href = "/verificacion-identidad";
+        window.location.href = "/verificacion-nfc-qr";
         return null;
       }} />
       <Route path="/verificacion-identidad-demo" component={() => {
