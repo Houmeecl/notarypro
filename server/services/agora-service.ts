@@ -1,160 +1,137 @@
 /**
- * Servicio de Videollamadas con Agora para RON
+ * Servicio para gestionar la integración con Agora.io
  * 
- * Implementa la integración con Agora.io para videollamadas en tiempo real
- * dentro del sistema de certificación remota (RON)
+ * Este servicio proporciona funciones para generar tokens de acceso
+ * y gestionar las sesiones de videollamada para el sistema RON.
  */
 
-import { createHmac } from 'crypto';
-// Importar correctamente desde agora-access-token con sintaxis ESM
+// ESM import para entorno moderno
 import AgoraAccessToken from 'agora-access-token';
-
-// Extraer los objetos necesarios
+// Es necesario acceder a las propiedades de esta manera
+// debido a la forma en que el paquete está estructurado
 const RtcTokenBuilder = AgoraAccessToken.RtcTokenBuilder;
-const Role = AgoraAccessToken.Role;
+const RtcRole = AgoraAccessToken.RtcRole;
 
-export interface VideoSessionParams {
+// Configuración de Agora desde variables de entorno
+const appId = process.env.AGORA_APP_ID as string;
+const appCertificate = process.env.AGORA_APP_CERTIFICATE as string;
+
+if (!appId || !appCertificate) {
+  console.error('Error: Se requieren las variables AGORA_APP_ID y AGORA_APP_CERTIFICATE');
+}
+
+// Interfaz para generar token
+interface TokenOptions {
   sessionId: string;
-  userId: string | number;
-  userRole: 'host' | 'audience'; // host = certifier, audience = client
-  expirationTimeInSeconds?: number;
+  userId?: string | number;
+  userRole?: string;
   channelName?: string;
 }
 
-export interface VideoSessionToken {
-  appId: string;
-  channelName: string;
-  token: string;
-  uid: string | number;
-  role: string;
-  privilegeExpiredTs: number;
-}
-
-export interface ScreenshotResult {
-  success: boolean;
-  imageUrl?: string;
-  imageBuffer?: Buffer;
-  timestamp?: Date;
-  error?: string;
-}
-
-class AgoraService {
-  private appId: string;
-  private appCertificate: string;
-  
-  constructor() {
-    this.appId = process.env.AGORA_APP_ID || '';
-    this.appCertificate = process.env.AGORA_APP_CERTIFICATE || '';
-    
-    if (!this.appId || !this.appCertificate) {
-      console.warn('AGORA_APP_ID or AGORA_APP_CERTIFICATE not set. Video calling functionality will not work properly.');
-    }
+/**
+ * Convierte un código RON a un nombre de canal de Agora
+ * Ejemplo: RON-2025-001 => ron-session-2025-001
+ * 
+ * @param ronCode Código RON
+ * @returns Nombre de canal para Agora
+ */
+function ronCodeToChannelName(ronCode: string): string {
+  if (!ronCode.startsWith('RON-')) {
+    throw new Error('El código RON debe comenzar con "RON-"');
   }
   
-  /**
-   * Verifica si el servicio está configurado correctamente
-   */
-  isConfigured(): boolean {
-    return Boolean(this.appId && this.appCertificate);
-  }
+  return ronCode.replace('RON-', 'ron-session-');
+}
+
+// Objeto de servicio exportado
+export const agoraService = {
+  isConfigured: () => !!appId && !!appCertificate,
   
-  /**
-   * Genera un token para unirse a una sesión de video
-   */
-  generateToken(params: VideoSessionParams): VideoSessionToken | null {
-    if (!this.isConfigured()) {
-      console.error('Agora service not properly configured');
-      return null;
-    }
-    
+  generateToken: (options: TokenOptions) => {
     try {
-      const channelName = params.channelName || `ron-session-${params.sessionId}`;
-      const uid = params.userId;
-      const role = params.userRole === 'host' ? Role.PUBLISHER : Role.SUBSCRIBER;
+      const channelName = options.channelName || ronCodeToChannelName(options.sessionId);
+      const uid = options.userId ? Number(options.userId) : 0;
       
-      // El token expirará en 3 horas por defecto
-      const expirationTimeInSeconds = params.expirationTimeInSeconds || 60 * 60 * 3;
+      // Default a ROL_PUBLISHER si es host o publisher
+      const userRole = (options.userRole === 'host' || options.userRole === 'publisher') 
+        ? RtcRole.PUBLISHER 
+        : RtcRole.SUBSCRIBER;
+      
+      // Tiempo de expiración (1 hora)
+      const expirationTimeInSeconds = 3600;
       const currentTimestamp = Math.floor(Date.now() / 1000);
-      const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+      const expirationTimestamp = currentTimestamp + expirationTimeInSeconds;
       
-      // Generar token
-      const token = RtcTokenBuilder.buildTokenWithUid(
-        this.appId,
-        this.appCertificate,
+      // Generar token con RtcTokenBuilder
+      return RtcTokenBuilder.buildTokenWithUid(
+        appId,
+        appCertificate,
         channelName,
         uid,
-        role,
-        privilegeExpiredTs
+        userRole,
+        expirationTimestamp
       );
+    } catch (error) {
+      console.error('Error al generar token de Agora:', error);
+      return '';
+    }
+  },
+  
+  // Generar tokens para una sesión RON
+  generateVideoTokens: (ronSessionId: string) => {
+    try {
+      const channelName = ronCodeToChannelName(ronSessionId);
       
       return {
-        appId: this.appId,
         channelName,
-        token,
-        uid,
-        role: params.userRole,
-        privilegeExpiredTs
+        token: agoraService.generateToken({
+          sessionId: ronSessionId,
+          channelName,
+          userRole: 'publisher'
+        }),
+        uid: 0,
+        appId
       };
     } catch (error) {
-      console.error('Failed to generate Agora token:', error);
-      return null;
+      console.error('Error al generar tokens para sesión RON:', error);
+      return {
+        channelName: '',
+        token: '',
+        uid: 0,
+        appId: ''
+      };
     }
-  }
+  },
   
-  /**
-   * Crea una sesión de videollamada para RON
-   */
-  createVideoSession(sessionId: string, certifierId: string | number, clientId: string | number): {
-    certifierToken: VideoSessionToken | null;
-    clientToken: VideoSessionToken | null;
-    channelName: string;
-  } {
-    const channelName = `ron-session-${sessionId}`;
-    
-    // Generar token para el certificador (host)
-    const certifierToken = this.generateToken({
-      sessionId,
-      userId: certifierId,
-      userRole: 'host',
-      channelName
-    });
-    
-    // Generar token para el cliente
-    const clientToken = this.generateToken({
-      sessionId,
-      userId: clientId,
-      userRole: 'audience',
-      channelName
-    });
+  // Obtener configuración para cliente
+  getClientConfig: (ronSessionId: string) => {
+    const channelName = ronCodeToChannelName(ronSessionId);
     
     return {
-      certifierToken,
-      clientToken,
-      channelName
+      appId,
+      channelName,
+      token: agoraService.generateToken({
+        sessionId: ronSessionId,
+        channelName,
+        userRole: 'publisher'
+      }),
+      uid: null
+    };
+  },
+  
+  // Obtener configuración para certificador
+  getCertifierConfig: (ronSessionId: string) => {
+    const channelName = ronCodeToChannelName(ronSessionId);
+    
+    return {
+      appId,
+      channelName,
+      token: agoraService.generateToken({
+        sessionId: ronSessionId,
+        channelName,
+        userRole: 'publisher'
+      }),
+      uid: null
     };
   }
-  
-  /**
-   * Revoca los tokens de una sesión de video
-   */
-  revokeSessionTokens(sessionId: string): boolean {
-    // En la implementación actual de Agora, no hay una API directa para revocar tokens
-    // La estrategia es generar nuevos tokens con tiempo de expiración inmediato
-    // o simplemente dejar que los tokens existentes expiren
-    
-    console.log(`Session ${sessionId} tokens will expire naturally.`);
-    return true;
-  }
-  
-  /**
-   * Registra evento de sesión de video
-   */
-  logVideoEvent(sessionId: string, event: string, metadata?: Record<string, any>): void {
-    console.log(`Video session ${sessionId} event: ${event}`, metadata || '');
-    
-    // Aquí se implementaría la lógica para registrar eventos en base de datos
-    // Util para auditoría y seguimiento
-  }
-}
-
-export const agoraService = new AgoraService();
+};
