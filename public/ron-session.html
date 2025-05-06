@@ -373,6 +373,24 @@
             </dl>
           </div>
 
+          <div class="document-management" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+            <h3 style="margin-bottom: 15px; text-align: center;">Gestión de Documentos</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+              <button id="viewDocumentBtn" class="btn-action" style="flex: 1;" onclick="viewDocument()">
+                Ver Documento
+              </button>
+              <button id="createDocumentBtn" class="btn-action" style="flex: 1;" onclick="createDocument()">
+                Crear Documento
+              </button>
+            </div>
+            <!-- Previsualización de documento cargado o creado -->
+            <div id="documentPreview" style="display: none; margin-bottom: 15px; max-height: 200px; overflow: auto; border: 1px solid #ddd; padding: 10px; border-radius: 4px;">
+              <div id="previewContent">
+                <!-- Contenido del documento se mostrará aquí -->
+              </div>
+            </div>
+          </div>
+          
           <div class="signature-options" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
             <h3 style="margin-bottom: 15px; text-align: center;">Opciones de Firma</h3>
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
@@ -443,95 +461,267 @@
     let appId = ""; // Se cargará desde la API
     let agoraToken = ""; // Se cargará desde la API
     
-    // Funciones para verificación de identidad y firma
-    function captureID() {
+    // Funciones para verificación de identidad y firma - SISTEMA REAL
+    async function captureID() {
       if (!isConnected || localTracks.length < 2) {
         alert("La cámara no está activa");
         return;
       }
       
       try {
-        // Tomar una captura de la cámara
+        // Tomar una captura de la cámara para documento de identidad
         const videoTrack = localTracks[1];
+        const frameCapture = videoTrack.getCurrentFrameData();
+        if (!frameCapture) {
+          throw new Error("No se pudo capturar imagen de la cámara");
+        }
         
-        // En una implementación real, esta imagen se enviaría al servidor
-        alert("Captura de documento de identidad realizada correctamente");
+        // Crear un canvas para procesar la imagen
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const videoEl = document.querySelector('#local-player video');
         
-        // Actualizar UI
-        document.getElementById("captureIDBtn").style.backgroundColor = "var(--success)";
+        if (!videoEl) {
+          throw new Error("No se encontró el elemento de video");
+        }
+        
+        // Configurar tamaño del canvas
+        canvas.width = videoEl.videoWidth;
+        canvas.height = videoEl.videoHeight;
+        
+        // Dibujar el frame actual en el canvas
+        ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+        
+        // Convertir canvas a imagen base64
+        const imageData = canvas.toDataURL('image/jpeg', 0.9);
+        
+        // Enviar imagen al servidor
+        const response = await fetch(`/api/ron/session/${sessionData.sessionId}/capture-id`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+            image: imageData,
+            captureType: 'id-document'
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error("Error al enviar imagen al servidor");
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          // Actualizar UI
+          document.getElementById("captureIDBtn").style.backgroundColor = "var(--success)";
+          alert("Captura de documento de identidad realizada correctamente");
+        } else {
+          throw new Error(result.message || "Error al procesar la imagen");
+        }
         
       } catch (error) {
         console.error("Error al capturar imagen:", error);
-        alert("Error al capturar imagen. Por favor intente nuevamente.");
+        alert("Error al capturar imagen: " + error.message);
       }
     }
     
-    function verifyIdentity() {
+    async function verifyIdentity() {
       if (!isConnected) {
         alert("Debe estar conectado a la sesión para verificar su identidad");
         return;
       }
       
-      // En una implementación real, esto enviaría los datos al servidor
-      alert("Verificación de identidad iniciada. El certificador revisará sus documentos.");
-      
-      // Actualizar UI
-      document.getElementById("verifyIdentityBtn").disabled = true;
-      document.getElementById("verifyIdentityBtn").textContent = "Verificación en proceso...";
-      
-      // Simular verificación exitosa después de un tiempo
-      setTimeout(() => {
-        updateUI("identityVerified");
-        document.getElementById("verifyIdentityBtn").textContent = "Identidad Verificada ✓";
-        document.getElementById("verifyIdentityBtn").style.backgroundColor = "var(--success)";
-      }, 3000);
+      try {
+        // Actualizar UI
+        document.getElementById("verifyIdentityBtn").disabled = true;
+        document.getElementById("verifyIdentityBtn").textContent = "Verificación en proceso...";
+        
+        // Capturar imagen de rostro para verificación
+        const videoTrack = localTracks[1];
+        const videoEl = document.querySelector('#local-player video');
+        
+        if (!videoEl) {
+          throw new Error("No se encontró el elemento de video");
+        }
+        
+        // Crear un canvas para procesar la imagen
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Configurar tamaño del canvas
+        canvas.width = videoEl.videoWidth;
+        canvas.height = videoEl.videoHeight;
+        
+        // Dibujar el frame actual en el canvas
+        ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+        
+        // Convertir canvas a imagen base64
+        const imageData = canvas.toDataURL('image/jpeg', 0.9);
+        
+        // Enviar solicitud de verificación al servidor
+        const response = await fetch(`/api/ron/session/${sessionData.sessionId}/verify-identity`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+            image: imageData,
+            verificationMethod: 'video-session'
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error("Error al verificar identidad");
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          // Actualizar UI
+          updateUI("identityVerified");
+          document.getElementById("verifyIdentityBtn").textContent = "Identidad Verificada ✓";
+          document.getElementById("verifyIdentityBtn").style.backgroundColor = "var(--success)";
+        } else {
+          throw new Error(result.message || "Error en la verificación de identidad");
+        }
+        
+      } catch (error) {
+        console.error("Error al verificar identidad:", error);
+        alert("Error al verificar identidad: " + error.message);
+        
+        // Restaurar botón
+        document.getElementById("verifyIdentityBtn").disabled = false;
+        document.getElementById("verifyIdentityBtn").textContent = "Verificar Identidad";
+      }
     }
     
-    function initiateSimpleSign() {
+    async function initiateSimpleSign() {
       if (!isConnected) {
         alert("Debe estar conectado a la sesión para iniciar la firma");
         return;
       }
       
-      // En una implementación real, esto enviaría la solicitud al servidor
-      alert("Iniciando proceso de firma simple. Recibirá un correo para completar el proceso.");
-      
-      // Actualizar UI
-      document.getElementById("simpleSignBtn").disabled = true;
-      document.getElementById("eTokenSignBtn").disabled = true;
-      document.getElementById("simpleSignBtn").textContent = "Firma simple iniciada...";
-      
-      // Simular inicio de firma
-      setTimeout(() => {
-        updateUI("signingStarted");
-        document.getElementById("simpleSignBtn").textContent = "Firma simple en proceso ✓";
-        document.getElementById("simpleSignBtn").style.backgroundColor = "var(--success)";
-      }, 2000);
-    }
-    
-    function initiateETokenSign() {
-      if (!isConnected) {
-        alert("Debe estar conectado a la sesión para iniciar la firma");
-        return;
-      }
-      
-      // En una implementación real, esto verificaría el eToken y enviaría al servidor
-      alert("Iniciando proceso de firma avanzada con eToken. Conecte su dispositivo de firma electrónica.");
-      
-      // Actualizar UI
-      document.getElementById("eTokenSignBtn").disabled = true;
-      document.getElementById("simpleSignBtn").disabled = true;
-      document.getElementById("eTokenSignBtn").textContent = "Firma eToken iniciada...";
-      
-      // Simular detección de eToken
-      setTimeout(() => {
-        alert("eToken detectado. Proceda a firmar con su clave.");
-        setTimeout(() => {
+      try {
+        // Actualizar UI
+        document.getElementById("simpleSignBtn").disabled = true;
+        document.getElementById("eTokenSignBtn").disabled = true;
+        document.getElementById("simpleSignBtn").textContent = "Firma simple iniciada...";
+        
+        // Enviar solicitud de firma simple al servidor
+        const response = await fetch(`/api/ron/session/${sessionData.sessionId}/initiate-simple-sign`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error("Error al iniciar proceso de firma simple");
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          // Actualizar UI con información de la firma
           updateUI("signingStarted");
-          document.getElementById("eTokenSignBtn").textContent = "Firma eToken en proceso ✓";
-          document.getElementById("eTokenSignBtn").style.backgroundColor = "var(--success)";
-        }, 2000);
-      }, 2000);
+          document.getElementById("simpleSignBtn").textContent = "Firma simple en proceso ✓";
+          document.getElementById("simpleSignBtn").style.backgroundColor = "var(--success)";
+          
+          // Mostrar información adicional
+          alert(`Proceso de firma simple iniciado. ${result.message || "Recibirá un correo para completar el proceso."}`);
+        } else {
+          throw new Error(result.message || "Error al iniciar firma simple");
+        }
+        
+      } catch (error) {
+        console.error("Error al iniciar firma simple:", error);
+        alert("Error al iniciar firma simple: " + error.message);
+        
+        // Restaurar botones
+        document.getElementById("simpleSignBtn").disabled = false;
+        document.getElementById("eTokenSignBtn").disabled = false;
+        document.getElementById("simpleSignBtn").textContent = "Firma Simple";
+      }
+    }
+    
+    async function initiateETokenSign() {
+      if (!isConnected) {
+        alert("Debe estar conectado a la sesión para iniciar la firma");
+        return;
+      }
+      
+      try {
+        // Actualizar UI
+        document.getElementById("eTokenSignBtn").disabled = true;
+        document.getElementById("simpleSignBtn").disabled = true;
+        document.getElementById("eTokenSignBtn").textContent = "Preparando eToken...";
+        
+        // Solicitar información para firma con eToken
+        const response = await fetch(`/api/ron/session/${sessionData.sessionId}/initiate-etoken-sign`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error("Error al iniciar proceso de firma con eToken");
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          // Actualizar UI
+          document.getElementById("eTokenSignBtn").textContent = "Conecte su eToken...";
+          
+          // Mostrar información al usuario
+          alert(`Conecte su dispositivo eToken y siga las instrucciones. ${result.message || ""}`);
+          
+          // Iniciar verificación de eToken (polling o WebUSB)
+          if (result.signUrl) {
+            // Si hay una URL de firma externa, abrir en ventana nueva
+            window.open(result.signUrl, '_blank');
+          }
+          
+          // Consultar estado de la firma
+          let signStatus = "pending";
+          const checkInterval = setInterval(async () => {
+            try {
+              const statusResponse = await fetch(`/api/ron/session/${sessionData.sessionId}/sign-status`);
+              if (statusResponse.ok) {
+                const statusResult = await statusResponse.json();
+                signStatus = statusResult.status;
+                
+                if (signStatus === "completed") {
+                  clearInterval(checkInterval);
+                  updateUI("signingStarted");
+                  document.getElementById("eTokenSignBtn").textContent = "Firma eToken completada ✓";
+                  document.getElementById("eTokenSignBtn").style.backgroundColor = "var(--success)";
+                } else if (signStatus === "failed") {
+                  clearInterval(checkInterval);
+                  throw new Error(statusResult.message || "Error en la firma con eToken");
+                }
+              }
+            } catch (err) {
+              console.error("Error al verificar estado de firma:", err);
+            }
+          }, 5000);
+          
+        } else {
+          throw new Error(result.message || "Error al iniciar firma con eToken");
+        }
+        
+      } catch (error) {
+        console.error("Error al iniciar firma con eToken:", error);
+        alert("Error al iniciar firma con eToken: " + error.message);
+        
+        // Restaurar botones
+        document.getElementById("eTokenSignBtn").disabled = false;
+        document.getElementById("simpleSignBtn").disabled = false;
+        document.getElementById("eTokenSignBtn").textContent = "Firma eToken (Avanzada)";
+      }
     }
     
     // Función para cargar el AppId de Agora
@@ -696,6 +886,127 @@
       };
       
       return statusMap[status] || status;
+    }
+    
+    // Funciones para gestionar documentos (definidas aquí)
+    async function viewDocument() {
+      if (!isConnected) {
+        alert("Debe estar conectado a la sesión para ver documentos");
+        return;
+      }
+      
+      try {
+        // Mostrar indicador de carga
+        document.getElementById("viewDocumentBtn").disabled = true;
+        document.getElementById("viewDocumentBtn").textContent = "Cargando...";
+        
+        // Solicitar documentos disponibles 
+        const response = await fetch(`/api/ron/session/${sessionData.sessionId}/documents`);
+        
+        if (!response.ok) {
+          throw new Error("Error al obtener documentos");
+        }
+        
+        const result = await response.json();
+        
+        if (result.documents && result.documents.length > 0) {
+          // Mostrar el primer documento (o permitir selección si hay varios)
+          const documentId = result.documents[0].id;
+          const documentResponse = await fetch(`/api/ron/document/${documentId}`);
+          
+          if (!documentResponse.ok) {
+            throw new Error("Error al cargar el documento");
+          }
+          
+          const documentData = await documentResponse.json();
+          
+          // Mostrar el documento (sea HTML o PDF)
+          const previewDiv = document.getElementById("documentPreview");
+          const previewContent = document.getElementById("previewContent");
+          
+          if (documentData.contentType === "application/pdf") {
+            // Si es PDF, mostrar previsualización o enlace
+            previewContent.innerHTML = `
+              <div style="text-align: center; padding: 10px;">
+                <p><strong>Documento PDF:</strong> ${documentData.filename || "Documento.pdf"}</p>
+                <a href="/api/ron/document/${documentId}/download" target="_blank" class="btn-action" style="display: inline-block; margin-top: 10px;">Abrir PDF</a>
+              </div>
+            `;
+          } else {
+            // Si es HTML o texto, mostrar contenido
+            previewContent.innerHTML = documentData.content || "No hay contenido disponible";
+          }
+          
+          previewDiv.style.display = "block";
+          
+        } else {
+          alert("No hay documentos disponibles. Por favor, crea un nuevo documento.");
+        }
+        
+      } catch (error) {
+        console.error("Error al cargar documentos:", error);
+        alert("Error: " + error.message);
+      } finally {
+        document.getElementById("viewDocumentBtn").disabled = false;
+        document.getElementById("viewDocumentBtn").textContent = "Ver Documento";
+      }
+    }
+    
+    async function createDocument() {
+      if (!isConnected) {
+        alert("Debe estar conectado a la sesión para crear documentos");
+        return;
+      }
+      
+      try {
+        // Solicitar al servidor la creación de un documento desde plantilla
+        const response = await fetch(`/api/ron/session/${sessionData.sessionId}/create-document`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            templateId: "default", // Puedes tener diferentes plantillas
+            title: "Documento de sesión RON",
+            data: {
+              // Datos para completar la plantilla (se pueden obtener de sessionData)
+              client: sessionData.client || "Cliente",
+              date: new Date().toLocaleDateString("es-CL")
+            }
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error("Error al crear documento");
+        }
+        
+        const result = await response.json();
+        
+        if (result.success && result.documentId) {
+          alert("Documento creado correctamente. Ya puede verlo y firmarlo.");
+          
+          // Mostrar automáticamente el documento creado
+          const documentResponse = await fetch(`/api/ron/document/${result.documentId}`);
+          
+          if (documentResponse.ok) {
+            const documentData = await documentResponse.json();
+            
+            // Mostrar el documento
+            const previewDiv = document.getElementById("documentPreview");
+            const previewContent = document.getElementById("previewContent");
+            
+            previewContent.innerHTML = documentData.content || "Documento creado correctamente";
+            previewDiv.style.display = "block";
+          }
+          
+        } else {
+          throw new Error(result.message || "Error al crear el documento");
+        }
+        
+      } catch (error) {
+        console.error("Error al crear documento:", error);
+        alert("Error: " + error.message);
+      }
     }
     
     // Actualizar UI basado en eventos
