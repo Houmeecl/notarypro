@@ -109,6 +109,11 @@ ronRouter.post('/session/initialize', isAuthenticated, async (req: Request, res:
     });
   }
   
+  // Verificar que el usuario esté autenticado
+  if (!req.user) {
+    return res.status(401).json({ error: 'Usuario no autenticado' });
+  }
+  
   const result = await certificationService.initializeRONSession({
     sessionId,
     documentId,
@@ -129,8 +134,15 @@ ronRouter.post('/session/initialize', isAuthenticated, async (req: Request, res:
 // Ruta para obtener tokens de video para una sesión
 ronRouter.get('/session/:sessionId/video-tokens', isAuthenticated, async (req: Request, res: Response) => {
   const { sessionId } = req.params;
+  
+  // Verificar que el usuario esté autenticado
+  if (!req.user) {
+    return res.status(401).json({ error: 'Usuario no autenticado' });
+  }
+  
   const userId = req.user.id;
-  const userRole = req.user.role === 'certifier' ? 'host' : 'audience';
+  // Si es admin o certificador, se considera host (anfitrión)
+  const userRole = (req.user.role === 'certifier' || req.user.role === 'admin') ? 'host' : 'audience';
   
   const token = agoraService.generateToken({
     sessionId,
@@ -161,6 +173,11 @@ ronRouter.post(
     
     if (!req.file) {
       return res.status(400).json({ error: 'No se proporcionó imagen' });
+    }
+    
+    // Verificar que el usuario esté autenticado
+    if (!req.user) {
+      return res.status(401).json({ error: 'Usuario no autenticado' });
     }
     
     const result = await certificationService.captureIdentityDocument(
@@ -248,6 +265,11 @@ ronRouter.post('/session/:sessionId/generate-certificate', isAuthenticated, asyn
     return res.status(400).json({ error: 'Se requieren documentId y documentName' });
   }
   
+  // Verificar que el usuario esté autenticado
+  if (!req.user) {
+    return res.status(401).json({ error: 'Usuario no autenticado' });
+  }
+  
   const result = await certificationService.generateCertificate({
     sessionId,
     documentId,
@@ -280,6 +302,11 @@ ronRouter.post('/session/:sessionId/complete', isAuthenticated, async (req: Requ
   
   if (!documentId || !clientId) {
     return res.status(400).json({ error: 'Se requieren documentId y clientId' });
+  }
+  
+  // Verificar que el usuario esté autenticado
+  if (!req.user) {
+    return res.status(401).json({ error: 'Usuario no autenticado' });
   }
   
   const completed = await certificationService.completeRONSession(
