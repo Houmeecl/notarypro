@@ -1,262 +1,227 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useRealFuncionality } from '@/hooks/use-real-funcionality';
-import { User, Plus, UserPlus, QrCode, Check, Smartphone } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { UserCircle2, CheckCircle2, Clock, AlertCircle, Users } from 'lucide-react';
 import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle 
-} from '@/components/ui/dialog';
-import { useToast } from '@/hooks/use-toast';
-import { QRCodeSVG } from 'qrcode.react';
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
 
-interface Signatory {
+export interface SignerInfo {
   id: number;
   name: string;
   email: string;
-  hasSigned: boolean;
+  avatarUrl?: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'rejected';
+  signedAt?: Date;
+  role?: string;
 }
 
 interface MultiSignatureControlProps {
   documentId: number;
   documentName: string;
+  signers: SignerInfo[];
+  currentUserId?: number;
+  progress?: number;
+  onSignDocument?: () => void;
+  onRemindSigner?: (signerId: number) => void;
+  onAddSigner?: () => void;
 }
 
-export function MultiSignatureControl({ documentId, documentName }: MultiSignatureControlProps) {
+/**
+ * Componente para gestionar múltiples firmantes en un documento
+ * según los requerimientos de la Ley 19.799 de Chile
+ */
+export function MultiSignatureControl({
+  documentId,
+  documentName,
+  signers,
+  currentUserId,
+  progress = 0,
+  onSignDocument,
+  onRemindSigner,
+  onAddSigner
+}: MultiSignatureControlProps) {
   const { isFunctionalMode } = useRealFuncionality();
-  const { toast } = useToast();
-  const [signatories, setSignatories] = useState<Signatory[]>([
-    { id: 1, name: '', email: '', hasSigned: false }
-  ]);
-  const [enableMultiple, setEnableMultiple] = useState(false);
-  const [showQRDialog, setShowQRDialog] = useState(false);
-  const [selectedSignatory, setSelectedSignatory] = useState<Signatory | null>(null);
-  const [signingUrl, setSigningUrl] = useState('');
   
-  // Agregar otro firmante
-  const addSignatory = () => {
-    if (signatories.length < 2) {
-      setSignatories([
-        ...signatories,
-        { id: signatories.length + 1, name: '', email: '', hasSigned: false }
-      ]);
+  // Si no está en modo funcional, mostrar placeholder básico
+  if (!isFunctionalMode) {
+    return (
+      <Card className="mt-4">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            <span>Firmantes</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-gray-500">
+            El control de múltiples firmantes no está disponible en modo de demostración.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  // Obtener el estado del firmante actual (si existe)
+  const currentSigner = signers.find(signer => signer.id === currentUserId);
+  const isCurrentUserPending = currentSigner && currentSigner.status === 'pending';
+  
+  // Comprobar si todos los firmantes han completado el proceso
+  const allSignersCompleted = signers.every(signer => signer.status === 'completed');
+  
+  // Obtener mensaje según progreso
+  const getProgressMessage = () => {
+    if (allSignersCompleted) {
+      return 'Todos los firmantes han completado el proceso';
     }
+    
+    const completedCount = signers.filter(s => s.status === 'completed').length;
+    return `${completedCount} de ${signers.length} firmas completadas`;
   };
   
-  // Actualizar datos de firmante
-  const updateSignatory = (id: number, field: keyof Signatory, value: string | boolean) => {
-    setSignatories(
-      signatories.map(signatory => 
-        signatory.id === id ? { ...signatory, [field]: value } : signatory
-      )
+  // Renderizar un firmante
+  const renderSigner = (signer: SignerInfo, index: number) => {
+    // Obtener color e icono según estado
+    const getStatusInfo = () => {
+      switch (signer.status) {
+        case 'completed':
+          return {
+            icon: <CheckCircle2 className="h-4 w-4 text-green-600" />,
+            text: 'Firmado',
+            color: 'text-green-600',
+            bgColor: 'bg-green-50'
+          };
+        case 'in_progress':
+          return {
+            icon: <Clock className="h-4 w-4 text-amber-600" />,
+            text: 'En proceso',
+            color: 'text-amber-600',
+            bgColor: 'bg-amber-50'
+          };
+        case 'rejected':
+          return {
+            icon: <AlertCircle className="h-4 w-4 text-red-600" />,
+            text: 'Rechazado',
+            color: 'text-red-600',
+            bgColor: 'bg-red-50'
+          };
+        default:
+          return {
+            icon: <Clock className="h-4 w-4 text-gray-400" />,
+            text: 'Pendiente',
+            color: 'text-gray-500',
+            bgColor: 'bg-gray-50'
+          };
+      }
+    };
+    
+    const statusInfo = getStatusInfo();
+    const isCurrentUser = signer.id === currentUserId;
+    
+    return (
+      <div 
+        key={signer.id} 
+        className={`flex items-center gap-3 p-2 rounded-md ${isCurrentUser ? statusInfo.bgColor : ''}`}
+      >
+        <Avatar className="h-8 w-8">
+          {signer.avatarUrl ? (
+            <AvatarImage src={signer.avatarUrl} alt={signer.name} />
+          ) : (
+            <AvatarFallback className="text-xs">
+              {signer.name.substring(0, 2).toUpperCase()}
+            </AvatarFallback>
+          )}
+        </Avatar>
+        
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium truncate">
+              {signer.name} 
+              {isCurrentUser && <span className="text-xs text-gray-500 ml-1">(Tú)</span>}
+            </p>
+            {statusInfo.icon}
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-gray-500 truncate">
+              {signer.role || signer.email}
+            </p>
+            <p className={`text-xs ${statusInfo.color}`}>
+              {statusInfo.text}
+            </p>
+          </div>
+        </div>
+        
+        {signer.status === 'pending' && onRemindSigner && !isCurrentUser && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-xs h-7 px-2"
+            onClick={() => onRemindSigner(signer.id)}
+          >
+            Recordar
+          </Button>
+        )}
+      </div>
     );
   };
   
-  // Generar URL de firma móvil
-  const generateSigningUrl = (signatoryId: number) => {
-    const signatory = signatories.find(s => s.id === signatoryId);
-    if (!signatory) return;
-    
-    // Crear una URL única para esta firma específica
-    const baseUrl = window.location.origin;
-    const uniqueToken = `${documentId}-${signatoryId}-${Date.now()}`;
-    const url = `${baseUrl}/sign-mobile/${uniqueToken}`;
-    
-    setSigningUrl(url);
-    setSelectedSignatory(signatory);
-    setShowQRDialog(true);
-    
-    if (isFunctionalMode) {
-      console.log(`✅ URL de firma generada en modo funcional real: ${url}`);
-    }
-  };
-  
-  // Simular firma completada desde móvil
-  const completeSignature = (id: number) => {
-    updateSignatory(id, 'hasSigned', true);
-    setShowQRDialog(false);
-    
-    toast({
-      title: "Firma completada",
-      description: "La firma se ha completado exitosamente desde el dispositivo móvil.",
-      duration: 3000,
-    });
-    
-    if (isFunctionalMode) {
-      console.log(`✅ Firma completada en modo funcional real para firmante ID: ${id}`);
-    }
-  };
-  
   return (
-    <>
-      <Card className="mt-6">
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle>Opciones de firma</CardTitle>
-            {isFunctionalMode && (
-              <div className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                Ley 19.799
-              </div>
-            )}
-          </div>
-          <CardDescription>
-            Configure quién necesita firmar este documento
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <Switch 
-                id="multiple-signers"
-                checked={enableMultiple}
-                onCheckedChange={setEnableMultiple}
-              />
-              <Label htmlFor="multiple-signers">Habilitar múltiples firmantes</Label>
-            </div>
-            
-            {signatories.map((signatory, index) => (
-              <div key={signatory.id} className="space-y-3 pt-3 border-t">
-                <div className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-gray-500" />
-                  <span className="font-medium">Firmante {index + 1}</span>
-                  {signatory.hasSigned && (
-                    <div className="ml-auto flex items-center gap-1 text-green-600 text-sm">
-                      <Check className="h-4 w-4" />
-                      <span>Firmado</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="grid gap-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label htmlFor={`name-${signatory.id}`}>Nombre</Label>
-                      <Input 
-                        id={`name-${signatory.id}`}
-                        value={signatory.name}
-                        onChange={(e) => updateSignatory(signatory.id, 'name', e.target.value)}
-                        placeholder="Nombre completo"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor={`email-${signatory.id}`}>Email</Label>
-                      <Input 
-                        id={`email-${signatory.id}`}
-                        value={signatory.email}
-                        onChange={(e) => updateSignatory(signatory.id, 'email', e.target.value)}
-                        placeholder="correo@ejemplo.com"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="flex items-center gap-1"
-                      onClick={() => generateSigningUrl(signatory.id)}
-                      disabled={signatory.hasSigned}
-                    >
-                      <QrCode className="h-4 w-4" />
-                      <span>Firmar con móvil</span>
-                    </Button>
-                    
-                    {/* Botón para simular firma (solo para demostración) */}
-                    {!signatory.hasSigned && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        className="text-blue-600 hover:text-blue-800"
-                        onClick={() => completeSignature(signatory.id)}
-                      >
-                        <span className="text-xs">(Simular firma)</span>
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-            
-            {enableMultiple && signatories.length < 2 && (
-              <Button 
-                variant="outline" 
-                className="mt-3 w-full flex items-center justify-center gap-1"
-                onClick={addSignatory}
-              >
-                <UserPlus className="h-4 w-4" />
-                <span>Agregar firmante</span>
-              </Button>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button 
-            className="w-full"
-            disabled={signatories.some(s => !s.hasSigned)}
-          >
-            {signatories.every(s => s.hasSigned) 
-              ? "Finalizar proceso de firma" 
-              : "Esperando firmas..."}
-          </Button>
-        </CardFooter>
-      </Card>
+    <Card className="mt-4">
+      <CardHeader className="pb-2">
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            <span>Firmantes del documento</span>
+          </CardTitle>
+          
+          {(progress > 0 && progress < 100) && (
+            <span className="text-xs font-medium">
+              {progress}%
+            </span>
+          )}
+        </div>
+        <CardDescription>{getProgressMessage()}</CardDescription>
+        
+        {progress > 0 && (
+          <Progress value={progress} className="h-1.5 mt-1" />
+        )}
+      </CardHeader>
       
-      {/* Diálogo de código QR */}
-      <Dialog open={showQRDialog} onOpenChange={setShowQRDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Continuar firma en dispositivo móvil</DialogTitle>
-            <DialogDescription>
-              Escanee este código QR con su dispositivo móvil para continuar el proceso de firma.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="flex flex-col items-center py-4">
-            <div className="bg-white p-3 rounded-lg mb-4">
-              <QRCode 
-                value={signingUrl} 
-                size={200}
-                level="H"
-                includeMargin={true}
-              />
-            </div>
-            <p className="text-sm text-gray-500 text-center mb-2">
-              Documento: <span className="font-medium">{documentName}</span>
-            </p>
-            {selectedSignatory && (
-              <p className="text-sm text-gray-500 text-center">
-                Firmante: <span className="font-medium">{selectedSignatory.name || "Sin nombre"}</span>
-              </p>
-            )}
-            
-            <div className="flex items-center gap-2 mt-4 bg-blue-50 rounded-md p-3 w-full">
-              <Smartphone className="h-5 w-5 text-blue-600" />
-              <p className="text-sm text-blue-800">
-                Al escanear este código, se abrirá la aplicación de firma en su dispositivo móvil para completar el proceso.
-              </p>
-            </div>
-          </div>
-          
-          <DialogFooter className="flex-col sm:flex-row sm:justify-between">
-            <Button variant="outline" onClick={() => setShowQRDialog(false)}>
-              Cancelar
-            </Button>
-            {selectedSignatory && (
-              <Button onClick={() => completeSignature(selectedSignatory.id)}>
-                Confirmar firma
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+      <CardContent>
+        <div className="space-y-1">
+          {signers.map(renderSigner)}
+        </div>
+        
+        {onAddSigner && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full mt-3 text-xs"
+            onClick={onAddSigner}
+          >
+            <UserCircle2 className="h-3 w-3 mr-1" />
+            Añadir firmante
+          </Button>
+        )}
+        
+        {isCurrentUserPending && onSignDocument && (
+          <Button 
+            variant="default" 
+            className="w-full mt-3"
+            onClick={onSignDocument}
+          >
+            Firmar documento
+          </Button>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
