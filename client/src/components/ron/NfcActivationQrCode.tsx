@@ -48,16 +48,29 @@ const NfcActivationQrCode: React.FC<NfcActivationQrCodeProps> = ({
     setIsGenerating(true);
     
     try {
-      // Crear una URL directa para la verificación - más fácil de escanear
-      const appUrl = `${window.location.origin}/verificacion-nfc-puente/result/${sessionId}`;
+      // Crear una URL NFC que active directamente la funcionalidad NFC en el teléfono
+      // El esquema web+nfc:// es reconocido por teléfonos con NFC y activa la lectura
+      const nfcScheme = `web+nfc://read?id=${sessionId}&callback=${encodeURIComponent(`${window.location.origin}/verificacion-nfc-puente/result/${sessionId}`)}`;
       
-      // En entorno de producción, se utilizaría una URL corta personalizada
-      // Por ahora usamos una URL directa para hacer pruebas
-      setQrValue(appUrl);
+      // URL alternativa para navegadores que no soportan el esquema web+nfc://
+      const webUrl = `${window.location.origin}/nfc-reader.html?id=${sessionId}&callback=${encodeURIComponent(`${window.location.origin}/verificacion-nfc-puente/result/${sessionId}`)}`;
       
-      // Generar una URL para compartir o abrir directamente
-      const deepLink = appUrl;
-      setQrUrl(deepLink);
+      // Generar un custom URI scheme que funciona en Android
+      const androidNfcUrl = `intent://scan/nfc?sessionId=${sessionId}&returnUrl=${encodeURIComponent(`${window.location.origin}/verificacion-nfc-puente/result/${sessionId}`)}#Intent;scheme=vecinosxpress;package=cl.vecinosxpress.app;end`;
+      
+      // Codificar todos los esquemas en un único QR
+      const combinedScheme = JSON.stringify({
+        nfc: nfcScheme,
+        web: webUrl,
+        android: androidNfcUrl,
+        sessionId: sessionId
+      });
+      
+      // Para el QR usamos el esquema combinado (más compatible)
+      setQrValue(combinedScheme);
+      
+      // Para compartir usamos la URL web (más compatible)
+      setQrUrl(webUrl);
       
       // Simular tiempo de generación
       setTimeout(() => {
