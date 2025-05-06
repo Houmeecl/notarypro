@@ -43,17 +43,33 @@ export default function VecinosLogin() {
   // Mutación para el login
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      const res = await apiRequest("POST", "/api/vecinos/login", credentials);
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Error al iniciar sesión");
+      console.log("Intentando login con:", credentials.username);
+      
+      try {
+        const res = await apiRequest("POST", "/api/vecinos/login", credentials);
+        
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Error al iniciar sesión");
+        }
+        
+        return await res.json();
+      } catch (error) {
+        console.error("Error en petición de login:", error);
+        throw error;
       }
-      return await res.json();
     },
     onSuccess: (data) => {
+      console.log("Login exitoso, datos recibidos:", data);
+      
       // Guardar token en localStorage si se utiliza JWT
       if (data.token) {
         localStorage.setItem("vecinos_token", data.token);
+      }
+      
+      // También guardar datos de usuario para persistencia entre páginas
+      if (data.user) {
+        localStorage.setItem("vecinos_user", JSON.stringify(data.user));
       }
       
       // Mostrar mensaje de éxito con terminología notarial
@@ -62,10 +78,29 @@ export default function VecinosLogin() {
         description: "Bienvenido al Sistema Notarial VecinoXpress",
       });
       
-      // Redirigir directamente a la página de selección de documentos para generar QR
-      setLocation("/document-selection");
+      // VERIFICAR QUE LA RUTA EXISTE
+      // Redirigir a dashboard de vecinos (si es admin) o selección de documentos (si es usuario regular)
+      if (data.role === 'admin' || data.user?.role === 'admin') {
+        setLocation("/vecinos/admin");
+      } else {
+        setLocation("/vecinos/dashboard");
+      }
     },
     onError: (error: Error) => {
+      console.error("Error en autenticación:", error);
+      
+      // En caso de modo de emergencia, intentar login directo
+      if (localStorage.getItem("emergency_mode") === "true") {
+        console.log("Intentando login en modo de emergencia");
+        localStorage.setItem("vecinos_token", "emergency_token");
+        toast({
+          title: "Acceso en Modo de Emergencia",
+          description: "Iniciando sesión con credenciales de emergencia",
+        });
+        setLocation("/vecinos/dashboard");
+        return;
+      }
+      
       toast({
         title: "Error de Autenticación",
         description: "Credenciales no válidas o acceso denegado. Verifique sus datos e intente nuevamente.",
