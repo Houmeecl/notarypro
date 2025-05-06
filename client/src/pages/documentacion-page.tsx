@@ -39,17 +39,21 @@ export default function DocumentacionPage() {
                   <strong>NUEVO:</strong> Este documento incluye el manual completo de NotaryPro con todos sus enlaces, detalles del código fuente, interacción entre componentes y datos del desarrollador.
                 </p>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="flex flex-col gap-2">
                 <a 
-                  href="/docs/NotaryPro_Manual_Completo_y_Codigo_Fuente.pdf" 
+                  href="/docs/NotaryPro_Manual_Completo_y_Codigo_Fuente.md" 
                   download
                   className="w-full"
                 >
                   <Button className="w-full bg-indigo-600 hover:bg-indigo-700">
                     <Download className="h-4 w-4 mr-2" />
-                    Descargar Manual Completo (PDF)
+                    Descargar Manual Completo (Markdown)
                   </Button>
                 </a>
+                <p className="text-xs text-gray-500 text-center">
+                  La documentación completa está disponible como archivo Markdown. 
+                  Para convertirlo a PDF, puede usar cualquier conversor Markdown a PDF online o en su ordenador.
+                </p>
               </CardFooter>
             </Card>
             
