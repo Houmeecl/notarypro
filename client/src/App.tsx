@@ -191,6 +191,14 @@ function Router() {
           </Suspense>
         );
       }} />
+      <Route path="/qa-code-generator" component={() => {
+        const QACodeGeneratorPage = React.lazy(() => import("@/pages/qa-code-generator"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <QACodeGeneratorPage />
+          </Suspense>
+        );
+      }} />
 
       {/* User routes */}
       <ProtectedRoute 

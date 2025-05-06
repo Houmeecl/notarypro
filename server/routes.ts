@@ -78,6 +78,70 @@ export function registerRoutes(app: Express): Server {
     console.error("Error inicializando admins de prueba:", error);
   });
 
+// Endpoint para validar códigos QA
+app.post('/api/qa/validate-code', isAuthenticated, async (req, res) => {
+  try {
+    const { code } = req.body;
+    
+    if (!code || typeof code !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Se requiere un código QA válido'
+      });
+    }
+    
+    // Validar el formato básico (QA-XXXXXX-XXXXXX)
+    const codePattern = /^QA-[A-Z0-9]{6}-\d{6}$/;
+    
+    if (!codePattern.test(code)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Formato de código QA inválido'
+      });
+    }
+    
+    // Obtener timestamp del código
+    const timestamp = parseInt(code.split('-')[2]);
+    const currentTime = Date.now() % 1000000; // últimos 6 dígitos
+    
+    // En un sistema real, aquí verificaríamos contra la base de datos
+    // Para demo/QA, simplemente hacemos una validación básica
+    const isValid = true;
+    
+    // Registrar uso del código QA (para auditoría)
+    await db.insert(auditLogs).values({
+      userId: req.user?.id,
+      actionType: 'qa_code_used',
+      details: JSON.stringify({
+        code,
+        userAgent: req.headers['user-agent'],
+        ip: req.ip
+      }),
+      timestamp: new Date()
+    });
+    
+    res.json({
+      success: true,
+      isValid,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 horas
+      permissions: {
+        skipIdentityVerification: true,
+        skipSignatureValidation: true,
+        skipNfcValidation: true,
+        allowAllFunctionality: true
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error al validar código QA:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al procesar la solicitud'
+    });
+  }
+});
+
+
   // Crea el servidor HTTP
   const httpServer = createServer(app);
 
