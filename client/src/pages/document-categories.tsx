@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { Loader2, CheckCircle, FileText } from "lucide-react";
+import { Loader2, FileText } from "lucide-react";
 import { DocumentCategory } from "@shared/schema";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import DocumentNavbar from "@/components/layout/DocumentNavbar";
 import { useRealFuncionality } from "@/hooks/use-real-funcionality";
+import FunctionalModeIndicator from "@/components/document/FunctionalModeIndicator";
 
 export default function DocumentCategoriesPage() {
   const { toast } = useToast();
@@ -53,15 +54,7 @@ export default function DocumentCategoriesPage() {
     <>
       <DocumentNavbar />
       <div className="container mx-auto py-8">
-        {isFunctionalMode && (
-          <div className="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md flex items-center">
-            <CheckCircle className="h-5 w-5 mr-3 text-green-600" />
-            <div>
-              <p className="font-medium">Sistema documental con certificación legal</p>
-              <p className="text-sm text-green-700">Todas las categorías y documentos cumplen con los requisitos de la Ley 19.799 de Firma Electrónica</p>
-            </div>
-          </div>
-        )}
+        <FunctionalModeIndicator className="mb-6" />
       
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Categorías de Documentos</h1>
