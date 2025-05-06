@@ -6,11 +6,12 @@
  * de videollamadas y añadir funcionalidades de verificación.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'wouter';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 import { 
   Card, 
   CardHeader, 
@@ -19,6 +20,21 @@ import {
   CardContent,
   CardFooter 
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { 
   Users, 
   FileText, 
@@ -28,7 +44,9 @@ import {
   Camera,
   Shield,
   Save,
-  FileCheck
+  FileCheck,
+  Download,
+  Video
 } from 'lucide-react';
 import AgoraUIKit from 'agora-react-uikit';
 import 'agora-react-uikit/dist/index.css';
@@ -183,6 +201,213 @@ const IdentityVerification = ({
   );
 };
 
+// Componente para manejar la firma digital
+const SignatureDialog = ({ 
+  isOpen, 
+  onClose, 
+  onSign 
+}: { 
+  isOpen: boolean;
+  onClose: () => void;
+  onSign: (signatureData: string) => void;
+}) => {
+  const [signaturePoints, setSignaturePoints] = useState<Array<{x: number, y: number}>>([]);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [selectedDocument, setSelectedDocument] = useState("Contrato de Arriendo");
+  
+  // Función para limpiar el canvas
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        setSignaturePoints([]);
+      }
+    }
+  };
+  
+  // Inicializar canvas
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        const canvas = canvasRef.current;
+        if (canvas) {
+          canvas.width = canvas.offsetWidth;
+          canvas.height = 150;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#4f46e5';
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          }
+        }
+      }, 100);
+    }
+  }, [isOpen]);
+  
+  // Manejar eventos de mouse/touch
+  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    setIsDrawing(true);
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      setSignaturePoints([...signaturePoints, {x, y}]);
+      
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+      }
+    }
+  };
+  
+  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDrawing) return;
+    
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      setSignaturePoints([...signaturePoints, {x, y}]);
+      
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      }
+    }
+  };
+  
+  const handleMouseUp = () => {
+    setIsDrawing(false);
+    
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.closePath();
+      }
+    }
+  };
+  
+  // Finalizar firma
+  const handleSignDocument = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      if (signaturePoints.length < 10) {
+        alert('Por favor dibuje una firma válida');
+        return;
+      }
+      const signatureData = canvas.toDataURL('image/png');
+      onSign(signatureData);
+    }
+  };
+  
+  if (!isOpen) return null;
+  
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex items-center">
+            <Save className="h-5 w-5 mr-2 text-primary" />
+            Firma digital
+          </DialogTitle>
+          <DialogDescription>
+            Firme el documento electrónicamente para completar el proceso de certificación.
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-6 py-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Documento a firmar</label>
+            <Select
+              value={selectedDocument}
+              onValueChange={setSelectedDocument}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Seleccionar documento" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Contrato de Arriendo">Contrato de Arriendo</SelectItem>
+                <SelectItem value="Poder Notarial">Poder Notarial</SelectItem>
+                <SelectItem value="Declaración Jurada">Declaración Jurada</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-primary/5 py-2 px-4">
+                <CardTitle className="text-sm font-medium text-primary">Vista previa del documento</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="bg-gray-100 rounded border p-3 text-sm text-gray-800 h-32 overflow-auto">
+                  <p className="font-semibold mb-2">{selectedDocument}</p>
+                  <p>
+                    En Santiago de Chile, a {new Date().toLocaleDateString('es-CL')}, comparece Don/Doña 
+                    <span className="font-semibold"> Cliente Demo</span>, quien certifica haber leído 
+                    y aceptado el contenido completo de este documento, y en señal de conformidad, 
+                    procede a firmar electrónicamente según la Ley N° 19.799.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div>
+            <label className="text-sm font-medium">Dibuje su firma a continuación</label>
+            <div className="mt-2 border rounded-md overflow-hidden">
+              <canvas 
+                ref={canvasRef}
+                className="w-full touch-none"
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+              />
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="mt-2" 
+              onClick={clearCanvas}
+            >
+              Borrar y dibujar de nuevo
+            </Button>
+          </div>
+        </div>
+        
+        <DialogFooter>
+          <div className="flex space-x-2 justify-between w-full">
+            <div className="text-xs text-muted-foreground">
+              La firma electrónica tiene validez legal según Ley 19.799
+            </div>
+            <div className="flex space-x-2">
+              <Button variant="outline" onClick={onClose}>
+                Cancelar
+              </Button>
+              <Button onClick={handleSignDocument}>
+                <FileCheck className="h-4 w-4 mr-2" />
+                Firmar documento
+              </Button>
+            </div>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 // Componente principal que integra Agora UI Kit
 const RonAgoraKitTest = () => {
   const [, navigate] = useLocation();
@@ -197,6 +422,9 @@ const RonAgoraKitTest = () => {
   const [videoCall, setVideoCall] = useState<boolean>(false);
   const [agoraConfig, setAgoraConfig] = useState<any>(null);
   const [showVerification, setShowVerification] = useState<boolean>(false);
+  const [showSignatureDialog, setShowSignatureDialog] = useState<boolean>(false);
+  const [signatureData, setSignatureData] = useState<string | null>(null);
+  const [documentSigned, setDocumentSigned] = useState<boolean>(false);
   
   // Unirse a la sesión con el código proporcionado
   const startSession = async () => {
@@ -476,6 +704,9 @@ const RonAgoraKitTest = () => {
                       <Button 
                         size="sm" 
                         variant="outline"
+                        onClick={() => {
+                          setShowSignatureDialog(true);
+                        }}
                       >
                         <Save className="h-4 w-4 mr-1" />
                         Firmar documento
@@ -520,9 +751,80 @@ const RonAgoraKitTest = () => {
                     userType="client"
                   />
                 )}
+                
+                {/* Panel de documento firmado */}
+                {documentSigned && (
+                  <Card>
+                    <CardHeader className="bg-green-50 dark:bg-green-900/20">
+                      <CardTitle className="flex items-center text-base">
+                        <FileCheck className="h-5 w-5 mr-2 text-green-600 dark:text-green-400" />
+                        Documento firmado electrónicamente
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center mb-2">
+                          <div>
+                            <p className="font-medium text-sm">Contrato de Arriendo</p>
+                            <p className="text-xs text-slate-500">
+                              Firmado el {new Date().toLocaleDateString('es-CL')} a las {new Date().toLocaleTimeString('es-CL')}
+                            </p>
+                          </div>
+                          <Badge variant="outline" className="bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Verificado
+                          </Badge>
+                        </div>
+                        
+                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-md p-3 border">
+                          <p className="text-sm text-slate-700 dark:text-slate-300 mb-3">
+                            Firma del cliente:
+                          </p>
+                          {signatureData && (
+                            <div className="border p-2 bg-white dark:bg-slate-800 rounded">
+                              <img 
+                                src={signatureData} 
+                                alt="Firma digital" 
+                                className="h-20 object-contain"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="mt-4 pt-2 border-t flex justify-between items-center">
+                          <div className="text-xs text-slate-500">
+                            <span className="flex items-center">
+                              <CheckCircle className="h-3 w-3 mr-1 text-green-600" />
+                              Documento firmado y verificado
+                            </span>
+                          </div>
+                          <Button variant="outline" size="sm">
+                            <Download className="h-4 w-4 mr-1" />
+                            Descargar copia
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             </div>
           </div>
+          
+          {/* Componente de diálogo de firma */}
+          <SignatureDialog
+            isOpen={showSignatureDialog}
+            onClose={() => setShowSignatureDialog(false)}
+            onSign={(data) => {
+              setSignatureData(data);
+              setDocumentSigned(true);
+              setShowSignatureDialog(false);
+              toast({
+                title: "Documento firmado",
+                description: "El documento ha sido firmado con éxito",
+              });
+            }}
+          />
         </main>
       </div>
     );
