@@ -109,8 +109,8 @@ export default function VerificacionSimple({
     }, 1500);
   };
 
-  // Simular proceso de verificación de identidad
-  const verificarIdentidad = () => {
+  // Proceso de verificación de identidad con API real
+  const verificarIdentidad = async () => {
     setLoading(true);
     setError('');
     
@@ -139,20 +139,79 @@ export default function VerificacionSimple({
       return;
     }
     
-    // Simulamos la verificación después de un tiempo
-    setTimeout(() => {
-      // Simulamos un 90% de éxito en la verificación
-      if (Math.random() < 0.9) {
+    try {
+      // Preparar datos para enviar a la API según el método de verificación
+      let verificationData: Record<string, any> = {};
+      
+      switch (activeTab) {
+        case 'rut':
+          verificationData = {
+            verificationType: 'rut',
+            rut: rut.replace(/\./g, '').replace('-', ''),
+            fullName: nombreCompleto
+          };
+          break;
+        case 'docId':
+          verificationData = {
+            verificationType: 'document',
+            serialNumber: numeroSerie,
+            fullName: nombreCompleto
+          };
+          break;
+        case 'rostro':
+          verificationData = {
+            verificationType: 'facial',
+            faceImage: imagenRostro?.replace(/^data:image\/(png|jpg|jpeg);base64,/, '')
+          };
+          break;
+        case 'documento':
+          verificationData = {
+            verificationType: 'documentImage',
+            documentImage: imagenDocumento?.replace(/^data:image\/(png|jpg|jpeg);base64,/, '')
+          };
+          break;
+      }
+      
+      // Consumimos la API real de verificación de identidad
+      // En esta implementación, usamos una API real de verificación para validar los datos
+      console.log('Enviando datos a API de verificación de identidad:', verificationData);
+      
+      // Realizar la llamada a la API de verificación
+      const response = await fetch('/api/identity/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(verificationData),
+      });
+      
+      if (!response.ok) {
+        // Si la respuesta no es exitosa, extraemos el mensaje de error
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error en la verificación de identidad');
+      }
+      
+      // Analizamos la respuesta
+      const result = await response.json();
+      
+      // Verificamos si la identidad fue validada
+      if (result.verified) {
         setVerificado(true);
         toast({
           title: 'Identidad verificada',
-          description: 'Su identidad ha sido verificada correctamente.',
+          description: 'Su identidad ha sido verificada correctamente según los registros oficiales.',
         });
       } else {
-        setError('No se pudo verificar su identidad. Por favor, intente nuevamente o utilice otro método de verificación.');
+        // Si la verificación falló por razones específicas
+        setError(result.message || 'No se pudo verificar su identidad. Verifique los datos proporcionados.');
       }
+    } catch (err) {
+      // Cuando se produce un error en la API o la red
+      console.error('Error en la verificación de identidad:', err);
+      setError('Error en el servicio de verificación: ' + (err instanceof Error ? err.message : String(err)));
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
 
   // Completar el proceso
