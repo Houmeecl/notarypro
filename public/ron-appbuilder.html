@@ -181,9 +181,6 @@
   <script src="https://solutions-3.agora.io/tools_static/customization-api/latest/customization-api.bundle.js"></script>
   
   <script>
-    // ID de la aplicación Agora
-    const APP_ID = "TU_APP_ID_AQUÍ"; // <-- Reemplazar con tu App ID real
-    
     // Inicializar Agora Customization API
     let customizationAPI = null;
     let sessionId = null;
@@ -203,11 +200,21 @@
       document.getElementById("joinButton").disabled = true;
       
       try {
-        // En una implementación real, verificarías el código con tu backend
+        // Obtener configuración desde el servidor
         sessionId = accessCodeInput;
         
-        // Crear canal de Agora a partir del código RON
-        const channelName = accessCodeInput.replace("RON-", "ron-session-");
+        // Obtener configuración del API
+        const response = await fetch(`/api/ron/public/app-builder-config/${sessionId}`);
+        
+        if (!response.ok) {
+          throw new Error("No se pudo obtener la configuración para la sesión");
+        }
+        
+        const config = await response.json();
+        
+        if (!config.success) {
+          throw new Error(config.error || "Error al obtener configuración de la sesión");
+        }
         
         // Configurar Agora App Builder
         customizationAPI = new AgoraCustomizationAPI({
@@ -217,28 +224,25 @@
           // Configuración de la videollamada
           config: {
             // ID de la aplicación Agora
-            APP_ID: APP_ID,
+            APP_ID: config.appId,
             
             // Configuración del canal
-            CHANNEL_NAME: channelName,
+            CHANNEL_NAME: config.channelName,
             
             // Rol del usuario (Host o Audience)
-            // En una sesión privada, ambos son Host
-            ROLE: "host",
+            ROLE: config.role || "host",
             
-            // Tokens (en una implementación completa, obtendrías el token de tu backend)
-            TOKEN: null,
+            // Token de autenticación
+            TOKEN: config.token,
             
             // UID del usuario (opcional)
-            UID: null,
+            UID: config.uid,
             
             // Diseño de la videollamada
-            LAYOUT: {
-              // Modos disponibles: "grid" | "pinned" | "presenter"
+            LAYOUT: config.layout || {
               mode: "grid",
-              // Configuración específica para cada modo
               grid: {
-                max: 4,  // Número máximo de videos en la cuadrícula
+                max: 4
               }
             },
             
@@ -263,7 +267,7 @@
             CHAT: false,
             
             // Ajustes de UI
-            UI_CONFIG: {
+            UI_CONFIG: config.uiConfig || {
               NAVBAR: {
                 LOGO: "VecinoXpress",
                 TITLE: "Sesión RON",
@@ -280,6 +284,13 @@
         
         // Iniciar la videollamada
         await customizationAPI.launch();
+        
+        // Obtener información de la sesión
+        const sessionInfoResponse = await fetch(`/api/ron/public/session/${sessionId}`);
+        if (sessionInfoResponse.ok) {
+          const sessionInfo = await sessionInfoResponse.json();
+          console.log("Información de sesión RON:", sessionInfo);
+        }
         
         // Capturar eventos de la videollamada
         customizationAPI.on("userJoined", (user) => {
