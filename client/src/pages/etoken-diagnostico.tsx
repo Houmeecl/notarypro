@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, XCircle, Shield, AlertCircle, KeyRound, FileDigit } from "lucide-react";
+import { CheckCircle2, XCircle, Shield, AlertCircle, KeyRound, FileDigit, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { checkExtensionAvailability, listTokenDevices, getCertificates, CertificateInfo } from "@/lib/pkcs11-bridge";
 
