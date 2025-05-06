@@ -158,7 +158,7 @@ export default function RonSession() {
 
   // Toggles para los controles de video
   const toggleCamera = () => setCameraEnabled(!cameraEnabled);
-  const toggleMic = () => setMicEnabled(!micEnabled);
+  const toggleMicSimple = () => setMicEnabled(!micEnabled);
   const toggleScreenShare = () => setScreenShareEnabled(!screenShareEnabled);
 
   // Manejo de mensajes de chat
@@ -981,7 +981,7 @@ export default function RonSession() {
             <Button 
               variant={micEnabled ? "ghost" : "destructive"} 
               size="icon" 
-              onClick={toggleMic}
+              onClick={toggleMicSimple}
               className="rounded-full h-10 w-10"
             >
               {micEnabled ? <Mic className="h5 w-5" /> : <MicOff className="h-5 w-5" />}

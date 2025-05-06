@@ -307,7 +307,7 @@ const VerificacionNFC: React.FC = () => {
   );
 };
 
-export default VerificacionNFC;
+// Don't export VerificacionNFC here, we're defining a new component below
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

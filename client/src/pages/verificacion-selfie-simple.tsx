@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 /**
  * Página de verificación mediante selfie (versión simplificada)
  */
-export default function VerificacionSelfieSimplePage() {
+function VerificacionSelfieSimplePage() {
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const [loading, setLoading] = useState(false);
@@ -475,4 +475,6 @@ function VerificacionSelfieSimple() {
   );
 }
 
-export default VerificacionSelfieSimple;
+export default function VerificacionSelfieSimpleCombined() {
+  return <VerificacionSelfieSimple />;
+}

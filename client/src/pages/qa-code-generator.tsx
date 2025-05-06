@@ -59,7 +59,7 @@ const QACodeGeneratorPage: React.FC = () => {
             <ol className="list-decimal list-inside space-y-2 ml-4">
               <li>Pantalla de verificación de identidad (campo "Código de Administrador")</li>
               <li>Pantalla de firma digital (opción "Ingresar código QA")</li>
-              <li>Panel de certificación (menú "Herramientas > Activar modo QA")</li>
+              <li>Panel de certificación (menú "Herramientas {'>'} Activar modo QA")</li>
               <li>Cualquier interfaz donde veas un botón "Ingresar código QA"</li>
             </ol>
             
