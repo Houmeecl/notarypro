@@ -8,6 +8,8 @@
 
 import express, { Router, Request, Response } from 'express';
 import { sendAgoraTokens, sendAgoraAppId } from './services/agora-service';
+import { storage } from './storage';
+import { comparePasswords } from './auth';
 
 // Extender la interfaz Session para que pueda contener un usuario
 declare module 'express-session' {
@@ -322,6 +324,83 @@ ronRouter.get('/public/app-id', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: 'Error al obtener AppID de Agora'
+    });
+  }
+});
+
+/**
+ * Ruta para inicio de sesión especial para el sistema RON
+ * Esta ruta permite iniciar sesión al subsistema utilizando el sistema de autenticación principal 
+ * POST /api/ron/login
+ */
+ronRouter.post('/login', async (req: Request, res: Response) => {
+  try {
+    const { username, password } = req.body;
+    
+    // Validación básica
+    if (!username || !password) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Nombre de usuario y contraseña requeridos' 
+      });
+    }
+    
+    // Buscar usuario en el sistema
+    const user = await storage.getUserByUsername(username);
+    
+    // Verificar si el usuario existe
+    if (!user) {
+      console.log(`Inicio de sesión RON fallido - Usuario no encontrado: ${username}`);
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Usuario o contraseña incorrectos' 
+      });
+    }
+    
+    // Verificar contraseña
+    const passwordValid = await comparePasswords(password, user.password);
+    
+    if (!passwordValid) {
+      console.log(`Inicio de sesión RON fallido - Contraseña incorrecta para: ${username}`);
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Usuario o contraseña incorrectos' 
+      });
+    }
+    
+    // Iniciar sesión exitosamente
+    req.login(user, (loginErr) => {
+      if (loginErr) {
+        console.error("Error en login RON:", loginErr);
+        return res.status(500).json({ 
+          success: false, 
+          error: 'Error interno al iniciar sesión' 
+        });
+      }
+      
+      console.log(`Inicio de sesión RON exitoso para: ${username} (${user.role})`);
+      
+      // Devolver información del usuario (sin la contraseña)
+      const userResponse = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role
+      };
+      
+      return res.status(200).json({ 
+        success: true, 
+        user: userResponse,
+        message: 'Inicio de sesión exitoso'
+      });
+    });
+    
+  } catch (error) {
+    console.error('Error en el proceso de login RON:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al procesar la solicitud de inicio de sesión'
     });
   }
 });
