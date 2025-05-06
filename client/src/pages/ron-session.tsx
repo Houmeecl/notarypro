@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link, useLocation, useParams } from "wouter";
 import { 
@@ -25,7 +25,9 @@ import {
   LogOut,
   Settings,
   Info,
-  UserPlus
+  UserPlus,
+  ScanFace,
+  FileCheck
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -66,6 +68,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { RealTimeVideoVerification, VerificationResult } from "@/components/video/RealTimeVideoVerification";
+import { 
+  requestUserMedia, 
+  stopMediaStream, 
+  attachStreamToVideo,
+  captureImageFromVideo,
+  supportsScreenCapture,
+  requestScreenCapture
+} from '@/lib/camera-access';
 
 // Componente principal: interfaz de sesión RON (Remote Online Notarization)
 export default function RonSession() {
@@ -213,12 +224,119 @@ export default function RonSession() {
     }, 3000);
   }, []);
   
+  // Referencias a elementos de video
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const localStreamRef = useRef<MediaStream | null>(null);
+  
+  // Estado para diálogos de verificación
+  const [showIdentityVerification, setShowIdentityVerification] = useState(false);
+  const [showDocumentVerification, setShowDocumentVerification] = useState(false);
+  const [verificationInProgress, setVerificationInProgress] = useState(false);
+  
   // Actualizar el paso de verificación
   const updateVerificationStep = (step: keyof typeof verificationSteps, completed: boolean) => {
     setVerificationSteps({
       ...verificationSteps,
       [step]: completed
     });
+    
+    // Comprobar si todos los pasos de verificación están completos
+    if (completed && 
+        (step === 'biometricCheck' || 
+         (verificationSteps.documentCheck && step === 'securityQuestions') || 
+         (verificationSteps.biometricCheck && step === 'documentCheck'))) {
+      
+      // Si están completos los pasos necesarios, actualizar en la base de datos
+      updateSessionMutation.mutate({
+        verificationSteps: {
+          ...verificationSteps,
+          [step]: completed
+        },
+        verificationCompleted: true
+      });
+    }
+  };
+  
+  // Iniciar la cámara local si está disponible
+  const startLocalCamera = async () => {
+    try {
+      if (localStreamRef.current) {
+        stopMediaStream(localStreamRef.current);
+      }
+      
+      const mediaStream = await requestUserMedia({
+        video: true,
+        audio: micEnabled
+      });
+      
+      localStreamRef.current = mediaStream;
+      
+      if (localVideoRef.current) {
+        attachStreamToVideo(mediaStream, localVideoRef.current);
+      }
+      
+      setCameraEnabled(true);
+    } catch (err) {
+      console.error('Error al iniciar cámara local:', err);
+      setCameraEnabled(false);
+      
+      toast({
+        title: "Error de cámara",
+        description: "No se pudo acceder a la cámara. Verifique los permisos del navegador.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  // Manejar la verificación de identidad
+  const handleIdentityVerification = (result: VerificationResult) => {
+    setShowIdentityVerification(false);
+    setVerificationInProgress(false);
+    
+    if (result.success) {
+      updateVerificationStep('biometricCheck', true);
+      
+      // Agregar un mensaje al chat
+      const newSystemMessage = {
+        sender: "system",
+        text: "✓ Verificación de identidad completada correctamente",
+        time: new Date().toLocaleTimeString()
+      };
+      
+      setChatMessages([...chatMessages, newSystemMessage]);
+    } else {
+      toast({
+        title: "Verificación fallida",
+        description: result.message || "No se pudo verificar la identidad",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  // Manejar la verificación de documento
+  const handleDocumentVerification = (result: VerificationResult) => {
+    setShowDocumentVerification(false);
+    setVerificationInProgress(false);
+    
+    if (result.success) {
+      updateVerificationStep('documentCheck', true);
+      
+      // Agregar un mensaje al chat
+      const newSystemMessage = {
+        sender: "system",
+        text: "✓ Documento verificado correctamente",
+        time: new Date().toLocaleTimeString()
+      };
+      
+      setChatMessages([...chatMessages, newSystemMessage]);
+    } else {
+      toast({
+        title: "Verificación fallida",
+        description: result.message || "No se pudo verificar el documento",
+        variant: "destructive",
+      });
+    }
   };
   
   return (
