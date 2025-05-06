@@ -10,9 +10,9 @@ async function hashPassword(password) {
 }
 
 async function main() {
-  const password = 'nfc123';
+  const password = '77239800';
   const hashed = await hashPassword(password);
-  console.log('Hashed password:', hashed);
+  console.log('Contraseña hasheada para evenegas:', hashed);
 }
 
 main().catch(console.error);
