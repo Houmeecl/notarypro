@@ -48,26 +48,15 @@ const NfcActivationQrCode: React.FC<NfcActivationQrCodeProps> = ({
     setIsGenerating(true);
     
     try {
-      // Crear objeto con los datos necesarios para activar NFC en el móvil
-      const qrData = {
-        action: 'read_nfc',
-        type: 'id_card',
-        document_type: documentInfo?.type || 'cedula_identidad',
-        document_number: documentInfo?.number || '',
-        session_id: sessionId,
-        timestamp: new Date().toISOString(),
-        callback_url: `${window.location.origin}/api/nfc/callback`,
-        redirect_url: `${window.location.origin}/verificacion-nfc-qr/success?session=${sessionId}`
-      };
+      // Crear una URL directa para la verificación - más fácil de escanear
+      const appUrl = `${window.location.origin}/verificacion-nfc-puente/result/${sessionId}`;
       
-      // Convertir a JSON para incluir en el QR
-      const qrDataString = JSON.stringify(qrData);
-      setQrValue(qrDataString);
+      // En entorno de producción, se utilizaría una URL corta personalizada
+      // Por ahora usamos una URL directa para hacer pruebas
+      setQrValue(appUrl);
       
       // Generar una URL para compartir o abrir directamente
-      // En formato: vecinosxpress://nfc-read?data=BASE64_ENCODED_DATA
-      const encodedData = btoa(qrDataString);
-      const deepLink = `vecinosxpress://nfc-read?data=${encodedData}`;
+      const deepLink = appUrl;
       setQrUrl(deepLink);
       
       // Simular tiempo de generación
