@@ -13,6 +13,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { createHash } from 'crypto';
 import QRCode from 'qrcode';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { storage } from '../storage';
+import { comparePasswords } from '../auth';
 
 export interface IdVerificationResult {
   success: boolean;
@@ -50,6 +52,41 @@ export interface RONSessionInitParams {
 }
 
 class CertificationService {
+  /**
+   * Autentica a un usuario para acceso RON
+   * Verifica que el usuario exista y tenga permisos para RON (admin o certificador)
+   */
+  async authenticateRONUser(username: string, password: string) {
+    try {
+      // Buscar usuario por nombre de usuario
+      const user = await storage.getUserByUsername(username);
+      
+      // Si no existe el usuario, devolver null
+      if (!user) {
+        console.log(`RON Auth: Usuario ${username} no encontrado`);
+        return null;
+      }
+      
+      // Verificar contraseña
+      const passwordValid = await comparePasswords(password, user.password);
+      if (!passwordValid) {
+        console.log(`RON Auth: Contraseña inválida para ${username}`);
+        return null;
+      }
+      
+      // Verificar rol (sólo admin o certificador pueden usar RON)
+      if (user.role !== 'admin' && user.role !== 'certifier') {
+        console.log(`RON Auth: Usuario ${username} no tiene permisos de RON (rol: ${user.role})`);
+        return null;
+      }
+      
+      // Usuario autenticado correctamente con permisos RON
+      return user;
+    } catch (error) {
+      console.error('Error en autenticación RON:', error);
+      return null;
+    }
+  }
   /**
    * Inicia una sesión de certificación RON
    */

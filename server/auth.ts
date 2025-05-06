@@ -21,7 +21,7 @@ export async function hashPassword(password: string) {
   return `${buf.toString("hex")}.${salt}`;
 }
 
-async function comparePasswords(supplied: string, stored: string) {
+export async function comparePasswords(supplied: string, stored: string) {
   try {
     // Verificar que stored sea una cadena válida y tenga el formato correcto
     if (!stored || !stored.includes(".")) {
