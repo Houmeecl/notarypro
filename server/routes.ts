@@ -3,12 +3,12 @@ import { createServer, type Server } from "http";
 import { WebSocketServer } from "ws";
 import vecinosRoutes from "./vecinos/vecinos-routes";
 import documentSignRoutes from "./vecinos/document-sign-routes";
-import express from "express";
+import express, { Request, Response } from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import { setupAuth, hashPassword } from "./auth";
 import { db } from "./db";
-import { users, partners } from "@shared/schema";
+import { users, partners, auditLogs } from "@shared/schema";
 import { documentForensicsRouter } from "./document-forensics-routes";
 import { identityVerificationRouter } from "./identity-verification-routes";
 import { contractRouter } from "./contract-routes";
@@ -22,6 +22,14 @@ import { posManagementRouter } from "./pos-management-routes";
 import { documentSignaturesRouter } from "./routes/document-signatures";
 import { secureDocumentRouter } from "./routes/secure-document-routes";
 import { qrSignatureRouter } from "./vecinos/qr-signature-routes";
+
+// Middleware de autenticación
+function isAuthenticated(req: Request, res: Response, next: any) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  return res.status(401).json({ error: "No autorizado" });
+}
 
 export function registerRoutes(app: Express): Server {
   // Configuración de autenticación para la aplicación principal

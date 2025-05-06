@@ -3,6 +3,15 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { eq, and } from "drizzle-orm";
 
+// Audit Logs
+export const auditLogs = pgTable("audit_logs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id"),
+  actionType: text("action_type").notNull(),
+  details: jsonb("details"),
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
 // Analytics Events
 export const analyticsEvents = pgTable("analytics_events", {
   id: serial("id").primaryKey(),
