@@ -75,6 +75,51 @@ ronRouter.get('/public/app-id', (req, res) => {
   res.json({ appId: process.env.AGORA_APP_ID || '' });
 });
 
+// Ruta para obtener configuración de Agora App Builder
+ronRouter.get('/public/app-builder-config/:sessionId', (req, res) => {
+  const { sessionId } = req.params;
+  
+  // Para pruebas, aceptamos códigos que empiecen con RON-
+  if (!sessionId || !sessionId.startsWith('RON-')) {
+    return res.status(404).json({ error: 'Sesión no encontrada' });
+  }
+  
+  const channelName = sessionId.replace('RON-', 'ron-session-');
+  
+  // Generar token usando el servicio de Agora
+  const token = agoraService.generateToken({
+    sessionId,
+    channelName,
+    userRole: 'publisher'
+  });
+  
+  // Configuración para Agora App Builder
+  res.json({
+    success: true,
+    appId: process.env.AGORA_APP_ID || '',
+    channelName,
+    token,
+    uid: null,
+    role: 'host',
+    layout: {
+      mode: 'grid',
+      grid: {
+        max: 4
+      }
+    },
+    uiConfig: {
+      navbar: {
+        title: 'Sesión RON',
+        color: '#2d219b'
+      },
+      theme: {
+        primaryColor: '#2d219b',
+        secondaryColor: '#4939c7'
+      }
+    }
+  });
+});
+
 // Ruta para verificar código RON y devolver información básica (no requiere autenticación)
 ronRouter.get('/public/session/:sessionId', (req, res) => {
   const { sessionId } = req.params;
