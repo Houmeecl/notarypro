@@ -484,9 +484,9 @@ const VerificacionNfcPuente: React.FC = () => {
               <Button 
                 variant="outline" 
                 className="w-full"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/verificacion-avanzada')}
               >
-                Finalizar
+                Volver a verificación
               </Button>
             </CardFooter>
           </Card>
@@ -536,9 +536,9 @@ const VerificacionNfcPuente: React.FC = () => {
               <Button 
                 variant="outline" 
                 className="w-full"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/verificacion-avanzada')}
               >
-                Cancelar
+                Volver a verificación
               </Button>
             </CardFooter>
           </Card>

@@ -98,37 +98,34 @@ const NfcActivationQrCode: React.FC<NfcActivationQrCodeProps> = ({
     });
   };
   
-  // Función para compartir la URL (en dispositivos móviles)
+  // Función para abrir directamente la URL del lector NFC
   const shareUrl = () => {
     if (!qrUrl) return;
     
-    // Si el navegador soporta Web Share API
-    if (navigator.share) {
-      navigator.share({
-        title: 'Activar NFC para verificación',
-        text: 'Escanea la cédula de identidad con NFC',
-        url: qrUrl
-      }).then(() => {
+    try {
+      // Abrir el lector NFC en una nueva pestaña/ventana
+      const newWindow = window.open(qrUrl, '_blank');
+      
+      // Verificar si la ventana se abrió correctamente
+      if (newWindow) {
         toast({
-          title: 'Enlace compartido',
-          description: 'El enlace ha sido compartido exitosamente.',
+          title: 'Lector NFC abierto',
+          description: 'Se ha abierto el lector NFC en una nueva pestaña.'
         });
-      }).catch(err => {
-        if (err.name !== 'AbortError') {
-          console.error('Error al compartir:', err);
-          toast({
-            title: 'Error',
-            description: 'No se pudo compartir el enlace.',
-            variant: 'destructive'
-          });
-        }
-      });
-    } else {
-      // Alternativa para navegadores sin Web Share API
-      window.open(qrUrl, '_blank');
+      } else {
+        // Es posible que los popups estén bloqueados
+        toast({
+          title: 'No se pudo abrir el lector',
+          description: 'Por favor, permita las ventanas emergentes para este sitio.',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      console.error('Error al abrir el lector NFC:', error);
       toast({
-        title: 'NFC Reader abierto',
-        description: 'Se ha abierto el lector NFC en una nueva pestaña.'
+        title: 'Error',
+        description: 'No se pudo abrir el lector NFC. Intente escanear el código QR directamente.',
+        variant: 'destructive'
       });
     }
   };
