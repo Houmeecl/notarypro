@@ -503,7 +503,6 @@
     let sessionData = null;
     let appId = ""; // Se cargará desde la API
     let agoraToken = ""; // Se cargará desde la API
-    let MODO_SIMULADO = true; // Todo simulado para demo, pero mensajes como si fuera real
     
     // Función real para solicitar acceso a cámara/micrófono (Ley 19.799)
     async function requestCameraAndMicrophone() {
@@ -791,17 +790,29 @@
       return true;
     }
     
-    // Función para capturar documento de identidad - CUMPLIMIENTO LEGAL (SIMULADO)
+    // Función para capturar documento de identidad - CUMPLIMIENTO LEGAL
     async function captureID() {
       // Mostrar modal de verificación de identidad
       showVerificationModal("Verificación de documento de identidad");
       
-      // Mensajes legales como si fuera real, pero todo simulado
-      console.log("🔒 Iniciando verificación en MODO PRODUCCIÓN"); 
-
+      if (!isConnected) {
+        updateVerificationModalStatus("error", "Debe estar conectado a la sesión para verificar identidad");
+        return;
+      }
+      
       try {
-        // Simulamos activación de cámara y verificación aunque no funcione realmente
-        // Mostramos instrucciones específicas según Ley 19.799
+        // Intentar activar cámara si aún no está activa
+        if (localTracks.length < 2) {
+          updateVerificationModalStatus("loading", "Iniciando cámara...");
+          await initializeCamera();
+        }
+        
+        // Si después de intentar inicializar, todavía no hay track de video
+        if (localTracks.length < 2) {
+          throw new Error("No se pudo activar la cámara");
+        }
+        
+        // Mostrar instrucciones específicas según Ley 19.799
         updateVerificationModalStatus("loading", "Por favor, muestre su cédula/pasaporte frente a la cámara");
         const modalContainer = document.getElementById('modalIframeContainer');
         if (modalContainer) {
@@ -826,71 +837,103 @@
           
           // Eventos para botones
           document.getElementById('captureNowBtn').addEventListener('click', async () => {
-            // Simulamos todo el proceso pero siempre es exitoso
             try {
               updateVerificationModalStatus("loading", "Capturando documento...");
               
-              // Simulamos procesamiento...
-              await new Promise(resolve => setTimeout(resolve, 1500));
+              // Tomar una captura de la cámara para documento de identidad
+              const videoTrack = localTracks[1];
+              const videoEl = document.querySelector('#local-player video');
+              
+              if (!videoEl) {
+                throw new Error("No se encontró el elemento de video");
+              }
+              
+              // Crear un canvas para procesar la imagen
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+              
+              // Configurar tamaño del canvas
+              canvas.width = videoEl.videoWidth;
+              canvas.height = videoEl.videoHeight;
+              
+              // Dibujar el frame actual en el canvas
+              ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+              
+              // Convertir canvas a imagen base64
+              const imageData = canvas.toDataURL('image/jpeg', 0.9);
               
               updateVerificationModalStatus("loading", "Verificando documento según Ley 19.799...");
-              // Más procesamiento simulado...
-              await new Promise(resolve => setTimeout(resolve, 2000));
               
-              // Simulamos consulta a API exitosa
-              console.log("Intento 1 de captura de imagen fallido, reintentando...");
-              console.log("Intento 2 de captura de imagen fallido, reintentando...");
-              console.log("Intento 3 de captura de imagen fallido, reintentando...");
+              // Enviar imagen al servidor
+              const response = await fetch(`/api/ron/session/${sessionData.sessionId}/capture-id`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                  image: imageData,
+                  captureType: 'id-document',
+                  verificationMethod: 'legal-compliant' // Campo para cumplimiento legal
+                })
+              });
               
-              // Más tiempo para simular procesamiento final...
-              await new Promise(resolve => setTimeout(resolve, 1000));
+              if (!response.ok) {
+                throw new Error("Error al procesar documento de identidad");
+              }
               
-              console.log("Recuperación automática en MODO FUNCIONAL para QA");
+              const result = await response.json();
               
-              // Simulamos éxito - SIEMPRE FUNCIONA en modo simulado
-              // Actualizar UI con información legal
-              if (document.getElementById("captureIDBtn")) {
+              if (result.success) {
+                // Actualizar UI con información legal
                 document.getElementById("captureIDBtn").style.backgroundColor = "var(--success)";
-              }
-              updateVerificationModalStatus("success", "Documento verificado correctamente");
-              
-              // Mostrar información legal adicional
-              const legalInfo = document.createElement('div');
-              legalInfo.style.marginTop = '15px';
-              legalInfo.style.padding = '10px';
-              legalInfo.style.backgroundColor = '#f5f5f7';
-              legalInfo.style.borderRadius = '5px';
-              legalInfo.innerHTML = `
-                <h4 style="margin-top:0">Verificación conforme a Ley 19.799</h4>
-                <p>- Documento capturado: Cédula/pasaporte</p>
-                <p>- Verificación realizada por: ${sessionData?.certifierName || "Administrador Sistema"}</p>
-                <p>- Fecha y hora: ${new Date().toLocaleString('es-CL')}</p>
-                <p>- Estado: Verificación legal completada</p>
-              `;
-              
-              const modalContent = document.getElementById('verificationModalContent');
-              if (modalContent) {
+                updateVerificationModalStatus("success", "Documento verificado correctamente");
+                
+                // Mostrar información legal adicional
+                const legalInfo = document.createElement('div');
+                legalInfo.style.marginTop = '15px';
+                legalInfo.style.padding = '10px';
+                legalInfo.style.backgroundColor = '#f5f5f7';
+                legalInfo.style.borderRadius = '5px';
+                legalInfo.innerHTML = `
+                  <h4 style="margin-top:0">Verificación conforme a Ley 19.799</h4>
+                  <p>- Documento capturado: Cédula/pasaporte</p>
+                  <p>- Verificación realizada por: ${sessionData.certifierName}</p>
+                  <p>- Fecha y hora: ${new Date().toLocaleString('es-CL')}</p>
+                  <p>- Estado: Verificación legal completada</p>
+                `;
+                
+                const modalContent = document.getElementById('verificationModalContent');
                 modalContent.appendChild(legalInfo);
+                
+                // Cerrar modal después de un tiempo
+                setTimeout(() => {
+                  closeVerificationModal();
+                }, 5000);
+              } else {
+                throw new Error(result.message || "Error en la verificación legal del documento");
               }
-              
-              // Cerrar modal después de un tiempo
-              setTimeout(() => {
-                closeVerificationModal();
-              }, 5000);
               
             } catch (error) {
               console.error("Error en captura de documento:", error);
-              // En modo simulado, siempre es exitoso incluso con errores
-              updateVerificationModalStatus("success", "Documento verificado correctamente (simulación)");
+              updateVerificationModalStatus("error", "Error: " + error.message);
               
-              if (document.getElementById("captureIDBtn")) {
-                document.getElementById("captureIDBtn").style.backgroundColor = "var(--success)";
-              }
-              
-              // Cerrar modal después de un tiempo
-              setTimeout(() => {
+              // Crear opción para reintentar
+              const retryButton = document.createElement('button');
+              retryButton.style.width = '100%';
+              retryButton.style.padding = '10px';
+              retryButton.style.backgroundColor = '#f0f0f0';
+              retryButton.style.border = 'none';
+              retryButton.style.borderRadius = '5px';
+              retryButton.style.cursor = 'pointer';
+              retryButton.style.marginTop = '15px';
+              retryButton.textContent = 'Reintentar captura';
+              retryButton.addEventListener('click', () => {
+                // Cerrar y reabrir el modal para reiniciar el proceso
                 closeVerificationModal();
-              }, 3000);
+                setTimeout(() => captureID(), 500);
+              });
+              
+              modalContainer.appendChild(retryButton);
             }
           });
           
@@ -901,20 +944,41 @@
         
       } catch (error) {
         console.error("Error al capturar imagen:", error);
+        updateVerificationModalStatus("error", "Error: " + error.message);
         
-        // En modo simulado, siempre recuperamos el error automáticamente
-        console.log("Error en verificación (modo producción):", error);
-        console.log("Recuperación automática en MODO FUNCIONAL para QA");
-        
-        updateVerificationModalStatus("success", "Verificación completada en modo simulado");
-        
-        if (document.getElementById("captureIDBtn")) {
-          document.getElementById("captureIDBtn").style.backgroundColor = "var(--success)";
+        // Opción para mostrar mensaje de error detallado
+        const modalContent = document.getElementById('verificationModalContent');
+        if (modalContent) {
+          const errorMessage = document.createElement('div');
+          errorMessage.innerHTML = `
+            <div style="margin-top: 15px; padding: 15px; background-color: #f8d7da; border-radius: 5px; border-left: 4px solid #dc3545;">
+              <h4 style="margin-top:0; color: #721c24;">Error de verificación</h4>
+              <p>No se pudo completar la verificación de identidad requerida por la Ley 19.799.</p>
+              <p>Por favor, asegúrese de permitir el acceso a su cámara e intente nuevamente.</p>
+              <p><strong>Detalles técnicos:</strong> ${error.message}</p>
+            </div>
+          `;
+          
+          modalContent.appendChild(errorMessage);
+          
+          // Botón para reintentar
+          const retryButton = document.createElement('button');
+          retryButton.style.width = '100%';
+          retryButton.style.padding = '10px';
+          retryButton.style.backgroundColor = '#f0f0f0';
+          retryButton.style.border = 'none';
+          retryButton.style.borderRadius = '5px';
+          retryButton.style.cursor = 'pointer';
+          retryButton.style.marginTop = '15px';
+          retryButton.textContent = 'Reintentar verificación';
+          retryButton.addEventListener('click', () => {
+            // Cerrar y reabrir el modal para reiniciar el proceso
+            closeVerificationModal();
+            setTimeout(() => captureID(), 500);
+          });
+          
+          modalContent.appendChild(retryButton);
         }
-        
-        setTimeout(() => {
-          closeVerificationModal();
-        }, 2000);
       }
     }
     
@@ -922,16 +986,15 @@
       // Mostrar modal de verificación legal
       showVerificationModal("Verificación de identidad - Ley 19.799");
       
-      // Simulamos que estamos en modo real pero todo es simulado
-      console.log("Iniciando verificación en MODO PRODUCCIÓN para verificación real");
-      console.log("✅ Componente de verificación video iniciado en MODO REAL");
+      if (!isConnected) {
+        updateVerificationModalStatus("error", "Debe estar conectado a la sesión para verificar identidad");
+        return;
+      }
       
       try {
         // Actualizar UI inicial
-        if (document.getElementById("verifyIdentityBtn")) {
-          document.getElementById("verifyIdentityBtn").disabled = true;
-          document.getElementById("verifyIdentityBtn").textContent = "Verificación en proceso...";
-        }
+        document.getElementById("verifyIdentityBtn").disabled = true;
+        document.getElementById("verifyIdentityBtn").textContent = "Verificación en proceso...";
         
         // Mostrar información de cumplimiento legal al usuario
         updateVerificationModalStatus("loading", "Iniciando verificación conforme a la Ley 19.799...");
@@ -957,34 +1020,27 @@
           
           // Evento para iniciar verificación
           document.getElementById('startIdentityVerificationBtn').addEventListener('click', async () => {
-            // Todo es simulado pero con mensajes de verificación legal
-            
-            // Simulamos solicitud de permisos
             try {
-              console.log("Permiso parcial o denegado para enumerar dispositivos");
-              console.log("Solicitando acceso a cámara/micrófono con config:", {"video":true,"audio":false});
-              console.log("Solicitando acceso a cámara/micrófono con config:", {"video":{"width":{"ideal":1280},"height":{"ideal":720},"facingMode":"user"},"audio":false});
+              // Intentar activar cámara si aún no está activa
+              if (localTracks.length < 2) {
+                updateVerificationModalStatus("loading", "Iniciando cámara para verificación biométrica...");
+                await initializeCamera();
+              }
               
-              // Simulamos que los permisos son concedidos después de un tiempo
-              updateVerificationModalStatus("loading", "Solicitando acceso a cámara...");
-              await new Promise(resolve => setTimeout(resolve, 1500));
+              // Si después de intentar inicializar, todavía no hay track de video
+              if (localTracks.length < 2) {
+                throw new Error("No se pudo activar la cámara para la verificación biométrica");
+              }
               
-              console.log("Acceso concedido a cámara/micrófono");
-              
-              // Mostramos pantalla de captura facial simulada
               updateVerificationModalStatus("loading", "Realizando verificación biométrica...");
-              
               modalContainer.innerHTML = `
                 <div style="text-align: center; margin-bottom: 20px;">
                   <p style="font-weight: bold; margin-bottom: 10px;">Por favor, centre su rostro en la cámara</p>
-                  <div style="width: 100%; height: 200px; border: 2px dashed var(--primary); border-radius: 5px; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 15px; background-color: #f1f1f1;">
-                    <div style="text-align: center; color: #666;">
-                      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="9" r="3.5" stroke="#2d219b" stroke-width="1.5"/>
-                        <path d="M18 20.25C18 20.25 18 18 18 16C18 13.972 15.472 12 12 12C8.55 12 6 13.93 6 16C6 18 6 20.25 6 20.25" stroke="#2d219b" stroke-width="1.5"/>
-                      </svg>
-                      <p>Previsualización de cámara (simulada)</p>
+                  <div style="width: 100%; height: 200px; border: 2px dashed var(--primary); border-radius: 5px; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 15px;">
+                    <div id="faceVerificationPreview" style="width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                      <!-- La previsualización irá aquí -->
                     </div>
+                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 2px solid transparent; border-radius: 5px; box-shadow: 0 0 0 2px rgba(255,255,255,0.5); pointer-events: none;"></div>
                   </div>
                   <button id="captureFaceBtn" style="padding: 10px 20px; background-color: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
                     Capturar imagen para verificación
@@ -992,143 +1048,206 @@
                 </div>
               `;
               
+              // Crear previsualización de video
+              const videoTrack = localTracks[1];
+              const videoEl = document.createElement('video');
+              videoEl.autoplay = true;
+              videoEl.muted = true;
+              videoEl.style.width = '100%';
+              videoEl.style.height = '100%';
+              videoEl.style.objectFit = 'cover';
+              
+              // Mostrar previsualización
+              document.getElementById('faceVerificationPreview').appendChild(videoEl);
+              videoTrack.play(videoEl);
+              
               // Evento para capturar rostro
               document.getElementById('captureFaceBtn').addEventListener('click', async () => {
                 try {
                   updateVerificationModalStatus("loading", "Capturando imagen para verificación biométrica...");
-                  await new Promise(resolve => setTimeout(resolve, 1000));
                   
-                  updateVerificationModalStatus("loading", "Procesando verificación facial...");
-                  await new Promise(resolve => setTimeout(resolve, 2000));
+                  // Crear un canvas para procesar la imagen
+                  const canvas = document.createElement('canvas');
+                  const ctx = canvas.getContext('2d');
                   
-                  // Simulamos verificación exitosa siempre
-                  // Actualizar UI principal
-                  if (document.getElementById("verifyIdentityBtn")) {
-                    document.getElementById("verifyIdentityBtn").textContent = "Identidad Verificada ✓";
-                    document.getElementById("verifyIdentityBtn").style.backgroundColor = "var(--success)";
+                  // Configurar tamaño del canvas
+                  canvas.width = videoEl.videoWidth;
+                  canvas.height = videoEl.videoHeight;
+                  
+                  // Dibujar el frame actual en el canvas
+                  ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+                  
+                  // Convertir canvas a imagen base64
+                  const imageData = canvas.toDataURL('image/jpeg', 0.9);
+                  
+                  updateVerificationModalStatus("loading", "Enviando datos para verificación legal de identidad...");
+                  
+                  // Enviar solicitud de verificación al servidor
+                  const response = await fetch(`/api/ron/session/${sessionData.sessionId}/verify-identity`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                      image: imageData,
+                      verificationMethod: 'legal-face-verification',
+                      legalCompliance: true
+                    })
+                  });
+                  
+                  if (!response.ok) {
+                    throw new Error("Error en la verificación legal de identidad");
                   }
                   
-                  // Actualizar modal con información legal de verificación exitosa
-                  updateVerificationModalStatus("success", "Verificación legal de identidad completada exitosamente");
+                  const result = await response.json();
                   
-                  modalContainer.innerHTML = `
-                    <div style="text-align: center; margin: 20px 0;">
-                      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="32" cy="32" r="28" stroke="#388e3c" stroke-width="2" fill="#ecffef"/>
-                        <path d="M20 32 L28 40 L44 24" stroke="#388e3c" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      <h3 style="margin-top: 15px; color: #388e3c;">Verificación de identidad completada</h3>
-                    </div>
+                  if (result.success) {
+                    // Actualizar UI principal
+                    updateUI("identityVerified");
+                    document.getElementById("verifyIdentityBtn").textContent = "Identidad Verificada ✓";
+                    document.getElementById("verifyIdentityBtn").style.backgroundColor = "var(--success)";
                     
-                    <div style="padding: 15px; background-color: #f0f7ff; border-radius: 5px; margin-bottom: 20px; text-align: left;">
-                      <h4 style="margin-top: 0;">Certificado de Verificación</h4>
-                      <p><strong>Fecha y hora:</strong> ${new Date().toLocaleString('es-CL')}</p>
-                      <p><strong>Certificador:</strong> ${sessionData?.certifierName || "Administrador Sistema"}</p>
-                      <p><strong>Método:</strong> Verificación biométrica en vivo</p>
-                      <p><strong>ID de verificación:</strong> VID-${Date.now()}</p>
-                      <p><strong>Estado:</strong> Verificado conforme a Ley 19.799</p>
-                    </div>
+                    // Actualizar modal con información legal de verificación exitosa
+                    updateVerificationModalStatus("success", "Verificación legal de identidad completada exitosamente");
                     
-                    <button id="closeVerificationBtn" style="width: 100%; padding: 10px; background-color: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
-                      Cerrar
-                    </button>
-                  `;
-                  
-                  document.getElementById('closeVerificationBtn').addEventListener('click', () => {
-                    closeVerificationModal();
-                  });
+                    modalContainer.innerHTML = `
+                      <div style="text-align: center; margin: 20px 0;">
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="32" cy="32" r="28" stroke="#388e3c" stroke-width="2" fill="#ecffef"/>
+                          <path d="M20 32 L28 40 L44 24" stroke="#388e3c" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <h3 style="margin-top: 15px; color: #388e3c;">Verificación de identidad completada</h3>
+                      </div>
+                      
+                      <div style="padding: 15px; background-color: #f0f7ff; border-radius: 5px; margin-bottom: 20px; text-align: left;">
+                        <h4 style="margin-top: 0;">Certificado de Verificación</h4>
+                        <p><strong>Fecha y hora:</strong> ${new Date().toLocaleString('es-CL')}</p>
+                        <p><strong>Certificador:</strong> ${sessionData.certifierName || "Certificador autorizado"}</p>
+                        <p><strong>Método:</strong> Verificación biométrica en vivo</p>
+                        <p><strong>ID de verificación:</strong> ${result.verificationId || "VID-" + Date.now()}</p>
+                        <p><strong>Estado:</strong> Verificado conforme a Ley 19.799</p>
+                      </div>
+                      
+                      <button id="closeVerificationBtn" style="width: 100%; padding: 10px; background-color: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Cerrar
+                      </button>
+                    `;
+                    
+                    document.getElementById('closeVerificationBtn').addEventListener('click', () => {
+                      closeVerificationModal();
+                    });
+                    
+                  } else {
+                    throw new Error(result.message || "Error en la verificación legal de identidad");
+                  }
                   
                 } catch (error) {
-                  // En modo simulado, siempre funciona, ignoramos errores
-                  console.error("Error en verificación facial (simulado):", error);
+                  console.error("Error en verificación facial:", error);
+                  updateVerificationModalStatus("error", error.message);
                   
-                  // Fingimos éxito después de un breve tiempo
-                  updateVerificationModalStatus("loading", "Recuperando verificación en modo alternativo...");
-                  await new Promise(resolve => setTimeout(resolve, 1500));
-                  
-                  // Mostramos éxito simulado
-                  updateVerificationModalStatus("success", "Verificación completada en modo simulado");
-                  
-                  // Actualizar UI principal
-                  if (document.getElementById("verifyIdentityBtn")) {
-                    document.getElementById("verifyIdentityBtn").textContent = "Identidad Verificada ✓";
-                    document.getElementById("verifyIdentityBtn").style.backgroundColor = "var(--success)";
-                  }
-                  
-                  // Mostramos UI de éxito
-                  modalContainer.innerHTML = `
-                    <div style="text-align: center; margin: 20px 0;">
-                      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="32" cy="32" r="28" stroke="#388e3c" stroke-width="2" fill="#ecffef"/>
-                        <path d="M20 32 L28 40 L44 24" stroke="#388e3c" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      <h3 style="margin-top: 15px; color: #388e3c;">Verificación de identidad completada</h3>
-                    </div>
-                    
-                    <div style="padding: 15px; background-color: #f0f7ff; border-radius: 5px; margin-bottom: 20px; text-align: left;">
-                      <h4 style="margin-top: 0;">Certificado de Verificación (Simulado)</h4>
-                      <p><strong>Fecha y hora:</strong> ${new Date().toLocaleString('es-CL')}</p>
-                      <p><strong>Certificador:</strong> ${sessionData?.certifierName || "Administrador Sistema"}</p>
-                      <p><strong>Método:</strong> Verificación biométrica en vivo (simulada)</p>
-                      <p><strong>ID de verificación:</strong> VID-SIM-${Date.now()}</p>
-                      <p><strong>Estado:</strong> Verificado conforme a Ley 19.799</p>
-                    </div>
-                    
-                    <button id="closeVerificationBtn" style="width: 100%; padding: 10px; background-color: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
-                      Cerrar
-                    </button>
-                  `;
-                  
-                  document.getElementById('closeVerificationBtn').addEventListener('click', () => {
+                  // Crear botón para reintentar
+                  const retryButton = document.createElement('button');
+                  retryButton.style.width = '100%';
+                  retryButton.style.padding = '10px';
+                  retryButton.style.backgroundColor = '#f0f0f0';
+                  retryButton.style.border = 'none';
+                  retryButton.style.borderRadius = '5px';
+                  retryButton.style.cursor = 'pointer';
+                  retryButton.style.marginTop = '15px';
+                  retryButton.textContent = 'Reintentar verificación';
+                  retryButton.addEventListener('click', () => {
+                    // Cerrar y reabrir el modal para reiniciar el proceso
                     closeVerificationModal();
+                    setTimeout(() => verifyIdentity(), 500);
                   });
+                  
+                  modalContainer.appendChild(retryButton);
                 }
               });
               
             } catch (error) {
-              // En modo simulado, ignoramos errores reales y mostramos éxito
-              console.error("Error en verificación de identidad (simulado):", error);
+              console.error("Error en verificación de identidad:", error);
+              updateVerificationModalStatus("error", "Error: " + error.message);
               
-              // Fingimos proceso de recuperación
-              updateVerificationModalStatus("loading", "Recuperando verificación...");
-              await new Promise(resolve => setTimeout(resolve, 1500));
+              // Restaurar botón principal
+              document.getElementById("verifyIdentityBtn").disabled = false;
+              document.getElementById("verifyIdentityBtn").textContent = "Verificar Identidad";
               
-              // Mostramos éxito simulado
-              updateVerificationModalStatus("success", "Verificación recuperada exitosamente");
+              // Crear mensaje de error detallado
+              const errorMessage = document.createElement('div');
+              errorMessage.innerHTML = `
+                <div style="margin-top: 15px; padding: 15px; background-color: #f8d7da; border-radius: 5px; border-left: 4px solid #dc3545;">
+                  <h4 style="margin-top:0; color: #721c24;">Error de verificación</h4>
+                  <p>No se pudo completar la verificación de identidad requerida por la Ley 19.799.</p>
+                  <p>Por favor, asegúrese de permitir el acceso a su cámara e intente nuevamente.</p>
+                  <p><strong>Detalles técnicos:</strong> ${error.message}</p>
+                </div>
+              `;
               
-              // Actualizar UI principal
-              if (document.getElementById("verifyIdentityBtn")) {
-                document.getElementById("verifyIdentityBtn").textContent = "Identidad Verificada ✓";
-                document.getElementById("verifyIdentityBtn").style.backgroundColor = "var(--success)";
-              }
+              modalContainer.appendChild(errorMessage);
               
-              // Cerramos el modal después de un tiempo
-              setTimeout(() => {
+              // Botón para reintentar
+              const retryButton = document.createElement('button');
+              retryButton.style.width = '100%';
+              retryButton.style.padding = '10px';
+              retryButton.style.backgroundColor = '#f0f0f0';
+              retryButton.style.border = 'none';
+              retryButton.style.borderRadius = '5px';
+              retryButton.style.cursor = 'pointer';
+              retryButton.style.marginTop = '15px';
+              retryButton.textContent = 'Reintentar verificación';
+              retryButton.addEventListener('click', () => {
+                // Cerrar y reabrir el modal para reiniciar el proceso
                 closeVerificationModal();
-              }, 3000);
+                setTimeout(() => verifyIdentity(), 500);
+              });
+              
+              modalContainer.appendChild(retryButton);
             }
           });
         }
         
       } catch (error) {
-        // En modo simulado, ignoramos errores reales
-        console.error("Error al verificar identidad (simulado):", error);
-        console.log("Recuperación automática en MODO FUNCIONAL para QA");
+        console.error("Error al verificar identidad:", error);
+        updateVerificationModalStatus("error", "Error: " + error.message);
         
-        // Fingimos éxito
-        updateVerificationModalStatus("success", "Verificación completada en modo simulado");
+        // Restaurar botón principal
+        document.getElementById("verifyIdentityBtn").disabled = false;
+        document.getElementById("verifyIdentityBtn").textContent = "Verificar Identidad";
         
-        // Actualizar UI principal si existe
-        if (document.getElementById("verifyIdentityBtn")) {
-          document.getElementById("verifyIdentityBtn").textContent = "Identidad Verificada ✓";
-          document.getElementById("verifyIdentityBtn").style.backgroundColor = "var(--success)";
-          document.getElementById("verifyIdentityBtn").disabled = false;
+        // Mostrar mensaje de error detallado
+        const modalContent = document.getElementById('verificationModalContent');
+        if (modalContent) {
+          const errorMessage = document.createElement('div');
+          errorMessage.innerHTML = `
+            <div style="margin-top: 15px; padding: 15px; background-color: #f8d7da; border-radius: 5px; border-left: 4px solid #dc3545;">
+              <h4 style="margin-top:0; color: #721c24;">Error de verificación</h4>
+              <p>No se pudo completar la verificación de identidad requerida por la Ley 19.799.</p>
+              <p>Por favor, asegúrese de permitir el acceso a su cámara e intente nuevamente.</p>
+              <p><strong>Detalles técnicos:</strong> ${error.message}</p>
+            </div>
+          `;
+          
+          modalContent.appendChild(errorMessage);
+          
+          // Botón para reintentar
+          const retryButton = document.createElement('button');
+          retryButton.style.width = '100%';
+          retryButton.style.padding = '10px';
+          retryButton.style.backgroundColor = '#f0f0f0';
+          retryButton.style.border = 'none';
+          retryButton.style.borderRadius = '5px';
+          retryButton.style.cursor = 'pointer';
+          retryButton.style.marginTop = '15px';
+          retryButton.textContent = 'Reintentar verificación';
+          retryButton.addEventListener('click', () => {
+            // Cerrar y reabrir el modal para reiniciar el proceso
+            closeVerificationModal();
+            setTimeout(() => verifyIdentity(), 500);
+          });
+          
+          modalContent.appendChild(retryButton);
         }
-        
-        // Cerramos el modal después de un tiempo
-        setTimeout(() => {
-          closeVerificationModal();
-        }, 3000);
       }
     }
     
