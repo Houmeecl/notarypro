@@ -3,11 +3,22 @@
  * 
  * Esta biblioteca proporciona funciones para leer datos de cédulas chilenas 
  * usando la API Web NFC en dispositivos móviles y la interfaz con lectores POS.
+ * Implementa funcionalidad real conforme a la Ley 19.799 de Documentos Electrónicos.
  */
+
+// Importar funciones de modo real
+import { esFuncionalidadRealActiva } from './funcionalidad-real';
+import { 
+  readWithWebNFC, 
+  readWithAlternativeNFC, 
+  readWithAndroidInterface,
+  NFCDocumentData
+} from './nfc-real';
 
 // Variables para controlar el estado de la lectura
 let isReading = false;
 let abortController: AbortController | null = null;
+const USING_REAL_MODE = true; // Forzar uso del modo real en toda la aplicación
 
 // Estructura de datos para la información de la cédula chilena
 export interface CedulaChilenaData {

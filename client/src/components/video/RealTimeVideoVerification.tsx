@@ -8,7 +8,8 @@ import {
   AlertTriangle,
   FileCheck,
   Loader2,
-  Repeat
+  Repeat,
+  ShieldCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,6 +40,9 @@ import {
   validateFacialImage,
   MediaDeviceInfo
 } from '@/lib/camera-access';
+import { esFuncionalidadRealActiva } from '@/lib/funcionalidad-real';
+import { useRealFunctionality } from '@/hooks/use-real-funcionality';
+import { Badge } from '@/components/ui/badge';
 
 export interface VerificationResult {
   success: boolean;
@@ -93,11 +97,16 @@ export function RealTimeVideoVerification({
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
   
   const { toast } = useToast();
+  const { isRealMode } = useRealFunctionality();
 
-  // Inicialización del componente
+  // Inicialización del componente con modo real activado
   useEffect(() => {
     if (autoStart) {
       initializeCamera();
+    }
+    
+    if (isRealMode) {
+      console.log("✅ Componente de verificación video iniciado en MODO REAL");
     }
     
     return () => {
@@ -105,7 +114,7 @@ export function RealTimeVideoVerification({
       if (stream) stopMediaStream(stream);
       if (verificationTimeout.current) clearTimeout(verificationTimeout.current);
     };
-  }, [autoStart]);
+  }, [autoStart, isRealMode]);
 
   // Inicializa la cámara y solicita permisos
   const initializeCamera = async () => {
