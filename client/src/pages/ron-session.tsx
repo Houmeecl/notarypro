@@ -112,7 +112,7 @@ export default function RonSession() {
   });
   
   // Consulta para obtener usuario actual (profesional o cliente)
-  const { data: currentUser } = useQuery({
+  const { data: currentUser = { role: 'professional' } } = useQuery({
     queryKey: ['/api/ron/user'],
   });
   
@@ -612,7 +612,7 @@ export default function RonSession() {
                                 Preguntas de verificación
                               </span>
                               {verificationSteps.securityQuestions && (
-                                <Badge variant="success" className="ml-auto">Completado</Badge>
+                                <Badge variant="outline" className="ml-auto bg-green-600/20 text-green-500 border-green-600/30">Completado</Badge>
                               )}
                             </div>
                             <p className="text-xs text-gray-400">
@@ -1165,7 +1165,7 @@ export default function RonSession() {
         <DialogContent className="max-w-3xl bg-gray-900 text-white border-gray-700 overflow-y-auto max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="flex items-center">
-              <User className="h-5 w-5 mr-2 text-primary" />
+              <Users className="h-5 w-5 mr-2 text-primary" />
               Verificación biométrica facial
             </DialogTitle>
             <DialogDescription>
