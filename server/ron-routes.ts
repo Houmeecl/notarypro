@@ -1,201 +1,259 @@
-import { Router, Request, Response } from "express";
-import { storage } from "./storage";
-import { scrypt, randomBytes, timingSafeEqual } from "crypto";
-import { promisify } from "util";
+/**
+ * Rutas API para el sistema RON (Remote Online Notarization)
+ */
 
-const scryptAsync = promisify(scrypt);
+import { Router, Request, Response } from 'express';
+import { agoraService } from './services/agora-service';
+import { helloSignService } from './services/hellosign-service';
+import { s3StorageService } from './services/s3-storage-service';
+import { certificationService } from './services/certification-service';
+import multer from 'multer';
 
-async function comparePasswords(supplied: string, stored: string) {
-  const [hashed, salt] = stored.split(".");
-  const hashedBuf = Buffer.from(hashed, "hex");
-  const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
-  return timingSafeEqual(hashedBuf, suppliedBuf);
-}
-
-export const ronRouter = Router();
-
-// Middleware para verificar si el usuario tiene permisos de RON
-function hasRonAccess(req: Request, res: Response, next: any) {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: "No autenticado" });
-  }
-  
-  const user = req.user;
-  if (user.role !== "certifier" && user.role !== "lawyer" && user.role !== "admin") {
-    return res.status(403).json({ message: "No tiene permisos para acceder a la plataforma RON" });
-  }
-  
-  next();
-}
-
-// Login para la plataforma RON - permite usar las mismas credenciales del sistema principal
-ronRouter.post("/login", async (req: Request, res: Response) => {
-  try {
-    // Asegurarnos de que estamos recibiendo una solicitud JSON
-    if (!req.is('application/json')) {
-      return res.status(400).json({ message: "Se requiere Content-Type: application/json" });
-    }
-    
-    const { username, password } = req.body;
-    
-    // Validar que tenemos username y password
-    if (!username || !password) {
-      return res.status(400).json({ message: "Se requiere usuario y contraseña" });
-    }
-    
-    console.log(`Intento de acceso RON para usuario: ${username}`);
-    
-    // ACCESO DE EMERGENCIA: Permitir credenciales predefinidas para administradores
-    if ((username === "Edwardadmin" && password === "adminq") || 
-        (username === "Sebadmin" && password === "admin123") ||
-        (username === "nfcadmin" && password === "nfc123") ||
-        (username === "vecinosadmin" && password === "vecinosadmin") ||
-        (username === "miadmin" && password === "miadmin123")) {
-      
-      console.log(`Acceso de emergencia RON concedido para administrador: ${username}`);
-      
-      // Crear usuario simulado para respuesta
-      const adminUser = {
-        id: 999,
-        username: username,
-        role: "admin",
-        fullName: `Administrador (${username})`,
-        region: "Metropolitana"
-      };
-      
-      // Continuar con la respuesta exitosa
-      const ronUserData = {
-        id: adminUser.id,
-        username: adminUser.username,
-        role: adminUser.role,
-        name: adminUser.fullName || adminUser.username,
-        region: adminUser.region || "Metropolitana", 
-        specialization: "Administrador RON",
-        avatarUrl: "https://randomuser.me/api/portraits/men/42.jpg"
-      };
-      
-      return res.status(200).json(ronUserData);
-    }
-    
-    // Para usuarios regulares, verificar en la base de datos
-    const user = await storage.getUserByUsername(username);
-    
-    if (!user) {
-      console.log(`Usuario RON no encontrado: ${username}`);
-      return res.status(401).json({ message: "Credenciales incorrectas" });
-    }
-    
-    // Verificar la contraseña usando el método de hash y sal correcto
-    const passwordValid = await comparePasswords(password, user.password);
-    if (!passwordValid) {
-      console.log(`Contraseña incorrecta para usuario RON: ${username}`);
-      return res.status(401).json({ message: "Credenciales incorrectas" });
-    }
-    
-    console.log(`Validación RON exitosa para: ${username}, rol: ${user.role}`);
-    
-    // Para usuarios normales, verificar si tienen permisos para acceder a la plataforma RON
-    if (user.role !== 'certifier' && user.role !== 'lawyer' && user.role !== 'admin') {
-      return res.status(403).json({ message: "No tiene permisos para acceder a la plataforma RON" });
-    }
-    
-    // Formatear la respuesta con datos específicos de RON
-    const ronUserData = {
-      id: user.id,
-      username: user.username,
-      role: user.role,
-      name: user.fullName || user.username,
-      region: user.region || "Metropolitana", 
-      specialization: user.role === 'certifier' ? "Documentos generales" : "Legal",
-      avatarUrl: "https://randomuser.me/api/portraits/men/42.jpg"
-    };
-    
-    // Establecer explícitamente el tipo de contenido
-    res.setHeader('Content-Type', 'application/json');
-    res.status(200).json(ronUserData);
-  } catch (error) {
-    console.error("Error en login RON:", error);
-    res.status(500).json({ message: "Error en el servidor: " + error.message });
+// Configuración de multer para manejar archivos
+const storage = multer.memoryStorage();
+const upload = multer({ 
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // Limitar a 10MB
   }
 });
 
-// Acceso para clientes mediante código
-ronRouter.post("/client-access", async (req: Request, res: Response) => {
-  try {
-    const { code } = req.body;
-    
-    if (!code) {
-      return res.status(400).json({ message: "Se requiere un código de acceso" });
-    }
-    
-    // Aquí verificaríamos el código de acceso en la base de datos
-    // Por ahora usamos datos de ejemplo para probar la funcionalidad
-    // En la implementación definitiva, estos códigos se almacenarían en la base de datos
-    // y se generarían al momento de crear una sesión RON
-    
-    if (code !== "RON123" && code !== "TEST456") {
-      return res.status(401).json({ message: "Código de acceso inválido o expirado" });
-    }
-    
-    // Datos de sesión RON
-    const sessionData = {
-      id: code === "RON123" ? "RON-001" : "RON-002",
-      clientName: code === "RON123" ? "María González" : "Pedro Soto",
-      documentType: code === "RON123" ? "Contrato de arrendamiento" : "Poder notarial",
-      certifierId: code === "RON123" ? 5 : 8,
-      certifierName: code === "RON123" ? "Dr. Juan Pérez" : "Dra. Ana Silva",
-      scheduledFor: new Date(Date.now() + 10 * 60000).toISOString(), // 10 minutos en el futuro
-      status: "programada"
-    };
-    
-    res.status(200).json(sessionData);
-  } catch (error) {
-    res.status(500).json({ message: "Error en el servidor: " + error.message });
+// Middleware de autenticación
+const isAuthenticated = (req: Request, res: Response, next: Function) => {
+  if (req.isAuthenticated()) {
+    return next();
   }
+  res.status(401).json({ error: 'No autenticado' });
+};
+
+// Middleware para verificar rol de certificador
+const isCertifier = (req: Request, res: Response, next: Function) => {
+  if (req.isAuthenticated() && req.user && req.user.role === 'certifier') {
+    return next();
+  }
+  res.status(403).json({ error: 'Acceso denegado. Se requiere rol de certificador.' });
+};
+
+// Crear router
+const ronRouter = Router();
+
+// Ruta para verificar configuración y estado de servicios RON
+ronRouter.get('/status', isAuthenticated, async (req: Request, res: Response) => {
+  const status = {
+    video: agoraService.isConfigured(),
+    signature: helloSignService.isConfigured(),
+    storage: s3StorageService.isConfigured()
+  };
+  
+  res.json({
+    status,
+    ready: Object.values(status).every(Boolean),
+    timestamp: new Date().toISOString()
+  });
 });
 
-// Obtener sesiones de RON
-ronRouter.get("/sessions", hasRonAccess, async (req: Request, res: Response) => {
-  try {
-    // Aquí se obtendrían las sesiones reales desde la base de datos
-    // Por ahora devolvemos datos de ejemplo
+// Ruta para iniciar sesión de certificación RON
+ronRouter.post('/session/initialize', isAuthenticated, async (req: Request, res: Response) => {
+  const { sessionId, documentId, documentName, clientId, clientEmail, clientName } = req.body;
+  
+  if (!sessionId || !documentId || !clientId) {
+    return res.status(400).json({ 
+      error: 'Se requieren sessionId, documentId y clientId' 
+    });
+  }
+  
+  const result = await certificationService.initializeRONSession({
+    sessionId,
+    documentId,
+    documentName: documentName || 'Documento sin nombre',
+    certifierId: req.user.id,
+    clientId,
+    clientEmail: clientEmail || 'cliente@example.com',
+    clientName: clientName || 'Cliente'
+  });
+  
+  if (!result.success) {
+    return res.status(500).json({ error: result.error });
+  }
+  
+  res.json(result);
+});
+
+// Ruta para obtener tokens de video para una sesión
+ronRouter.get('/session/:sessionId/video-tokens', isAuthenticated, async (req: Request, res: Response) => {
+  const { sessionId } = req.params;
+  const userId = req.user.id;
+  const userRole = req.user.role === 'certifier' ? 'host' : 'audience';
+  
+  const token = agoraService.generateToken({
+    sessionId,
+    userId,
+    userRole,
+    channelName: `ron-session-${sessionId}`
+  });
+  
+  if (!token) {
+    return res.status(500).json({ error: 'No se pudo generar el token de video' });
+  }
+  
+  res.json({ 
+    token,
+    channelName: `ron-session-${sessionId}`,
+    userId
+  });
+});
+
+// Ruta para capturar documento de identidad
+ronRouter.post(
+  '/session/:sessionId/capture-identity', 
+  isAuthenticated, 
+  upload.single('image'), 
+  async (req: Request, res: Response) => {
+    const { sessionId } = req.params;
+    const { documentType, notes } = req.body;
     
-    const mockSessions = [
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se proporcionó imagen' });
+    }
+    
+    const result = await certificationService.captureIdentityDocument(
+      sessionId,
+      req.file.buffer,
       {
-        id: "RON-001",
-        client: "María González",
-        documentType: "Contrato de arrendamiento",
-        scheduledFor: new Date(Date.now() + 3600000).toISOString(),
-        region: "Metropolitana",
-        status: "programada"
-      },
-      {
-        id: "RON-002",
-        client: "Carlos Muñoz",
-        documentType: "Poder notarial",
-        scheduledFor: new Date(Date.now() - 1800000).toISOString(),
-        region: "Valparaíso",
-        status: "en_espera"
-      },
-      {
-        id: "RON-003",
-        client: "Ana Silva",
-        documentType: "Certificación de firma",
-        scheduledFor: new Date(Date.now() - 86400000).toISOString(),
-        region: "Metropolitana",
-        status: "completada"
+        capturedBy: req.user.id,
+        documentType,
+        notes
       }
-    ];
+    );
     
-    res.status(200).json(mockSessions);
-  } catch (error) {
-    res.status(500).json({ message: "Error en el servidor: " + error.message });
+    if (!result.success) {
+      return res.status(500).json({ error: result.error });
+    }
+    
+    res.json(result);
   }
+);
+
+// Ruta para iniciar proceso de firma
+ronRouter.post(
+  '/session/:sessionId/sign-document',
+  isAuthenticated,
+  upload.single('document'),
+  async (req: Request, res: Response) => {
+    const { sessionId } = req.params;
+    const { documentId, documentName, signers } = req.body;
+    
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se proporcionó documento' });
+    }
+    
+    let parsedSigners;
+    try {
+      parsedSigners = JSON.parse(signers);
+      if (!Array.isArray(parsedSigners)) {
+        throw new Error('El formato de firmantes es inválido');
+      }
+    } catch (e) {
+      return res.status(400).json({ error: 'El formato de firmantes es inválido' });
+    }
+    
+    const result = await certificationService.initializeSignatureProcess(
+      sessionId,
+      documentId,
+      documentName || 'Documento sin nombre',
+      req.file.buffer,
+      parsedSigners
+    );
+    
+    if (!result.success) {
+      return res.status(500).json({ error: result.error });
+    }
+    
+    res.json(result);
+  }
+);
+
+// Ruta para verificar estado de firma
+ronRouter.get('/signature/:signatureId/status', isAuthenticated, async (req: Request, res: Response) => {
+  const { signatureId } = req.params;
+  
+  const status = await helloSignService.checkSignatureStatus(signatureId);
+  
+  if (!status) {
+    return res.status(404).json({ error: 'No se encontró información de firma' });
+  }
+  
+  res.json(status);
 });
 
-// Cerrar sesión en la plataforma RON
-ronRouter.post("/logout", (req: Request, res: Response) => {
-  // Aquí solo enviamos una respuesta exitosa
-  // La lógica real de cerrar sesión se maneja en el frontend
-  res.status(200).json({ success: true });
+// Ruta para generar constancia de certificación
+ronRouter.post('/session/:sessionId/generate-certificate', isAuthenticated, async (req: Request, res: Response) => {
+  const { sessionId } = req.params;
+  const { 
+    documentId, 
+    documentName,
+    participantName,
+    verificationResult,
+    signatureInfo
+  } = req.body;
+  
+  if (!documentId || !documentName) {
+    return res.status(400).json({ error: 'Se requieren documentId y documentName' });
+  }
+  
+  const result = await certificationService.generateCertificate({
+    sessionId,
+    documentId,
+    documentName,
+    participantName: participantName || 'Participante',
+    certifierName: req.user.username || 'Certificador',
+    verificationResult: verificationResult || { success: false },
+    signatureInfo
+  });
+  
+  if (!result.success) {
+    return res.status(500).json({ error: result.error });
+  }
+  
+  res.json(result);
 });
+
+// Ruta para completar sesión RON
+ronRouter.post('/session/:sessionId/complete', isAuthenticated, async (req: Request, res: Response) => {
+  const { sessionId } = req.params;
+  const { 
+    documentId, 
+    clientId,
+    verificationId,
+    signatureId,
+    certificateId,
+    status,
+    notes
+  } = req.body;
+  
+  if (!documentId || !clientId) {
+    return res.status(400).json({ error: 'Se requieren documentId y clientId' });
+  }
+  
+  const completed = await certificationService.completeRONSession(
+    sessionId,
+    {
+      documentId,
+      certifierId: req.user.id,
+      clientId,
+      verificationId,
+      signatureId,
+      certificateId,
+      status: status || 'completed',
+      notes
+    }
+  );
+  
+  if (!completed) {
+    return res.status(500).json({ error: 'No se pudo completar la sesión RON' });
+  }
+  
+  res.json({ success: true, message: 'Sesión RON completada correctamente' });
+});
+
+export default ronRouter;
