@@ -281,29 +281,68 @@ const RonAgoraKitTest = () => {
           
           setVideoCall(true);
         } else {
-          // Configuración de respaldo para modo forzado
-          setAgoraConfig({
-            appId: '43b48ab9fbc942b3bb52c17cad38e08b', // Demo
-            channel: `ron-session-${accessCode.replace('RON-', '')}`,
-            token: null, // Funcionará sin token en modo prueba
-            uid: 2, // Cliente = 2
-            rtmUid: '2', // Debe ser string para RTM
-            enabledButtons: ['camera', 'mic', 'fullscreen', 'exit'],
-          });
+          // Si falla la API pública, intentar obtener el AppID directamente
+          try {
+            const appIdResponse = await fetch('/api/ron/public/app-id');
+            if (appIdResponse.ok) {
+              const appIdData = await appIdResponse.json();
+              
+              // Configuración de respaldo para modo forzado usando el AppID real
+              setAgoraConfig({
+                appId: appIdData.appId,
+                channel: `ron-session-${accessCode.replace('RON-', '')}`,
+                token: null, // En modo forzado/prueba sin token
+                uid: 2, // Cliente = 2
+                rtmUid: '2', // Debe ser string para RTM
+                enabledButtons: ['camera', 'mic', 'fullscreen', 'exit'],
+              });
+            } else {
+              throw new Error("No se pudo obtener el AppID de Agora");
+            }
+          } catch (appIdError) {
+            console.error("Error al obtener AppID de Agora:", appIdError);
+            toast({
+              title: 'Advertencia',
+              description: 'Funcionando en modo limitado sin videollamada',
+              variant: 'destructive'
+            });
+          }
           
           setVideoCall(true);
         }
       } catch (error) {
         console.error('Error al obtener tokens de Agora:', error);
-        // Continuar en modo forzado con configuración básica
-        setAgoraConfig({
-          appId: '43b48ab9fbc942b3bb52c17cad38e08b', // Demo
-          channel: `ron-session-${accessCode.replace('RON-', '')}`,
-          token: null,
-          uid: 2,
-        });
         
-        setVideoCall(true);
+        // Intentar obtener al menos el AppID para modo forzado
+        try {
+          const appIdResponse = await fetch('/api/ron/public/app-id');
+          if (appIdResponse.ok) {
+            const appIdData = await appIdResponse.json();
+            
+            setAgoraConfig({
+              appId: appIdData.appId,
+              channel: `ron-session-${accessCode.replace('RON-', '')}`,
+              token: null,
+              uid: 2,
+              rtmUid: '2',
+            });
+            
+            setVideoCall(true);
+          } else {
+            toast({
+              title: 'Error de configuración',
+              description: 'No se pudo iniciar la videollamada',
+              variant: 'destructive'
+            });
+          }
+        } catch (appIdError) {
+          console.error("No se pudo obtener configuración de Agora:", appIdError);
+          toast({
+            title: 'Error de conexión',
+            description: 'Funcionando en modo limitado sin videollamada',
+            variant: 'destructive'
+          });
+        }
       }
       
       // Mostrar notificación de éxito
