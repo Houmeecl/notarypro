@@ -436,6 +436,68 @@ export default function RonPlatform() {
             </div>
           </div>
           
+          {/* Acciones rápidas */}
+          <div className="mb-6">
+            <h3 className="text-lg font-medium mb-4">Acciones rápidas</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="hover:bg-slate-50 transition cursor-pointer border-indigo-100 hover:border-indigo-300">
+                <Link href="/ron-session-option" className="block">
+                  <CardContent className="p-4 flex items-center space-x-3">
+                    <div className="bg-indigo-100 rounded-full p-2">
+                      <Video className="h-5 w-5 text-indigo-700" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Sesión RON</p>
+                      <p className="text-sm text-muted-foreground">Estándar</p>
+                    </div>
+                  </CardContent>
+                </Link>
+              </Card>
+              
+              <Card className="hover:bg-slate-50 transition cursor-pointer border-indigo-100 hover:border-indigo-300">
+                <Link href="/ron-client" className="block">
+                  <CardContent className="p-4 flex items-center space-x-3">
+                    <div className="bg-green-100 rounded-full p-2">
+                      <Video className="h-5 w-5 text-green-700" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Cliente RON</p>
+                      <p className="text-sm text-muted-foreground">Mejorado</p>
+                    </div>
+                  </CardContent>
+                </Link>
+              </Card>
+              
+              <Card className="hover:bg-slate-50 transition cursor-pointer border-indigo-100 hover:border-indigo-300">
+                <Link href="/ron-agora-kit-test" className="block">
+                  <CardContent className="p-4 flex items-center space-x-3">
+                    <div className="bg-purple-100 rounded-full p-2">
+                      <Users className="h-5 w-5 text-purple-700" />
+                    </div>
+                    <div>
+                      <p className="font-medium">RON UI Kit</p>
+                      <p className="text-sm text-muted-foreground">Nueva versión</p>
+                    </div>
+                  </CardContent>
+                </Link>
+              </Card>
+              
+              <Card className="hover:bg-slate-50 transition cursor-pointer border-indigo-100 hover:border-indigo-300">
+                <Link href="/integraciones-demo" className="block">
+                  <CardContent className="p-4 flex items-center space-x-3">
+                    <div className="bg-blue-100 rounded-full p-2">
+                      <ClipboardList className="h-5 w-5 text-blue-700" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Integraciones</p>
+                      <p className="text-sm text-muted-foreground">API y SDK</p>
+                    </div>
+                  </CardContent>
+                </Link>
+              </Card>
+            </div>
+          </div>
+          
           {/* Contenido principal */}
           <Tabs defaultValue="all-sessions" className="w-full">
             <TabsList className="w-full bg-muted mb-6">
