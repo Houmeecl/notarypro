@@ -88,6 +88,8 @@ import DocumentProcessor from "@/pages/document-processor";
 import DocumentExplorerPage from "@/pages/document-explorer";
 import DocumentUploadPage from "@/pages/document-upload";
 import SignatureDemo from "@/pages/signature-demo";
+import DocumentSignatureFlowPage from "@/pages/document-signature-flow";
+import SignMobilePage from "@/pages/sign-mobile";
 
 // Partner pages
 import PartnersPublicPage from "@/pages/partners/public-page";
@@ -194,6 +196,8 @@ function Router() {
         allowedRoles={["user", "certifier", "admin"]} 
       />
       <Route path="/document-sign/:id" component={DocumentSign} />
+      <Route path="/document-signature/:documentId" component={DocumentSignatureFlowPage} />
+      <Route path="/sign-mobile/:token" component={SignMobilePage} />
 
       {/* Document routes */}
       <Route path="/document-categories" component={DocumentCategoriesPage} />
