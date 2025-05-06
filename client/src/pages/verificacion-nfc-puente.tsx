@@ -51,9 +51,15 @@ const VerificacionNfcPuente: React.FC = () => {
   useEffect(() => {
     if (params && params.sessionId) {
       // Esta página fue cargada con un sessionId, verificar resultados inmediatamente
-      checkResults(params.sessionId);
-      setSessionId(params.sessionId);
-      setVerificationStep('waiting');
+      // Para evitar bucles infinitos, solo establecer la sesión y verificar una vez
+      const isInitialLoad = !sessionStorage.getItem(`initialized_${params.sessionId}`);
+      
+      if (isInitialLoad) {
+        sessionStorage.setItem(`initialized_${params.sessionId}`, 'true');
+        checkResults(params.sessionId);
+        setSessionId(params.sessionId);
+        setVerificationStep('waiting');
+      }
     }
   }, [params]);
   
@@ -309,7 +315,7 @@ const VerificacionNfcPuente: React.FC = () => {
               </Button>
               
               <Button 
-                variant="outline" 
+                variant="secondary" 
                 className="w-full"
                 onClick={() => navigate('/')}
               >
@@ -375,7 +381,7 @@ const VerificacionNfcPuente: React.FC = () => {
                 </p>
               </div>
               
-              <Alert variant="outline" className="bg-blue-50 border-blue-200">
+              <Alert className="bg-blue-50 border-blue-200">
                 <Smartphone className="h-4 w-4" />
                 <AlertTitle>Verifique su teléfono</AlertTitle>
                 <AlertDescription>
