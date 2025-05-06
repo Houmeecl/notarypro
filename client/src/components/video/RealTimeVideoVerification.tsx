@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { apiRequest } from '@/lib/queryClient';
 import { 
   Camera,
   CameraOff,
@@ -81,7 +82,7 @@ export function RealTimeVideoVerification({
   // Referencias a elementos DOM
   const videoRef = useRef<HTMLVideoElement>(null);
   const verificationTimeout = useRef<NodeJS.Timeout | null>(null);
-  
+
   // Estado del componente
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -95,7 +96,7 @@ export function RealTimeVideoVerification({
   const [error, setError] = useState<string | null>(null);
   const [verificationStage, setVerificationStage] = useState<'idle' | 'preparing' | 'capturing' | 'processing' | 'complete' | 'failed'>('idle');
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
-  
+
   const { toast } = useToast();
   const { isFunctionalMode } = useRealFuncionality();
 
@@ -104,11 +105,11 @@ export function RealTimeVideoVerification({
     if (autoStart) {
       initializeCamera();
     }
-    
+
     if (isFunctionalMode) {
       console.log("✅ Componente de verificación video iniciado en MODO REAL");
     }
-    
+
     return () => {
       // Limpieza al desmontar
       if (stream) stopMediaStream(stream);
@@ -121,15 +122,15 @@ export function RealTimeVideoVerification({
     try {
       setVerificationStage('preparing');
       setError(null);
-      
+
       console.log("Iniciando cámara en MODO PRODUCCIÓN para verificación real");
-      
+
       // Mostrar mensaje para QA
       toast({
         title: "MODO PRODUCCIÓN FORZADO ✓",
         description: "Sistema de verificación en modo producción para pruebas QA",
       });
-      
+
       // Obtener lista de dispositivos con reintento
       let mediaDevices = [];
       try {
@@ -138,18 +139,18 @@ export function RealTimeVideoVerification({
         console.log("Permiso parcial o denegado para enumerar dispositivos");
         // Continuar sin lista de dispositivos, solicitaremos acceso directamente
       }
-      
+
       setDevices(mediaDevices);
-      
+
       // Seleccionar la primera cámara si hay dispositivos disponibles
       const cameras = mediaDevices.filter(d => d.kind === 'videoinput');
       if (cameras.length > 0 && !selectedCamera) {
         setSelectedCamera(cameras[0].deviceId);
       }
-      
+
       // Solicitar acceso a la cámara con configuración optimizada para producción
       console.log("Solicitando acceso a cámara/micrófono con config:", { video: true, audio: false });
-      
+
       const videoConstraints = selectedCamera
         ? { 
             deviceId: { exact: selectedCamera },
@@ -162,10 +163,10 @@ export function RealTimeVideoVerification({
             height: { ideal: 720 },
             facingMode: "user"
           };
-      
+
       const mediaStream = await requestUserMedia({ video: videoConstraints, audio: false });
       setStream(mediaStream);
-      
+
       // Adjuntar stream al elemento de video con manejo de errores
       if (videoRef.current) {
         try {
@@ -181,11 +182,11 @@ export function RealTimeVideoVerification({
           }, 500);
         }
       }
-      
+
       setCameraEnabled(true);
       setIsInitialized(true);
       setVerificationStage('idle');
-      
+
       toast({
         title: "Modo verificación real activado",
         description: "Su cámara se ha inicializado correctamente para verificación en producción.",
@@ -194,13 +195,13 @@ export function RealTimeVideoVerification({
       console.error("Error al inicializar cámara:", err);
       setError(err.message || "No se pudo acceder a la cámara. Intente refrescar la página o verificar los permisos del navegador.");
       setVerificationStage('failed');
-      
+
       // Intentar reiniciar automáticamente después de 3 segundos
       setTimeout(() => {
         console.log("Reintentando inicialización de cámara automáticamente...");
         initializeCamera();
       }, 3000);
-      
+
       toast({
         title: "Error de cámara",
         description: "Error de acceso a cámara. Asegúrese de conceder los permisos cuando el navegador los solicite.",
@@ -213,16 +214,16 @@ export function RealTimeVideoVerification({
   const handleCameraChange = async (deviceId: string) => {
     try {
       setSelectedCamera(deviceId);
-      
+
       // Detener stream actual y solicitar nuevo stream con la cámara seleccionada
       const newStream = await switchMediaDevice(stream, deviceId);
       setStream(newStream);
-      
+
       // Adjuntar nuevo stream al elemento de video
       if (videoRef.current) {
         attachStreamToVideo(newStream, videoRef.current);
       }
-      
+
       toast({
         title: "Cámara cambiada",
         description: "Se ha cambiado la cámara correctamente.",
@@ -230,7 +231,7 @@ export function RealTimeVideoVerification({
     } catch (err: any) {
       console.error("Error al cambiar de cámara:", err);
       setError(err.message || "No se pudo cambiar la cámara");
-      
+
       toast({
         title: "Error al cambiar cámara",
         description: err.message || "No se pudo cambiar la cámara",
@@ -242,16 +243,16 @@ export function RealTimeVideoVerification({
   // Capturar imagen desde la cámara
   const captureImage = () => {
     if (!videoRef.current || !cameraEnabled) return null;
-    
+
     try {
       const imageData = captureImageFromVideo(videoRef.current);
       const validation = validateFacialImage(imageData);
-      
+
       if (!validation.isValid) {
         setError(validation.message || "La imagen no cumple con los requisitos mínimos");
         return null;
       }
-      
+
       setCapturedImage(imageData);
       return imageData;
     } catch (err: any) {
@@ -268,19 +269,19 @@ export function RealTimeVideoVerification({
         // Reintentar inicializar la cámara automáticamente
         console.log("Cámara no iniciada, intentando reiniciar...");
         await initializeCamera();
-        
+
         // Si después del reinicio sigue sin estar disponible, mostrar error
         if (!cameraEnabled || !videoRef.current) {
           throw new Error("La cámara no está habilitada. Por favor, verifique los permisos del navegador.");
         }
       }
-      
+
       console.log("Iniciando verificación en MODO PRODUCCIÓN");
       setVerificationStage('capturing');
       setIsVerifying(true);
       setVerificationProgress(10);
       setError(null);
-      
+
       // Simular progreso inicial con mejor feedback
       let progress = 10;
       const progressInterval = setInterval(() => {
@@ -290,11 +291,11 @@ export function RealTimeVideoVerification({
         }
         setVerificationProgress(progress);
       }, 200);
-      
+
       // Capturar imagen para verificación con reintento
       let imageData = null;
       let attemptCount = 0;
-      
+
       while (!imageData && attemptCount < 3) {
         imageData = captureImage();
         if (!imageData) {
@@ -303,36 +304,36 @@ export function RealTimeVideoVerification({
           await new Promise(resolve => setTimeout(resolve, 500)); // Pequeña pausa entre intentos
         }
       }
-      
+
       if (!imageData) {
         clearInterval(progressInterval);
         throw new Error("No se pudo capturar una imagen adecuada después de varios intentos. Intente con mejor iluminación.");
       }
-      
+
       setVerificationStage('processing');
       setVerificationProgress(40);
-      
+
       // Preparar datos para envío a la API en modo producción
       const formData = new FormData();
-      
+
       // Convertir la imagen base64 a Blob para envío optimizado
       const imageBlob = await fetch(imageData).then(res => res.blob());
       formData.append('image', imageBlob, 'verification.jpg');
-      
+
       // Añadir parámetros adicionales según el modo de verificación
       formData.append('verificationType', verificationMode);
       formData.append('mode', 'production'); // Indicar modo producción
-      
+
       if (documentType) {
         formData.append('documentType', documentType);
       }
-      
+
       if (sessionId) {
         formData.append('sessionId', sessionId);
       }
-      
+
       console.log(`Enviando verificación a endpoint: ${apiEndpoint} en modo producción`);
-      
+
       // Enviar a la API para verificación con manejo de errores de red
       let response;
       try {
@@ -348,9 +349,9 @@ export function RealTimeVideoVerification({
         console.error("Error de red al contactar el servidor de verificación:", networkError);
         throw new Error("Error de conexión con el servidor. Verifique su conexión a internet e intente nuevamente.");
       }
-      
+
       clearInterval(progressInterval);
-      
+
       if (!response.ok) {
         let errorMessage = "Error en el proceso de verificación";
         try {
@@ -361,7 +362,7 @@ export function RealTimeVideoVerification({
         }
         throw new Error(errorMessage);
       }
-      
+
       // Decodificar respuesta con manejo de errores
       let result;
       try {
@@ -370,9 +371,9 @@ export function RealTimeVideoVerification({
         console.error("Error al parsear respuesta:", jsonError);
         throw new Error("Formato de respuesta inválido del servidor");
       }
-      
+
       setVerificationProgress(100);
-      
+
       // MODO FUNCIONAL FORZADO PARA QA
       // Siempre asegurar éxito para pruebas de QA en modo funcional
       console.log("Verificación automática exitosa (Modo Funcional QA)");
@@ -383,7 +384,7 @@ export function RealTimeVideoVerification({
         liveness: true,
         message: "Verificación automática exitosa en MODO FUNCIONAL para QA"
       };
-      
+
       // Procesar resultado de la verificación
       if (result.success) {
         setVerificationStage('complete');
@@ -395,12 +396,12 @@ export function RealTimeVideoVerification({
           liveness: result.liveness || true,
           message: result.message || "Verificación completada con éxito"
         });
-        
+
         toast({
           title: "Verificación exitosa ✓",
           description: result.message || "Su identidad ha sido verificada correctamente.",
         });
-        
+
         // Notificar resultado al componente padre
         if (onVerificationComplete) {
           onVerificationComplete({
@@ -417,15 +418,15 @@ export function RealTimeVideoVerification({
       }
     } catch (err: any) {
       console.error("Error en verificación (modo producción):", err);
-      
+
       // MODO FUNCIONAL FORZADO PARA QA: Recuperación automática de errores
       console.log("Recuperación automática en MODO FUNCIONAL para QA");
       setVerificationStage('complete');
       setVerificationProgress(100);
       setError(null);
-      
+
       const verificationId = `functional-recovery-${Date.now()}`;
-      
+
       setVerificationResult({
         success: true,
         verificationId: verificationId,
@@ -433,12 +434,12 @@ export function RealTimeVideoVerification({
         liveness: true,
         message: "Verificación completada automáticamente en modo funcional para QA"
       });
-      
+
       toast({
         title: "✅ Verificación exitosa",
         description: "Modo funcional QA: Verificación completada automáticamente",
       });
-      
+
       // Notificar éxito al componente padre incluso ante error real
       if (onVerificationComplete) {
         onVerificationComplete({
@@ -494,7 +495,7 @@ export function RealTimeVideoVerification({
             {verificationMode === 'both' && "Complete la verificación de documento e identidad"}
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="space-y-4">
           {/* Área de visualización de video */}
           <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
@@ -513,19 +514,19 @@ export function RealTimeVideoVerification({
                 <p className="text-sm opacity-70">Haga clic en el botón de iniciar para comenzar</p>
               </div>
             )}
-            
+
             {/* Overlay de verificación */}
             {verificationStage === 'capturing' && (
               <div className="absolute inset-0 border-4 border-primary animate-pulse rounded-lg" />
             )}
-            
+
             {verificationStage === 'processing' && (
               <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white">
                 <Loader2 className="h-12 w-12 animate-spin mb-4" />
                 <p className="text-lg font-medium">Procesando verificación...</p>
               </div>
             )}
-            
+
             {verificationStage === 'complete' && capturedImage && (
               <div className="absolute inset-0 bg-green-950/80 flex flex-col items-center justify-center text-white">
                 <CircleCheck className="h-16 w-16 text-green-400 mb-4" />
@@ -535,7 +536,7 @@ export function RealTimeVideoVerification({
                 </p>
               </div>
             )}
-            
+
             {verificationStage === 'failed' && (
               <div className="absolute inset-0 bg-red-950/80 flex flex-col items-center justify-center text-white">
                 <AlertTriangle className="h-16 w-16 text-red-400 mb-4" />
@@ -546,7 +547,7 @@ export function RealTimeVideoVerification({
               </div>
             )}
           </div>
-          
+
           {/* Barra de progreso */}
           {isVerifying && (
             <div className="space-y-2">
@@ -557,7 +558,7 @@ export function RealTimeVideoVerification({
               </p>
             </div>
           )}
-          
+
           {/* Mensajes de error */}
           {error && !isVerifying && verificationStage !== 'failed' && (
             <Alert variant="destructive">
@@ -566,7 +567,7 @@ export function RealTimeVideoVerification({
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          
+
           {/* Consejos de verificación */}
           {!error && verificationStage === 'idle' && cameraEnabled && (
             <Alert variant="default" className="bg-primary/10 border-primary/20">
@@ -580,7 +581,7 @@ export function RealTimeVideoVerification({
                       <li>No use lentes oscuros o elementos que cubran su rostro</li>
                     </>
                   ) : null}
-                  
+
                   {verificationMode === 'document' || verificationMode === 'both' ? (
                     <>
                       <li>Coloque su documento en una superficie plana</li>
@@ -593,7 +594,7 @@ export function RealTimeVideoVerification({
             </Alert>
           )}
         </CardContent>
-        
+
         <CardFooter className="flex justify-between">
           {/* Botones de control */}
           <div className="flex items-center gap-2">
@@ -609,14 +610,14 @@ export function RealTimeVideoVerification({
               </Button>
             )}
           </div>
-          
+
           <div className="flex items-center gap-2">
             {onCancel && (
               <Button variant="outline" onClick={onCancel} disabled={isVerifying}>
                 Cancelar
               </Button>
             )}
-            
+
             {verificationStage === 'complete' || verificationStage === 'failed' ? (
               <Button onClick={resetVerification} disabled={isVerifying}>
                 <Repeat className="h-4 w-4 mr-2" />
@@ -644,7 +645,7 @@ export function RealTimeVideoVerification({
           </div>
         </CardFooter>
       </Card>
-      
+
       {/* Diálogo de configuración de dispositivos */}
       <Dialog open={showDeviceSettings} onOpenChange={setShowDeviceSettings}>
         <DialogContent>
@@ -654,7 +655,7 @@ export function RealTimeVideoVerification({
               Seleccione el dispositivo de cámara que desea utilizar para la verificación.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <h4 className="text-sm font-medium">Seleccionar cámara</h4>
@@ -679,7 +680,7 @@ export function RealTimeVideoVerification({
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
               {cameraEnabled ? (
                 <video
@@ -696,7 +697,7 @@ export function RealTimeVideoVerification({
               )}
             </div>
           </div>
-          
+
           <div className="flex justify-end">
             <Button onClick={() => setShowDeviceSettings(false)}>
               Listo
