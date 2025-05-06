@@ -1,6 +1,6 @@
 /**
- * Versión mejorada de la página de cliente RON con mejor manejo de errores de cámara
- * y compatibilidad con diferentes navegadores.
+ * Versión mejorada de la página de cliente RON con mejor manejo de errores de cámara,
+ * compatibilidad con diferentes navegadores y notificación clara de modo forzado.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -21,9 +21,11 @@ import {
   FileText, 
   Info, 
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  Shield
 } from 'lucide-react';
 import ImprovedVideoSession from '@/components/ron/ImprovedVideoSession';
+import ForcedModeNotification from '@/components/ron/ForcedModeNotification';
 
 export default function RonClientMejorado() {
   const params = useParams();
@@ -121,6 +123,9 @@ export default function RonClientMejorado() {
         
         <main className="flex-1 container mx-auto px-4 py-6 max-w-7xl">
           <div className="grid grid-cols-1 gap-6">
+            {/* Notificación de Modo Forzado */}
+            <ForcedModeNotification mode="forced" />
+            
             <Card className="border-0 shadow-lg overflow-hidden">
               <CardHeader className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4">
                 <CardTitle className="flex items-center">
@@ -192,7 +197,10 @@ export default function RonClientMejorado() {
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="space-y-4">
+          {/* Notificación de Modo Forzado */}
+          <ForcedModeNotification mode="forced" />
+          
+          <div className="space-y-4 mt-4">
             <div className="space-y-2">
               <label 
                 htmlFor="accessCode" 
