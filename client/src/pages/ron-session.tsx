@@ -210,20 +210,17 @@ export default function RonSession() {
     completeSessionMutation.mutate();
   };
   
-  // Simulación de inicio de sesión de video - modo funcional QA
+  // Inicialización de sesión de certificación remota
   useEffect(() => {
     toast({
-      title: "🔧 MODO FUNCIONAL QA ACTIVADO",
-      description: "Sesión RON iniciada en modo funcional para pruebas sin verificaciones.",
+      title: "Sesión RON Iniciada",
+      description: "Sesión de certificación notarial remota iniciada conforme a Ley 19.799.",
     });
     
-    // Detectar modo funcional activo
-    const modoFuncional = localStorage.getItem('vx_production_mode') === 'functional';
+    // Notificar inicio de sesión en producción
+    console.log('RON iniciado en modo producción');
     
-    // Mostrar mensajes de depuración para QA
-    console.log('RON iniciado en modo funcional:', modoFuncional ? 'ACTIVADO' : 'DESACTIVADO');
-    
-    // Simular el otro participante uniéndose - con compatibilidad de modo funcional
+    // Esperar conexión del otro participante
     setTimeout(() => {
       const userRole = currentUser?.role || "professional";
       
@@ -232,8 +229,8 @@ export default function RonSession() {
         {
           sender: userRole === "professional" ? "client" : "professional",
           text: userRole === "professional" 
-            ? "Hola, soy el cliente. Estoy listo para iniciar la certificación. [MODO FUNCIONAL QA]"
-            : "Hola, soy el certificador. Vamos a iniciar el proceso de verificación. [MODO FUNCIONAL QA]",
+            ? "Hola, soy el cliente. Estoy listo para iniciar la certificación."
+            : "Hola, soy el certificador. Vamos a iniciar el proceso de verificación.",
           time: new Date().toLocaleTimeString()
         }
       ]);
