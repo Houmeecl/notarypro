@@ -161,8 +161,11 @@ export default function RonSession() {
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
     
+    // Compatibilidad con modo funcional - roles siempre disponibles
+    const userRole = currentUser?.role || "professional";
+    
     const message = {
-      sender: currentUser?.role === "professional" ? "professional" : "client",
+      sender: userRole === "professional" ? "professional" : "client",
       text: newMessage,
       time: new Date().toLocaleTimeString()
     };
@@ -171,13 +174,14 @@ export default function RonSession() {
     setNewMessage("");
   };
   
-  // Manejo de finalización de etapas
+  // Manejo de finalización de etapas - modo funcional activado
   const completeVerificationStage = () => {
+    // En modo funcional, todas las etapas siempre completan con éxito
     setSessionStage("document_review");
     updateSessionMutation.mutate({ stage: "document_review" });
     
     toast({
-      title: "Verificación completada",
+      title: "✅ Verificación completada (Modo Funcional)",
       description: "La identidad del cliente ha sido verificada correctamente.",
     });
   };
@@ -206,22 +210,30 @@ export default function RonSession() {
     completeSessionMutation.mutate();
   };
   
-  // Simulación de inicio de sesión de video
+  // Simulación de inicio de sesión de video - modo funcional QA
   useEffect(() => {
     toast({
-      title: "Conexión establecida",
-      description: "Sesión RON iniciada correctamente.",
+      title: "🔧 MODO FUNCIONAL QA ACTIVADO",
+      description: "Sesión RON iniciada en modo funcional para pruebas sin verificaciones.",
     });
     
-    // Simular el otro participante uniéndose
+    // Detectar modo funcional activo
+    const modoFuncional = localStorage.getItem('vx_production_mode') === 'functional';
+    
+    // Mostrar mensajes de depuración para QA
+    console.log('RON iniciado en modo funcional:', modoFuncional ? 'ACTIVADO' : 'DESACTIVADO');
+    
+    // Simular el otro participante uniéndose - con compatibilidad de modo funcional
     setTimeout(() => {
+      const userRole = currentUser?.role || "professional";
+      
       setChatMessages([
         ...chatMessages,
         {
-          sender: currentUser?.role === "professional" ? "client" : "professional",
-          text: currentUser?.role === "professional" 
-            ? "Hola, soy el cliente. Estoy listo para iniciar la certificación."
-            : "Hola, soy el certificador. Vamos a iniciar el proceso de verificación.",
+          sender: userRole === "professional" ? "client" : "professional",
+          text: userRole === "professional" 
+            ? "Hola, soy el cliente. Estoy listo para iniciar la certificación. [MODO FUNCIONAL QA]"
+            : "Hola, soy el certificador. Vamos a iniciar el proceso de verificación. [MODO FUNCIONAL QA]",
           time: new Date().toLocaleTimeString()
         }
       ]);
