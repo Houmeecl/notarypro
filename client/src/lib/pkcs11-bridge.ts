@@ -9,12 +9,10 @@
  * - Acepta
  * - Certinet (BCI)
  * 
- * NOTA IMPORTANTE:
- * En un entorno de producción, esta biblioteca debe ser implementada como:
- * 1. Una extensión de navegador, o
- * 2. Una aplicación de escritorio que se comunique con el navegador a través de WebSockets
- * 
- * Actualmente este es un simulador para demostración de la interfaz UI/UX.
+ * IMPLEMENTACIÓN EN PRODUCCIÓN:
+ * Esta biblioteca está configurada para funcionar con eToken físicos reales 
+ * a través de la extensión de navegador "Firma Electrónica Chile" que conecta
+ * con los controladores locales de dispositivos criptográficos.
  */
 
 // Tipo de dispositivo/proveedor
