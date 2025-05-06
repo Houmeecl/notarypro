@@ -9,6 +9,7 @@ import {
   VideoOff, 
   MessageSquare, 
   Users, 
+  User, 
   Phone, 
   PhoneOff,
   FileText, 
@@ -512,10 +513,14 @@ export default function RonSession() {
             value={currentTab} 
             onValueChange={setCurrentTab}
           >
-            <TabsList className="bg-gray-900 p-0 h-14 border-b border-gray-700 grid grid-cols-3">
+            <TabsList className="bg-gray-900 p-0 h-14 border-b border-gray-700 grid grid-cols-4">
               <TabsTrigger value="documents" className="data-[state=active]:bg-gray-800">
                 <FileText className="h-4 w-4 mr-2" />
                 Documentos
+              </TabsTrigger>
+              <TabsTrigger value="verification" className="data-[state=active]:bg-gray-800">
+                <ScanFace className="h-4 w-4 mr-2" />
+                Verificación
               </TabsTrigger>
               <TabsTrigger value="chat" className="data-[state=active]:bg-gray-800">
                 <MessageSquare className="h-4 w-4 mr-2" />
@@ -526,6 +531,141 @@ export default function RonSession() {
                 Participantes
               </TabsTrigger>
             </TabsList>
+            
+            {/* Pestaña de verificación */}
+            <TabsContent value="verification" className="flex-1 flex flex-col overflow-hidden p-0 m-0">
+              <div className="p-4 border-b border-gray-700">
+                <h3 className="font-medium flex items-center">
+                  <ScanFace className="h-4 w-4 mr-2 text-primary" />
+                  Verificación de identidad
+                </h3>
+                <p className="text-sm text-gray-400 mt-1">
+                  Complete los pasos de verificación para certificar la identidad
+                </p>
+              </div>
+              
+              <ScrollArea className="flex-1 p-4">
+                <div className="space-y-4">
+                  <Card className="bg-gray-900 border-gray-700">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base">Proceso de verificación</CardTitle>
+                      <CardDescription>
+                        Seleccione el tipo de verificación a realizar
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4 pt-0">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <Button 
+                          variant="outline" 
+                          className="h-auto py-3 px-4 flex items-start border-gray-700 hover:border-primary hover:bg-gray-800"
+                          onClick={() => setShowIdentityVerification(true)}
+                          disabled={verificationSteps.biometricCheck || verificationInProgress}
+                        >
+                          <div className="flex flex-col items-start text-left">
+                            <div className="flex items-center w-full justify-between mb-2">
+                              <span className="font-medium flex items-center">
+                                <User className="h-4 w-4 mr-2 text-primary" />
+                                Verificación biométrica
+                              </span>
+                              {verificationSteps.biometricCheck && (
+                                <Badge variant="outline" className="ml-auto bg-green-600/20 text-green-500 border-green-600/30">Completado</Badge>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-400">
+                              Verificación facial en tiempo real para confirmar identidad
+                            </p>
+                          </div>
+                        </Button>
+                        
+                        <Button 
+                          variant="outline" 
+                          className="h-auto py-3 px-4 flex items-start border-gray-700 hover:border-primary hover:bg-gray-800"
+                          onClick={() => setShowDocumentVerification(true)}
+                          disabled={verificationSteps.documentCheck || verificationInProgress}
+                        >
+                          <div className="flex flex-col items-start text-left">
+                            <div className="flex items-center w-full justify-between mb-2">
+                              <span className="font-medium flex items-center">
+                                <FileCheck className="h-4 w-4 mr-2 text-primary" />
+                                Verificación de documento
+                              </span>
+                              {verificationSteps.documentCheck && (
+                                <Badge variant="outline" className="ml-auto bg-green-600/20 text-green-500 border-green-600/30">Completado</Badge>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-400">
+                              Verificación del documento oficial de identidad (cédula)
+                            </p>
+                          </div>
+                        </Button>
+                        
+                        <Button 
+                          variant="outline" 
+                          className="h-auto py-3 px-4 flex items-start border-gray-700 hover:border-primary hover:bg-gray-800"
+                          onClick={() => updateVerificationStep('securityQuestions', true)}
+                          disabled={verificationSteps.securityQuestions || verificationInProgress}
+                        >
+                          <div className="flex flex-col items-start text-left">
+                            <div className="flex items-center w-full justify-between mb-2">
+                              <span className="font-medium flex items-center">
+                                <Info className="h-4 w-4 mr-2 text-primary" />
+                                Preguntas de verificación
+                              </span>
+                              {verificationSteps.securityQuestions && (
+                                <Badge variant="success" className="ml-auto">Completado</Badge>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-400">
+                              Verificación mediante preguntas de seguridad personales
+                            </p>
+                          </div>
+                        </Button>
+                        
+                        <div className="bg-blue-900/30 border border-blue-800/50 rounded-md p-3 md:col-span-2">
+                          <div className="flex items-start space-x-3">
+                            <div className="bg-blue-600/20 p-1.5 rounded-full">
+                              <Info className="h-4 w-4 text-blue-400" />
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-medium text-blue-300">Sistema de verificación en tiempo real</h4>
+                              <p className="text-xs text-blue-300/80 mt-1">
+                                La verificación se realiza en tiempo real utilizando acceso a la cámara. Es necesario 
+                                permitir el acceso a la cámara cuando el navegador lo solicite para completar la verificación.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="pt-2">
+                        <Progress
+                          value={
+                            ((verificationSteps.biometricCheck ? 1 : 0) +
+                            (verificationSteps.documentCheck ? 1 : 0) +
+                            (verificationSteps.securityQuestions ? 1 : 0)) * 33.33
+                          }
+                          className="h-2"
+                        />
+                        <p className="text-xs text-gray-400 mt-2 text-center">
+                          {Object.values(verificationSteps).filter(Boolean).length} de 3 verificaciones completadas
+                        </p>
+                      </div>
+                      
+                      <div className="pt-2">
+                        <Button 
+                          className="w-full"
+                          disabled={!Object.values(verificationSteps).every(step => step)}
+                          onClick={completeVerificationStage}
+                        >
+                          <Check className="mr-2 h-4 w-4" />
+                          Completar proceso de verificación
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </ScrollArea>
+            </TabsContent>
             
             {/* Pestaña de documentos */}
             <TabsContent value="documents" className="flex-1 flex flex-col overflow-hidden p-0 m-0">
@@ -1019,6 +1159,76 @@ export default function RonSession() {
           </Tabs>
         </div>
       </main>
+
+      {/* Diálogos de verificación */}
+      <Dialog open={showIdentityVerification} onOpenChange={setShowIdentityVerification}>
+        <DialogContent className="max-w-3xl bg-gray-900 text-white border-gray-700 overflow-y-auto max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <User className="h-5 w-5 mr-2 text-primary" />
+              Verificación biométrica facial
+            </DialogTitle>
+            <DialogDescription>
+              Este proceso verifica su identidad utilizando reconocimiento facial en tiempo real
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <RealTimeVideoVerification
+              onVerificationComplete={handleIdentityVerification}
+              onCancel={() => setShowIdentityVerification(false)}
+              verificationMode="identity"
+              autoStart={true}
+              apiEndpoint="/api/identity/verify-face"
+              sessionId={params.id}
+            />
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowIdentityVerification(false)}
+            >
+              Cancelar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={showDocumentVerification} onOpenChange={setShowDocumentVerification}>
+        <DialogContent className="max-w-3xl bg-gray-900 text-white border-gray-700 overflow-y-auto max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <FileCheck className="h-5 w-5 mr-2 text-primary" />
+              Verificación de documento de identidad
+            </DialogTitle>
+            <DialogDescription>
+              Este proceso verifica la autenticidad del documento de identidad mediante análisis de la cámara
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <RealTimeVideoVerification
+              onVerificationComplete={handleDocumentVerification}
+              onCancel={() => setShowDocumentVerification(false)}
+              verificationMode="document"
+              documentType="cedula_cl"
+              autoStart={true}
+              apiEndpoint="/api/identity/verify-document"
+              sessionId={params.id}
+            />
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowDocumentVerification(false)}
+            >
+              Cancelar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
