@@ -98,6 +98,27 @@
       font-size: 16px;
       font-weight: 600;
       transition: background-color 0.3s;
+    }
+    
+    /* Estilos para los botones de acción */
+    .btn-action {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    
+    .btn-action:hover {
+      background-color: var(--primary-light);
+    }
+    
+    .btn-action:disabled {
+      background-color: #aaaaaa;
+      cursor: not-allowed;
       width: 100%;
     }
     
@@ -307,6 +328,14 @@
               <button id="audioToggle" class="control-button" onclick="toggleAudio()">
                 <span class="icon">🎤</span>
               </button>
+              <button id="captureIDBtn" class="control-button" onclick="captureID()">
+                <span class="icon">🪪</span>
+              </button>
+            </div>
+            <div class="verification-controls" style="margin-top: 10px;">
+              <button id="verifyIdentityBtn" class="btn-action" style="width: 100%; margin-bottom: 5px;" onclick="verifyIdentity()">
+                Verificar Identidad
+              </button>
             </div>
           </div>
         </div>
@@ -342,6 +371,18 @@
               <dt>Estado:</dt>
               <dd id="sessionStatus">En proceso</dd>
             </dl>
+          </div>
+
+          <div class="signature-options" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+            <h3 style="margin-bottom: 15px; text-align: center;">Opciones de Firma</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <button id="simpleSignBtn" class="btn-action" style="flex: 1;" onclick="initiateSimpleSign()">
+                Firma Simple
+              </button>
+              <button id="eTokenSignBtn" class="btn-action" style="flex: 1;" onclick="initiateETokenSign()">
+                Firma eToken (Avanzada)
+              </button>
+            </div>
           </div>
           
           <div class="verification-steps">
@@ -401,6 +442,97 @@
     let sessionData = null;
     let appId = ""; // Se cargará desde la API
     let agoraToken = ""; // Se cargará desde la API
+    
+    // Funciones para verificación de identidad y firma
+    function captureID() {
+      if (!isConnected || localTracks.length < 2) {
+        alert("La cámara no está activa");
+        return;
+      }
+      
+      try {
+        // Tomar una captura de la cámara
+        const videoTrack = localTracks[1];
+        
+        // En una implementación real, esta imagen se enviaría al servidor
+        alert("Captura de documento de identidad realizada correctamente");
+        
+        // Actualizar UI
+        document.getElementById("captureIDBtn").style.backgroundColor = "var(--success)";
+        
+      } catch (error) {
+        console.error("Error al capturar imagen:", error);
+        alert("Error al capturar imagen. Por favor intente nuevamente.");
+      }
+    }
+    
+    function verifyIdentity() {
+      if (!isConnected) {
+        alert("Debe estar conectado a la sesión para verificar su identidad");
+        return;
+      }
+      
+      // En una implementación real, esto enviaría los datos al servidor
+      alert("Verificación de identidad iniciada. El certificador revisará sus documentos.");
+      
+      // Actualizar UI
+      document.getElementById("verifyIdentityBtn").disabled = true;
+      document.getElementById("verifyIdentityBtn").textContent = "Verificación en proceso...";
+      
+      // Simular verificación exitosa después de un tiempo
+      setTimeout(() => {
+        updateUI("identityVerified");
+        document.getElementById("verifyIdentityBtn").textContent = "Identidad Verificada ✓";
+        document.getElementById("verifyIdentityBtn").style.backgroundColor = "var(--success)";
+      }, 3000);
+    }
+    
+    function initiateSimpleSign() {
+      if (!isConnected) {
+        alert("Debe estar conectado a la sesión para iniciar la firma");
+        return;
+      }
+      
+      // En una implementación real, esto enviaría la solicitud al servidor
+      alert("Iniciando proceso de firma simple. Recibirá un correo para completar el proceso.");
+      
+      // Actualizar UI
+      document.getElementById("simpleSignBtn").disabled = true;
+      document.getElementById("eTokenSignBtn").disabled = true;
+      document.getElementById("simpleSignBtn").textContent = "Firma simple iniciada...";
+      
+      // Simular inicio de firma
+      setTimeout(() => {
+        updateUI("signingStarted");
+        document.getElementById("simpleSignBtn").textContent = "Firma simple en proceso ✓";
+        document.getElementById("simpleSignBtn").style.backgroundColor = "var(--success)";
+      }, 2000);
+    }
+    
+    function initiateETokenSign() {
+      if (!isConnected) {
+        alert("Debe estar conectado a la sesión para iniciar la firma");
+        return;
+      }
+      
+      // En una implementación real, esto verificaría el eToken y enviaría al servidor
+      alert("Iniciando proceso de firma avanzada con eToken. Conecte su dispositivo de firma electrónica.");
+      
+      // Actualizar UI
+      document.getElementById("eTokenSignBtn").disabled = true;
+      document.getElementById("simpleSignBtn").disabled = true;
+      document.getElementById("eTokenSignBtn").textContent = "Firma eToken iniciada...";
+      
+      // Simular detección de eToken
+      setTimeout(() => {
+        alert("eToken detectado. Proceda a firmar con su clave.");
+        setTimeout(() => {
+          updateUI("signingStarted");
+          document.getElementById("eTokenSignBtn").textContent = "Firma eToken en proceso ✓";
+          document.getElementById("eTokenSignBtn").style.backgroundColor = "var(--success)";
+        }, 2000);
+      }, 2000);
+    }
     
     // Función para cargar el AppId de Agora
     async function loadAppId() {
