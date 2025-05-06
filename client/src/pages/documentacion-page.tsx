@@ -24,6 +24,35 @@ export default function DocumentacionPage() {
           </p>
 
           <div className="grid gap-6">
+            <Card className="border-2 border-indigo-600 shadow-lg">
+              <CardHeader className="bg-indigo-50">
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-indigo-600" />
+                  Manual Completo y Código Fuente
+                </CardTitle>
+                <CardDescription>
+                  Documentación completa con manual de NotaryPro, código fuente y detalles técnicos
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 mb-4">
+                  <strong>NUEVO:</strong> Este documento incluye el manual completo de NotaryPro con todos sus enlaces, detalles del código fuente, interacción entre componentes y datos del desarrollador.
+                </p>
+              </CardContent>
+              <CardFooter>
+                <a 
+                  href="/docs/NotaryPro_Manual_Completo_y_Codigo_Fuente.pdf" 
+                  download
+                  className="w-full"
+                >
+                  <Button className="w-full bg-indigo-600 hover:bg-indigo-700">
+                    <Download className="h-4 w-4 mr-2" />
+                    Descargar Manual Completo (PDF)
+                  </Button>
+                </a>
+              </CardFooter>
+            </Card>
+            
             <Card>
               <CardHeader>
                 <CardTitle className="text-xl flex items-center gap-2">
