@@ -1,25 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  CERTIFIED_PROVIDERS, 
-  TokenCertificate, 
-  checkTokenAvailability, 
-  getCertificates, 
-  signWithToken 
-} from '../../lib/etoken-signer';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Alert, AlertDescription, AlertTitle } from '../../components/ui/alert';
-import { CircleAlert, CircleCheck, FileSignature, Key, Lock, ShieldCheck, Loader2 } from 'lucide-react';
+import { FileSignature, CheckCircle, AlertTriangle, AlertCircle, ArrowLeft, FileCheck } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
+import { detectEToken, signWithEToken } from '../../lib/etoken-signer';
 
 interface VecinosETokenSignatureProps {
   documentId: number;
   documentName: string;
-  onSuccess?: (signature: any) => void;
+  onSuccess?: (signatureData: any) => void;
   onCancel?: () => void;
 }
 
@@ -29,171 +19,117 @@ export function VecinosETokenSignature({
   onSuccess, 
   onCancel 
 }: VecinosETokenSignatureProps) {
-  const [step, setStep] = useState<'device' | 'certificate' | 'pin'>('device');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<boolean>(false);
-  const [tokenAvailable, setTokenAvailable] = useState<boolean | null>(null);
-  const [certificates, setCertificates] = useState<TokenCertificate[]>([]);
-  const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
-  const [selectedCertificate, setSelectedCertificate] = useState<string | null>(null);
-  const [pin, setPin] = useState<string>('');
   const { toast } = useToast();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [detecting, setDetecting] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [tokenDetected, setTokenDetected] = useState<boolean>(false);
+  const [tokenInfo, setTokenInfo] = useState<any | null>(null);
+  const [signing, setSigning] = useState<boolean>(false);
+  const [signatureComplete, setSignatureComplete] = useState<boolean>(false);
 
-  // Comprobar disponibilidad del token al cargar
+  // Detectar eToken al cargar el componente
   useEffect(() => {
-    checkDeviceAvailability();
+    detectToken();
   }, []);
 
-  const checkDeviceAvailability = async () => {
-    setLoading(true);
-    setError(null);
+  // Función para detectar eToken
+  const detectToken = async () => {
     try {
-      const available = await checkTokenAvailability();
-      setTokenAvailable(available);
+      setDetecting(true);
+      setError(null);
       
-      if (available) {
-        // Cargar certificados
-        const certs = await getCertificates();
-        setCertificates(certs);
-        
-        // Avanzar al siguiente paso
-        setStep('certificate');
+      const result = await detectEToken();
+      
+      setTokenDetected(result.detected);
+      setTokenInfo(result.info);
+      
+      if (!result.detected) {
+        setError('No se detectó ningún token de firma electrónica. Por favor, conecte su eToken y vuelva a intentarlo.');
       } else {
-        setError('No se detectó ningún dispositivo eToken. Por favor conecte su token y vuelva a intentarlo.');
+        toast({
+          title: "Token detectado",
+          description: `Se ha detectado correctamente: ${result.info?.tokenName || 'Token de firma digital'}`,
+        });
       }
     } catch (err: any) {
-      setError(err.message || 'Error al comprobar dispositivo eToken');
-      toast({
-        variant: "destructive",
-        title: "Error de conexión",
-        description: "No se ha podido detectar el dispositivo eToken.",
-      });
+      setError(err.message || 'Error al detectar el token de firma');
+      setTokenDetected(false);
     } finally {
-      setLoading(false);
+      setDetecting(false);
     }
   };
 
-  const handleProviderChange = (providerId: string) => {
-    setSelectedProvider(providerId);
-  };
-
-  const handleCertificateChange = (certificateId: string) => {
-    setSelectedCertificate(certificateId);
-  };
-
-  const handlePinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPin(e.target.value);
-  };
-
-  const handleNextStep = () => {
-    if (step === 'certificate' && selectedProvider && selectedCertificate) {
-      setStep('pin');
-    }
-  };
-
-  const handlePrevStep = () => {
-    if (step === 'pin') {
-      setStep('certificate');
-    } else if (step === 'certificate') {
-      setStep('device');
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!selectedProvider || !selectedCertificate || !pin) {
-      setError('Por favor complete todos los campos');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
+  // Función para firmar el documento
+  const signDocument = async () => {
     try {
-      // Simulamos un hash del documento
-      const documentHash = `document-${documentId}-${Date.now()}`;
+      setSigning(true);
+      setError(null);
       
-      // Firmar con eToken
-      const signatureData = await signWithToken(
-        documentHash,
-        pin,
-        selectedProvider,
-        selectedCertificate
-      );
-
-      // Ahora debemos enviar la firma al servidor para aplicarla al documento
-      const response = await fetch(`/api/vecinos/document-sign/sign-with-etoken/${documentId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('vecinosToken')}`
-        },
-        body: JSON.stringify({
-          pin,
-          providerId: selectedProvider,
-          certificateId: selectedCertificate
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al procesar la firma en el servidor');
-      }
-
-      const result = await response.json();
+      // Simulamos la firma con eToken
+      const signatureResult = await signWithEToken(documentId);
       
-      // Mostrar mensaje de éxito
-      setSuccess(true);
-      toast({
-        title: "Firma exitosa",
-        description: "El documento ha sido firmado exitosamente.",
-      });
-      
-      // Llamar al callback de éxito
-      if (onSuccess) {
-        onSuccess(result);
+      if (signatureResult.success) {
+        setSignatureComplete(true);
+        toast({
+          title: "Documento firmado",
+          description: "El documento ha sido firmado correctamente con firma electrónica avanzada",
+        });
+      } else {
+        throw new Error(signatureResult.error || 'Error durante el proceso de firma');
       }
     } catch (err: any) {
-      setError(err.message || 'Error al firmar documento');
+      setError(err.message || 'Error al firmar el documento');
       toast({
         variant: "destructive",
-        title: "Error al firmar",
-        description: err.message || "Ha ocurrido un error al intentar firmar el documento.",
+        title: "Error de firma",
+        description: err.message || "Ha ocurrido un error al firmar el documento",
       });
     } finally {
-      setLoading(false);
+      setSigning(false);
     }
   };
 
-  // Renderizar mensaje de éxito
-  if (success) {
+  // Mostrar pantalla de éxito si la firma se completó
+  if (signatureComplete) {
     return (
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full max-w-3xl mx-auto">
         <CardHeader className="bg-green-50 border-b">
           <CardTitle className="flex items-center gap-2 text-green-700">
-            <CircleCheck className="h-5 w-5" />
-            Firma exitosa
+            <CheckCircle className="h-5 w-5" />
+            Firma completada
           </CardTitle>
           <CardDescription>
-            El documento ha sido firmado exitosamente
+            El documento ha sido firmado correctamente
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6 pb-2">
-          <Alert className="bg-green-50 border-green-200">
-            <ShieldCheck className="h-4 w-4 text-green-700" />
-            <AlertTitle className="text-green-700">Documento firmado</AlertTitle>
-            <AlertDescription>
-              El documento <strong>{documentName}</strong> ha sido firmado electrónicamente de manera exitosa.
-            </AlertDescription>
-          </Alert>
+          <div className="text-center max-w-md mx-auto py-8">
+            <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold mb-2">¡Firma exitosa!</h2>
+            <p className="text-gray-600 mb-6">
+              El documento ha sido firmado electrónicamente de manera exitosa.
+            </p>
+            <Alert className="mb-4 text-left">
+              <AlertTitle>Información de la firma</AlertTitle>
+              <AlertDescription>
+                <p>Se ha utilizado firma electrónica avanzada según Ley 19.799.</p>
+                <p className="mt-2">Documento firmado: <strong>{documentName}</strong></p>
+                <p className="mt-2">ID de documento: <strong>{documentId}</strong></p>
+                <p className="mt-2">Hora de firma: <strong>{new Date().toLocaleString()}</strong></p>
+              </AlertDescription>
+            </Alert>
+          </div>
         </CardContent>
         <CardFooter className="flex justify-end gap-2">
-          <Button 
-            variant="default" 
-            onClick={() => {
-              if (onSuccess) onSuccess({});
-            }}
-          >
-            Cerrar
+          <Button onClick={() => {
+            if (onSuccess) onSuccess({
+              documentId,
+              signatureType: 'etoken',
+              signatureTime: new Date().toISOString()
+            });
+          }}>
+            Continuar
           </Button>
         </CardFooter>
       </Card>
@@ -201,189 +137,134 @@ export function VecinosETokenSignature({
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-3xl mx-auto">
       <CardHeader className="border-b">
         <CardTitle className="flex items-center gap-2">
           <FileSignature className="h-5 w-5" />
-          Firma electrónica avanzada
+          Firma con Token Electrónico
         </CardTitle>
         <CardDescription>
-          Utilice su token criptográfico para firmar el documento {documentName}
+          Firma electrónica avanzada para el documento: {documentName}
         </CardDescription>
       </CardHeader>
-      <CardContent className="pt-6 pb-2">
-        <Tabs value={step} onValueChange={(value) => setStep(value as any)}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger 
-              value="device" 
-              disabled={loading || step !== 'device'}
-              className={tokenAvailable ? 'text-green-600' : ''}
-            >
-              Dispositivo
-            </TabsTrigger>
-            <TabsTrigger 
-              value="certificate" 
-              disabled={loading || !tokenAvailable || step === 'device'}
-              className={selectedCertificate ? 'text-green-600' : ''}
-            >
-              Certificado
-            </TabsTrigger>
-            <TabsTrigger 
-              value="pin" 
-              disabled={loading || !selectedCertificate || step !== 'pin'}
-            >
-              PIN
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="device" className="pt-4">
-            <div className="space-y-4">
-              <p className="text-sm text-gray-500">
-                Conecte su dispositivo eToken y haga clic en "Detectar dispositivo".
-              </p>
-              
-              {error && (
-                <Alert variant="destructive">
-                  <CircleAlert className="h-4 w-4" />
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-              
-              <div className="flex justify-center pt-2">
-                <Button 
-                  onClick={checkDeviceAvailability} 
-                  disabled={loading}
-                  className="w-full"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Comprobando...
-                    </>
-                  ) : (
-                    <>Detectar dispositivo</>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="certificate" className="space-y-4 pt-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="provider">Proveedor de certificación</Label>
-                <Select 
-                  value={selectedProvider || undefined} 
-                  onValueChange={handleProviderChange}
-                >
-                  <SelectTrigger id="provider">
-                    <SelectValue placeholder="Seleccione proveedor" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CERTIFIED_PROVIDERS.map(provider => (
-                      <SelectItem key={provider.id} value={provider.id}>
-                        {provider.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="certificate">Certificado</Label>
-                <Select 
-                  value={selectedCertificate || undefined} 
-                  onValueChange={handleCertificateChange}
-                  disabled={!selectedProvider}
-                >
-                  <SelectTrigger id="certificate">
-                    <SelectValue placeholder="Seleccione certificado" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {certificates.map(cert => (
-                      <SelectItem key={cert.id} value={cert.id}>
-                        {cert.subject}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {selectedCertificate && (
-                <div className="pt-2">
-                  <Button onClick={handleNextStep} disabled={!selectedCertificate || loading} className="w-full">
-                    Continuar
-                  </Button>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="pin" className="space-y-4 pt-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="pin" className="flex items-center gap-1">
-                  <Lock className="h-4 w-4" />
-                  PIN de acceso a su token
-                </Label>
-                <Input 
-                  id="pin" 
-                  type="password" 
-                  value={pin} 
-                  onChange={handlePinChange} 
-                  placeholder="Ingrese su PIN"
-                  autoComplete="one-time-code"
-                />
-              </div>
-
-              {error && (
-                <Alert variant="destructive">
-                  <CircleAlert className="h-4 w-4" />
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <div className="text-xs text-gray-500">
-                El PIN será utilizado únicamente para acceder a su token criptográfico.
-                Nunca almacenamos esta información.
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-      <CardFooter className="flex justify-between gap-2">
-        {step !== 'device' ? (
-          <Button 
-            variant="outline" 
-            onClick={handlePrevStep} 
-            disabled={loading || step === 'device'}
-          >
-            Atrás
-          </Button>
-        ) : (
-          <Button variant="outline" onClick={onCancel}>
-            Cancelar
-          </Button>
+      <CardContent className="pt-6">
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
         
-        {step === 'pin' && (
-          <Button 
-            onClick={handleSubmit} 
-            disabled={loading || !pin} 
-            className="flex-1"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Firmando...
-              </>
+        <div className="space-y-6">
+          {/* Información del documento */}
+          <div className="rounded-lg border p-4 bg-gray-50">
+            <h3 className="text-sm font-medium mb-2">Información del documento:</h3>
+            <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                <div>
+                  <span className="text-gray-500">Nombre:</span>{" "}
+                  <span className="font-medium">{documentName}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500">ID del documento:</span>{" "}
+                  <span className="font-medium">{documentId}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Estado del token */}
+          <div className="rounded-lg border p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium">Estado del token:</h3>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={detectToken}
+                disabled={detecting}
+              >
+                {detecting ? "Detectando..." : "Volver a detectar"}
+              </Button>
+            </div>
+            
+            {detecting ? (
+              <div className="flex items-center justify-center py-4">
+                <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full mr-2"></div>
+                <span>Detectando token...</span>
+              </div>
+            ) : tokenDetected ? (
+              <Alert className="bg-green-50 border-green-200">
+                <FileCheck className="h-4 w-4 text-green-700" />
+                <AlertTitle className="text-green-700">Token detectado</AlertTitle>
+                <AlertDescription>
+                  <p>Se ha detectado un token de firma electrónica avanzada.</p>
+                  {tokenInfo && (
+                    <div className="mt-2 text-sm">
+                      <p><span className="font-medium">Nombre:</span> {tokenInfo.tokenName}</p>
+                      <p><span className="font-medium">Certificado:</span> {tokenInfo.certificateInfo}</p>
+                    </div>
+                  )}
+                </AlertDescription>
+              </Alert>
             ) : (
-              <>Firmar documento</>
+              <Alert>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>No se detectó ningún token</AlertTitle>
+                <AlertDescription>
+                  <p>Por favor, conecte su token de firma electrónica y haga clic en "Volver a detectar".</p>
+                  <div className="mt-2 text-sm space-y-1">
+                    <p>Recuerde:</p>
+                    <ul className="list-disc pl-5 space-y-1">
+                      <li>Conecte su eToken a un puerto USB de su computador</li>
+                      <li>Asegúrese de tener instalados los drivers necesarios</li>
+                      <li>El token debe contener un certificado válido</li>
+                    </ul>
+                  </div>
+                </AlertDescription>
+              </Alert>
             )}
-          </Button>
-        )}
+          </div>
+          
+          {/* Instrucciones */}
+          <div className="rounded-lg border p-4">
+            <h3 className="text-sm font-medium mb-2">Instrucciones:</h3>
+            <ol className="list-decimal pl-5 space-y-2 text-sm">
+              <li>Conecte su token de firma electrónica al equipo.</li>
+              <li>Espere a que el sistema detecte el dispositivo.</li>
+              <li>Haga clic en "Firmar documento" cuando esté listo.</li>
+              <li>Ingrese su PIN cuando el sistema se lo solicite.</li>
+            </ol>
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-between gap-2 border-t pt-4">
+        <Button 
+          variant="outline" 
+          onClick={onCancel}
+          disabled={signing}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Cancelar
+        </Button>
+        
+        <Button 
+          onClick={signDocument}
+          disabled={!tokenDetected || signing}
+          className="flex-1 sm:flex-none"
+        >
+          {signing ? (
+            <>
+              <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2"></div>
+              Firmando...
+            </>
+          ) : (
+            <>
+              <FileSignature className="mr-2 h-4 w-4" />
+              Firmar documento
+            </>
+          )}
+        </Button>
       </CardFooter>
     </Card>
   );

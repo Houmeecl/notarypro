@@ -163,6 +163,7 @@ function Router() {
       {/* VecinosExpress - Versión consolidada */}
       <Route path="/vecinos-express" component={VecinosExpress} />
       <Route path="/vecinos-sign-document/:documentId?" component={VecinosSignDocument} />
+      <Route path="/vecinos-complete-verification/:documentId?" component={React.lazy(() => import("./pages/vecinos-complete-verification"))} />
       <Route path="/vecinos-express-new" component={() => {
         window.location.href = "/vecinos-express";
         return null;

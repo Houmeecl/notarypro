@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { FileIcon, FileText, FilePlus, FileCheck, Store, DollarSign, Bell, User, PlusCircle, FileSignature } from 'lucide-react';
+import { FileIcon, FileText, FilePlus, FileCheck, Store, DollarSign, Bell, User, PlusCircle, FileSignature, Video } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 
 export default function VecinosExpressPage() {
@@ -108,6 +108,10 @@ export default function VecinosExpressPage() {
 
   const handleSignDocument = (documentId: number) => {
     navigate(`/vecinos-sign-document/${documentId}`);
+  };
+
+  const handleCompleteVerification = (documentId: number) => {
+    navigate(`/vecinos-complete-verification/${documentId}`);
   };
 
   const handleCreateDocument = () => {
@@ -239,11 +243,11 @@ export default function VecinosExpressPage() {
                       <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => handleSignDocument(doc.id)}
+                        onClick={() => handleCompleteVerification(doc.id)}
                         disabled={doc.status !== 'pending'}
                       >
-                        <FileSignature className="h-3.5 w-3.5 mr-1" />
-                        Firmar
+                        <Video className="h-3.5 w-3.5 mr-1" />
+                        Verificar
                       </Button>
                       <Button variant="default" size="sm">Ver</Button>
                     </CardFooter>

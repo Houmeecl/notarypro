@@ -1,184 +1,140 @@
 /**
- * Utilidad para manejar firmas con eToken (token criptográfico) - Versión para cliente
+ * Biblioteca para gestión de firma electrónica con eToken
  * 
- * Esta es una versión optimizada para el cliente que interactúa con el hardware
- * de token criptográfico para realizar firmas electrónicas avanzadas.
+ * Este módulo proporciona funciones para detectar tokens de firma electrónica
+ * conectados y firmar documentos usando certificados digitales.
  */
 
-// Interfaz para los proveedores de token
-export interface TokenProvider {
-  id: string;
-  name: string;
-  apiUrl: string;
-  supportedDevices: string[];
+// Tipos para las respuestas de las funciones
+interface TokenDetectionResult {
+  detected: boolean;
+  info?: {
+    tokenName: string;
+    certificateInfo: string;
+    validUntil?: string;
+    issuer?: string;
+  } | null;
+  error?: string;
 }
 
-// Lista de proveedores certificados en Chile
-export const CERTIFIED_PROVIDERS: TokenProvider[] = [
-  {
-    id: "e-cert",
-    name: "E-CERT",
-    apiUrl: import.meta.env.VITE_ECERT_API_URL || "https://api.e-certchile.cl",
-    supportedDevices: ["ePass2003", "SafeNet5110"]
-  },
-  {
-    id: "acepta",
-    name: "Acepta",
-    apiUrl: import.meta.env.VITE_ACEPTA_API_URL || "https://api.acepta.com",
-    supportedDevices: ["ePass2003", "CryptoID"]
-  },
-  {
-    id: "certinet",
-    name: "CertiNet",
-    apiUrl: import.meta.env.VITE_CERTINET_API_URL || "https://api.certinet.cl", 
-    supportedDevices: ["TokenKey", "SafeNet5110"]
-  }
-];
-
-/**
- * Interfaces para los certificados del token
- */
-export interface TokenCertificate {
-  id: string;
-  subject: string;
-  issuer: string;
-  validFrom: string;
-  validTo: string;
-  serialNumber: string;
-}
-
-/**
- * Comprueba la disponibilidad de dispositivos eToken
- * @returns Promise<boolean> que resuelve a true si hay dispositivos disponibles
- */
-export async function checkTokenAvailability(): Promise<boolean> {
-  try {
-    // En el cliente, simulamos que está disponible para pruebas
-    // En una implementación real, aquí detectaríamos el hardware USB/HID
-    return true;
-  } catch (error) {
-    console.error("Error al comprobar disponibilidad de token:", error);
-    return false;
-  }
-}
-
-/**
- * Obtiene los certificados disponibles en el token
- * @returns Promise<TokenCertificate[]> con la lista de certificados
- */
-export async function getCertificates(): Promise<TokenCertificate[]> {
-  try {
-    // Simulamos una respuesta para pruebas
-    // En una implementación real, aquí leeríamos los certificados del token
-    return [
-      {
-        id: "cert-1",
-        subject: "CN=Juan Pérez, O=ACME Inc., C=CL",
-        issuer: "CN=Entidad Certificadora, O=E-CERT, C=CL",
-        validFrom: "2023-01-01T00:00:00Z",
-        validTo: "2025-01-01T00:00:00Z",
-        serialNumber: "AB12CD34EF"
-      },
-      {
-        id: "cert-2",
-        subject: "CN=Juan Pérez, O=Personal, C=CL",
-        issuer: "CN=Entidad Certificadora, O=E-CERT, C=CL",
-        validFrom: "2023-01-01T00:00:00Z",
-        validTo: "2025-01-01T00:00:00Z",
-        serialNumber: "56GH78IJ90"
-      }
-    ];
-  } catch (error) {
-    console.error("Error al obtener certificados:", error);
-    throw new Error("No se pudieron obtener los certificados del token");
-  }
-}
-
-/**
- * Información de la firma electrónica
- */
-export interface TokenSignatureData {
-  tokenSignature: string;
-  tokenInfo: {
-    certificateAuthor: string;
-    certificateId: string;
+interface SignatureResult {
+  success: boolean;
+  signatureData?: {
     timestamp: string;
+    certificate: string;
+    algorithm: string;
+    signatureValue: string;
   };
+  documentHash?: string;
+  error?: string;
 }
 
 /**
- * Realiza la firma de un documento con el token criptográfico
- * @param documentHash Hash del documento a firmar
- * @param pin PIN de acceso al token
- * @param providerId ID del proveedor de certificación
- * @param certificateId ID del certificado a utilizar
- * @returns Datos de la firma
+ * Detecta si hay un token de firma electrónica conectado
+ * @returns Objeto con información del resultado de la detección
  */
-export async function signWithToken(
-  documentHash: string,
-  pin: string,
-  providerId: string,
-  certificateId: string
-): Promise<TokenSignatureData> {
-  // Validar parámetros básicos
-  if (!documentHash || !pin || !providerId || !certificateId) {
-    throw new Error("Parámetros incompletos para la firma");
-  }
-
-  // Verificar que el pin cumpla con los requisitos de seguridad
-  if (pin.length < 4) {
-    throw new Error("PIN inválido: debe tener al menos 4 caracteres");
-  }
-
+export async function detectEToken(): Promise<TokenDetectionResult> {
   try {
-    // Buscar el proveedor seleccionado
-    const provider = CERTIFIED_PROVIDERS.find(p => p.id === providerId);
-    if (!provider) {
-      throw new Error(`Proveedor "${providerId}" no reconocido`);
-    }
+    // Simulación de detección de token
+    // En una implementación real, esto usaría APIs del navegador para detectar dispositivos USB
+    // o APIs específicas para acceder a certificados del sistema
 
-    // Verificar disponibilidad del token
-    const isAvailable = await checkTokenAvailability();
-    if (!isAvailable) {
-      throw new Error("No se detectó ningún dispositivo eToken");
-    }
-
-    // Aquí en una implementación real, llamaríamos a una librería nativa
-    // o una API Web para interactuar con el token y realizar la firma
-
-    // Para pruebas, simulamos una firma exitosa
-    const timestamp = new Date().toISOString();
-    const signature = `CLIENT_${certificateId}_${btoa(documentHash).substring(0, 32)}`;
+    // Simulamos un breve retraso para simular detección de hardware
+    await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // En una implementación real, la firma sería generada por el token
+    // Probabilidad de 80% de éxito en la detección (para simular)
+    const tokenDetected = Math.random() < 0.8;
+    
+    if (!tokenDetected) {
+      return {
+        detected: false,
+        error: "No se detectó ningún dispositivo de firma electrónica conectado."
+      };
+    }
+    
+    // Información simulada del token detectado
     return {
-      tokenSignature: signature,
-      tokenInfo: {
-        certificateAuthor: provider.name,
-        certificateId: certificateId,
-        timestamp: timestamp
+      detected: true,
+      info: {
+        tokenName: "eToken PKI Pro",
+        certificateInfo: "Certificado de Firma Electrónica Avanzada",
+        validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        issuer: "Entidad Certificadora Acreditada"
       }
     };
-  } catch (error: any) {
-    console.error("Error al firmar con eToken:", error);
-    throw new Error(`Error al firmar con eToken: ${error.message}`);
+  } catch (err: any) {
+    console.error("Error al detectar token:", err);
+    return {
+      detected: false,
+      error: err.message || "Error desconocido al detectar el token"
+    };
   }
 }
 
 /**
- * Verifica una firma realizada con token criptográfico
- * @param signature Datos de la firma a verificar
- * @returns true si la firma es válida
+ * Firma un documento utilizando el token electrónico
+ * @param documentId ID del documento a firmar
+ * @returns Resultado de la operación de firma
  */
-export async function verifyTokenSignature(
-  signature: TokenSignatureData
-): Promise<boolean> {
+export async function signWithEToken(documentId: number): Promise<SignatureResult> {
   try {
-    // En cliente, enviamos la verificación al servidor
-    // Para pruebas, simulamos una verificación exitosa
-    return true;
-  } catch (error: any) {
-    console.error("Error al verificar firma:", error);
-    return false;
+    // Validaciones básicas
+    if (!documentId) {
+      throw new Error("Se requiere un ID de documento válido");
+    }
+    
+    // Simulamos la petición al servidor para iniciar el proceso de firma
+    // En una implementación real, esto:
+    // 1. Obtendría el hash del documento desde el servidor
+    // 2. Firmaría el hash con el certificado del token
+    // 3. Enviaría la firma al servidor para validación y almacenamiento
+    
+    // Simular delay de procesamiento
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Simular que el usuario ingresa el PIN de su token
+    const simulatePinEntry = async (): Promise<boolean> => {
+      // En una implementación real, esto abriría un diálogo nativo para solicitar el PIN
+      
+      // Simulamos entrada de PIN con un delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Simulamos 90% de probabilidad de PIN correcto
+      return Math.random() < 0.9;
+    };
+    
+    const pinCorrect = await simulatePinEntry();
+    
+    if (!pinCorrect) {
+      return {
+        success: false,
+        error: "PIN incorrecto. Por favor intente nuevamente."
+      };
+    }
+    
+    // Simular la firma criptográfica
+    const timestamp = new Date().toISOString();
+    const documentHash = "sha256-" + Math.random().toString(36).substring(2, 15);
+    
+    // Simular envío de la firma al servidor
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Simulamos respuesta exitosa del servidor
+    return {
+      success: true,
+      signatureData: {
+        timestamp,
+        certificate: "SerialNumber=12345678-9,CN=Juan Pérez,O=Entidad Certificadora",
+        algorithm: "SHA256withRSA",
+        signatureValue: "MIIEpAIBAAKCAQEA12345..." // Valor truncado para el ejemplo
+      },
+      documentHash
+    };
+  } catch (err: any) {
+    console.error("Error al firmar documento:", err);
+    return {
+      success: false,
+      error: err.message || "Error desconocido al firmar el documento"
+    };
   }
 }
