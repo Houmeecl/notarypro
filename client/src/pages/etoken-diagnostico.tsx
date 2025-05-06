@@ -257,7 +257,7 @@ export default function EtokenDiagnostico() {
                       <p className="text-xs text-gray-600">Compatible con Chrome, Edge, Brave y otros navegadores basados en Chromium</p>
                     </div>
                     <a 
-                      href="https://ecertchile.cl/descargas/pkcs11/chrome_extension.zip" 
+                      href="https://chrome.google.com/webstore/detail/etoken-chile/bjiggnkkapmcoaemgbojjbbkejobfgnn" 
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors inline-flex items-center"
@@ -274,7 +274,7 @@ export default function EtokenDiagnostico() {
                       <p className="text-xs text-gray-600">Para navegadores Firefox</p>
                     </div>
                     <a 
-                      href="https://ecertchile.cl/descargas/pkcs11/firefox_extension.xpi" 
+                      href="https://addons.mozilla.org/es/firefox/addon/firmador-electronico-chile/" 
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors inline-flex items-center"
@@ -285,13 +285,13 @@ export default function EtokenDiagnostico() {
                   </div>
                   
                   <div className="border rounded p-3 flex items-center hover:bg-gray-50 transition-colors">
-                    <div className="bg-gray-800 h-10 w-10 mr-3 rounded-full flex items-center justify-center text-white text-xl font-bold">S</div>
+                    <div className="bg-gray-800 h-10 w-10 mr-3 rounded-full flex items-center justify-center text-white text-xl font-bold">D</div>
                     <div className="flex-grow">
-                      <h4 className="font-medium">Controladores y software del token</h4>
-                      <p className="text-xs text-gray-600">Descargue los controladores necesarios para su dispositivo</p>
+                      <h4 className="font-medium">Controladores SafeNet eToken</h4>
+                      <p className="text-xs text-gray-600">Descargue los controladores oficiales de SafeNet para su dispositivo eToken</p>
                     </div>
                     <a 
-                      href="https://ecertchile.cl/descargas/pkcs11/drivers_etoken.zip" 
+                      href="https://www.safenet-inc.es/pki-authentication/authentication-and-pki-clients/safenet-authentication-client" 
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors inline-flex items-center"
