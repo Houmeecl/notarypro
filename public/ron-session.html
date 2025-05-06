@@ -503,12 +503,29 @@
     let sessionData = null;
     let appId = ""; // Se cargará desde la API
     let agoraToken = ""; // Se cargará desde la API
-    let QA_MODE = true; // Modo para pruebas QA
+    let QA_MODE = false; // Modo de producción con verificaciones legales habilitadas
     
-    // Función simple para solicitar acceso a cámara/micrófono
+    // Función real para solicitar acceso a cámara/micrófono (Ley 19.799)
     async function requestCameraAndMicrophone() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        console.log("✅ Modo FUNCIONAL REAL activado correctamente");
+        console.log("🔒 Verificaciones y validaciones legales habilitadas según Ley 19.799");
+        
+        // Solicitar permisos de cámara y micrófono con máxima calidad para verificación legal
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: {
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            frameRate: { ideal: 30 },
+            facingMode: "user"
+          }, 
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          } 
+        });
+        
         const videoElement = document.getElementById('local-player');
         
         if (!videoElement) {
@@ -516,7 +533,10 @@
           tempVideoElement.id = 'local-video';
           tempVideoElement.autoplay = true;
           tempVideoElement.muted = true;
-          document.getElementById('local-player').appendChild(tempVideoElement);
+          tempVideoElement.playsInline = true; // Importante para iOS
+          
+          const container = document.getElementById('local-player') || document.body;
+          container.appendChild(tempVideoElement);
           tempVideoElement.srcObject = stream;
         } else if (videoElement.querySelector('video')) {
           videoElement.querySelector('video').srcObject = stream;
@@ -524,15 +544,47 @@
           const tempVideoElement = document.createElement('video');
           tempVideoElement.autoplay = true;
           tempVideoElement.muted = true;
+          tempVideoElement.playsInline = true; // Importante para iOS
           videoElement.appendChild(tempVideoElement);
           tempVideoElement.srcObject = stream;
         }
         
-        console.log("Cámara y micrófono activos en modo QA.");
+        // Añadir información legal al inicializar la cámara
+        if (!document.getElementById('legalDisclaimer')) {
+          const legalDiv = document.createElement('div');
+          legalDiv.id = 'legalDisclaimer';
+          legalDiv.style.position = 'fixed';
+          legalDiv.style.bottom = '10px';
+          legalDiv.style.right = '10px';
+          legalDiv.style.backgroundColor = 'rgba(45, 33, 155, 0.8)';
+          legalDiv.style.color = 'white';
+          legalDiv.style.padding = '8px 12px';
+          legalDiv.style.borderRadius = '4px';
+          legalDiv.style.fontSize = '12px';
+          legalDiv.style.zIndex = '1000';
+          legalDiv.style.maxWidth = '300px';
+          legalDiv.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+          legalDiv.innerHTML = 'Verificación de identidad según Ley 19.799';
+          
+          document.body.appendChild(legalDiv);
+          
+          // Auto-ocultar después de 5 segundos
+          setTimeout(() => {
+            legalDiv.style.opacity = '0';
+            legalDiv.style.transition = 'opacity 1s ease-out';
+            setTimeout(() => {
+              if (legalDiv.parentNode) {
+                legalDiv.parentNode.removeChild(legalDiv);
+              }
+            }, 1000);
+          }, 5000);
+        }
+        
+        console.log("✅ Cámara y micrófono activos en modo LEGAL");
         return stream;
       } catch (error) {
         console.error("Error al acceder a dispositivos:", error);
-        alert("Debes habilitar cámara y micrófono para continuar con la verificación legal.");
+        alert("Debe habilitar cámara y micrófono para cumplir con la verificación legal requerida por la Ley 19.799");
         throw error;
       }
     }
