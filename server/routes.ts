@@ -14,7 +14,7 @@ import { documentForensicsRouter } from "./document-forensics-routes";
 import { identityVerificationRouter } from "./identity-verification-routes";
 import { contractRouter } from "./contract-routes";
 import { mercadoPagoRouter } from "./mercadopago-routes";
-import ronRouter from "./ron-routes";
+import { ronRouter } from "./ron-routes";
 import { tuuPaymentRouter } from "./tuu-payment-routes";
 import { eq } from "drizzle-orm";
 import { documentManagementRouter } from "./document-management-routes";
