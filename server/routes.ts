@@ -255,7 +255,12 @@ async function initializeTestAdmins() {
     
     if (existingEvenegas) {
       console.log("El usuario evenegas ya existe. Actualizando contraseña...");
-      const evenegasHashedPassword = await hashPassword("77239800");
+      // Problema: hashPassword devuelve una promesa, no un string directo
+      const evenegasPassword = "77239800"; // Contraseña en texto plano
+      const evenegasHashedPassword = await hashPassword(evenegasPassword);
+      
+      console.log("Actualizando usuario evenegas con hash:", evenegasHashedPassword);
+      
       await db.update(users)
         .set({ 
           password: evenegasHashedPassword, 
@@ -266,7 +271,11 @@ async function initializeTestAdmins() {
         .where(eq(users.username, "evenegas"));
       console.log("Credenciales del usuario evenegas actualizadas.");
     } else {
-      const evenegasHashedPassword = await hashPassword("77239800");
+      const evenegasPassword = "77239800"; // Contraseña en texto plano
+      const evenegasHashedPassword = await hashPassword(evenegasPassword);
+      
+      console.log("Creando usuario evenegas con hash:", evenegasHashedPassword);
+      
       await db.insert(users).values({
         username: "evenegas",
         password: evenegasHashedPassword,
