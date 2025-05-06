@@ -355,11 +355,19 @@ function Router() {
       <Route path="/service-selection" component={ServiceSelectionPage} />
       <Route path="/quienes-somos" component={QuienesSomosPage} />
       <Route path="/signature-demo" component={SignatureDemo} />
-      <Route path="/verificacion-etoken" component={() => {
-        const VerificacionEToken = React.lazy(() => import("@/pages/verificacion-etoken"));
+      <Route path="/test-etoken" component={() => {
+        const TestEtoken = React.lazy(() => import("@/pages/test-etoken"));
         return (
           <Suspense fallback={<LazyLoadingFallback />}>
-            <VerificacionEToken />
+            <TestEtoken />
+          </Suspense>
+        );
+      }} />
+      <Route path="/etoken-diagnostico" component={() => {
+        const EtokenDiagnostico = React.lazy(() => import("@/pages/etoken-diagnostico"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <EtokenDiagnostico />
           </Suspense>
         );
       }} />

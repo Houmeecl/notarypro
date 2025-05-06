@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, Pen, Fingerprint, Key } from "lucide-react";
-import { ETokenSignature } from "./ETokenSignature";
+import ETokenSignature from "./ETokenSignature";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -123,7 +123,7 @@ export function SignatureOptions({
   if (showETokenFlow) {
     return (
       <ETokenSignature 
-        documentId={documentId}
+        documentId={documentId.toString()}
         documentHash={documentHash}
         onSignComplete={handleETokenSignComplete}
         onCancel={handleCancel}

@@ -34,9 +34,9 @@ import {
 import { useToast } from "@/hooks/use-toast";
 
 interface ETokenSignatureProps {
-  documentId: string;
+  documentId: number | string;
   documentHash: string;
-  onSigningComplete: (signatureData: {
+  onSignComplete: (signatureData: {
     signature: string;
     certificate: string;
     timestamp: string;
@@ -49,7 +49,7 @@ interface ETokenSignatureProps {
 export default function ETokenSignature({
   documentId,
   documentHash,
-  onSigningComplete,
+  onSignComplete,
   onCancel
 }: ETokenSignatureProps) {
   const [extensionAvailable, setExtensionAvailable] = useState<boolean | null>(null);
@@ -149,7 +149,7 @@ export default function ETokenSignature({
       
       const result = await signData(documentHash, selectedCertSerial, pin);
       
-      onSigningComplete({
+      onSignComplete({
         signature: result.signature,
         certificate: result.certificate,
         timestamp: result.timestamp,
