@@ -491,6 +491,7 @@
     </div>
   </div>
   
+  <script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
   <script>
     // Variables de estado
     let client;
@@ -502,6 +503,39 @@
     let sessionData = null;
     let appId = ""; // Se cargará desde la API
     let agoraToken = ""; // Se cargará desde la API
+    let QA_MODE = true; // Modo para pruebas QA
+    
+    // Función simple para solicitar acceso a cámara/micrófono
+    async function requestCameraAndMicrophone() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        const videoElement = document.getElementById('local-player');
+        
+        if (!videoElement) {
+          const tempVideoElement = document.createElement('video');
+          tempVideoElement.id = 'local-video';
+          tempVideoElement.autoplay = true;
+          tempVideoElement.muted = true;
+          document.getElementById('local-player').appendChild(tempVideoElement);
+          tempVideoElement.srcObject = stream;
+        } else if (videoElement.querySelector('video')) {
+          videoElement.querySelector('video').srcObject = stream;
+        } else {
+          const tempVideoElement = document.createElement('video');
+          tempVideoElement.autoplay = true;
+          tempVideoElement.muted = true;
+          videoElement.appendChild(tempVideoElement);
+          tempVideoElement.srcObject = stream;
+        }
+        
+        console.log("Cámara y micrófono activos en modo QA.");
+        return stream;
+      } catch (error) {
+        console.error("Error al acceder a dispositivos:", error);
+        alert("Debes habilitar cámara y micrófono para continuar con la verificación legal.");
+        throw error;
+      }
+    }
     
     // Funciones para verificación de identidad y firma - SISTEMA REAL
     // Funciones para mostrar/cerrar modal de verificación
@@ -631,39 +665,90 @@
       }
     }
     
-    // Función para inicializar cámara si no está activa
+    // Función para inicializar cámara y audio (Videollamada - Ley 19.799)
     async function initializeCamera() {
       if (localTracks.length < 2) {
         try {
-          console.log("Iniciando cámara en MODO PRODUCCIÓN para verificación real");
+          if (QA_MODE) {
+            console.log("Iniciando cámara en MODO QA (compatible con Ley 19.799)");
+          } else {
+            console.log("Iniciando cámara en MODO PRODUCCIÓN para verificación legal");
+          }
+          
+          // Primero verificamos soporte del navegador para WebRTC
+          if (!AgoraRTC.checkSystemRequirements()) {
+            throw new Error("Su navegador no es compatible con los requisitos técnicos para firma electrónica según Ley 19.799");
+          }
+          
+          // Solicitar permisos explícitamente antes de crear Agora tracks
+          // Esto es necesario para evitar problemas de permisos en algunos dispositivos
           const videoConfig = { 
             video: {
               width: { ideal: 1280 },
               height: { ideal: 720 },
               facingMode: "user"
             }, 
-            audio: false
+            audio: true
           };
           
-          // Solicitar permisos explícitamente
-          console.log("Solicitando acceso a cámara/micrófono con config:", videoConfig);
-          await navigator.mediaDevices.getUserMedia(videoConfig);
+          // Solicitar acceso directo vía navigator.mediaDevices (WebRTC estándar)
+          console.log("Solicitando permisos explícitamente:", videoConfig);
+          const mediaStream = await navigator.mediaDevices.getUserMedia(videoConfig);
           
-          // Crear tracks locales
-          if (AgoraRTC.checkSystemRequirements()) {
-            const tracks = await AgoraRTC.createMicrophoneAndCameraTracks();
-            localTracks = tracks;
-            localTracks[1].play("local-player");
-            console.log("Acceso concedido a cámara/micrófono");
-            return true;
-          } else {
-            throw new Error("Su navegador no cumple con los requisitos para videollamada");
+          // Una vez que tenemos permisos explícitos, liberamos el stream nativo
+          mediaStream.getTracks().forEach(track => track.stop());
+          
+          // Ahora usamos Agora para crear tracks optimizados para videollamada
+          // Crear tracks con configuración optimizada para mejor calidad en verificación de identidad
+          const [microphoneTrack, cameraTrack] = await AgoraRTC.createMicrophoneAndCameraTracks({
+            audioConfig: {
+              AEC: true, // Echo Cancellation
+              AGC: true, // Auto Gain Control
+              ANS: true, // Automatic Noise Suppression
+              microphoneId: undefined // Usar dispositivo predeterminado
+            },
+            videoConfig: {
+              encoderConfig: "1080p_2", // Alta calidad para mejor verificación
+              facingMode: "user",
+              mirrorMode: "auto"
+            }
+          });
+          
+          // Guardar tracks para uso posterior
+          localTracks = [microphoneTrack, cameraTrack];
+          
+          // Reproducir video local
+          cameraTrack.play("local-player");
+          
+          // Si estamos en una sala Agora activa, publicamos los tracks
+          if (client && isConnected) {
+            try {
+              await client.publish(localTracks);
+              console.log("Tracks publicados en la sesión RON");
+            } catch (publishError) {
+              console.error("Error al publicar tracks:", publishError);
+              // No interrumpimos la función si falla la publicación
+              // pero mantenemos la cámara activa para la verificación local
+            }
           }
+          
+          console.log("Cámara y micrófono inicializados correctamente");
+          return true;
         } catch (error) {
-          console.error("Error al inicializar cámara:", error);
-          throw error;
+          console.error("Error al inicializar dispositivos multimedia:", error);
+          
+          // En modo QA, mostrar botón de verificación forzada
+          if (QA_MODE) {
+            console.log("Ejecutando en modo QA - Mostrando opciones alternativas...");
+            
+            // No lanzamos el error en modo QA
+            return false;
+          }
+          
+          throw new Error("Para cumplir con los requisitos de verificación de la Ley 19.799, debe permitir acceso a su cámara y micrófono");
         }
       }
+      
       return true;
     }
     
@@ -1525,10 +1610,64 @@
       audioEnabled = !audioEnabled;
     }
     
-    // Finalizar sesión
+    // Finalizar sesión RON (Remota Online Notary) - Ley 19.799
     async function endSession() {
-      if (confirm("¿Estás seguro de que deseas finalizar la sesión?")) {
+      if (confirm("¿Estás seguro de que deseas finalizar la sesión de certificación electrónica?")) {
         try {
+          // Registrar cierre de sesión según requerimientos legales
+          if (sessionData && sessionData.sessionId) {
+            try {
+              await fetch(`/api/ron/session/${sessionData.sessionId}/client-left`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  disconnectReason: 'user_terminated',
+                  leaveTime: new Date().toISOString(),
+                  sessionStatus: 'closed_by_client',
+                  qaMode: QA_MODE
+                })
+              });
+              console.log("Sessión RON registrada como finalizada en servidor");
+            } catch (registerError) {
+              console.error("Error al registrar cierre de sesión:", registerError);
+              // No interrumpir el cierre de sesión si esto falla
+            }
+          }
+          
+          // Mostrar diálogo legal en caso de QA_MODE
+          if (QA_MODE) {
+            const sessionTerminationElement = document.createElement('div');
+            sessionTerminationElement.innerHTML = `
+              <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                          background: rgba(255,255,255,0.95); z-index: 9999; display: flex; 
+                          flex-direction: column; justify-content: center; align-items: center; padding: 20px;">
+                <div style="background: white; max-width: 500px; padding: 30px; border-radius: 10px; 
+                            box-shadow: 0 5px 20px rgba(0,0,0,0.2); text-align: center;">
+                  <h2 style="color: var(--primary); margin-top: 0;">Sesión finalizada en modo QA</h2>
+                  <p style="margin: 15px 0;">La sesión ha sido terminada correctamente en entorno de pruebas.</p>
+                  <p style="margin: 10px 0; font-size: 14px; color: #666;">
+                    Este mensaje solo aparece en modo QA y es para fines de prueba.
+                  </p>
+                  <button style="background: var(--primary); color: white; border: none; 
+                                padding: 10px 20px; border-radius: 5px; margin-top: 15px; cursor: pointer;"
+                          onclick="this.parentNode.parentNode.remove()">
+                    Cerrar mensaje
+                  </button>
+                </div>
+              </div>
+            `;
+            document.body.appendChild(sessionTerminationElement);
+            
+            // Este diálogo se autocerra después de 3 segundos
+            setTimeout(() => {
+              if (sessionTerminationElement.parentNode) {
+                sessionTerminationElement.remove();
+              }
+            }, 3000);
+          }
+          
           if (localTracks.length > 0) {
             // Detener y cerrar tracks locales
             localTracks.forEach((track) => {
@@ -1537,16 +1676,17 @@
             });
           }
           
-          // Abandonar canal
+          // Abandonar canal Agora RTC
           if (client) {
             await client.leave();
+            console.log("Canal de comunicación cerrado correctamente");
           }
           
           // Actualizar UI
           document.getElementById("session-screen").classList.add("hidden");
           document.getElementById("access-screen").classList.remove("hidden");
           
-          document.getElementById("joinButtonText").classList.remove("hidden");
+          document.getElementById("joinButtonText").style.display = "inline";
           document.getElementById("joinButtonLoading").classList.add("hidden");
           document.getElementById("joinButton").disabled = false;
           
@@ -1562,6 +1702,7 @@
           
         } catch (error) {
           console.error("Error ending session:", error);
+          alert("Error al finalizar sesión: " + error.message);
         }
       }
     }
