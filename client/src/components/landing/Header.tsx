@@ -60,6 +60,9 @@ export default function Header() {
             <Link href="/payment-demo" className="text-secondary hover:text-primary font-medium text-sm transition duration-150">
               Demo Pagos
             </Link>
+            <a href="/documentacion-tecnica.html" className="text-secondary hover:text-primary font-medium text-sm transition duration-150" target="_blank" rel="noopener noreferrer">
+              Documentación
+            </a>
             
             {user ? (
               <Link href={user.role === "certifier" ? "/certifier-dashboard" : (user.role === "admin" ? "/admin-dashboard" : "/user-dashboard")}>
@@ -158,6 +161,15 @@ export default function Header() {
               >
                 Demo Pagos
               </Link>
+              <a 
+                href="/documentacion-tecnica.html"
+                className="block px-3 py-2 text-base font-medium text-secondary hover:text-primary hover:bg-light rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Documentación
+              </a>
               
               {user ? (
                 <Link href={user.role === "certifier" ? "/certifier-dashboard" : (user.role === "admin" ? "/admin-dashboard" : "/user-dashboard")}>
