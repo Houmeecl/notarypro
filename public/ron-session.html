@@ -390,9 +390,6 @@
   </div>
   
   <script>
-    // Configuración Agora
-    const APP_ID = "TU_APP_ID_AQUÍ"; // <-- Reemplazar con tu App ID real
-    
     // Variables de estado
     let client;
     let localTracks = [];
@@ -401,6 +398,24 @@
     let videoEnabled = true;
     let audioEnabled = true;
     let sessionData = null;
+    let appId = ""; // Se cargará desde la API
+    let agoraToken = ""; // Se cargará desde la API
+    
+    // Función para cargar el AppId de Agora
+    async function loadAppId() {
+      try {
+        const response = await fetch('/api/ron/public/app-id');
+        const data = await response.json();
+        appId = data.appId;
+        console.log("App ID cargado correctamente");
+      } catch (error) {
+        console.error("Error al cargar App ID:", error);
+        alert("Error al cargar la configuración. Por favor intenta nuevamente.");
+      }
+    }
+    
+    // Cargar AppId al iniciar
+    loadAppId();
     
     // Función para unirse a la sesión RON
     async function joinSession() {
@@ -417,11 +432,25 @@
       document.getElementById("joinButton").disabled = true;
       
       try {
-        // En una implementación real, aquí verificarías el código con tu backend
-        // Para este ejemplo, simplemente usamos el código como ID de sesión
+        // Verificar el código con el backend
+        const sessionResponse = await fetch(`/api/ron/public/session/${accessCodeInput}`);
+        if (!sessionResponse.ok) {
+          throw new Error('Código de sesión inválido o sesión no encontrada');
+        }
+        
+        const sessionInfo = await sessionResponse.json();
+        
+        // Obtener tokens para la videollamada
+        const tokensResponse = await fetch(`/api/ron/public/session/${accessCodeInput}/tokens`);
+        if (!tokensResponse.ok) {
+          throw new Error('Error al obtener tokens para la videollamada');
+        }
+        
+        const tokensInfo = await tokensResponse.json();
         
         const sessionId = accessCodeInput;
-        const channelName = sessionId.replace("RON-", "ron-session-");
+        const channelName = tokensInfo.channelName;
+        agoraToken = tokensInfo.token;
         
         // Inicializar cliente Agora
         client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
@@ -430,8 +459,8 @@
         client.on("user-published", handleUserPublished);
         client.on("user-unpublished", handleUserUnpublished);
         
-        // Unirse al canal (sin token por ahora)
-        await client.join(APP_ID, channelName, null, null);
+        // Unirse al canal con token
+        await client.join(appId, channelName, agoraToken, null);
         
         // Crear tracks locales
         localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
@@ -445,12 +474,12 @@
         
         console.log("Joined channel successfully");
         
-        // Simular datos de sesión (reemplazar con datos reales desde tu backend)
+        // Usar datos de sesión del servidor
         sessionData = {
           sessionId: sessionId,
-          documentName: "Documento pendiente de firma",
-          certifierName: "Certificador asignado",
-          status: "en-proceso"
+          documentName: sessionInfo.documentName || "Documento pendiente de firma",
+          certifierName: sessionInfo.certifierName || "Certificador asignado",
+          status: sessionInfo.status || "en-proceso"
         };
         
         // Actualizar información de sesión en la UI
@@ -598,56 +627,44 @@
       audioEnabled = !audioEnabled;
     }
     
-    // Finalizar sesión y liberar recursos
+    // Finalizar sesión
     async function endSession() {
-      if (!isConnected) return;
-      
-      // Detener y cerrar tracks locales
-      for (let track of localTracks) {
-        track.stop();
-        track.close();
-      }
-      
-      // Dejar el canal
-      await client.leave();
-      
-      // Reiniciar variables
-      localTracks = [];
-      remoteUsers = {};
-      isConnected = false;
-      
-      // Volver a la pantalla de acceso
-      document.getElementById("session-screen").classList.add("hidden");
-      document.getElementById("access-screen").classList.remove("hidden");
-      
-      // Restaurar botón
-      document.getElementById("joinButtonText").classList.remove("hidden");
-      document.getElementById("joinButtonLoading").classList.add("hidden");
-      document.getElementById("joinButton").disabled = false;
-      
-      // Limpiar inputs
-      document.getElementById("accessCode").value = "";
-      
-      // Limpiar contenedores de video
-      document.getElementById("local-player").innerHTML = "";
-      document.getElementById("remote-player").innerHTML = "";
-      
-      // Reiniciar pasos
-      document.querySelectorAll(".step").forEach((step, index) => {
-        if (index > 0) step.classList.remove("active");
-      });
-      
-      console.log("Session ended successfully");
-    }
-    
-    // Función para simular eventos (solo para demostración)
-    function simulateEvent(event) {
-      updateUI(event);
-      
-      if (event === "sessionCompleted") {
-        setTimeout(() => {
-          endSession();
-        }, 5000);
+      if (confirm("¿Estás seguro de que deseas finalizar la sesión?")) {
+        try {
+          if (localTracks.length > 0) {
+            // Detener y cerrar tracks locales
+            localTracks.forEach((track) => {
+              track.stop();
+              track.close();
+            });
+          }
+          
+          // Abandonar canal
+          if (client) {
+            await client.leave();
+          }
+          
+          // Actualizar UI
+          document.getElementById("session-screen").classList.add("hidden");
+          document.getElementById("access-screen").classList.remove("hidden");
+          
+          document.getElementById("joinButtonText").classList.remove("hidden");
+          document.getElementById("joinButtonLoading").classList.add("hidden");
+          document.getElementById("joinButton").disabled = false;
+          
+          // Reiniciar variables
+          localTracks = [];
+          remoteUsers = {};
+          isConnected = false;
+          videoEnabled = true;
+          audioEnabled = true;
+          sessionData = null;
+          
+          console.log("Session ended successfully");
+          
+        } catch (error) {
+          console.error("Error ending session:", error);
+        }
       }
     }
   </script>

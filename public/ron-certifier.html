@@ -79,18 +79,14 @@
       font-weight: 600;
     }
     
-    select, input, textarea {
+    input[type="text"],
+    input[type="password"] {
       width: 100%;
       padding: 10px 15px;
       border: 1px solid #ddd;
       border-radius: 4px;
       font-size: 16px;
       box-sizing: border-box;
-    }
-    
-    textarea {
-      min-height: 100px;
-      resize: vertical;
     }
     
     button {
@@ -167,6 +163,30 @@
       background-color: var(--primary);
     }
     
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    
+    .tab.active {
+      border-bottom: 3px solid var(--primary);
+      font-weight: bold;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
     .session-info {
       margin-top: 20px;
     }
@@ -189,6 +209,42 @@
       text-align: center;
     }
     
+    .verification-steps {
+      margin-top: 20px;
+    }
+    
+    .step {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .step-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      background-color: var(--primary);
+      color: white;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    
+    .step-content {
+      flex: 1;
+    }
+    
+    .step-content h4 {
+      margin: 0 0 5px;
+    }
+    
+    .step-content p {
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+    }
+    
     .hidden {
       display: none;
     }
@@ -207,12 +263,39 @@
       to { transform: rotate(360deg); }
     }
     
+    .snapshot-preview {
+      max-width: 100%;
+      height: auto;
+      margin-top: 10px;
+      display: none;
+    }
+    
     .btn-action {
       background-color: var(--success);
     }
     
     .btn-danger {
       background-color: var(--error);
+    }
+    
+    .text-center {
+      text-align: center;
+    }
+    
+    .mt-3 {
+      margin-top: 15px;
+    }
+    
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    
+    .grid-1 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
     }
     
     .icon {
@@ -223,115 +306,6 @@
       background-repeat: no-repeat;
       vertical-align: middle;
     }
-    
-    .action-buttons {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-    
-    @media (min-width: 768px) {
-      .action-buttons {
-        grid-template-columns: 1fr 1fr 1fr;
-      }
-    }
-    
-    .action-button {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .modal.active {
-      display: flex;
-    }
-    
-    .modal-content {
-      background-color: white;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 500px;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    
-    .modal-header {
-      background-color: var(--primary);
-      color: white;
-      padding: 15px 20px;
-    }
-    
-    .modal-header h3 {
-      margin: 0;
-      color: white;
-    }
-    
-    .modal-body {
-      padding: 20px;
-    }
-    
-    .modal-footer {
-      padding: 15px 20px;
-      border-top: 1px solid #ddd;
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    }
-    
-    .modal-footer button {
-      width: auto;
-    }
-    
-    .footer-buttons {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-      gap: 20px;
-    }
-    
-    .footer-buttons button {
-      flex: 1;
-    }
-    
-    .session-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    
-    .session-item {
-      padding: 15px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .session-item:hover {
-      background-color: #f0f0f0;
-      border-color: var(--primary);
-    }
-    
-    .session-item.selected {
-      background-color: var(--primary-light);
-      color: white;
-      border-color: var(--primary);
-    }
   </style>
 </head>
 <body>
@@ -341,30 +315,51 @@
     </div>
     
     <h1>Panel de Certificador RON</h1>
-    <p class="text-center">Verificación de identidad y firma electrónica en línea</p>
+    <p class="text-center">Gestión de sesiones de certificación remota</p>
     
-    <!-- Pantalla inicial de selección de sesión -->
-    <div id="access-screen" class="card">
+    <!-- Pantalla de login (inicialmente visible) -->
+    <div id="login-screen" class="card">
       <div class="card-header">
-        <h2>Selecciona una sesión</h2>
+        <h2>Acceso certificador</h2>
       </div>
       <div class="card-content">
         <div class="form-group">
-          <label for="session-select">Sesiones programadas</label>
-          <select id="session-select">
-            <option value="">Selecciona una sesión</option>
-          </select>
+          <label for="username">Usuario</label>
+          <input type="text" id="username" placeholder="Usuario certificador">
         </div>
-        <div id="session-list-container" class="hidden">
-          <h3>Sesiones disponibles</h3>
-          <ul id="session-list" class="session-list">
-            <!-- Las sesiones se cargarán dinámicamente -->
-          </ul>
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" placeholder="*********">
         </div>
-        <button id="joinButton" onclick="joinSession()">
-          <span id="joinButtonText">Iniciar sesión</span>
-          <span id="joinButtonLoading" class="loading hidden"></span>
+        <button id="loginButton" onclick="login()">
+          <span id="loginButtonText">Iniciar sesión</span>
+          <span id="loginButtonLoading" class="loading hidden"></span>
         </button>
+      </div>
+    </div>
+    
+    <!-- Pantalla de sesiones (después de login) -->
+    <div id="sessions-screen" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>Sesiones disponibles</h2>
+        </div>
+        <div class="card-content">
+          <div class="form-group">
+            <label for="sessionCode">Código de sesión RON</label>
+            <div style="display: flex; gap: 10px;">
+              <input type="text" id="sessionCode" placeholder="Ejemplo: RON-12345" style="flex: 1;">
+              <button onclick="joinSession()" style="width: auto; white-space: nowrap;">
+                <span id="joinButtonText">Unirse</span>
+                <span id="joinButtonLoading" class="loading hidden"></span>
+              </button>
+            </div>
+          </div>
+          
+          <div class="status-bar" id="statusMessage">
+            Ingresa el código RON para iniciar la certificación
+          </div>
+        </div>
       </div>
     </div>
     
@@ -427,108 +422,97 @@
             </dl>
           </div>
           
-          <div class="action-buttons">
-            <button class="action-button" onclick="showVerifyIdentityModal()">
-              <span class="icon">👤</span>
-              Verificar identidad
-            </button>
+          <div class="tabs">
+            <div class="tab active" onclick="switchTab('tab-verification')">Verificación</div>
+            <div class="tab" onclick="switchTab('tab-signature')">Firma</div>
+            <div class="tab" onclick="switchTab('tab-notes')">Notas</div>
+          </div>
+          
+          <!-- Tab de verificación -->
+          <div id="tab-verification" class="tab-content active">
+            <div class="verification-steps">
+              <h3>Verificación de identidad</h3>
+              
+              <div id="capturedImage" class="text-center">
+                <img id="snapshotPreview" class="snapshot-preview" alt="Captura de identificación">
+              </div>
+              
+              <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                  <h4>Verificar identidad visual</h4>
+                  <p>Verifica que la persona coincida con su documento de identidad</p>
+                </div>
+              </div>
+              
+              <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                  <h4>Capturar identificación</h4>
+                  <p>Usa el botón de cámara para capturar la identificación</p>
+                </div>
+              </div>
+              
+              <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                  <h4>Confirmar identidad</h4>
+                  <p>Confirma la identidad para continuar con el proceso</p>
+                </div>
+              </div>
+              
+              <div class="mt-3 text-center">
+                <button class="btn-action" onclick="verifyIdentity()">Confirmar identidad</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Tab de firma -->
+          <div id="tab-signature" class="tab-content">
+            <h3>Proceso de firma</h3>
             
-            <button class="action-button" id="btnInitiateSignature" onclick="initiateSignature()" disabled>
-              <span class="icon">✍️</span>
-              Iniciar firma
-            </button>
+            <div class="form-group">
+              <label for="emailInput">Correo del firmante</label>
+              <input type="text" id="emailInput" placeholder="correo@ejemplo.com">
+            </div>
             
-            <button class="action-button" onclick="showCertificateModal()">
-              <span class="icon">📄</span>
-              Generar constancia
-            </button>
-          </div>
-          
-          <div class="status-bar" id="statusBar">
-            Esperando al cliente...
-          </div>
-          
-          <div class="footer-buttons">
-            <button onclick="cancelSession()" class="btn-danger">
-              Cancelar sesión
-            </button>
+            <div class="mt-3 text-center">
+              <button class="btn-action" onclick="startSigningProcess()">
+                <span id="signButtonText">Iniciar firma con Zoho Sign</span>
+                <span id="signButtonLoading" class="loading hidden"></span>
+              </button>
+            </div>
             
-            <button onclick="completeSession()" class="btn-action">
-              Completar sesión
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Modales -->
-    <!-- Modal de verificación de identidad -->
-    <div id="identityModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>Verificación de identidad</h3>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="id-type">Tipo de documento</label>
-            <select id="id-type">
-              <option value="dni">Cédula de identidad</option>
-              <option value="passport">Pasaporte</option>
-              <option value="driver">Licencia de conducir</option>
-            </select>
+            <div class="status-bar" id="signatureStatus">
+              Pendiente de verificación de identidad
+            </div>
           </div>
           
-          <div class="form-group">
-            <label for="id-number">Número de documento</label>
-            <input type="text" id="id-number" placeholder="Ej: 12345678-9">
+          <!-- Tab de notas -->
+          <div id="tab-notes" class="tab-content">
+            <h3>Notas de la sesión</h3>
+            
+            <div class="form-group">
+              <label for="notesInput">Observaciones</label>
+              <textarea id="notesInput" rows="5" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ddd;"></textarea>
+            </div>
+            
+            <div class="mt-3 text-center">
+              <button onclick="saveNotes()">Guardar notas</button>
+            </div>
           </div>
           
-          <div class="form-group">
-            <label for="verification-notes">Notas de verificación</label>
-            <textarea id="verification-notes" placeholder="Detalles del proceso de verificación..."></textarea>
+          <div class="grid-2 mt-3">
+            <button class="btn-danger" onclick="endSession()">Finalizar sesión</button>
+            <button class="btn-action" onclick="completeSession()">Completar certificación</button>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button onclick="closeModal('identityModal')">Cancelar</button>
-          <button onclick="verifyIdentity()" class="btn-action">Confirmar verificación</button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Modal de constancia -->
-    <div id="certificateModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>Generar constancia</h3>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="certificate-type">Tipo de constancia</label>
-            <select id="certificate-type">
-              <option value="verification">Verificación de identidad</option>
-              <option value="signature">Firma electrónica</option>
-              <option value="complete">Certificación completa</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="certificate-notes">Notas adicionales</label>
-            <textarea id="certificate-notes" placeholder="Información adicional para la constancia..."></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button onclick="closeModal('certificateModal')">Cancelar</button>
-          <button onclick="generateCertificate()" class="btn-action">Generar constancia</button>
         </div>
       </div>
     </div>
   </div>
   
   <script>
-    // Configuración Agora
-    const APP_ID = "TU_APP_ID_AQUÍ"; // <-- Reemplazar con tu App ID real
-    
-    // Variables de estado
+    // Variables para manejo de estado global
     let client;
     let localTracks = [];
     let remoteUsers = {};
@@ -536,132 +520,170 @@
     let videoEnabled = true;
     let audioEnabled = true;
     let sessionData = null;
+    let currentUser = null;
     let identityVerified = false;
-    let signatureInitiated = false;
+    let appId = ""; // Se cargará desde la API
+    let agoraToken = ""; // Se cargará desde la API
     
-    // Cargar sesiones disponibles (simulado para ejemplo)
-    document.addEventListener('DOMContentLoaded', () => {
-      // En una implementación real, cargarías las sesiones desde tu backend
-      loadAvailableSessions();
-    });
-    
-    // Cargar sesiones disponibles
-    function loadAvailableSessions() {
-      // Simulación de sesiones (en producción, cargar desde API)
-      const mockSessions = [
-        { sessionId: 'RON-2025-001', clientName: 'Juan Pérez', status: 'pending' },
-        { sessionId: 'RON-2025-002', clientName: 'María González', status: 'pending' },
-        { sessionId: 'RON-2025-003', clientName: 'Carlos Rodríguez', status: 'pending' }
-      ];
-      
-      // Cargar en select
-      const selectElement = document.getElementById('session-select');
-      mockSessions.forEach(session => {
-        const option = document.createElement('option');
-        option.value = session.sessionId;
-        option.textContent = `${session.sessionId} - ${session.clientName}`;
-        selectElement.appendChild(option);
-      });
-      
-      // Cargar en lista
-      const listElement = document.getElementById('session-list');
-      mockSessions.forEach(session => {
-        const listItem = document.createElement('li');
-        listItem.className = 'session-item';
-        listItem.dataset.sessionId = session.sessionId;
-        listItem.innerHTML = `
-          <strong>${session.sessionId}</strong><br>
-          Cliente: ${session.clientName}<br>
-          Estado: ${formatStatus(session.status)}
-        `;
-        listItem.addEventListener('click', () => {
-          // Deseleccionar todos
-          document.querySelectorAll('.session-item').forEach(item => {
-            item.classList.remove('selected');
-          });
-          
-          // Seleccionar el actual
-          listItem.classList.add('selected');
-          
-          // Actualizar select
-          selectElement.value = session.sessionId;
-        });
-        listElement.appendChild(listItem);
-      });
-      
-      // Mostrar lista si hay sesiones
-      if (mockSessions.length > 0) {
-        document.getElementById('session-list-container').classList.remove('hidden');
+    // Función para cargar el AppId de Agora
+    async function loadAppId() {
+      try {
+        const response = await fetch('/api/ron/public/app-id');
+        const data = await response.json();
+        appId = data.appId;
+        console.log("App ID cargado correctamente");
+      } catch (error) {
+        console.error("Error al cargar App ID:", error);
+        showStatus("Error al cargar la configuración. Por favor recarga la página.", "error");
       }
     }
     
-    // Unirse a sesión seleccionada
-    async function joinSession() {
-      const sessionId = document.getElementById('session-select').value;
+    // Cargar AppId al iniciar
+    loadAppId();
+    
+    // Función de login
+    async function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
       
-      if (!sessionId) {
-        alert('Por favor selecciona una sesión');
+      if (!username || !password) {
+        showStatus("Por favor completa todos los campos", "error");
         return;
       }
       
       // Mostrar indicador de carga
-      document.getElementById('joinButtonText').classList.add('hidden');
-      document.getElementById('joinButtonLoading').classList.remove('hidden');
-      document.getElementById('joinButton').disabled = true;
+      document.getElementById("loginButtonText").classList.add("hidden");
+      document.getElementById("loginButtonLoading").classList.remove("hidden");
+      document.getElementById("loginButton").disabled = true;
       
       try {
-        // En una implementación real, aquí obtendrías información de la sesión desde tu backend
-        // Para este ejemplo, simulamos la información
+        // Autenticación con backend
+        const response = await fetch('/api/ron/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username,
+            password
+          })
+        });
         
-        const channelName = sessionId.replace('RON-', 'ron-session-');
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Error de autenticación');
+        }
+        
+        if (!data.success || !data.user) {
+          throw new Error('Credenciales inválidas o usuario sin permisos de certificación');
+        }
+        
+        // Guardar información de usuario
+        currentUser = data.user;
+        
+        // Cambiar a pantalla de sesiones
+        document.getElementById("login-screen").classList.add("hidden");
+        document.getElementById("sessions-screen").classList.remove("hidden");
+        
+        showStatus(`Bienvenido, ${currentUser.username}. Ingresa un código RON para comenzar.`, "info");
+        
+      } catch (error) {
+        console.error("Error de autenticación:", error);
+        showStatus(error.message || "Error de autenticación. Inténtalo nuevamente.", "error");
+        
+        // Restaurar botón
+        document.getElementById("loginButtonText").classList.remove("hidden");
+        document.getElementById("loginButtonLoading").classList.add("hidden");
+        document.getElementById("loginButton").disabled = false;
+      }
+    }
+    
+    // Función para unirse a una sesión
+    async function joinSession() {
+      if (!currentUser) {
+        showStatus("Debes iniciar sesión primero", "error");
+        return;
+      }
+      
+      const sessionCode = document.getElementById("sessionCode").value.trim();
+      
+      if (!sessionCode || !sessionCode.startsWith("RON-")) {
+        showStatus("Ingresa un código válido (formato: RON-XXXXX)", "error");
+        return;
+      }
+      
+      // Mostrar indicador de carga
+      document.getElementById("joinButtonText").classList.add("hidden");
+      document.getElementById("joinButtonLoading").classList.remove("hidden");
+      
+      try {
+        // Verificar el código con el backend
+        const sessionResponse = await fetch(`/api/ron/public/session/${sessionCode}`);
+        if (!sessionResponse.ok) {
+          throw new Error('Código de sesión inválido o sesión no encontrada');
+        }
+        
+        const sessionInfo = await sessionResponse.json();
+        
+        // Obtener tokens para la videollamada
+        const tokensResponse = await fetch(`/api/ron/public/session/${sessionCode}/tokens`);
+        if (!tokensResponse.ok) {
+          throw new Error('Error al obtener tokens para la videollamada');
+        }
+        
+        const tokensInfo = await tokensResponse.json();
+        
+        const sessionId = sessionCode;
+        const channelName = tokensInfo.channelName;
+        agoraToken = tokensInfo.token;
         
         // Inicializar cliente Agora
-        client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
+        client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
         
         // Configurar eventos
-        client.on('user-published', handleUserPublished);
-        client.on('user-unpublished', handleUserUnpublished);
+        client.on("user-published", handleUserPublished);
+        client.on("user-unpublished", handleUserUnpublished);
         
-        // Unirse al canal (sin token por ahora)
-        await client.join(APP_ID, channelName, null, null);
+        // Unirse al canal con token
+        await client.join(appId, channelName, agoraToken, null);
         
         // Crear tracks locales
         localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
         const [audioTrack, videoTrack] = localTracks;
         
         // Mostrar video local
-        videoTrack.play('local-player');
+        videoTrack.play("local-player");
         
         // Publicar tracks
         await client.publish(localTracks);
         
-        console.log('Joined channel successfully');
+        console.log("Joined channel successfully");
         
-        // Simular datos de sesión (reemplazar con datos reales desde tu backend)
+        // Usar datos de sesión reales
         sessionData = {
           sessionId: sessionId,
-          clientName: 'Cliente que ha solicitado la sesión',
-          documentName: 'Documento pendiente de firma',
-          status: 'en-proceso'
+          clientName: sessionInfo.clientName || "Cliente pendiente",
+          documentName: sessionInfo.documentName || "Documento pendiente",
+          status: sessionInfo.status || "en-proceso"
         };
         
         // Actualizar información de sesión en la UI
         updateSessionInfo();
         
         // Cambiar a la pantalla de sesión
-        document.getElementById('access-screen').classList.add('hidden');
-        document.getElementById('session-screen').classList.remove('hidden');
+        document.getElementById("sessions-screen").classList.add("hidden");
+        document.getElementById("session-screen").classList.remove("hidden");
         
         isConnected = true;
         
       } catch (error) {
-        console.error('Error joining channel:', error);
-        alert('Error al unirse a la sesión: ' + error.message);
+        console.error("Error joining channel:", error);
+        showStatus("Error al unirse a la sesión: " + error.message, "error");
         
         // Restaurar botón
-        document.getElementById('joinButtonText').classList.remove('hidden');
-        document.getElementById('joinButtonLoading').classList.add('hidden');
-        document.getElementById('joinButton').disabled = false;
+        document.getElementById("joinButtonText").classList.remove("hidden");
+        document.getElementById("joinButtonLoading").classList.add("hidden");
       }
     }
     
@@ -671,15 +693,12 @@
       await client.subscribe(user, mediaType);
       
       // Si es video, mostrarlo en el contenedor remoto
-      if (mediaType === 'video') {
-        user.videoTrack.play('remote-player');
-        
-        // Actualizar interfaz
-        updateUI('clientJoined');
+      if (mediaType === "video") {
+        user.videoTrack.play("remote-player");
       }
       
       // Si es audio, reproducirlo
-      if (mediaType === 'audio') {
+      if (mediaType === "audio") {
         user.audioTrack.play();
       }
       
@@ -689,69 +708,183 @@
     
     // Manejar cuando otro usuario deja de publicar video/audio
     function handleUserUnpublished(user, mediaType) {
-      if (mediaType === 'video') {
+      if (mediaType === "video") {
         // Limpiar contenedor de video remoto
-        const playerElement = document.getElementById('remote-player');
-        playerElement.innerHTML = '';
-        
-        // Actualizar interfaz
-        updateUI('clientLeft');
+        const playerElement = document.getElementById("remote-player");
+        playerElement.innerHTML = "";
       }
       
       // Eliminar usuario remoto
       delete remoteUsers[user.uid];
     }
     
-    // Actualizar información de sesión en la UI
-    function updateSessionInfo() {
-      if (!sessionData) return;
-      
-      document.getElementById('sessionId').textContent = sessionData.sessionId || '-';
-      document.getElementById('clientName').textContent = sessionData.clientName || '-';
-      document.getElementById('documentName').textContent = sessionData.documentName || '-';
-      document.getElementById('sessionStatus').textContent = formatStatus(sessionData.status) || 'En proceso';
-    }
-    
-    // Formatear estado para mostrar en UI
-    function formatStatus(status) {
-      const statusMap = {
-        'pending': 'Pendiente',
-        'en-proceso': 'En proceso',
-        'identity-verified': 'Identidad verificada',
-        'signing': 'Firmando',
-        'completed': 'Completado',
-        'cancelled': 'Cancelado'
-      };
-      
-      return statusMap[status] || status;
-    }
-    
-    // Actualizar UI basado en eventos
-    function updateUI(event) {
-      const statusBar = document.getElementById('statusBar');
-      
-      switch (event) {
-        case 'clientJoined':
-          statusBar.textContent = 'Cliente conectado. Proceda con la verificación de identidad.';
-          break;
-          
-        case 'clientLeft':
-          statusBar.textContent = 'Cliente desconectado. Esperando reconexión...';
-          break;
-          
-        case 'identityVerified':
-          statusBar.textContent = 'Identidad verificada con éxito. Puede iniciar el proceso de firma.';
-          document.getElementById('btnInitiateSignature').disabled = false;
-          break;
-          
-        case 'signingStarted':
-          statusBar.textContent = 'Proceso de firma iniciado. El cliente recibirá instrucciones por correo.';
-          break;
-          
-        case 'sessionCompleted':
-          statusBar.textContent = 'Sesión completada correctamente.';
-          break;
+    // Capturar imagen del participante remoto
+    function captureSnapshot() {
+      if (Object.keys(remoteUsers).length === 0) {
+        showStatus("No hay participante remoto para capturar", "error");
+        return;
       }
+      
+      try {
+        // Obtener uid del primer usuario remoto
+        const uid = Object.keys(remoteUsers)[0];
+        const user = remoteUsers[uid];
+        
+        if (user && user.videoTrack) {
+          const canvas = document.createElement('canvas');
+          const videoElement = document.querySelector('#remote-player video');
+          
+          if (!videoElement) {
+            showStatus("No se puede capturar la imagen remota", "error");
+            return;
+          }
+          
+          // Configurar el canvas con las dimensiones del video
+          canvas.width = videoElement.videoWidth;
+          canvas.height = videoElement.videoHeight;
+          
+          // Dibujar el frame actual del video en el canvas
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+          
+          // Convertir el canvas a una imagen
+          const imageUrl = canvas.toDataURL('image/jpeg', 0.8);
+          
+          // Mostrar la imagen capturada
+          const snapshotPreview = document.getElementById('snapshotPreview');
+          snapshotPreview.src = imageUrl;
+          snapshotPreview.style.display = 'block';
+          
+          showStatus("Identificación capturada correctamente", "success");
+        } else {
+          showStatus("No se puede acceder al video remoto", "error");
+        }
+      } catch (error) {
+        console.error("Error al capturar imagen:", error);
+        showStatus("Error al capturar imagen: " + error.message, "error");
+      }
+    }
+    
+    // Verificar identidad
+    function verifyIdentity() {
+      const snapshotPreview = document.getElementById('snapshotPreview');
+      
+      if (snapshotPreview.style.display !== 'block') {
+        showStatus("Debes capturar una imagen de identificación primero", "error");
+        return;
+      }
+      
+      // Simulamos la verificación (en una implementación real, enviaríamos al backend)
+      identityVerified = true;
+      document.getElementById("signatureStatus").textContent = "Listo para iniciar firma";
+      document.getElementById("sessionStatus").textContent = "Identidad verificada";
+      
+      showStatus("Identidad verificada correctamente", "success");
+      
+      // Cambiar a la pestaña de firma
+      switchTab('tab-signature');
+    }
+    
+    // Iniciar proceso de firma
+    async function startSigningProcess() {
+      if (!identityVerified) {
+        showStatus("Debes verificar la identidad primero", "error");
+        switchTab('tab-verification');
+        return;
+      }
+      
+      const email = document.getElementById("emailInput").value.trim();
+      
+      if (!email || !email.includes('@')) {
+        showStatus("Ingresa un correo electrónico válido", "error");
+        return;
+      }
+      
+      // Mostrar indicador de carga
+      document.getElementById("signButtonText").classList.add("hidden");
+      document.getElementById("signButtonLoading").classList.remove("hidden");
+      
+      try {
+        // Llamada a la API de firma (en una implementación real)
+        // Aquí iría el código para iniciar el proceso de firma con Zoho Sign
+        
+        // En una implementación real, este llamado debería enviar los datos al backend
+        // y obtener una respuesta real del proceso de firma iniciado
+        
+        // Simular respuesta exitosa
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        document.getElementById("signatureStatus").textContent = "Proceso de firma iniciado correctamente";
+        document.getElementById("sessionStatus").textContent = "Firma en proceso";
+        
+        showStatus("Proceso de firma iniciado. Se envió un correo al cliente.", "success");
+        
+      } catch (error) {
+        console.error("Error al iniciar firma:", error);
+        showStatus("Error al iniciar proceso de firma: " + error.message, "error");
+      } finally {
+        // Restaurar botón
+        document.getElementById("signButtonText").classList.remove("hidden");
+        document.getElementById("signButtonLoading").classList.add("hidden");
+      }
+    }
+    
+    // Guardar notas
+    function saveNotes() {
+      const notes = document.getElementById("notesInput").value.trim();
+      
+      if (!notes) {
+        showStatus("Ingresa alguna nota para guardar", "error");
+        return;
+      }
+      
+      // En una implementación real, enviaríamos las notas al backend
+      
+      showStatus("Notas guardadas correctamente", "success");
+    }
+    
+    // Completar sesión
+    async function completeSession() {
+      if (!identityVerified) {
+        showStatus("Debes verificar la identidad primero", "error");
+        switchTab('tab-verification');
+        return;
+      }
+      
+      if (confirm("¿Estás seguro de que deseas completar esta sesión de certificación?")) {
+        // En una implementación real, enviaríamos datos al backend para completar la sesión
+        
+        try {
+          // Simular completado exitoso
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          showStatus("Sesión completada exitosamente", "success");
+          
+          // Después de completar, volvemos a la pantalla de sesiones
+          await endSession(false);
+          
+        } catch (error) {
+          console.error("Error al completar sesión:", error);
+          showStatus("Error al completar la sesión: " + error.message, "error");
+        }
+      }
+    }
+    
+    // Cambiar entre pestañas
+    function switchTab(tabId) {
+      // Desactivar todas las pestañas
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Desactivar todos los contenidos de pestañas
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      
+      // Activar la pestaña seleccionada
+      document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+      document.getElementById(tabId).classList.add('active');
     }
     
     // Activar/desactivar cámara
@@ -762,10 +895,10 @@
       
       if (videoEnabled) {
         await videoTrack.setEnabled(false);
-        document.getElementById('videoToggle').innerHTML = '<span class="icon">🚫</span>';
+        document.getElementById("videoToggle").innerHTML = '<span class="icon">🚫</span>';
       } else {
         await videoTrack.setEnabled(true);
-        document.getElementById('videoToggle').innerHTML = '<span class="icon">📹</span>';
+        document.getElementById("videoToggle").innerHTML = '<span class="icon">📹</span>';
       }
       
       videoEnabled = !videoEnabled;
@@ -779,169 +912,113 @@
       
       if (audioEnabled) {
         await audioTrack.setEnabled(false);
-        document.getElementById('audioToggle').innerHTML = '<span class="icon">🔇</span>';
+        document.getElementById("audioToggle").innerHTML = '<span class="icon">🔇</span>';
       } else {
         await audioTrack.setEnabled(true);
-        document.getElementById('audioToggle').innerHTML = '<span class="icon">🎤</span>';
+        document.getElementById("audioToggle").innerHTML = '<span class="icon">🎤</span>';
       }
       
       audioEnabled = !audioEnabled;
     }
     
-    // Capturar imagen del cliente
-    function captureSnapshot() {
-      // En una implementación real, capturarías un frame del video y lo enviarías al servidor
-      alert('Imagen capturada como evidencia de verificación');
-    }
-    
-    // Mostrar modal de verificación de identidad
-    function showVerifyIdentityModal() {
-      document.getElementById('identityModal').classList.add('active');
-    }
-    
-    // Mostrar modal de constancia
-    function showCertificateModal() {
-      document.getElementById('certificateModal').classList.add('active');
-    }
-    
-    // Cerrar modal
-    function closeModal(modalId) {
-      document.getElementById(modalId).classList.remove('active');
-    }
-    
-    // Verificar identidad del cliente
-    function verifyIdentity() {
-      const idType = document.getElementById('id-type').value;
-      const idNumber = document.getElementById('id-number').value;
-      const notes = document.getElementById('verification-notes').value;
-      
-      if (!idNumber || !notes) {
-        alert('Por favor completa todos los campos');
+    // Finalizar sesión
+    async function endSession(askConfirmation = true) {
+      if (askConfirmation && !confirm("¿Estás seguro de que deseas finalizar esta sesión?")) {
         return;
       }
       
-      // En una implementación real, enviarías esta información a tu backend
-      
-      // Actualizar estado
-      identityVerified = true;
-      sessionData.status = 'identity-verified';
-      updateSessionInfo();
-      updateUI('identityVerified');
-      
-      // Cerrar modal
-      closeModal('identityModal');
-      
-      // Notificar
-      alert('Identidad verificada correctamente');
-    }
-    
-    // Iniciar proceso de firma
-    function initiateSignature() {
-      if (!identityVerified) {
-        alert('Primero debe verificar la identidad del cliente');
-        return;
-      }
-      
-      // En una implementación real, iniciarías el proceso de firma con Zoho Sign
-      
-      // Actualizar estado
-      signatureInitiated = true;
-      sessionData.status = 'signing';
-      updateSessionInfo();
-      updateUI('signingStarted');
-      
-      // Notificar
-      alert('Proceso de firma iniciado correctamente. El cliente ha sido notificado por correo electrónico.');
-    }
-    
-    // Generar constancia de certificación
-    function generateCertificate() {
-      const certificateType = document.getElementById('certificate-type').value;
-      const notes = document.getElementById('certificate-notes').value;
-      
-      if (!notes) {
-        alert('Por favor ingresa notas para la constancia');
-        return;
-      }
-      
-      // En una implementación real, generarías la constancia y la enviarías al cliente
-      
-      // Cerrar modal
-      closeModal('certificateModal');
-      
-      // Notificar
-      alert('Constancia generada correctamente. Se enviará automáticamente al cliente por correo electrónico.');
-    }
-    
-    // Cancelar sesión
-    function cancelSession() {
-      if (confirm('¿Está seguro de que desea cancelar esta sesión?')) {
-        endSession();
-      }
-    }
-    
-    // Completar sesión
-    function completeSession() {
-      if (!identityVerified) {
-        alert('Debe verificar la identidad del cliente antes de completar la sesión');
-        return;
-      }
-      
-      if (confirm('¿Está seguro de que desea completar esta sesión?')) {
-        // Actualizar estado
-        sessionData.status = 'completed';
-        updateSessionInfo();
-        updateUI('sessionCompleted');
+      try {
+        if (localTracks.length > 0) {
+          // Detener y cerrar tracks locales
+          localTracks.forEach((track) => {
+            track.stop();
+            track.close();
+          });
+        }
         
-        // En una implementación real, actualizarías el estado en el backend
+        // Abandonar canal
+        if (client) {
+          await client.leave();
+        }
         
-        setTimeout(() => {
-          endSession();
-        }, 3000);
+        // Limpiar contenedores de video
+        document.getElementById("local-player").innerHTML = "";
+        document.getElementById("remote-player").innerHTML = "";
+        
+        // Ocultar imagen capturada
+        const snapshotPreview = document.getElementById('snapshotPreview');
+        snapshotPreview.style.display = 'none';
+        
+        // Reiniciar variables
+        localTracks = [];
+        remoteUsers = {};
+        isConnected = false;
+        videoEnabled = true;
+        audioEnabled = true;
+        sessionData = null;
+        identityVerified = false;
+        
+        // Volver a la pantalla de sesiones
+        document.getElementById("session-screen").classList.add("hidden");
+        document.getElementById("sessions-screen").classList.remove("hidden");
+        
+        // Resetear formulario de sesiones
+        document.getElementById("sessionCode").value = "";
+        document.getElementById("joinButtonText").classList.remove("hidden");
+        document.getElementById("joinButtonLoading").classList.add("hidden");
+        
+        showStatus("Sesión finalizada", "info");
+        
+      } catch (error) {
+        console.error("Error ending session:", error);
+        showStatus("Error al finalizar la sesión: " + error.message, "error");
       }
     }
     
-    // Finalizar sesión y liberar recursos
-    async function endSession() {
-      if (!isConnected) return;
+    // Actualizar información de sesión en la UI
+    function updateSessionInfo() {
+      if (!sessionData) return;
       
-      // Detener y cerrar tracks locales
-      for (let track of localTracks) {
-        track.stop();
-        track.close();
+      document.getElementById("sessionId").textContent = sessionData.sessionId || "-";
+      document.getElementById("clientName").textContent = sessionData.clientName || "-";
+      document.getElementById("documentName").textContent = sessionData.documentName || "-";
+      document.getElementById("sessionStatus").textContent = formatStatus(sessionData.status) || "En proceso";
+    }
+    
+    // Formatear estado para mostrar en UI
+    function formatStatus(status) {
+      const statusMap = {
+        "pending": "Pendiente",
+        "en-proceso": "En proceso",
+        "identity-verified": "Identidad verificada",
+        "signing": "Firmando",
+        "completed": "Completado",
+        "cancelled": "Cancelado"
+      };
+      
+      return statusMap[status] || status;
+    }
+    
+    // Mostrar mensaje de estado
+    function showStatus(message, type = "info") {
+      const statusBar = document.getElementById("statusMessage");
+      if (!statusBar) return;
+      
+      statusBar.textContent = message;
+      
+      // Aplicar estilos según el tipo de mensaje
+      statusBar.className = "status-bar";
+      
+      if (type === "error") {
+        statusBar.style.backgroundColor = "#ffebee";
+        statusBar.style.color = "#d32f2f";
+      } else if (type === "success") {
+        statusBar.style.backgroundColor = "#e8f5e9";
+        statusBar.style.color = "#388e3c";
+      } else {
+        statusBar.style.backgroundColor = "#f8f9fa";
+        statusBar.style.color = "#3e3e3e";
       }
-      
-      // Dejar el canal
-      await client.leave();
-      
-      // Reiniciar variables
-      localTracks = [];
-      remoteUsers = {};
-      isConnected = false;
-      identityVerified = false;
-      signatureInitiated = false;
-      
-      // Volver a la pantalla de acceso
-      document.getElementById('session-screen').classList.add('hidden');
-      document.getElementById('access-screen').classList.remove('hidden');
-      
-      // Restaurar botón
-      document.getElementById('joinButtonText').classList.remove('hidden');
-      document.getElementById('joinButtonLoading').classList.add('hidden');
-      document.getElementById('joinButton').disabled = false;
-      document.getElementById('btnInitiateSignature').disabled = true;
-      
-      // Limpiar selección
-      document.getElementById('session-select').value = '';
-      document.querySelectorAll('.session-item').forEach(item => {
-        item.classList.remove('selected');
-      });
-      
-      // Limpiar contenedores de video
-      document.getElementById('local-player').innerHTML = '';
-      document.getElementById('remote-player').innerHTML = '';
-      
-      console.log('Session ended successfully');
     }
   </script>
 </body>
