@@ -1,435 +1,487 @@
-import { useState } from "react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Fingerprint, ShieldCheck, AlertCircle, Key, Loader2, CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 import { 
-  checkExtensionAvailability, 
-  listTokenDevices, 
-  getCertificates, 
-  signData, 
-  getTimestamp,
-  CertificateInfo,
-  TokenProvider
+  RotateCcw, 
+  CheckCircle2, 
+  XCircle, 
+  KeyRound, 
+  Shield, 
+  AlertCircle,
+  FileSignature
+} from "lucide-react";
+import { 
+  Alert,
+  AlertTitle,
+  AlertDescription
+} from "@/components/ui/alert";
+import { 
+  checkExtensionAvailability,
+  listTokenDevices,
+  getCertificates,
+  signData,
+  CertificateInfo 
 } from "@/lib/pkcs11-bridge";
+import { useToast } from "@/hooks/use-toast";
 
 interface ETokenSignatureProps {
-  documentId: number;
+  documentId: string;
   documentHash: string;
-  onSignComplete: (signatureData: any) => void;
+  onSigningComplete: (signatureData: {
+    signature: string;
+    certificate: string;
+    timestamp: string;
+    provider: string;
+    algorithm: string;
+  }) => void;
   onCancel: () => void;
 }
 
-export function ETokenSignature({ 
-  documentId, 
+export default function ETokenSignature({
+  documentId,
   documentHash,
-  onSignComplete,
+  onSigningComplete,
   onCancel
 }: ETokenSignatureProps) {
-  const [step, setStep] = useState<'extension' | 'device' | 'certificate' | 'pin' | 'process'>('extension');
-  const [pin, setPin] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [extensionAvailable, setExtensionAvailable] = useState(false);
+  const [extensionAvailable, setExtensionAvailable] = useState<boolean | null>(null);
   const [devices, setDevices] = useState<string[]>([]);
-  const [selectedDevice, setSelectedDevice] = useState<string>('');
-  const [certificates, setCertificates] = useState<CertificateInfo[]>([]);
-  const [selectedCertificate, setSelectedCertificate] = useState<string>('');
+  const [pin, setPin] = useState("");
+  const [certificados, setCertificados] = useState<CertificateInfo[]>([]);
+  const [selectedCertSerial, setSelectedCertSerial] = useState<string>("");
+  const [isChecking, setIsChecking] = useState(false);
+  const [currentError, setCurrentError] = useState<string | null>(null);
+  const [currentStep, setCurrentStep] = useState<number>(1);
   const { toast } = useToast();
 
-  // Paso 1: Verificar extensión instalada
-  const checkExtension = async () => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const available = await checkExtensionAvailability();
-      setExtensionAvailable(available);
-      
-      if (available) {
-        setStep('device');
-        // En una aplicación real, este es el momento de verificar 
-        // si se tiene instalado el middleware adecuado
-        await detectDevices();
-      } else {
-        setError("No se detectó la extensión necesaria para firmar con eToken");
+  // Verificar si la extensión está disponible
+  useEffect(() => {
+    const checkExtension = async () => {
+      try {
+        setIsChecking(true);
+        setCurrentError(null);
+        const isAvailable = await checkExtensionAvailability();
+        setExtensionAvailable(isAvailable);
+      } catch (error: any) {
+        setCurrentError(`Error al verificar la extensión: ${error.message}`);
+        setExtensionAvailable(false);
+      } finally {
+        setIsChecking(false);
       }
-    } catch (err: any) {
-      setError("Error al verificar la extensión: " + err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
 
-  // Paso 2: Detectar dispositivos
-  const detectDevices = async () => {
-    setIsLoading(true);
-    setError(null);
-    
+    checkExtension();
+  }, []);
+
+  // Detectar dispositivos
+  const handleDetectarDispositivos = async () => {
     try {
+      setIsChecking(true);
+      setCurrentError(null);
+      setDevices([]);
+      
       const detectedDevices = await listTokenDevices();
       setDevices(detectedDevices);
       
-      if (detectedDevices.length > 0) {
-        setSelectedDevice(detectedDevices[0]);
-        setStep('certificate');
-        await loadCertificates();
+      if (detectedDevices.length === 0) {
+        setCurrentError("No se detectaron dispositivos criptográficos conectados");
       } else {
-        setError("No se detectaron dispositivos criptográficos conectados");
+        setCurrentStep(2);
       }
-    } catch (err: any) {
-      setError("Error al detectar dispositivos: " + err.message);
+    } catch (error: any) {
+      setCurrentError(`Error al detectar dispositivos: ${error.message}`);
     } finally {
-      setIsLoading(false);
+      setIsChecking(false);
     }
   };
 
-  // Paso 3: Cargar certificados
-  const loadCertificates = async () => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // Para cargar certificados sin PIN, enviamos un string vacío
-      // En un caso real, algunas implementaciones requieren PIN para este paso
-      const certs = await getCertificates("");
-      setCertificates(certs);
-      
-      if (certs.length > 0) {
-        setSelectedCertificate(certs[0].serialNumber);
-        setStep('pin');
-      } else {
-        setError("No se encontraron certificados válidos en el dispositivo");
-      }
-    } catch (err: any) {
-      setError("Error al cargar certificados: " + err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Paso 4: Firmar con PIN
-  const handleSignWithPin = async () => {
-    if (!pin || pin.length < 4) {
-      setError("El PIN debe tener al menos 4 dígitos");
+  // Obtener certificados
+  const handleObtenerCertificados = async () => {
+    if (!pin) {
+      setCurrentError("Debe ingresar un PIN válido");
       return;
     }
 
-    setError(null);
-    setIsLoading(true);
-    setStep('process');
-
     try {
-      // Firmar datos con el token
-      const signatureResult = await signData(
-        documentHash,
-        selectedCertificate,
-        pin
-      );
+      setIsChecking(true);
+      setCurrentError(null);
+      setCertificados([]);
       
-      // Obtener sello de tiempo
-      const timestampToken = await getTimestamp(signatureResult);
+      const certs = await getCertificates(pin);
+      setCertificados(certs);
       
-      // Encontrar información del certificado seleccionado
-      const certInfo = certificates.find(c => c.serialNumber === selectedCertificate);
-      
-      // Preparar datos de firma para el backend
-      const signatureData = {
-        tokenSignature: signatureResult.signature,
-        certificate: signatureResult.certificate,
-        timestamp: signatureResult.timestamp,
-        timestampToken,
-        tokenInfo: {
-          certificateAuthor: certInfo?.issuer || "Unknown Issuer",
-          certificateId: selectedCertificate,
-          provider: certInfo?.provider || TokenProvider.UNKNOWN,
-          algorithm: signatureResult.algorithm
-        }
-      };
-
-      // Enviar al callback de firma completa
-      onSignComplete(signatureData);
-      
-    } catch (err: any) {
-      setError(err.message || "Error al firmar con eToken. Inténtelo nuevamente.");
-      setStep('pin');
-      setIsLoading(false);
+      if (certs.length > 0) {
+        setSelectedCertSerial(certs[0].serialNumber);
+        setCurrentStep(3);
+      } else {
+        setCurrentError("No se encontraron certificados válidos en el dispositivo");
+      }
+    } catch (error: any) {
+      setCurrentError(`Error al obtener certificados: ${error.message}`);
+    } finally {
+      setIsChecking(false);
     }
   };
 
-  // Formatea fecha para display
+  // Firmar datos
+  const handleFirmar = async () => {
+    if (!selectedCertSerial) {
+      setCurrentError("Debe seleccionar un certificado para firmar");
+      return;
+    }
+
+    if (!pin) {
+      setCurrentError("Debe ingresar un PIN válido");
+      return;
+    }
+
+    try {
+      setIsChecking(true);
+      setCurrentError(null);
+      
+      const result = await signData(documentHash, selectedCertSerial, pin);
+      
+      onSigningComplete({
+        signature: result.signature,
+        certificate: result.certificate,
+        timestamp: result.timestamp,
+        provider: result.provider,
+        algorithm: result.algorithm
+      });
+      
+      toast({
+        title: "¡Documento firmado!",
+        description: "El documento ha sido firmado con éxito utilizando su firma digital avanzada.",
+      });
+    } catch (error: any) {
+      setCurrentError(`Error al firmar datos: ${error.message}`);
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
+  // Formatear fecha del certificado 
   const formatDate = (date: Date): string => {
-    return date.toLocaleDateString('es-CL', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
+    return date.toLocaleDateString("es-CL", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
     });
   };
 
-  // Traduce el proveedor a nombre legible
-  const getProviderName = (provider: TokenProvider): string => {
-    const names: Record<TokenProvider, string> = {
-      [TokenProvider.ECERT]: 'E-Cert Chile',
-      [TokenProvider.ESIGN]: 'E-Sign',
-      [TokenProvider.TOC]: 'TOC (Transbank)',
-      [TokenProvider.ACEPTA]: 'Acepta',
-      [TokenProvider.CERTINET]: 'Certinet (BCI)',
-      [TokenProvider.UNKNOWN]: 'Desconocido'
-    };
-    return names[provider];
-  };
-
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Fingerprint className="text-primary h-5 w-5" />
-          Firma con eToken
-        </CardTitle>
-        <CardDescription>
-          Use su dispositivo criptográfico para firmar el documento
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        {/* Paso 1: Verificar extensión instalada */}
-        {step === 'extension' && (
-          <div className="space-y-4">
-            <Alert className="bg-blue-50 border-blue-200">
-              <ShieldCheck className="h-4 w-4 text-blue-600" />
-              <AlertTitle className="text-blue-800">Verificación de extensión</AlertTitle>
-              <AlertDescription className="text-blue-700">
-                Para poder firmar con su dispositivo criptográfico, necesitamos verificar si tiene la extensión necesaria instalada.
-              </AlertDescription>
-            </Alert>
-            
-            <div className="border rounded-md p-4 bg-gray-50">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Preparación:</h3>
-              <ol className="space-y-1.5 text-sm text-gray-600 ml-5 list-decimal">
-                <li>Asegúrese que tenga instalada la extensión "Firma Digital Chile"</li>
-                <li>Verifique que su dispositivo eToken esté conectado a un puerto USB</li>
-                <li>Confirme que los drivers del dispositivo estén instalados</li>
-                <li>Tenga a mano su PIN de acceso al dispositivo</li>
-              </ol>
+    <div className="space-y-6 max-w-3xl mx-auto">
+      {/* Paso 1: Verificar extensión instalada */}
+      <Card className={currentStep !== 1 ? "opacity-60" : ""}>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Shield className="h-5 w-5 text-indigo-600" />
+            <span>Paso 1: Verificar extensión</span>
+          </CardTitle>
+          <CardDescription>
+            Verificando si la extensión de firma electrónica está instalada
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isChecking && extensionAvailable === null ? (
+            <div className="flex items-center justify-center p-4">
+              <div className="animate-spin h-6 w-6 border-2 border-indigo-600 rounded-full border-t-transparent"></div>
+              <span className="ml-3 text-sm text-gray-600">Verificando extensión...</span>
             </div>
-          </div>
-        )}
-
-        {/* Paso 2: Detectar dispositivos */}
-        {step === 'device' && (
-          <div className="space-y-4">
-            <Alert className="border-slate-200 bg-slate-50">
-              <CheckCircle2 className="h-4 w-4 text-slate-600" />
-              <AlertTitle className="text-slate-800">Extensión detectada</AlertTitle>
-              <AlertDescription className="text-slate-700">
-                La extensión para firmas digitales está disponible. Conecte su dispositivo criptográfico si aún no lo ha hecho.
+          ) : extensionAvailable === true ? (
+            <Alert className="bg-green-50 border-green-200">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <AlertTitle className="text-green-800">Extensión detectada</AlertTitle>
+              <AlertDescription className="text-green-700">
+                La extensión de firma electrónica está correctamente instalada y lista para usar.
               </AlertDescription>
             </Alert>
-            
-            <div className="border rounded-md p-4">
-              <h3 className="text-sm font-medium mb-3">Dispositivos detectados:</h3>
-              {devices.length > 0 ? (
-                <div className="space-y-3">
-                  <Select 
-                    value={selectedDevice} 
-                    onValueChange={setSelectedDevice}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccione un dispositivo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {devices.map((device, index) => (
-                        <SelectItem key={index} value={device}>
-                          {device}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              ) : (
-                <p className="text-sm text-gray-600">
-                  Buscando dispositivos conectados...
-                </p>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Paso 3: Seleccionar certificado */}
-        {step === 'certificate' && (
-          <div className="space-y-4">
-            <Alert className="border-slate-200 bg-slate-50">
-              <CheckCircle2 className="h-4 w-4 text-slate-600" />
-              <AlertTitle className="text-slate-800">Dispositivo detectado</AlertTitle>
-              <AlertDescription className="text-slate-700">
-                {selectedDevice}
+          ) : (
+            <Alert className="bg-red-50 border-red-200">
+              <XCircle className="h-4 w-4 text-red-600" />
+              <AlertTitle className="text-red-800">Extensión no detectada</AlertTitle>
+              <AlertDescription className="text-red-700">
+                No se detectó la extensión necesaria para firmar con eToken. Por favor instálela y recargue la página.
               </AlertDescription>
             </Alert>
-            
-            <div className="border rounded-md p-4">
-              <h3 className="text-sm font-medium mb-3">Certificados disponibles:</h3>
-              {certificates.length > 0 ? (
-                <div className="space-y-3">
-                  <Select 
-                    value={selectedCertificate} 
-                    onValueChange={setSelectedCertificate}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccione un certificado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {certificates.map((cert, index) => (
-                        <SelectItem key={index} value={cert.serialNumber}>
-                          {cert.subject} ({getProviderName(cert.provider)})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  
-                  {selectedCertificate && (
-                    <div className="text-xs space-y-1 mt-2 bg-zinc-50 p-2 rounded-md border border-zinc-200">
-                      {certificates
-                        .filter(cert => cert.serialNumber === selectedCertificate)
-                        .map((cert, index) => (
-                          <div key={index}>
-                            <p><span className="font-semibold">Emisor:</span> {cert.issuer}</p>
-                            <p><span className="font-semibold">Válido hasta:</span> {formatDate(cert.validTo)}</p>
-                            <p><span className="font-semibold">Entidad:</span> {getProviderName(cert.provider)}</p>
-                          </div>
+          )}
+        </CardContent>
+        <CardFooter className="justify-end">
+          {currentStep === 1 && extensionAvailable === true && (
+            <Button 
+              onClick={handleDetectarDispositivos}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+            >
+              Continuar al paso 2
+            </Button>
+          )}
+          {currentStep === 1 && extensionAvailable !== true && (
+            <Button 
+              variant="outline"
+              onClick={() => {
+                setExtensionAvailable(null);
+                setCurrentError(null);
+                setIsChecking(true);
+                checkExtensionAvailability().then(available => {
+                  setExtensionAvailable(available);
+                  setIsChecking(false);
+                }).catch(err => {
+                  setCurrentError(`Error al verificar la extensión: ${err.message}`);
+                  setExtensionAvailable(false);
+                  setIsChecking(false);
+                });
+              }}
+              disabled={isChecking}
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Verificar de nuevo
+            </Button>
+          )}
+        </CardFooter>
+      </Card>
+
+      {/* Paso 2: Detectar dispositivos */}
+      {extensionAvailable && (
+        <Card className={currentStep !== 2 ? "opacity-60" : ""}>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <KeyRound className="h-5 w-5 text-indigo-600" />
+              <span>Paso 2: Detectar dispositivos</span>
+            </CardTitle>
+            <CardDescription>
+              Buscar dispositivos criptográficos conectados (tokens, smartcards)
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {currentStep === 2 && (
+              <div className="space-y-4">
+                {isChecking && devices.length === 0 ? (
+                  <div className="flex items-center justify-center p-4">
+                    <div className="animate-spin h-6 w-6 border-2 border-indigo-600 rounded-full border-t-transparent"></div>
+                    <span className="ml-3 text-sm text-gray-600">Buscando dispositivos...</span>
+                  </div>
+                ) : devices.length > 0 ? (
+                  <div className="space-y-3">
+                    <Alert className="bg-green-50 border-green-200">
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <AlertTitle className="text-green-800">Dispositivos detectados</AlertTitle>
+                      <AlertDescription className="text-green-700">
+                        Se encontraron los siguientes dispositivos:
+                      </AlertDescription>
+                    </Alert>
+                    <div className="ml-2 mt-2">
+                      <ul className="list-disc list-inside space-y-1.5 text-sm ml-4">
+                        {devices.map((device, idx) => (
+                          <li key={idx} className="text-gray-700">{device}</li>
                         ))}
+                      </ul>
                     </div>
-                  )}
-                </div>
-              ) : (
-                <p className="text-sm text-zinc-600">
-                  No se encontraron certificados en el dispositivo.
-                </p>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Paso 4: Ingresar PIN */}
-        {step === 'pin' && (
-          <div className="space-y-4">
-            <Alert className="border-zinc-200 bg-zinc-50">
-              <ShieldCheck className="h-4 w-4 text-zinc-600" />
-              <AlertTitle className="text-zinc-800">Certificado seleccionado</AlertTitle>
-              <AlertDescription className="text-zinc-700">
-                {certificates.find(c => c.serialNumber === selectedCertificate)?.subject}
-              </AlertDescription>
-            </Alert>
-            
-            <div className="space-y-3">
-              <Label htmlFor="token-pin">
-                <div className="flex items-center gap-1.5">
-                  <Key className="h-3.5 w-3.5 text-zinc-700" />
-                  <span>PIN de acceso</span>
-                </div>
-              </Label>
-              <Input 
-                id="token-pin"
-                type="password" 
-                placeholder="Ingrese su PIN" 
-                value={pin}
-                onChange={(e) => setPin(e.target.value)}
-                className="font-mono tracking-widest"
-              />
-              <p className="text-xs text-zinc-500">
-                El PIN no se almacena en nuestros servidores y solo se utiliza para
-                autorizar la operación de firma en su dispositivo.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Paso 5: Procesando firma */}
-        {step === 'process' && (
-          <div className="py-6 text-center">
-            <div className="w-16 h-16 mx-auto bg-zinc-100 rounded-full flex items-center justify-center mb-4">
-              <Loader2 className="h-8 w-8 text-zinc-700 animate-spin" />
-            </div>
-            <h3 className="text-lg font-medium text-zinc-900 mb-2">Firmando documento</h3>
-            <p className="text-zinc-600 mb-4">
-              El documento está siendo firmado con su certificado digital.
-              Por favor, no desconecte su dispositivo.
-            </p>
-          </div>
-        )}
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button 
-          variant="outline" 
-          onClick={onCancel}
-          disabled={isLoading}
-        >
-          Cancelar
-        </Button>
-        
-        {step === 'extension' && (
-          <Button 
-            onClick={checkExtension} 
-            disabled={isLoading}
-            className="bg-zinc-800 hover:bg-zinc-700 text-white"
-          >
-            {isLoading ? (
+                    
+                    <div className="space-y-2 mt-4">
+                      <Label htmlFor="pin">PIN de acceso</Label>
+                      <Input 
+                        id="pin" 
+                        type="password" 
+                        placeholder="Ingrese su PIN" 
+                        value={pin}
+                        onChange={(e) => setPin(e.target.value)}
+                      />
+                      <p className="text-xs text-gray-500">
+                        Su PIN no se almacena y solo se utiliza para acceder al token.
+                      </p>
+                    </div>
+                  </div>
+                ) : currentError ? (
+                  <Alert className="bg-red-50 border-red-200">
+                    <AlertCircle className="h-4 w-4 text-red-600" />
+                    <AlertTitle className="text-red-800">Error al detectar dispositivos</AlertTitle>
+                    <AlertDescription className="text-red-700">
+                      {currentError}
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <Alert className="bg-blue-50 border-blue-200">
+                    <AlertCircle className="h-4 w-4 text-blue-600" />
+                    <AlertTitle className="text-blue-800">Dispositivos no detectados</AlertTitle>
+                    <AlertDescription className="text-blue-700">
+                      No se han detectado dispositivos aún. Haga clic en "Detectar dispositivos".
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            )}
+          </CardContent>
+          <CardFooter className="justify-between">
+            {currentStep === 2 && (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Verificando...
-              </>
-            ) : (
-              <>
-                <Fingerprint className="mr-2 h-4 w-4" />
-                Verificar extensión
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setCurrentStep(1);
+                    setPin("");
+                  }}
+                >
+                  Regresar
+                </Button>
+                
+                {devices.length === 0 ? (
+                  <Button 
+                    onClick={handleDetectarDispositivos}
+                    disabled={isChecking}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                  >
+                    {isChecking ? (
+                      <>
+                        <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent mr-2"></div>
+                        Buscando...
+                      </>
+                    ) : (
+                      <>
+                        <KeyRound className="h-4 w-4 mr-2" />
+                        Detectar dispositivos
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={handleObtenerCertificados}
+                    disabled={isChecking || !pin || pin.length < 4}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                  >
+                    Continuar
+                  </Button>
+                )}
               </>
             )}
-          </Button>
-        )}
-        
-        {step === 'device' && (
-          <Button 
-            onClick={detectDevices}
-            disabled={isLoading}
-            className="bg-zinc-800 hover:bg-zinc-700 text-white"
-          >
-            <Fingerprint className="mr-2 h-4 w-4" />
-            Detectar dispositivos
-          </Button>
-        )}
-        
-        {step === 'certificate' && (
-          <Button 
-            onClick={loadCertificates}
-            disabled={isLoading}
-            className="bg-zinc-800 hover:bg-zinc-700 text-white"
-          >
-            <ShieldCheck className="mr-2 h-4 w-4" />
-            Cargar certificados
-          </Button>
-        )}
-        
-        {step === 'pin' && (
-          <Button 
-            onClick={handleSignWithPin} 
-            disabled={!pin || isLoading || pin.length < 4}
-            className="bg-zinc-800 hover:bg-zinc-700 text-white"
-          >
-            <ShieldCheck className="mr-2 h-4 w-4" />
-            Firmar documento
-          </Button>
-        )}
-      </CardFooter>
-    </Card>
+          </CardFooter>
+        </Card>
+      )}
+
+      {/* Paso 3: Consultar certificados y firmar */}
+      {extensionAvailable && currentStep >= 2 && (
+        <Card className={currentStep !== 3 ? "opacity-60" : ""}>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <FileSignature className="h-5 w-5 text-indigo-600" />
+              <span>Paso 3: Firmar documento</span>
+            </CardTitle>
+            <CardDescription>
+              Firmar el documento con certificado digital
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {currentStep === 3 && (
+              <div className="space-y-4">
+                {certificados.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-medium text-gray-700">Certificado seleccionado:</h3>
+                    {certificados.map((cert, idx) => (
+                      <div 
+                        key={idx} 
+                        className={`p-3 border rounded-md ${
+                          selectedCertSerial === cert.serialNumber 
+                            ? 'border-indigo-300 bg-indigo-50' 
+                            : 'border-gray-200'
+                        }`}
+                      >
+                        <div className="flex items-start gap-2">
+                          <div className="ml-2">
+                            <p className="text-sm font-medium text-gray-800">{cert.subject}</p>
+                            <p className="text-xs text-gray-600 mt-1">Emisor: {cert.issuer}</p>
+                            <p className="text-xs text-gray-600">
+                              Válido hasta: {formatDate(cert.validTo)}
+                            </p>
+                            <p className="text-xs font-mono text-gray-500 mt-1.5">
+                              Serial: {cert.serialNumber}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                <div className="p-3 border border-gray-200 rounded-md bg-gray-50">
+                  <h3 className="text-sm font-medium mb-2">Documento a firmar:</h3>
+                  <p className="text-sm text-gray-700">
+                    ID: <span className="font-mono">{documentId}</span>
+                  </p>
+                  <p className="text-sm font-mono mt-2 bg-white p-2 border border-gray-200 rounded text-xs truncate">
+                    Hash: {documentHash.substring(0, 40)}...
+                  </p>
+                </div>
+                
+                {isChecking ? (
+                  <div className="flex items-center justify-center p-4">
+                    <div className="animate-spin h-6 w-6 border-2 border-indigo-600 rounded-full border-t-transparent"></div>
+                    <span className="ml-3 text-sm text-gray-600">Firmando documento...</span>
+                  </div>
+                ) : currentError ? (
+                  <Alert className="bg-red-50 border-red-200">
+                    <AlertCircle className="h-4 w-4 text-red-600" />
+                    <AlertTitle className="text-red-800">Error</AlertTitle>
+                    <AlertDescription className="text-red-700">
+                      {currentError}
+                    </AlertDescription>
+                  </Alert>
+                ) : null}
+              </div>
+            )}
+          </CardContent>
+          <CardFooter className="justify-between">
+            {currentStep === 3 && (
+              <>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setCurrentStep(2);
+                    setCertificados([]);
+                    setSelectedCertSerial("");
+                  }}
+                >
+                  Regresar
+                </Button>
+                
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={onCancel}
+                    disabled={isChecking}
+                  >
+                    Cancelar
+                  </Button>
+                  
+                  <Button 
+                    onClick={handleFirmar}
+                    disabled={isChecking || !selectedCertSerial || !pin}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                  >
+                    {isChecking ? (
+                      <>
+                        <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent mr-2"></div>
+                        Firmando...
+                      </>
+                    ) : (
+                      <>
+                        <FileSignature className="h-4 w-4 mr-2" />
+                        Firmar documento
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </>
+            )}
+          </CardFooter>
+        </Card>
+      )}
+    </div>
   );
 }

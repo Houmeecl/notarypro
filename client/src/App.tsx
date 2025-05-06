@@ -355,6 +355,14 @@ function Router() {
       <Route path="/service-selection" component={ServiceSelectionPage} />
       <Route path="/quienes-somos" component={QuienesSomosPage} />
       <Route path="/signature-demo" component={SignatureDemo} />
+      <Route path="/verificacion-etoken" component={() => {
+        const VerificacionEToken = React.lazy(() => import("@/pages/verificacion-etoken"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <VerificacionEToken />
+          </Suspense>
+        );
+      }} />
 
       {/* Vecinos Xpress Pages (lazy loaded) */}
       <Route path="/vecinos" component={() => (
