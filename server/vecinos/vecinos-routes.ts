@@ -88,12 +88,9 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Buscar usuario en la base de datos
+    // Buscar usuario en la base de datos - ahora permitimos cualquier plataforma
     const [user] = await db.select().from(users).where(
-      and(
-        eq(users.username, username),
-        eq(users.platform, "vecinos")
-      )
+      eq(users.username, username)
     );
 
     // Verificación de usuario específica para vecinosadmin
