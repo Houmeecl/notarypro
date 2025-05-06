@@ -23,7 +23,7 @@ export const realPOSConfig: POSConfig = {
   apiEndpoint: '/api/transactions',
   webhookEndpoint: '/api/mercadopago/webhook',
   paymentEnabled: true,
-  testMode: false,
+  testMode: false,  // Este es siempre false en producción real
   nfcEnabled: true,
   storeCodes: ['LOCAL-XP125', 'LOCAL-XP201', 'LOCAL-XP315', 'LOCAL-XP427'],
   mercadoPagoEnabled: true,

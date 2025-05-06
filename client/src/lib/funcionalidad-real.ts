@@ -49,8 +49,8 @@ export function esFuncionalidadRealActiva(): boolean {
     if (estado === null) {
       console.log('✅ Modo FUNCIONAL REAL activado correctamente');
       console.log('🔒 Verificaciones y validaciones legales habilitadas según Ley 19.799');
-      console.log('🔒 VecinoXpress iniciado en modo real funcional (QA sin verificaciones)');
-      console.log('🔧 Todas las verificaciones internas y RON configurados para funcionar sin interrupciones');
+      console.log('🔒 VecinoXpress configurado en modo real exclusivo (notarial)');
+      console.log('🔧 Todas las verificaciones y funciones POS activadas para operación real');
       activarFuncionalidadReal();
       return true;
     }
