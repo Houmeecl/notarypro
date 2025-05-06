@@ -927,6 +927,18 @@ function Router() {
         allowedRoles={["admin", "manager"]} 
       />
 
+      {/* Documentación Técnica */}
+      <Route path="/documentacion" component={() => {
+        const DocumentacionPage = React.lazy(() => import("@/pages/documentacion-page"));
+        return (
+          <Suspense fallback={<div className="flex items-center justify-center h-screen">
+            <p className="text-xl">Cargando documentación técnica...</p>
+          </div>}>
+            <DocumentacionPage />
+          </Suspense>
+        );
+      }} />
+
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
