@@ -3,14 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useRoute, useLocation } from "wouter";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { DocumentCategory, DocumentTemplate } from "@shared/schema";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import DocumentNavbar from "@/components/layout/DocumentNavbar";
 import { useRealFuncionality } from "@/hooks/use-real-funcionality";
 import FunctionalModeIndicator from "@/components/document/FunctionalModeIndicator";
+import FunctionalTemplateCard from "@/components/document/FunctionalTemplateCard";
 
 export default function DocumentTemplatesPage() {
   const { toast } = useToast();
