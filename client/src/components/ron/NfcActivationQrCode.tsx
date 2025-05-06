@@ -48,16 +48,30 @@ const NfcActivationQrCode: React.FC<NfcActivationQrCodeProps> = ({
     setIsGenerating(true);
     
     try {
-      // Usar directamente la URL del lector NFC - mucho más simple y directo
+      // URL base para el lector NFC
       const webUrl = `${window.location.origin}/nfc-reader.html?id=${sessionId}&callback=${encodeURIComponent(`${window.location.origin}/verificacion-nfc-puente/result/${sessionId}`)}`;
       
-      // Para el QR usamos la URL directa - más compatible
-      setQrValue(webUrl);
+      // Crear URL para Android Intent (protocolo intent://)
+      const androidIntentUrl = `intent://${window.location.host}/nfc-reader.html?id=${sessionId}&callback=${encodeURIComponent(`${window.location.origin}/verificacion-nfc-puente/result/${sessionId}`)}&direct=true#Intent;scheme=https;package=com.android.chrome;end`;
       
-      // Para compartir usamos la misma URL
+      // URL de esquema personalizado para Web NFC (web+nfc://)
+      const webNfcUrl = `web+nfc://read?url=${encodeURIComponent(webUrl)}&direct=true`;
+      
+      // Para el QR usamos la URL basada en intent:// que tiene mayor compatibilidad con Android
+      // Esta URL intentará abrir Chrome directamente con el lector NFC
+      setQrValue(androidIntentUrl);
+      
+      // Para compartir y botones usamos la URL web estándar
       setQrUrl(webUrl);
       
-      console.log("URL del lector NFC:", webUrl);
+      console.log("URL del lector NFC (web):", webUrl);
+      console.log("URL del lector NFC (Android Intent):", androidIntentUrl);
+      console.log("URL del lector NFC (Web NFC Scheme):", webNfcUrl);
+      
+      // Guardar URLs para uso futuro
+      sessionStorage.setItem(`nfc_url_web_${sessionId}`, webUrl);
+      sessionStorage.setItem(`nfc_url_android_${sessionId}`, androidIntentUrl);
+      sessionStorage.setItem(`nfc_url_scheme_${sessionId}`, webNfcUrl);
       
       // Simular tiempo de generación
       setTimeout(() => {

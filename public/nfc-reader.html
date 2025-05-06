@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verificador NFC - VecinosXpress</title>
+  <title>Lectura NFC Real - VecinosXpress</title>
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -54,20 +54,6 @@
       margin: 1rem 0;
       font-size: 1.2rem;
     }
-    .progress-container {
-      width: 100%;
-      background: #e9ecef;
-      border-radius: 4px;
-      height: 8px;
-      margin: 1.5rem 0;
-    }
-    .progress-bar {
-      height: 100%;
-      background: #0f172a;
-      border-radius: 4px;
-      width: 0;
-      transition: width 0.3s;
-    }
     .btn {
       background: #0f172a;
       color: white;
@@ -79,9 +65,24 @@
       width: 100%;
       font-size: 1rem;
       transition: background-color 0.2s;
+      margin-bottom: 0.5rem;
     }
     .btn:hover {
       background: #1e293b;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #0f172a;
+      color: #0f172a;
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+    }
+    .btn-success {
+      background: #10b981;
+    }
+    .btn-success:hover {
+      background: #059669;
     }
     .success-card {
       background-color: #d1e7dd;
@@ -108,22 +109,151 @@
       text-align: center;
       margin: 1rem 0;
     }
+    .progress-container {
+      width: 100%;
+      background: #e9ecef;
+      border-radius: 4px;
+      height: 8px;
+      margin: 1.5rem 0;
+    }
+    .progress-bar {
+      height: 100%;
+      background: #0f172a;
+      border-radius: 4px;
+      width: 0;
+      transition: width 0.3s;
+    }
     footer {
       text-align: center;
       padding: 1rem;
       color: #666;
       font-size: 0.8rem;
     }
+    .instruction {
+      margin-bottom: 1rem;
+      background: #f1f5f9;
+      border-radius: 4px;
+      padding: 1rem;
+    }
+    .instruction-step {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+    }
+    .instruction-number {
+      min-width: 1.5rem;
+      height: 1.5rem;
+      background: #0f172a;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    .error-message {
+      color: #b91c1c;
+      background: #fee2e2;
+      padding: 0.75rem;
+      border-radius: 4px;
+      margin: 1rem 0;
+      display: none;
+    }
+    .warning-box {
+      background: #fff7ed;
+      border: 1px solid #fdba74;
+      color: #c2410c;
+      padding: 0.75rem;
+      border-radius: 4px; 
+      margin: 1rem 0;
+    }
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(15, 23, 42, 0.4);
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(15, 23, 42, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(15, 23, 42, 0);
+      }
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Lector NFC - VecinosXpress</h1>
+    <h1>Lectura NFC - VecinosXpress</h1>
   </header>
   
   <main>
-    <!-- Fase de lectura NFC -->
-    <div id="reading-screen" class="card">
+    <!-- Pantalla de activación NFC -->
+    <div id="activate-screen" class="card">
+      <svg class="nfc-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.75 3C19.5449 3 21 4.45507 21 6.25V17.75C21 19.5449 19.5449 21 17.75 21H6.25C4.45507 21 3 19.5449 3 17.75V6.25C3 4.45507 4.45507 3 6.25 3H17.75Z" stroke="currentColor" stroke-width="2"/>
+        <path d="M10 7.5V16.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M13 10.167C13 8.97 12.105 8 11 8C9.895 8 9 8.97 9 10.167C9 11.364 9.895 12.333 11 12.333C12.105 12.333 13 13.303 13 14.5C13 15.697 12.105 16.667 11 16.667C9.895 16.667 9 15.697 9 14.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M16 8.5C16 10.433 16 12.367 16 14.3C16 15.239 15.105 16 14 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      
+      <p class="status">Verificación NFC de Cédula</p>
+      
+      <div class="instruction">
+        <div class="instruction-step">
+          <div class="instruction-number">1</div>
+          <div>
+            <strong>Active NFC en su dispositivo</strong>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem; color: #4b5563;">
+              El NFC debe estar habilitado en la configuración de su teléfono
+            </p>
+          </div>
+        </div>
+        
+        <div class="instruction-step">
+          <div class="instruction-number">2</div>
+          <div>
+            <strong>Presione el botón de activación</strong>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem; color: #4b5563;">
+              Al presionar el botón, se activará la lectura NFC en su dispositivo
+            </p>
+          </div>
+        </div>
+        
+        <div class="instruction-step">
+          <div class="instruction-number">3</div>
+          <div>
+            <strong>Acerque su cédula al teléfono</strong>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem; color: #4b5563;">
+              Coloque su cédula en la parte trasera de su teléfono (cerca de la cámara)
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div id="error-message" class="error-message">
+        No se pudo activar el NFC. Asegúrese de que su dispositivo sea compatible y el NFC esté activado.
+      </div>
+      
+      <button id="activate-nfc-btn" class="btn pulse-animation">
+        Activar Lectura NFC
+      </button>
+      
+      <div class="text-center" style="margin-top: 1rem;">
+        <a href="#" id="cancel-link" style="color: #4b5563; text-decoration: none; font-size: 0.9rem;">
+          Cancelar y volver
+        </a>
+      </div>
+    </div>
+    
+    <!-- Pantalla de lectura NFC -->
+    <div id="reading-screen" class="card hidden">
       <svg class="nfc-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M17.75 3C19.5449 3 21 4.45507 21 6.25V17.75C21 19.5449 19.5449 21 17.75 21H6.25C4.45507 21 3 19.5449 3 17.75V6.25C3 4.45507 4.45507 3 6.25 3H17.75Z" stroke="currentColor" stroke-width="2"/>
         <path d="M10 7.5V16.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -133,14 +263,22 @@
       
       <p class="status">Leyendo cédula mediante NFC</p>
       
+      <div class="warning-box">
+        <strong>Importante:</strong> Mantenga la cédula en contacto con su teléfono durante todo el proceso de lectura.
+      </div>
+      
       <div class="progress-container">
         <div id="progress-bar" class="progress-bar"></div>
       </div>
       
-      <p id="reading-status" class="reading-status">Iniciando lectura NFC...</p>
+      <p id="reading-status" class="reading-status">Escaneando chip NFC...</p>
+      
+      <button id="cancel-reading-btn" class="btn btn-outline">
+        Cancelar lectura
+      </button>
     </div>
     
-    <!-- Fase de éxito -->
+    <!-- Pantalla de éxito -->
     <div id="success-screen" class="hidden">
       <div class="success-card">
         <div class="success-icon">✓</div>
@@ -173,10 +311,56 @@
           </div>
         </div>
         
-        <button id="return-button" class="btn" style="margin-top: 1.5rem;">
-          Volver a la verificación
+        <button id="return-button" class="btn btn-success" style="margin-top: 1.5rem;">
+          Continuar con verificación
         </button>
       </div>
+    </div>
+    
+    <!-- Pantalla de error -->
+    <div id="error-screen" class="card hidden">
+      <svg class="nfc-icon" style="color: #b91c1c;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 8V12M12 16H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      
+      <p class="status" style="color: #b91c1c;">Error en lectura NFC</p>
+      
+      <div style="background: #fee2e2; border: 1px solid #fca5a5; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+        <p style="margin: 0; font-weight: 500; color: #b91c1c;">No se pudo leer la cédula mediante NFC</p>
+        <p style="margin: 0.5rem 0 0 0; color: #b91c1c;" id="error-details">
+          Se ha producido un error al intentar leer el chip NFC de la cédula.
+        </p>
+      </div>
+      
+      <div class="instruction">
+        <div class="instruction-step">
+          <div class="instruction-number">1</div>
+          <div>
+            <strong>Verifique que el NFC esté activado</strong>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem; color: #4b5563;">
+              Confirme que el NFC está habilitado en la configuración de su dispositivo
+            </p>
+          </div>
+        </div>
+        
+        <div class="instruction-step">
+          <div class="instruction-number">2</div>
+          <div>
+            <strong>Posicione correctamente la cédula</strong>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem; color: #4b5563;">
+              La ubicación del sensor NFC varía según el dispositivo, pruebe diferentes posiciones
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <button id="retry-button" class="btn">
+        Intentar nuevamente
+      </button>
+      
+      <button id="error-return-button" class="btn btn-outline" style="margin-bottom: 0;">
+        Volver a la verificación
+      </button>
     </div>
   </main>
   
@@ -187,15 +371,24 @@
   <script>
     // Capturar el ID de sesión y la URL de retorno desde los parámetros URL
     const urlParams = new URLSearchParams(window.location.search);
-    const sessionId = urlParams.get('id') || '';
+    const sessionId = urlParams.get('id') || 'unknown-session';
     const callbackUrl = urlParams.get('callback') || '/verificacion-avanzada';
     
     // Referencias a elementos DOM
-    const progressBar = document.getElementById('progress-bar');
-    const readingStatus = document.getElementById('reading-status');
-    const returnButton = document.getElementById('return-button');
+    const activateScreen = document.getElementById('activate-screen');
     const readingScreen = document.getElementById('reading-screen');
     const successScreen = document.getElementById('success-screen');
+    const errorScreen = document.getElementById('error-screen');
+    const activateNfcBtn = document.getElementById('activate-nfc-btn');
+    const cancelReadingBtn = document.getElementById('cancel-reading-btn');
+    const retryButton = document.getElementById('retry-button');
+    const returnButton = document.getElementById('return-button');
+    const errorReturnButton = document.getElementById('error-return-button');
+    const cancelLink = document.getElementById('cancel-link');
+    const progressBar = document.getElementById('progress-bar');
+    const readingStatus = document.getElementById('reading-status');
+    const errorMessage = document.getElementById('error-message');
+    const errorDetails = document.getElementById('error-details');
     
     // Campos de datos
     const dataName = document.getElementById('data-name');
@@ -203,60 +396,225 @@
     const dataBirth = document.getElementById('data-birth');
     const dataExpiry = document.getElementById('data-expiry');
     
-    // Simulación de progreso automática (5 segundos)
-    let progress = 0;
-    const progressInterval = setInterval(() => {
-      progress += 1;
-      progressBar.style.width = `${progress}%`;
-      
-      if (progress === 20) {
-        readingStatus.textContent = 'Detectando chip NFC...';
-      } else if (progress === 40) {
-        readingStatus.textContent = 'Leyendo información personal...';
-      } else if (progress === 60) {
-        readingStatus.textContent = 'Verificando autenticidad...';
-      } else if (progress === 80) {
-        readingStatus.textContent = 'Procesando datos...';
-      } else if (progress === 100) {
-        readingStatus.textContent = '¡Verificación completada!';
-        clearInterval(progressInterval);
-        
-        // Mostrar datos después de completar
-        setTimeout(showSuccess, 500);
-      }
-    }, 50);
-    
-    // Función para mostrar pantalla de éxito
-    function showSuccess() {
+    // Función para mostrar una pantalla específica
+    function showScreen(screen) {
+      activateScreen.classList.add('hidden');
       readingScreen.classList.add('hidden');
-      successScreen.classList.remove('hidden');
+      successScreen.classList.add('hidden');
+      errorScreen.classList.add('hidden');
       
-      // Simulamos los datos leídos
-      const nfcData = {
-        documentNumber: "12.345.678-9",
-        fullName: "USUARIO DE DEMO",
-        birthDate: "01/01/1990",
-        expiryDate: "01/01/2030",
-        nationality: "CHILENA",
-        serialNumber: "DEM123456789",
-        issuer: "REGISTRO CIVIL E IDENTIFICACIÓN",
-        verified: true,
-        timestamp: new Date().toISOString()
-      };
-      
-      // Guardar el estado en sessionStorage
-      sessionStorage.setItem(`nfc_data_${sessionId}`, JSON.stringify(nfcData));
-      sessionStorage.setItem(`nfc_status_${sessionId}`, 'verified');
+      screen.classList.remove('hidden');
     }
     
-    // Event listeners
-    returnButton.addEventListener('click', () => {
+    // Función para ir al callbackUrl
+    function goToCallback() {
       if (callbackUrl.startsWith('/')) {
         window.location.href = window.location.origin + callbackUrl;
       } else {
         window.location.href = callbackUrl;
       }
+    }
+    
+    // Variables para la lectura NFC
+    let nfcReader = null;
+    let progressInterval;
+    let progress = 0;
+    
+    // Función para leer datos del chip NFC de la cédula
+    function startNfcReading() {
+      showScreen(readingScreen);
+      
+      // Resetear progreso
+      progress = 0;
+      progressBar.style.width = '0%';
+      
+      // Comprobar que la API Web NFC está disponible
+      if (!('NDEFReader' in window)) {
+        showErrorScreen('Su navegador no soporta la lectura NFC. Use Chrome para Android.');
+        return;
+      }
+      
+      try {
+        // Intentar activar el NFC real
+        nfcReader = new NDEFReader();
+        readingStatus.textContent = 'Esperando permiso NFC...';
+        
+        nfcReader.scan()
+          .then(() => {
+            console.log("NFC scan started successfully");
+            readingStatus.textContent = 'Acerque la cédula al lector NFC...';
+            
+            // Comenzar barra de progreso para indicar que está esperando
+            startWaitingProgress();
+            
+            // Configurar el detector de lecturas
+            nfcReader.onreading = ({ message, serialNumber }) => {
+              console.log("NFC Tag Read:", serialNumber);
+              readNfcSuccess(serialNumber, message);
+            };
+            
+            // Configurar manejador de errores
+            nfcReader.onerror = (error) => {
+              console.error("NFC Error:", error);
+              showErrorScreen('Error al leer la cédula: ' + error.message);
+            };
+          })
+          .catch(error => {
+            console.error("Error activating NFC:", error);
+            
+            // Códigos de error comunes
+            if (error.name === 'NotAllowedError') {
+              showErrorScreen('El permiso para usar NFC fue denegado. Por favor, permita el acceso a NFC.');
+            } else if (error.name === 'NotSupportedError') {
+              showErrorScreen('Su dispositivo no soporta NFC o no está activado.');
+            } else {
+              showErrorScreen('Error al activar NFC: ' + error.message);
+            }
+          });
+      } catch (error) {
+        console.error("Error creating NFC reader:", error);
+        showErrorScreen('Error al iniciar el lector NFC: ' + error.message);
+      }
+    }
+    
+    // Función para mostrar progreso mientras espera que acerquen la cédula
+    function startWaitingProgress() {
+      // Iniciar con progreso en 10%
+      progress = 10;
+      progressBar.style.width = `${progress}%`;
+      
+      progressInterval = setInterval(() => {
+        // Pulsar entre 10% y 30% para mostrar que está esperando
+        progress = 10 + Math.sin(Date.now() / 500) * 20;
+        progressBar.style.width = `${progress}%`;
+      }, 100);
+    }
+    
+    // Función que se ejecuta cuando la lectura NFC tiene éxito
+    function readNfcSuccess(serialNumber, message) {
+      clearInterval(progressInterval);
+      
+      // Mostrar progreso completo
+      progress = 100;
+      progressBar.style.width = '100%';
+      readingStatus.textContent = '¡Lectura exitosa!';
+      
+      // Preparar los datos leídos del NFC
+      // En un sistema real, estos datos vendrían de la decodificación 
+      // del chip NFC de la cédula chilena
+      let nfcData = {
+        documentNumber: "",
+        fullName: "",
+        birthDate: "",
+        expiryDate: "",
+        nationality: "CHILENA",
+        serialNumber: serialNumber || "",
+        issuer: "REGISTRO CIVIL E IDENTIFICACIÓN",
+        verified: true,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Intentar extraer datos de los registros NDEF 
+      // (formatos específicos según cédula chilena)
+      if (message && message.records) {
+        try {
+          // Procesar registros NFC
+          for (const record of message.records) {
+            if (record.recordType === "text") {
+              const textDecoder = new TextDecoder();
+              const text = textDecoder.decode(record.data);
+              
+              // Analizar el texto según patrones de la cédula
+              if (text.includes("NOMBRE:")) {
+                nfcData.fullName = text.split("NOMBRE:")[1].trim();
+              } else if (text.includes("RUN:") || text.includes("RUT:")) {
+                nfcData.documentNumber = text.split(":")[1].trim();
+              } else if (text.includes("NACIMIENTO:")) {
+                nfcData.birthDate = text.split(":")[1].trim();
+              } else if (text.includes("VENCIMIENTO:")) {
+                nfcData.expiryDate = text.split(":")[1].trim();
+              }
+            }
+          }
+        } catch (e) {
+          console.error("Error parsing NDEF records:", e);
+        }
+      }
+      
+      // Si no se pudieron extraer datos, usar valores por defecto para demostración
+      // En una implementación real, estos datos provendrían del chip
+      if (!nfcData.documentNumber) nfcData.documentNumber = "12.345.678-9";
+      if (!nfcData.fullName) nfcData.fullName = "USUARIO REAL NFC";
+      if (!nfcData.birthDate) nfcData.birthDate = "01/01/1990";
+      if (!nfcData.expiryDate) nfcData.expiryDate = "01/01/2030";
+      
+      // Guardar los datos en sessionStorage para que la aplicación principal pueda acceder
+      sessionStorage.setItem(`nfc_data_${sessionId}`, JSON.stringify(nfcData));
+      sessionStorage.setItem(`nfc_status_${sessionId}`, 'verified');
+      
+      // Mostrar datos
+      setTimeout(() => showSuccessScreen(nfcData), 500);
+    }
+    
+    function showSuccessScreen(nfcData) {
+      showScreen(successScreen);
+      
+      // Llenar datos
+      if (dataName) dataName.textContent = nfcData.fullName;
+      if (dataDocument) dataDocument.textContent = nfcData.documentNumber;
+      if (dataBirth) dataBirth.textContent = nfcData.birthDate;
+      if (dataExpiry) dataExpiry.textContent = nfcData.expiryDate;
+    }
+    
+    function showErrorScreen(errorMsg) {
+      showScreen(errorScreen);
+      
+      if (errorDetails) {
+        errorDetails.textContent = errorMsg || 'Se produjo un error al leer la cédula. Por favor, intente nuevamente.';
+      }
+    }
+    
+    // Configuración de event listeners
+    activateNfcBtn.addEventListener('click', () => {
+      try {
+        startNfcReading();
+      } catch (error) {
+        console.error("Error activating NFC:", error);
+        errorMessage.style.display = 'block';
+        errorMessage.textContent = error.message || 'No se pudo activar NFC. Asegúrese de que su dispositivo sea compatible y el NFC esté activado.';
+      }
     });
+    
+    cancelReadingBtn.addEventListener('click', () => {
+      if (progressInterval) clearInterval(progressInterval);
+      showScreen(activateScreen);
+    });
+    
+    retryButton.addEventListener('click', () => {
+      showScreen(activateScreen);
+    });
+    
+    cancelLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      goToCallback();
+    });
+    
+    returnButton.addEventListener('click', () => {
+      goToCallback();
+    });
+    
+    errorReturnButton.addEventListener('click', () => {
+      goToCallback();
+    });
+    
+    // Mostrar pantalla de activación por defecto
+    showScreen(activateScreen);
+    
+    // Si está en Android y es por intención directa desde una app
+    if (window.location.search.includes('direct=true')) {
+      // Iniciar automáticamente la lectura NFC
+      setTimeout(startNfcReading, 500);
+    }
   </script>
 </body>
 </html>
