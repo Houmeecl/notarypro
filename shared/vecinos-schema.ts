@@ -48,13 +48,18 @@ export const documents = pgTable("vecinos_documents", {
   title: text("title").notNull(),
   type: text("type").notNull(),
   price: integer("price").notNull(),
-  status: text("status").default("pending").notNull(), // pending, completed, rejected
+  status: text("status").default("pending").notNull(), // pending, signing, completed, rejected
   clientName: text("client_name").notNull(),
   clientRut: text("client_rut").notNull(),
   clientPhone: text("client_phone").notNull(),
   clientEmail: text("client_email"),
   verificationCode: text("verification_code").notNull().unique(),
   commissionRate: integer("commission_rate").default(20).notNull(),
+  fileName: text("file_name"), // Nombre del archivo subido
+  signatureData: jsonb("signature_data"), // Datos de la firma electrónica
+  zohoRequestId: text("zoho_request_id"), // ID de solicitud de Zoho Sign
+  zohoSignUrl: text("zoho_sign_url"), // URL de firma de Zoho Sign
+  signedAt: timestamp("signed_at"), // Fecha de firma
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
