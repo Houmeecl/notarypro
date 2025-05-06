@@ -119,13 +119,36 @@ export async function signWithCertificate(
  * @returns Promise<boolean> true si la extensión está disponible
  */
 export async function checkExtensionAvailability(): Promise<boolean> {
-  // En producción esto verificaría la existencia de la extensión en el navegador
   return new Promise((resolve) => {
-    // Simulación: Responde después de un breve retardo
-    setTimeout(() => {
-      // En modo demostración siempre devolvemos true
+    // Verificar si la extensión está realmente disponible
+    if (typeof window !== 'undefined' && 'firmaDigitalChile' in window) {
+      // La extensión está disponible
       resolve(true);
-    }, 700);
+    } else {
+      // Intentar comunicarse con el servicio local (si está usando la aplicación de escritorio)
+      try {
+        fetch('http://localhost:8091/status', { 
+          method: 'GET',
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => {
+          if (response.ok) {
+            resolve(true);
+          } else {
+            console.warn('Servicio de firma digital no disponible');
+            resolve(false);
+          }
+        })
+        .catch(() => {
+          console.warn('Servicio de firma digital no disponible');
+          resolve(false);
+        });
+      } catch (error) {
+        console.warn('Error al verificar la extensión de firma:', error);
+        resolve(false);
+      }
+    }
   });
 }
 
@@ -134,13 +157,49 @@ export async function checkExtensionAvailability(): Promise<boolean> {
  * @returns Promise<string[]> Lista de dispositivos disponibles
  */
 export async function listTokenDevices(): Promise<string[]> {
-  // En producción esto usaría la extensión para detectar tokens físicos
-  return new Promise((resolve) => {
-    // Simulación: Responde después de un breve retardo
-    setTimeout(() => {
-      // Simular que se encuentra un dispositivo
-      resolve(["eToken SafeNet 5110"]);
-    }, 1200);
+  return new Promise((resolve, reject) => {
+    // Verificar si estamos usando la extensión en el navegador
+    if (typeof window !== 'undefined' && 'firmaDigitalChile' in window) {
+      try {
+        // @ts-ignore - Variable global inyectada por la extensión
+        window.firmaDigitalChile.listDevices()
+          .then((devices: string[]) => {
+            resolve(devices);
+          })
+          .catch((err: Error) => {
+            console.error('Error al obtener dispositivos:', err);
+            // En caso de error, retornar una lista vacía
+            resolve([]);
+          });
+      } catch (error) {
+        console.error('Error al llamar a la extensión:', error);
+        resolve([]);
+      }
+    } else {
+      // Intentar usar el servicio local (si se está usando la app de escritorio)
+      try {
+        fetch('http://localhost:8091/devices', {
+          method: 'GET',
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (Array.isArray(data.devices)) {
+            resolve(data.devices);
+          } else {
+            resolve([]);
+          }
+        })
+        .catch(err => {
+          console.error('Error al obtener dispositivos del servicio local:', err);
+          resolve([]);
+        });
+      } catch (error) {
+        console.error('Error al comunicarse con el servicio local:', error);
+        resolve([]);
+      }
+    }
   });
 }
 
@@ -150,33 +209,96 @@ export async function listTokenDevices(): Promise<string[]> {
  * @returns Promise<CertificateInfo[]> Información de certificados disponibles
  */
 export async function getCertificates(pin: string): Promise<CertificateInfo[]> {
-  // En producción, se conectaría al token y enumeraría los certificados
   return new Promise((resolve, reject) => {
-    // Validar PIN (simulación)
+    // Validar PIN
     if (!pin || pin.length < 4) {
-      reject(new Error("PIN inválido"));
+      reject(new Error("PIN inválido. Debe tener al menos 4 caracteres."));
       return;
     }
 
-    // Simulación: Responde después de un retardo
-    setTimeout(() => {
-      // Crear un certificado simulado
-      const now = new Date();
-      const validTo = new Date();
-      validTo.setFullYear(now.getFullYear() + 2);
-
-      resolve([
-        {
-          serialNumber: "45:67:A1:B2:C3:D4:E5:F6",
-          subject: "CN=Juan Pérez, O=Empresa ABC, C=CL",
-          issuer: "CN=E-Cert Chile CA, O=E-Cert Chile, C=CL",
-          validFrom: now,
-          validTo: validTo,
-          provider: TokenProvider.ECERT
-        }
-      ]);
-    }, 1500);
+    // Verificar si estamos usando la extensión en el navegador
+    if (typeof window !== 'undefined' && 'firmaDigitalChile' in window) {
+      try {
+        // @ts-ignore - Variable global inyectada por la extensión
+        window.firmaDigitalChile.getCertificates(pin)
+          .then((certificates: any[]) => {
+            // Transformar los certificados al formato esperado
+            const formattedCertificates: CertificateInfo[] = certificates.map(cert => ({
+              serialNumber: cert.serialNumber || cert.serial || '',
+              subject: cert.subject || '',
+              issuer: cert.issuer || '',
+              validFrom: new Date(cert.validFrom || Date.now()),
+              validTo: new Date(cert.validTo || Date.now()),
+              provider: mapProviderFromIssuer(cert.issuer || '')
+            }));
+            resolve(formattedCertificates);
+          })
+          .catch((err: Error) => {
+            reject(new Error(`Error al obtener certificados: ${err.message}`));
+          });
+      } catch (error: any) {
+        reject(new Error(`Error al llamar a la extensión: ${error.message}`));
+      }
+    } else {
+      // Intentar usar el servicio local (si se está usando la app de escritorio)
+      try {
+        fetch('http://localhost:8091/certificates', {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin })
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Error en la respuesta del servidor: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (Array.isArray(data.certificates)) {
+            // Transformar los certificados al formato esperado
+            const formattedCertificates: CertificateInfo[] = data.certificates.map((cert: any) => ({
+              serialNumber: cert.serialNumber || cert.serial || '',
+              subject: cert.subject || '',
+              issuer: cert.issuer || '',
+              validFrom: new Date(cert.validFrom || Date.now()),
+              validTo: new Date(cert.validTo || Date.now()),
+              provider: mapProviderFromIssuer(cert.issuer || '')
+            }));
+            resolve(formattedCertificates);
+          } else {
+            reject(new Error('Formato de respuesta inválido'));
+          }
+        })
+        .catch(err => {
+          reject(new Error(`Error al obtener certificados del servicio local: ${err.message}`));
+        });
+      } catch (error: any) {
+        reject(new Error(`Error al comunicarse con el servicio local: ${error.message}`));
+      }
+    }
   });
+}
+
+/**
+ * Función auxiliar para determinar el proveedor a partir del emisor del certificado
+ */
+function mapProviderFromIssuer(issuer: string): TokenProvider {
+  issuer = issuer.toLowerCase();
+  
+  if (issuer.includes('e-cert') || issuer.includes('ecert')) {
+    return TokenProvider.ECERT;
+  } else if (issuer.includes('e-sign') || issuer.includes('esign')) {
+    return TokenProvider.ESIGN;
+  } else if (issuer.includes('toc') || issuer.includes('transbank')) {
+    return TokenProvider.TOC;
+  } else if (issuer.includes('acepta')) {
+    return TokenProvider.ACEPTA;
+  } else if (issuer.includes('certinet') || issuer.includes('bci')) {
+    return TokenProvider.CERTINET;
+  } else {
+    return TokenProvider.UNKNOWN;
+  }
 }
 
 /**
@@ -191,25 +313,78 @@ export async function signData(
   certificateSerialNumber: string,
   pin: string
 ): Promise<SignatureResult> {
-  // En producción, esto enviaría los datos al token para firmar usando el certificado seleccionado
   return new Promise((resolve, reject) => {
-    // Validar PIN (simulación)
+    // Validar PIN
     if (!pin || pin.length < 4) {
-      reject(new Error("PIN inválido"));
+      reject(new Error("PIN inválido. Debe tener al menos 4 caracteres."));
       return;
     }
 
-    // Simulación: Responde después de un retardo
-    setTimeout(() => {
-      // Datos simulados de firma
-      resolve({
-        signature: `${data}_${Date.now()}_${certificateSerialNumber}_signed`,
-        certificate: "MIIDrDCCApSgAwIBAgIUF8H...", // Certificado simulado truncado
-        timestamp: new Date().toISOString(),
-        provider: TokenProvider.ECERT,
-        algorithm: "SHA256withRSA"
-      });
-    }, 2000);
+    // Verificar si estamos usando la extensión en el navegador
+    if (typeof window !== 'undefined' && 'firmaDigitalChile' in window) {
+      try {
+        // @ts-ignore - Variable global inyectada por la extensión
+        window.firmaDigitalChile.signData({
+          data,
+          certificateSerialNumber,
+          pin,
+          algorithm: 'SHA256withRSA'
+        })
+        .then((result: any) => {
+          // Transformar el resultado al formato esperado
+          const signatureResult: SignatureResult = {
+            signature: result.signature || '',
+            certificate: result.certificate || '',
+            timestamp: result.timestamp || new Date().toISOString(),
+            provider: mapProviderFromIssuer(result.issuer || ''),
+            algorithm: result.algorithm || 'SHA256withRSA'
+          };
+          resolve(signatureResult);
+        })
+        .catch((err: Error) => {
+          reject(new Error(`Error al firmar datos: ${err.message}`));
+        });
+      } catch (error: any) {
+        reject(new Error(`Error al llamar a la extensión: ${error.message}`));
+      }
+    } else {
+      // Intentar usar el servicio local (si se está usando la app de escritorio)
+      try {
+        fetch('http://localhost:8091/sign', {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            data,
+            certificateSerialNumber,
+            pin,
+            algorithm: 'SHA256withRSA'
+          })
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Error en la respuesta del servidor: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(result => {
+          // Transformar el resultado al formato esperado
+          const signatureResult: SignatureResult = {
+            signature: result.signature || '',
+            certificate: result.certificate || '',
+            timestamp: result.timestamp || new Date().toISOString(),
+            provider: mapProviderFromIssuer(result.issuer || ''),
+            algorithm: result.algorithm || 'SHA256withRSA'
+          };
+          resolve(signatureResult);
+        })
+        .catch(err => {
+          reject(new Error(`Error al firmar datos a través del servicio local: ${err.message}`));
+        });
+      } catch (error: any) {
+        reject(new Error(`Error al comunicarse con el servicio local: ${error.message}`));
+      }
+    }
   });
 }
 
@@ -223,13 +398,55 @@ export async function verifySignature(
   originalData: string,
   signatureResult: SignatureResult
 ): Promise<boolean> {
-  // En producción esto verificaría criptográficamente la firma
-  return new Promise((resolve) => {
-    // Simulación: Responde después de un retardo
-    setTimeout(() => {
-      // En modo demostración siempre validamos como correcta
-      resolve(true);
-    }, 800);
+  return new Promise((resolve, reject) => {
+    // Verificar si estamos usando la extensión en el navegador
+    if (typeof window !== 'undefined' && 'firmaDigitalChile' in window) {
+      try {
+        // @ts-ignore - Variable global inyectada por la extensión
+        window.firmaDigitalChile.verifySignature({
+          originalData,
+          signature: signatureResult.signature,
+          certificate: signatureResult.certificate,
+          algorithm: signatureResult.algorithm
+        })
+        .then((result: { valid: boolean }) => {
+          resolve(result.valid);
+        })
+        .catch((err: Error) => {
+          console.error("Error al verificar la firma:", err);
+          resolve(false);
+        });
+      } catch (error) {
+        console.error("Error al llamar a la extensión:", error);
+        resolve(false);
+      }
+    } else {
+      // Intentar usar el servicio local (si se está usando la app de escritorio)
+      try {
+        fetch('http://localhost:8091/verify', {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            originalData,
+            signature: signatureResult.signature,
+            certificate: signatureResult.certificate,
+            algorithm: signatureResult.algorithm
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          resolve(data.valid === true);
+        })
+        .catch(err => {
+          console.error("Error al verificar la firma con el servicio local:", err);
+          resolve(false);
+        });
+      } catch (error) {
+        console.error("Error al comunicarse con el servicio local:", error);
+        resolve(false);
+      }
+    }
   });
 }
 
@@ -239,11 +456,59 @@ export async function verifySignature(
  * @returns Promise<string> Sello de tiempo en formato base64
  */
 export async function getTimestamp(signatureResult: SignatureResult): Promise<string> {
-  // En producción esto haría una petición a un servicio TSA
-  return new Promise((resolve) => {
-    // Simulación: Responde después de un retardo
-    setTimeout(() => {
-      resolve("TSP.v1.base64encoded.timestamp." + Date.now());
-    }, 1000);
+  return new Promise((resolve, reject) => {
+    // En un entorno real, usaríamos un servicio de sellado de tiempo acreditado
+    // como el de E-Cert Chile o el de ICP Brasil
+    
+    // Verificar si estamos usando la extensión en el navegador
+    if (typeof window !== 'undefined' && 'firmaDigitalChile' in window) {
+      try {
+        // @ts-ignore - Variable global inyectada por la extensión
+        window.firmaDigitalChile.getTimestamp({
+          signature: signatureResult.signature,
+          certificate: signatureResult.certificate
+        })
+        .then((result: { timestamp: string }) => {
+          resolve(result.timestamp);
+        })
+        .catch((err: Error) => {
+          console.error("Error al obtener sello de tiempo:", err);
+          // En caso de error con el servicio TSA, usamos un timestamp local
+          resolve(`LOCAL-${Date.now()}`);
+        });
+      } catch (error) {
+        console.error("Error al llamar a la extensión:", error);
+        resolve(`LOCAL-${Date.now()}`);
+      }
+    } else {
+      // Intentar usar el servicio local (si se está usando la app de escritorio)
+      try {
+        fetch('http://localhost:8091/timestamp', {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            signature: signatureResult.signature,
+            certificate: signatureResult.certificate
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.timestamp) {
+            resolve(data.timestamp);
+          } else {
+            // Fallback a timestamp local
+            resolve(`LOCAL-${Date.now()}`);
+          }
+        })
+        .catch(err => {
+          console.error("Error al obtener sello de tiempo del servicio local:", err);
+          resolve(`LOCAL-${Date.now()}`);
+        });
+      } catch (error) {
+        console.error("Error al comunicarse con el servicio local:", error);
+        resolve(`LOCAL-${Date.now()}`);
+      }
+    }
   });
 }
