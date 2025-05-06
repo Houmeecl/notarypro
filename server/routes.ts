@@ -248,6 +248,36 @@ async function initializeTestAdmins() {
       console.log("Administrador miadmin inicializado correctamente");
     }
     
+    // Crear usuario evenegas (administrador principal con acceso completo)
+    const [existingEvenegas] = await db.select().from(users).where(
+      eq(users.username, "evenegas")
+    );
+    
+    if (existingEvenegas) {
+      console.log("El usuario evenegas ya existe. Actualizando contraseña...");
+      const evenegasHashedPassword = await hashPassword("77239800");
+      await db.update(users)
+        .set({ 
+          password: evenegasHashedPassword, 
+          role: "admin", 
+          fullName: "CEO NotaryPro",
+          email: "evenegas@notarypro.cl"
+        })
+        .where(eq(users.username, "evenegas"));
+      console.log("Credenciales del usuario evenegas actualizadas.");
+    } else {
+      const evenegasHashedPassword = await hashPassword("77239800");
+      await db.insert(users).values({
+        username: "evenegas",
+        password: evenegasHashedPassword,
+        email: "evenegas@notarypro.cl",
+        fullName: "CEO NotaryPro",
+        role: "admin",
+        createdAt: new Date()
+      });
+      console.log("Usuario evenegas (CEO) creado correctamente.");
+    }
+    
     // Usuario demo partner para VecinoXpress
     const [existingDemoPartner] = await db.select().from(users).where(
       eq(users.username, "demopartner")
