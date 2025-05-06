@@ -111,37 +111,21 @@ const VerificacionNfcPuente: React.FC = () => {
       //   }
       // }
       
-      // Por ahora, para pruebas, generamos una respuesta después de cierto tiempo
-      const mockApiCall = () => {
-        return new Promise<NfcData | null>((resolve) => {
-          // Simular un tiempo de respuesta aleatorio
-          setTimeout(() => {
-            // Solo devolver datos en la tercera llamada o después
-            const currentCount = sessionStorage.getItem(`nfc_attempt_${sessionId}`) || '0';
-            const attemptCount = parseInt(currentCount, 10) + 1;
-            sessionStorage.setItem(`nfc_attempt_${sessionId}`, attemptCount.toString());
-            
-            if (attemptCount >= 3) {
-              // Datos reales de ejemplo - en un entorno de producción vendrían de la API
-              resolve({
-                documentNumber: '12.345.678-9',
-                fullName: 'EDUARDO VENEGAS SOLAR',
-                birthDate: '01/01/1980',
-                expiryDate: '31/12/2028',
-                nationality: 'CHILENA',
-                serialNumber: `CHL${Date.now().toString().substring(8, 13)}`,
-                issuer: 'REGISTRO CIVIL E IDENTIFICACIÓN',
-                verified: true,
-                timestamp: new Date().toISOString()
-              });
-            } else {
-              resolve(null); // Aún no hay datos
-            }
-          }, 800);
-        });
-      };
+      // En un entorno real, consultaríamos a la API para verificar el estado
+      // de la sesión NFC y obtener los datos leídos
       
-      const result = await mockApiCall();
+      // Para esta demostración, simplemente simulamos la verificación del QR
+      // sin generar o mostrar datos falsos
+      let result: NfcData | null = null;
+      
+      // Solo verificamos el estado - no se generan datos automáticamente
+      const currentState = sessionStorage.getItem(`nfc_status_${sessionId}`);
+      
+      // Los datos vendrían de una API real, no se generan automáticamente
+      if (currentState === 'verified') {
+        // En una implementación real, estos datos vendrían de la API
+        result = null;
+      }
       
       if (result) {
         setNfcData(result);
