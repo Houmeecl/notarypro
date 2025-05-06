@@ -73,6 +73,8 @@ import DocumentoEjemplo from "@/pages/documento-ejemplo";
 import VerificacionIdentidadDemo from "@/pages/verificacion-identidad-demo";
 import ReadIDVerificationPage from "@/pages/readid-verification";
 import AccesoDirecto from "@/pages/acceso-directo";
+// Importar la página de verificación biométrica
+import VerificacionBiometricaPage from "@/pages/verificacion-biometrica";
 // Nuevas páginas para gestión de POS
 import POSMenuPage from "@/pages/pos-menu";
 import POSSessionPage from "@/pages/pos-session";
@@ -748,6 +750,9 @@ function Router() {
           </Suspense>
         );
       }} />
+      
+      {/* Nueva ruta para verificación biométrica con cámara */}
+      <Route path="/verificacion-biometrica" component={VerificacionBiometricaPage} />
       
       {/* Versión fixed explícita (para acceso directo) */}
       <Route path="/verificacion-nfc-fixed" component={() => {
