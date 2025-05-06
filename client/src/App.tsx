@@ -87,6 +87,7 @@ import DocumentsPage from "@/pages/documents";
 import DocumentProcessor from "@/pages/document-processor";
 import DocumentExplorerPage from "@/pages/document-explorer";
 import DocumentUploadPage from "@/pages/document-upload";
+import SignatureDemo from "@/pages/signature-demo";
 
 // Partner pages
 import PartnersPublicPage from "@/pages/partners/public-page";
@@ -353,6 +354,7 @@ function Router() {
       <Route path="/curso-certificador" component={CursoCertificador} />
       <Route path="/service-selection" component={ServiceSelectionPage} />
       <Route path="/quienes-somos" component={QuienesSomosPage} />
+      <Route path="/signature-demo" component={SignatureDemo} />
 
       {/* Vecinos Xpress Pages (lazy loaded) */}
       <Route path="/vecinos" component={() => (

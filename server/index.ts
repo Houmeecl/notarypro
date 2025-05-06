@@ -56,11 +56,11 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5500
+  // ALWAYS serve the app on port 5501
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  // Cambiado de 5000 a 5500 para evitar conflictos con otros servicios
-  const port = 5500;
+  // Cambiado a puerto 5000 para que coincida con la configuración del workflow de Replit
+  const port = 5000;
   server.listen({
     port,
     host: "0.0.0.0",

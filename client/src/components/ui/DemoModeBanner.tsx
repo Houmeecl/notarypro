@@ -29,10 +29,8 @@ export default function DemoModeBanner({
   const [dismissed, setDismissed] = useState(false);
   const { isDemo, deviceId, setRealMode } = useDeviceMode();
   
-  // Si no estamos en modo demo o el banner fue descartado, no mostrar nada
-  if (!isDemo || dismissed) {
-    return null;
-  }
+  // Modo demo desactivado permanentemente, nunca mostrar el banner
+  return null;
   
   // Determinar estilos según tema y variante
   const baseStyles = "flex items-center justify-between px-4 py-2 text-sm font-medium z-50";

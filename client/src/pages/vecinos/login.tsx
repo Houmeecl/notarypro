@@ -184,16 +184,13 @@ export default function VecinosLogin() {
 
         <CardFooter className="flex flex-col space-y-2 text-center text-sm">
           <div>
-            <a 
-              href="#" 
+            <button 
+              type="button"
               className="text-[#2d219b] hover:underline"
-              onClick={(e) => {
-                e.preventDefault();
-                setLocation("/vecinos/recuperar-password");
-              }}
+              onClick={() => setLocation("/vecinos/recuperar-password")}
             >
               ¿Olvidaste tu contraseña?
-            </a>
+            </button>
           </div>
           <div className="text-xs text-gray-500 mt-2">
             <FileCheck className="h-4 w-4 inline-block mr-1" />

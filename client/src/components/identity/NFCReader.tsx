@@ -9,6 +9,8 @@ export interface NFCReaderProps {
 }
 
 const NFCReader: React.FC<NFCReaderProps> = ({ onSuccess, onError, demoMode = false }) => {
+  // Forzar modo real independientemente del valor recibido
+  const forcedRealMode = false;
   const [status, setStatus] = useState<'idle' | 'reading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState<string>('Presione el botón para iniciar la lectura');
   
@@ -53,8 +55,9 @@ const NFCReader: React.FC<NFCReaderProps> = ({ onSuccess, onError, demoMode = fa
   
   // Intentar leer NFC real
   const readNFC = async () => {
-    // Si estamos en modo demo, usar los datos simulados
-    if (demoMode) {
+    // Forzar modo real, ignorar el parámetro demoMode
+    if (false) {
+      // Esta condición nunca se cumplirá, asegurando siempre modo real
       simulateNFCRead();
       return;
     }
@@ -84,14 +87,10 @@ const NFCReader: React.FC<NFCReaderProps> = ({ onSuccess, onError, demoMode = fa
         throw new Error('No se encontró una API NFC compatible');
       }
     } catch (err) {
-      if (demoMode) {
-        // En modo demo, si falla la lectura real, usamos simulación
-        simulateNFCRead();
-      } else {
-        setStatus('error');
-        setMessage('No se pudo acceder a la funcionalidad NFC');
-        onError('Este dispositivo no soporta NFC o no se pudo acceder a la funcionalidad');
-      }
+      // Modo real forzado, mostrar error real
+      setStatus('error');
+      setMessage('No se pudo acceder a la funcionalidad NFC');
+      onError('Este dispositivo no soporta NFC o no se pudo acceder a la funcionalidad');
     }
   };
   
@@ -110,14 +109,10 @@ const NFCReader: React.FC<NFCReaderProps> = ({ onSuccess, onError, demoMode = fa
       onSuccess(nfcData);
       
     } catch (error: any) {
-      // Si estamos en modo demo y falla, usamos simulación
-      if (demoMode) {
-        simulateNFCRead();
-      } else {
-        setStatus('error');
-        setMessage(`Error al iniciar el escaneo NFC: ${error.message}`);
-        onError(`Error al iniciar el escaneo NFC: ${error.message}`);
-      }
+      // Modo real forzado, mostrar error real
+      setStatus('error');
+      setMessage(`Error al iniciar el escaneo NFC: ${error.message}`);
+      onError(`Error al iniciar el escaneo NFC: ${error.message}`);
     }
   };
   
@@ -136,14 +131,10 @@ const NFCReader: React.FC<NFCReaderProps> = ({ onSuccess, onError, demoMode = fa
       onSuccess(nfcData);
       
     } catch (error: any) {
-      // Como fallback, usar simulación en modo demo
-      if (demoMode) {
-        simulateNFCRead();
-      } else {
-        setStatus('error');
-        setMessage(`API NFC alternativa: ${error.message}`);
-        onError(`API NFC alternativa: ${error.message}`);
-      }
+      // Modo real forzado, mostrar error real
+      setStatus('error');
+      setMessage(`API NFC alternativa: ${error.message}`);
+      onError(`API NFC alternativa: ${error.message}`);
     }
   };
   

@@ -18,6 +18,7 @@ import { eq } from "drizzle-orm";
 import { documentManagementRouter } from "./document-management-routes";
 import { notaryDocumentRouter } from "./notary-document-routes";
 import { posManagementRouter } from "./pos-management-routes";
+import { documentSignaturesRouter } from "./routes/document-signatures";
 
 export function registerRoutes(app: Express): Server {
   // Configuración de autenticación para la aplicación principal
@@ -52,6 +53,9 @@ export function registerRoutes(app: Express): Server {
   
   // Sistema de Gestión de Dispositivos POS
   app.use("/api/pos-management", posManagementRouter);
+  
+  // Sistema de firmas de documentos
+  app.use("/api/documents", documentSignaturesRouter);
   
   // Ruta para servir archivos estáticos (documentos y contratos)
   app.use("/docs", express.static(path.join(process.cwd(), "docs")));
