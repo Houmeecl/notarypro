@@ -504,11 +504,11 @@
     let appId = ""; // Se cargará desde la API
     let agoraToken = ""; // Se cargará desde la API
     
-    // Función real para solicitar acceso a cámara/micrófono (Ley 19.799)
+    // Función para solicitar acceso a cámara/micrófono (Ley 19.799)
     async function requestCameraAndMicrophone() {
       try {
-        console.log("✅ Modo FUNCIONAL REAL activado correctamente");
-        console.log("🔒 Verificaciones y validaciones legales habilitadas según Ley 19.799");
+        console.log("✅ Sistema verificación de identidad iniciado");
+        console.log("🔒 Verificación legal según Ley 19.799 activada");
         
         // Solicitar permisos de cámara y micrófono con máxima calidad para verificación legal
         const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -739,7 +739,7 @@
           };
           
           // Solicitar acceso directo vía navigator.mediaDevices (WebRTC estándar)
-          console.log("Solicitando permisos explícitamente:", videoConfig);
+          console.log("Solicitando acceso a dispositivos de cámara y audio");
           const mediaStream = await navigator.mediaDevices.getUserMedia(videoConfig);
           
           // Una vez que tenemos permisos explícitos, liberamos el stream nativo

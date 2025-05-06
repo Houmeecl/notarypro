@@ -63,17 +63,6 @@ if (remoteConfig) {
   }
 }
 
-// Añadir parámetro 'functional' a la URL si no está presente
-if (!window.location.href.includes('functional=true')) {
-  const url = new URL(window.location.href);
-  url.searchParams.set('functional', 'true');
-  url.searchParams.set('real', 'true');
-  url.searchParams.set('qa', 'true');
-  window.location.href = url.toString();
-} else {
-  console.log('✅ Modo FUNCIONAL activado correctamente');
-  console.log('🔧 Verificaciones internas y RON configurados en modo funcional QA');
-  
-  // Esta alerta ayuda a confirmar que el script ha funcionado
-  alert('¡Modo FUNCIONAL activado! La aplicación funcionará sin restricciones de verificación para pruebas QA.');
-}
+// Modo producción
+console.log('✅ Sistema verificación activado en producción');
+console.log('🔒 Certificación notarial conforme a Ley 19.799 activada');
