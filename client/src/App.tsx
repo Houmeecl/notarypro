@@ -683,6 +683,15 @@ function Router() {
       <Route path="/ron-session-native/:sessionId" component={RonSessionNativePage} />
       {/* Sistema externo (Zoom/Meet) como alternativa */}
       <Route path="/ron-session-external/:id?" component={RonSessionExternal} />
+      {/* Versión mejorada de cliente RON con mejor manejo de errores */}
+      <Route path="/ron-client/:code?" component={() => {
+        const RonClientMejorado = React.lazy(() => import("@/pages/ron-client-mejorado"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback message="Cargando sesión RON..." />}>
+            <RonClientMejorado />
+          </Suspense>
+        );
+      }} />
 
       {/* Ayuda Legal */}
       <ProtectedRoute 
