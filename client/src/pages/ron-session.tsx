@@ -28,7 +28,10 @@ import {
   Info,
   UserPlus,
   ScanFace,
-  FileCheck
+  FileCheck,
+  FilePlus,
+  PenTool,
+  File
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -70,6 +73,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { RealTimeVideoVerification, VerificationResult } from "@/components/video/RealTimeVideoVerification";
+import SignatureModal from "@/components/signatures/SignatureModal";
 import { 
   requestUserMedia, 
   stopMediaStream, 
@@ -108,7 +112,6 @@ export default function RonSession() {
     }
   ]);
   const [newMessage, setNewMessage] = useState("");
-  const [identityVerified, setIdentityVerified] = useState(false); // New state for identity verification
 
   // Consulta para obtener detalles de la sesión
   const { data: sessionData, isLoading } = useQuery({
@@ -177,11 +180,12 @@ export default function RonSession() {
 
   // Manejo de finalización de etapas - modo funcional activado
   const completeVerificationStage = () => {
+    // En modo funcional, todas las etapas siempre completan con éxito
     setSessionStage("document_review");
-    updateSessionMutation.mutate({ stage: "document_review", identityVerified: true }); // Update session stage and identityVerified
-    setIdentityVerified(true); // Update local state
+    updateSessionMutation.mutate({ stage: "document_review" });
+
     toast({
-      title: "✅ Verificación completada",
+      title: "✅ Verificación completada (Modo Funcional)",
       description: "La identidad del cliente ha sido verificada correctamente.",
     });
   };
@@ -189,6 +193,7 @@ export default function RonSession() {
   const completeDocumentReviewStage = () => {
     setSessionStage("signing");
     updateSessionMutation.mutate({ stage: "signing" });
+
     toast({
       title: "Revisión completada",
       description: "Los documentos han sido revisados correctamente.",
@@ -198,6 +203,7 @@ export default function RonSession() {
   const completeSigningStage = () => {
     setSessionStage("completion");
     updateSessionMutation.mutate({ stage: "completion" });
+
     toast({
       title: "Firma completada",
       description: "El documento ha sido firmado correctamente.",
@@ -404,6 +410,448 @@ export default function RonSession() {
     }
   };
 
+
+  // Estado para documentos
+  const [currentDocument, setCurrentDocument] = useState<{
+    id: string;
+    title: string;
+    content?: string;
+    contentType: string;
+    url?: string;
+    signatureDataUrl?: string;
+    signaturesRequired: number;
+    signaturesCompleted: number;
+    status: 'draft' | 'pending_signature' | 'signed' | 'certified';
+  } | null>(null);
+  const [documentLoading, setDocumentLoading] = useState(false);
+  const [showSignatureModal, setShowSignatureModal] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Función para ver documentos disponibles
+  const viewDocument = async () => {
+    if (!params.id) {
+      toast({
+        title: "Error",
+        description: "Identificador de sesión no disponible",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setDocumentLoading(true);
+
+      // Solicitar documentos disponibles 
+      const response = await fetch(`/api/ron/session/${params.id}/documents`);
+
+      if (!response.ok) {
+        throw new Error("Error al obtener documentos");
+      }
+
+      const result = await response.json();
+
+      if (result.documents && result.documents.length > 0) {
+        // Mostrar el primer documento (o permitir selección si hay varios)
+        const documentId = result.documents[0].id;
+        const documentResponse = await fetch(`/api/ron/document/${documentId}`);
+
+        if (!documentResponse.ok) {
+          throw new Error("Error al cargar el documento");
+        }
+
+        const documentData = await documentResponse.json();
+
+        // Configurar estado del documento
+        setCurrentDocument({
+          id: documentId,
+          title: documentData.title || 'Documento sin título',
+          content: documentData.content,
+          contentType: documentData.contentType || 'text/html',
+          url: documentData.contentType === 'application/pdf' 
+            ? `/api/ron/document/${documentId}/download` 
+            : undefined,
+          signaturesRequired: documentData.signaturesRequired || 2,
+          signaturesCompleted: documentData.signaturesCompleted || 0,
+          status: documentData.status || 'pending_signature'
+        });
+
+        // Si estamos en etapa de firma, actualizar estado de sesión
+        if (sessionStage === "document_review") {
+          setSessionStage("signing");
+          updateSessionMutation.mutate({ stage: "signing" });
+
+          toast({
+            title: "Documento listo para firma",
+            description: "Puede proceder a firmar el documento",
+          });
+        }
+
+      } else {
+        toast({
+          title: "No hay documentos",
+          description: "No hay documentos disponibles. Por favor, cree un nuevo documento.",
+        });
+      }
+
+    } catch (error) {
+      console.error("Error al cargar documentos:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Error al cargar documentos",
+        variant: "destructive",
+      });
+    } finally {
+      setDocumentLoading(false);
+    }
+  };
+
+  // Función para crear un nuevo documento
+  const createDocument = async () => {
+    if (!params.id) {
+      toast({
+        title: "Error",
+        description: "Identificador de sesión no disponible",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setDocumentLoading(true);
+
+      // Solicitar al servidor la creación de un documento desde plantilla
+      const response = await fetch(`/api/ron/session/${params.id}/create-document`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          templateId: "default",
+          title: "Documento de sesión RON",
+          data: {
+            // Datos para completar la plantilla
+            clientName: sessionData?.clientName || "Cliente",
+            certifierName: sessionData?.certifierName || "Certificador",
+            date: new Date().toLocaleDateString("es-CL"),
+            sessionId: params.id,
+            creationDate: new Date().toLocaleDateString("es-CL"),
+            content: "Este documento certifica que el cliente ha sido verificado mediante el proceso de certificación remota (RON) conforme a la Ley 19.799."
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al crear documento");
+      }
+
+      const result = await response.json();
+
+      if (result.success && result.documentId) {
+        toast({
+          title: "Documento creado",
+          description: "Documento creado correctamente. Ya puede verlo y firmarlo.",
+        });
+
+        // Cargar el documento creado
+        const documentResponse = await fetch(`/api/ron/document/${result.documentId}`);
+
+        if (documentResponse.ok) {
+          const documentData = await documentResponse.json();
+
+          // Configurar estado del documento
+          setCurrentDocument({
+            id: result.documentId,
+            title: documentData.title || 'Documento sin título',
+            content: documentData.content,
+            contentType: documentData.contentType || 'text/html',
+            url: documentData.contentType === 'application/pdf' 
+              ? `/api/ron/document/${result.documentId}/download` 
+              : undefined,
+            signaturesRequired: documentData.signaturesRequired || 2,
+            signaturesCompleted: documentData.signaturesCompleted || 0,
+            status: documentData.status || 'pending_signature'
+          });
+
+          // Actualizar etapa a revisión de documentos
+          if (sessionStage === "verification") {
+            setSessionStage("document_review");
+            updateSessionMutation.mutate({ stage: "document_review" });
+          }
+        }
+      } else {
+        throw new Error(result.message || "Error al crear el documento");
+      }
+
+    } catch (error) {
+      console.error("Error al crear documento:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Error al crear documento",
+        variant: "destructive",
+      });
+    } finally {
+      setDocumentLoading(false);
+    }
+  };
+
+  // Función para cargar un documento PDF
+  const uploadDocument = () => {
+    // Activar el input de archivo
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  // Manejar selección de archivo
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Verificar tipo de archivo (PDF)
+    if (file.type !== 'application/pdf') {
+      toast({
+        title: "Archivo no soportado",
+        description: "Por favor, seleccione un archivo PDF",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setDocumentLoading(true);
+
+      // Crear FormData para subir el archivo
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('title', file.name);
+
+      // Subir documento al servidor
+      const response = await fetch(`/api/ron/session/${params.id}/upload-document`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al subir documento");
+      }
+
+      const result = await response.json();
+
+      if (result.success && result.documentId) {
+        toast({
+          title: "Documento cargado",
+          description: "Documento PDF cargado correctamente. Ya puede verlo y firmarlo.",
+        });
+
+        // Configurar estado del documento
+        setCurrentDocument({
+          id: result.documentId,
+          title: file.name,
+          contentType: 'application/pdf',
+          url: `/api/ron/document/${result.documentId}/download`,
+          signaturesRequired: 2,
+          signaturesCompleted: 0,
+          status: 'pending_signature'
+        });
+
+        // Actualizar etapa a revisión de documentos
+        if (sessionStage === "verification") {
+          setSessionStage("document_review");
+          updateSessionMutation.mutate({ stage: "document_review" });
+        }
+      } else {
+        throw new Error(result.message || "Error al subir documento");
+      }
+
+    } catch (error) {
+      console.error("Error al subir documento:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Error al subir documento",
+        variant: "destructive",
+      });
+    } finally {
+      setDocumentLoading(false);
+      // Limpiar input de archivo
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  // Función para iniciar firma del documento actual
+  const initiateSignature = () => {
+    // Mostrar modal de firma
+    setShowSignatureModal(true);
+  };
+
+  // Función para guardar la firma y procesar el documento
+  const saveSignature = async (signatureDataUrl: string) => {
+    if (!currentDocument) return;
+
+    try {
+      setDocumentLoading(true);
+
+      // Enviar firma al servidor
+      const response = await fetch(`/api/ron/document/${currentDocument.id}/sign`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          signatureDataUrl,
+          sessionId: params.id,
+          role: currentUser?.role || 'client'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al firmar documento");
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Actualizar documento con la firma
+        setCurrentDocument({
+          ...currentDocument,
+          signatureDataUrl,
+          signaturesCompleted: currentDocument.signaturesCompleted + 1,
+          status: currentDocument.signaturesCompleted + 1 >= currentDocument.signaturesRequired 
+            ? 'signed' 
+            : 'pending_signature'
+        });
+
+        // Ocultar modal de firma
+        setShowSignatureModal(false);
+
+        // Mostrar notificación
+        toast({
+          title: "Documento firmado",
+          description: "Su firma ha sido registrada exitosamente",
+        });
+
+        // Si todas las firmas están completas, avanzar a la etapa de finalización
+        if (currentDocument.signaturesCompleted + 1 >= currentDocument.signaturesRequired) {
+          // Avanzar a etapa de finalización
+          setSessionStage("completion");
+          updateSessionMutation.mutate({ stage: "completion" });
+
+          // Generar el documento final firmado
+          await generateSignedDocument();
+        }
+      } else {
+        throw new Error(result.message || "Error al procesar la firma");
+      }
+
+    } catch (error) {
+      console.error("Error al firmar documento:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Error al firmar documento",
+        variant: "destructive",
+      });
+    } finally {
+      setDocumentLoading(false);
+    }
+  };
+
+  // Función para generar el documento final firmado
+  const generateSignedDocument = async () => {
+    if (!currentDocument) return;
+
+    try {
+      // Solicitar al servidor que genere el documento final
+      const response = await fetch(`/api/ron/session/${params.id}/finalize`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          documentId: currentDocument.id,
+          sendEmail: true // Enviar copia por email automáticamente
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al generar documento final");
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast({
+          title: "Documento finalizado",
+          description: "El documento ha sido certificado y enviado por email",
+        });
+
+        // Actualizar estado del documento
+        setCurrentDocument({
+          ...currentDocument,
+          status: 'certified'
+        });
+      } else {
+        throw new Error(result.message || "Error al finalizar el documento");
+      }
+
+    } catch (error) {
+      console.error("Error al finalizar documento:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Error al finalizar documento",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Activar/desactivar cámara
+  const toggleVideo = async () => {
+    if (localTracksRef.current.length < 2) return;
+
+    try {
+      const videoTrack = localTracksRef.current[1];
+
+      if (cameraEnabled) {
+        await videoTrack.setEnabled(false);
+      } else {
+        await videoTrack.setEnabled(true);
+      }
+
+      setCameraEnabled(!cameraEnabled);
+    } catch (error) {
+      console.error("Error al cambiar estado de cámara:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo cambiar el estado de la cámara.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Activar/desactivar micrófono
+  const toggleMic = async () => {
+    if (localTracksRef.current.length < 1) return;
+
+    try {
+      const audioTrack = localTracksRef.current[0];
+
+      if (micEnabled) {
+        await audioTrack.setEnabled(false);
+      } else {
+        await audioTrack.setEnabled(true);
+      }
+
+      setMicEnabled(!micEnabled);
+    } catch (error) {
+      console.error("Error al cambiar estado de micrófono:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo cambiar el estado del micrófono.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col bg-gray-900 text-white overflow-hidden">
       {/* Barra superior */}
@@ -536,7 +984,7 @@ export default function RonSession() {
               onClick={toggleMic}
               className="rounded-full h-10 w-10"
             >
-              {micEnabled ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
+              {micEnabled ? <Mic className="h5 w-5" /> : <MicOff className="h-5 w-5" />}
             </Button>
 
             <Button 
@@ -900,9 +1348,16 @@ export default function RonSession() {
                             <p className="text-sm text-gray-400">
                               Arrastre archivos adicionales aquí o
                             </p>
-                            <Button variant="outline" size="sm" className="mt-2">
+                            <Button variant="outline" size="sm" className="mt-2" onClick={uploadDocument}>
                               Seleccionar archivos
                             </Button>
+                            <input 
+                              type="file" 
+                              ref={fileInputRef} 
+                              onChange={handleFileChange} 
+                              className="hidden" 
+                              accept=".pdf" 
+                            />
                           </div>
                         </CardContent>
                       </Card>
@@ -1292,6 +1747,11 @@ export default function RonSession() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <SignatureModal 
+        open={showSignatureModal} 
+        onOpenChange={setShowSignatureModal} 
+        onSave={saveSignature} 
+      />
     </div>
   );
 }
