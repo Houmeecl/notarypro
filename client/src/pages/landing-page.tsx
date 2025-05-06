@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Link } from "wouter";
 import Header from "@/components/landing/Header";
 import Hero from "@/components/landing/Hero";
 import Services from "@/components/landing/Services";
@@ -56,15 +57,24 @@ export default function LandingPage() {
               </AlertDescription>
             </Alert>
           )}
-          <a 
-            href="/documentacion-tecnica.html" 
-            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md text-sm transition duration-150 ease-in-out"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FileText className="h-4 w-4 mr-2" />
-            Documentación Técnica
-          </a>
+          <div className="flex space-x-2">
+            <a 
+              href="/documentacion-tecnica.html" 
+              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md text-sm transition duration-150 ease-in-out"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Ver Documentación
+            </a>
+            <Link 
+              href="/documentacion"
+              className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md text-sm transition duration-150 ease-in-out"
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Descargar Docs
+            </Link>
+          </div>
         </div>
       </div>
       
