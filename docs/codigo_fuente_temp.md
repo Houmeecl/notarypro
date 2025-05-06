@@ -1,19 +1,11 @@
-const fs = require('fs');
-const path = require('path');
-const { mdToPdf } = require('md-to-pdf');
 
-async function generateCodeSourcePDF() {
-  console.log('Generando documentación del código fuente...');
-  
-  // Contenido del markdown
-  const markdown = `
 # Documentación Técnica Completa - NotaryPro / VecinosExpress POS
 
 ## Información del Desarrollador
 
 **Nombre del Proyecto:** NotaryPro / VecinosExpress POS
 **Versión:** 3.0.1
-**Fecha de Documentación:** ${new Date().toLocaleDateString()}
+**Fecha de Documentación:** 5/6/2025
 **Desarrollado por:** Equipo de Desarrollo VecinosExpress
 **Contacto:** desarrollo@notarypro.cl / soporte@vecinosexpress.cl
 **Desarrollador Principal:** Eduardo Venegas
@@ -60,7 +52,7 @@ El sistema está organizado en varios componentes clave que trabajan juntos:
 ### Frontend
 
 #### Estructura de Carpetas
-\`\`\`
+```
 client/
 ├── src/
 │   ├── components/     # Componentes reutilizables
@@ -68,7 +60,7 @@ client/
 │   ├── lib/            # Funciones de utilidad
 │   ├── pages/          # Páginas de la aplicación
 │   └── App.tsx         # Punto de entrada principal
-\`\`\`
+```
 
 #### Archivos Clave del Frontend
 
@@ -100,7 +92,7 @@ client/
 ### Backend
 
 #### Estructura de Carpetas
-\`\`\`
+```
 server/
 ├── auth.ts            # Configuración de autenticación
 ├── contract-routes.ts # Rutas para gestión de contratos
@@ -110,7 +102,7 @@ server/
 ├── index.ts           # Punto de entrada del servidor
 ├── ron-routes.ts      # Rutas para notarización remota
 └── services/          # Servicios del backend
-\`\`\`
+```
 
 #### Archivos Clave del Backend
 
@@ -231,7 +223,7 @@ El sistema NotaryPro tiene como propósito principal:
 
 La arquitectura de NotaryPro sigue un modelo cliente-servidor con múltiples capas:
 
-\`\`\`
+```
 +-------------------+     +-------------------+     +-------------------+
 | Capa de           |     | Capa de           |     | Capa de           |
 | Presentación      |<--->| Aplicación        |<--->| Datos             |
@@ -244,7 +236,7 @@ La arquitectura de NotaryPro sigue un modelo cliente-servidor con múltiples cap
 | Servicios de      |     | Servicios de      |     | Servicios de      |
 | UI/UX             |     | Negocio           |     | Persistencia      |
 +-------------------+     +-------------------+     +-------------------+
-\`\`\`
+```
 
 ### 2.2 Componentes Principales
 
@@ -538,40 +530,3 @@ NotaryPro es un software propietario. Todos los derechos reservados © 2025 Veci
 Las bibliotecas de código abierto utilizadas en este proyecto están sujetas a sus respectivas licencias, que se pueden consultar en el directorio /licenses del repositorio.
 
 Para solicitudes de licencia comercial, contactar a: licencias@notarypro.cl
-`;
-
-  // Guardar markdown temporalmente
-  fs.writeFileSync('./codigo_fuente_temp.md', markdown);
-  
-  // Configurar opciones del PDF
-  const pdfOptions = {
-    dest: './NotaryPro_Manual_Completo_y_Codigo_Fuente.pdf',
-    stylesheet: './pdf-style.css',
-    pdf_options: {
-      format: 'A4',
-      margin: '20mm 15mm',
-      printBackground: true
-    },
-    stylesheet_encoding: 'utf-8'
-  };
-  
-  // En lugar de generar PDF (que requiere Puppeteer), guardamos el markdown directamente
-  try {
-    // Copiamos el archivo al directorio principal para que sea accesible
-    fs.copyFileSync('./codigo_fuente_temp.md', './NotaryPro_Manual_Completo_y_Codigo_Fuente.md');
-    console.log('Archivo Markdown generado con éxito: ./NotaryPro_Manual_Completo_y_Codigo_Fuente.md');
-    
-    // Eliminar archivo temporal
-    fs.unlinkSync('./codigo_fuente_temp.md');
-    
-    return true;
-  } catch (error) {
-    console.error('Error al generar el PDF:', error);
-    return false;
-  }
-}
-
-// Ejecutar la función
-generateCodeSourcePDF().then(() => {
-  console.log('Proceso de generación de documentación completado');
-});
