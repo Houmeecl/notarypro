@@ -796,8 +796,12 @@ function Router() {
         return null;
       }} />
       <Route path="/verificacion-avanzada" component={() => {
-        window.location.href = "/verificacion-identidad";
-        return null;
+        const VerificacionAvanzada = React.lazy(() => import("@/pages/verificacion-avanzada"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <VerificacionAvanzada />
+          </Suspense>
+        );
       }} />
       <Route path="/verificacion-integrada" component={() => {
         window.location.href = "/verificacion-identidad";
