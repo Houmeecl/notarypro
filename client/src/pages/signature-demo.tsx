@@ -95,7 +95,7 @@ export default function SignatureDemo() {
                       <Info className="h-4 w-4" />
                       <AlertTitle>Firma electrónica simple</AlertTitle>
                       <AlertDescription>
-                        Permite al usuario registrar su firma manuscrita de forma digital.
+                        Permite al usuario registrar su firma manuscrita de forma digital previa verificación de identidad.
                       </AlertDescription>
                     </Alert>
                     
@@ -143,7 +143,7 @@ export default function SignatureDemo() {
                       <Shield className="h-4 w-4 text-green-600" />
                       <AlertTitle>Firma electrónica avanzada</AlertTitle>
                       <AlertDescription>
-                        Utilizada por certificadores y notarios para validar documentos oficialmente.
+                        Realizada por certificadores utilizando un dispositivo físico eToken de eCert Chile para validar documentos oficialmente.
                       </AlertDescription>
                     </Alert>
                     
@@ -220,16 +220,16 @@ export default function SignatureDemo() {
               <div>
                 <h3 className="font-medium mb-1">Firma electrónica simple</h3>
                 <p className="text-muted-foreground">
-                  Implementada utilizando un canvas para capturar la firma del usuario.
-                  Se almacena como una imagen base64 en la base de datos.
+                  Implementada utilizando un canvas para capturar la firma del usuario con previa verificación de identidad.
+                  Se almacena como una imagen base64 en la base de datos y requiere autenticación del firmante.
                 </p>
               </div>
               <div>
                 <h3 className="font-medium mb-1">Firma electrónica avanzada</h3>
                 <p className="text-muted-foreground">
-                  Además de capturar la firma, incluye validación de identidad mediante
-                  NFC y autorización por parte de un certificador oficial. Cumple con
-                  la Ley 19.799 sobre documentos electrónicos.
+                  Implementada utilizando dispositivos físicos eToken de eCert Chile
+                  por certificadores autorizados. Incluye firma digital certificada y
+                  cumple con la Ley 19.799 sobre documentos electrónicos, otorgando validez legal.
                 </p>
               </div>
               <div>
@@ -317,8 +317,8 @@ export default function SignatureDemo() {
         title={modalType === 'client' ? 'Firma electrónica simple' : 'Firma electrónica avanzada'}
         description={
           modalType === 'client'
-            ? 'Dibuje su firma en el recuadro a continuación. Esta firma se utilizará para validar el documento.'
-            : 'Como certificador, su firma otorga validez legal al documento según la Ley 19.799.'
+            ? 'Dibuje su firma en el recuadro a continuación. Recuerde que para la implementación real se requiere verificación previa de identidad.'
+            : 'Como certificador, utilice su eToken de eCert Chile para firmar digitalmente y otorgar validez legal según la Ley 19.799.'
         }
         signatureType={modalType}
       />
