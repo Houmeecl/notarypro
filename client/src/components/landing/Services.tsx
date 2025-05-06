@@ -2,15 +2,17 @@ import { Check, FileSignature, Shield, GraduationCap, ArrowRight, Store, Video, 
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { useEffect } from "react";
-import { esFuncionalidadRealActiva } from "@/lib/funcionalidad-real";
+import { esFuncionalidadRealActiva, activarFuncionalidadReal } from "@/lib/funcionalidad-real";
 import { Badge } from "@/components/ui/badge";
+import { useRealFuncionality } from "@/hooks/use-real-funcionality";
 
 /**
  * Componente de Servicios con funcionalidad real completa
  * Ofrece servicios genuinos de notarización digital según Ley 19.799
  */
 export default function Services() {
-  const isFunctionalMode = esFuncionalidadRealActiva();
+  // Usar el hook para gestión de funcionalidad real
+  const { isFunctionalMode } = useRealFuncionality(true);
   
   useEffect(() => {
     // Aplicar configuración real al cargar el componente
