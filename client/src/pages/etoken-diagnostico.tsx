@@ -15,6 +15,7 @@ export default function EtokenDiagnostico() {
   const [pin, setPin] = useState<string>("");
   const [requiresPin, setRequiresPin] = useState<boolean>(false);
   const [certificates, setCertificates] = useState<CertificateInfo[]>([]);
+  const [showExtensionDownload, setShowExtensionDownload] = useState<boolean>(false);
   const { toast } = useToast();
 
   const runDiagnostics = async () => {
@@ -35,6 +36,9 @@ export default function EtokenDiagnostico() {
           "➤ Por favor, instale la extensión PKCS#11 para su navegador",
           "➤ Si ya está instalada, verifique que esté habilitada en la configuración de extensiones"
         ]);
+        
+        // Mostramos enlaces para descarga/actualización
+        setShowExtensionDownload(true);
         return;
       }
       
@@ -227,6 +231,84 @@ export default function EtokenDiagnostico() {
                     {line}
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Sección de descarga o actualización de la extensión */}
+          {showExtensionDownload && (
+            <div className="mt-6 border border-indigo-200 rounded-md overflow-hidden">
+              <div className="bg-indigo-100 p-4 border-b border-indigo-200">
+                <h3 className="font-medium text-indigo-900 flex items-center">
+                  <Download className="h-5 w-5 mr-2 text-indigo-700" />
+                  Descargar extensión de firma digital
+                </h3>
+              </div>
+              <div className="p-4 space-y-3">
+                <p className="text-sm text-gray-700">
+                  Para utilizar firma digital avanzada, necesita instalar la extensión PKCS#11 en su navegador:
+                </p>
+                
+                <div className="space-y-3 mt-4">
+                  <div className="border rounded p-3 flex items-center hover:bg-gray-50 transition-colors">
+                    <img src="https://www.google.com/chrome/static/images/chrome-logo.svg" alt="Chrome" className="h-10 w-10 mr-3" />
+                    <div className="flex-grow">
+                      <h4 className="font-medium">Extensión para Google Chrome</h4>
+                      <p className="text-xs text-gray-600">Compatible con Chrome, Edge, Brave y otros navegadores basados en Chromium</p>
+                    </div>
+                    <a 
+                      href="https://chrome.google.com/webstore/detail/pkcs11-bridge/dhecpnmmmkcpmcnkfkoorbnjchkpmlca" 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors inline-flex items-center"
+                    >
+                      <Download className="h-4 w-4 mr-1" />
+                      Descargar
+                    </a>
+                  </div>
+                  
+                  <div className="border rounded p-3 flex items-center hover:bg-gray-50 transition-colors">
+                    <img src="https://www.mozilla.org/media/protocol/img/logos/firefox/browser/logo.eb1324e44442.svg" alt="Firefox" className="h-10 w-10 mr-3" />
+                    <div className="flex-grow">
+                      <h4 className="font-medium">Extensión para Mozilla Firefox</h4>
+                      <p className="text-xs text-gray-600">Para navegadores Firefox</p>
+                    </div>
+                    <a 
+                      href="https://addons.mozilla.org/es/firefox/addon/pkcs11-bridge/" 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors inline-flex items-center"
+                    >
+                      <Download className="h-4 w-4 mr-1" />
+                      Descargar
+                    </a>
+                  </div>
+                  
+                  <div className="border rounded p-3 flex items-center hover:bg-gray-50 transition-colors">
+                    <img src="https://www.apple.com/v/safari/compare/a/images/overview/safari_icon__dqsurhxwmiau_large.svg" alt="Safari" className="h-10 w-10 mr-3" />
+                    <div className="flex-grow">
+                      <h4 className="font-medium">Complemento para Safari</h4>
+                      <p className="text-xs text-gray-600">Para navegadores Safari en macOS</p>
+                    </div>
+                    <a 
+                      href="https://apps.apple.com/cl/app/pkcs11-bridge-safari-extension/id1609071384" 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors inline-flex items-center"
+                    >
+                      <Download className="h-4 w-4 mr-1" />
+                      Descargar
+                    </a>
+                  </div>
+                </div>
+                
+                <Alert className="mt-4 bg-yellow-50 border-yellow-200">
+                  <AlertCircle className="h-4 w-4 text-yellow-600" />
+                  <AlertTitle className="text-yellow-800">Información importante</AlertTitle>
+                  <AlertDescription className="text-yellow-700">
+                    Después de instalar la extensión, reinicie su navegador y vuelva a ejecutar el diagnóstico.
+                  </AlertDescription>
+                </Alert>
               </div>
             </div>
           )}
