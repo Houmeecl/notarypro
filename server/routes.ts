@@ -8,12 +8,13 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { setupAuth, hashPassword } from "./auth";
 import { db } from "./db";
-import { users, partners, auditLogs } from "@shared/schema";
+import { users, partners } from "@shared/schema";
+import { auditLogs } from "./db";
 import { documentForensicsRouter } from "./document-forensics-routes";
 import { identityVerificationRouter } from "./identity-verification-routes";
 import { contractRouter } from "./contract-routes";
 import { mercadoPagoRouter } from "./mercadopago-routes";
-import { ronRouter } from "./ron-routes";
+import ronRouter from "./ron-routes";
 import { tuuPaymentRouter } from "./tuu-payment-routes";
 import { eq } from "drizzle-orm";
 import { documentManagementRouter } from "./document-management-routes";
@@ -22,7 +23,6 @@ import { posManagementRouter } from "./pos-management-routes";
 import { documentSignaturesRouter } from "./routes/document-signatures";
 import { secureDocumentRouter } from "./routes/secure-document-routes";
 import { qrSignatureRouter } from "./vecinos/qr-signature-routes";
-import { biometricRouter } from "./routes/biometric-verification-routes";
 
 // Middleware de autenticación
 function isAuthenticated(req: Request, res: Response, next: any) {
@@ -78,9 +78,6 @@ export function registerRoutes(app: Express): Server {
   // Ruta para el sistema de firma con QR
   app.use("/api/qr-signature", qrSignatureRouter);
   
-  // Ruta para el sistema de verificación biométrica
-  app.use("/api/biometric", biometricRouter);
-  
   // Ruta para servir archivos estáticos (documentos y contratos)
   app.use("/docs", express.static(path.join(process.cwd(), "docs")));
   app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
@@ -121,16 +118,19 @@ app.post('/api/qa/validate-code', isAuthenticated, async (req, res) => {
     const isValid = true;
     
     // Registrar uso del código QA (para auditoría)
-    await db.insert(auditLogs).values({
-      userId: req.user?.id,
-      actionType: 'qa_code_used',
-      details: JSON.stringify({
+    await db.execute(`
+      INSERT INTO audit_logs (user_id, action_type, details, timestamp)
+      VALUES ($1, $2, $3, $4)
+    `, [
+      req.user?.id, 
+      'qa_code_used', 
+      JSON.stringify({
         code,
         userAgent: req.headers['user-agent'],
         ip: req.ip
       }),
-      timestamp: new Date()
-    });
+      new Date()
+    ]);
     
     res.json({
       success: true,
