@@ -40,20 +40,32 @@ export default function RonClientMejorado() {
   
   // Unirse a la sesión con el código proporcionado
   const startSession = async () => {
-    if (!accessCode || !accessCode.startsWith('RON-')) {
+    if (!accessCode) {
       toast({
-        title: 'Código inválido',
-        description: 'Por favor ingresa un código válido (formato: RON-XXXX-XXX)',
+        title: 'Código requerido',
+        description: 'Por favor ingresa un código de sesión RON',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Validar formato del código RON
+    const ronCodeRegex = /^RON-\d{4}-\d{3,}$/;
+    if (!ronCodeRegex.test(accessCode)) {
+      toast({
+        title: 'Formato inválido',
+        description: 'El código debe tener el formato RON-YYYY-NNN (ej: RON-2025-001)',
         variant: 'destructive'
       });
       return;
     }
     
     setLoading(true);
+    console.log('Verificando código RON:', accessCode);
     
     try {
-      // Verificar el código RON con el backend
-      const response = await fetch(`/api/ron/session/${accessCode}`, {
+      // Primero intentar con la API pública (que no requiere autenticación)
+      const response = await fetch(`/api/ron/public/session/${accessCode}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -65,13 +77,26 @@ export default function RonClientMejorado() {
       }
       
       const sessionData = await response.json();
+      
+      if (!sessionData.success) {
+        throw new Error(sessionData.error || 'Error al verificar el código de sesión');
+      }
+      
+      console.log('Sesión RON encontrada:', sessionData);
       setSessionDetails(sessionData);
       setSessionStarted(true);
+      
+      // Mostrar notificación de éxito
+      toast({
+        title: 'Sesión verificada',
+        description: 'Conectando a la sesión RON...',
+      });
       
       // Actualizar la URL para reflejar el código de sesión
       navigate(`/ron-client/${accessCode}`, { replace: true });
       
     } catch (error) {
+      console.error('Error al verificar sesión RON:', error);
       toast({
         title: 'Error al verificar sesión',
         description: (error as Error).message || 'No se pudo verificar el código de sesión',
@@ -85,10 +110,11 @@ export default function RonClientMejorado() {
   // Si tenemos código en los parámetros y aún no hemos iniciado, verificamos automáticamente
   useEffect(() => {
     if (params.code && !sessionStarted && !loading) {
+      console.log('Código RON detectado en URL:', params.code);
       setAccessCode(params.code);
       startSession();
     }
-  }, [params.code]);
+  }, [params.code, sessionStarted, loading]);
   
   // Función para manejar el fin de la sesión
   const handleSessionEnd = () => {
