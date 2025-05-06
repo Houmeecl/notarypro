@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface NfcActivationQrCodeProps {
   onReadComplete?: (data: any) => void;
@@ -165,15 +166,15 @@ const NfcActivationQrCode: React.FC<NfcActivationQrCodeProps> = ({
               </div>
             ) : qrValue ? (
               <div className="flex flex-col items-center">
-                <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-                  {/* En una implementación real, usaríamos un componente como QRCode.react para generar el QR */}
-                  <div className="w-64 h-64 bg-white relative overflow-hidden">
-                    <div className="absolute inset-2 border-2 border-black rounded-lg"></div>
-                    <div className="absolute inset-6 border-8 border-black rounded-lg"></div>
-                    <div className="absolute inset-20 border-4 border-black rounded-lg"></div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <NfcIcon className="h-16 w-16 text-black/50" />
-                    </div>
+                <div className="bg-white p-4 rounded-lg shadow-sm mb-4 relative">
+                  <QRCodeSVG 
+                    value={qrValue}
+                    size={256}
+                    level="H" // Alta corrección de errores
+                    includeMargin={true}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <NfcIcon className="h-16 w-16 text-primary opacity-70" />
                   </div>
                 </div>
                 

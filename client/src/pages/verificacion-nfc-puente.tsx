@@ -89,38 +89,80 @@ const VerificacionNfcPuente: React.FC = () => {
     }
   }, [verificationStep, sessionId]);
   
-  // Simular verificación de resultados (en producción esto sería una llamada a la API)
-  const checkResults = (sessionId: string) => {
+  // En producción esto sería una llamada a la API
+  const checkResults = async (sessionId: string) => {
     console.log('Verificando resultados para sesión:', sessionId);
     
-    // Simulación: después de un tiempo aleatorio, recibimos los datos
-    if (Math.random() > 0.8) { // 20% de probabilidad de recibir datos en cada intento
-      // Simular datos recibidos del NFC
-      const mockNfcData: NfcData = {
-        documentNumber: '12.345.678-9',
-        fullName: 'NOMBRE APELLIDO USUARIO',
-        birthDate: '01/01/1980',
-        expiryDate: '31/12/2028',
-        nationality: 'CHILENA',
-        serialNumber: 'CHL' + Math.random().toString().substring(2, 11),
-        issuer: 'REGISTRO CIVIL E IDENTIFICACIÓN',
-        verified: true,
-        timestamp: new Date().toISOString()
+    try {
+      // Aquí se implementaría la llamada a la API para verificar los resultados
+      // const response = await fetch(`/api/nfc/sessions/${sessionId}`);
+      // if (response.ok) {
+      //   const data = await response.json();
+      //   if (data.status === 'completed') {
+      //     setNfcData(data.nfcData);
+      //     setProgress(100);
+      //     setVerificationStep('complete');
+      //   }
+      // }
+      
+      // Por ahora, para pruebas, generamos una respuesta después de cierto tiempo
+      const mockApiCall = () => {
+        return new Promise<NfcData | null>((resolve) => {
+          // Simular un tiempo de respuesta aleatorio
+          setTimeout(() => {
+            // Solo devolver datos en la tercera llamada o después
+            const currentCount = sessionStorage.getItem(`nfc_attempt_${sessionId}`) || '0';
+            const attemptCount = parseInt(currentCount, 10) + 1;
+            sessionStorage.setItem(`nfc_attempt_${sessionId}`, attemptCount.toString());
+            
+            if (attemptCount >= 3) {
+              // Datos reales de ejemplo - en un entorno de producción vendrían de la API
+              resolve({
+                documentNumber: '12.345.678-9',
+                fullName: 'EDUARDO VENEGAS SOLAR',
+                birthDate: '01/01/1980',
+                expiryDate: '31/12/2028',
+                nationality: 'CHILENA',
+                serialNumber: `CHL${Date.now().toString().substring(8, 13)}`,
+                issuer: 'REGISTRO CIVIL E IDENTIFICACIÓN',
+                verified: true,
+                timestamp: new Date().toISOString()
+              });
+            } else {
+              resolve(null); // Aún no hay datos
+            }
+          }, 800);
+        });
       };
       
-      setNfcData(mockNfcData);
-      setProgress(100);
-      setVerificationStep('complete');
+      const result = await mockApiCall();
       
-      // Limpieza
-      if (pollingInterval) {
-        clearInterval(pollingInterval);
+      if (result) {
+        setNfcData(result);
+        setProgress(100);
+        setVerificationStep('complete');
+        
+        // Limpieza
+        if (pollingInterval) {
+          clearInterval(pollingInterval);
+        }
+        
+        toast({
+          title: 'Verificación completada',
+          description: 'Los datos NFC de la cédula han sido recibidos correctamente.'
+        });
       }
-      
-      toast({
-        title: 'Verificación completada',
-        description: 'Los datos NFC de la cédula han sido recibidos correctamente.'
-      });
+    } catch (error) {
+      console.error('Error al verificar los resultados:', error);
+      // Solo mostrar error después de varios intentos fallidos
+      if (progress > 70) {
+        setError('No se pudo conectar con el servidor para verificar los datos NFC.');
+        setVerificationStep('error');
+        
+        if (pollingInterval) {
+          clearInterval(pollingInterval);
+        }
+      }
     }
   };
   
