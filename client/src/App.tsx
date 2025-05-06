@@ -328,6 +328,16 @@ function Router() {
       <Route path="/certificacion-por-video" component={CertificacionPorVideo} />
       <Route path="/unete-al-equipo" component={UneteAlEquipo} />
       <Route path="/conversor-presencial-online" component={ConversorPresencialOnline} />
+      <Route path="/garantias-legales" component={() => {
+        const GarantiasLegales = React.lazy(() => import("@/pages/garantias-legales"));
+        return (
+          <Suspense fallback={<div className="flex items-center justify-center h-screen">
+            <p className="text-xl">Cargando garantías legales...</p>
+          </div>}>
+            <GarantiasLegales />
+          </Suspense>
+        );
+      }} />
       <Route path="/verificar-documento" component={VerificarDocumento} />
       <Route path="/verificar-documento/:code" component={VerificarDocumento} />
       <Route path="/verificar/:id" component={() => {
