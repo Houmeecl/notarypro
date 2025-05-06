@@ -13,7 +13,7 @@ import ApkDownload from "@/components/landing/ApkDownload";
 import { activarFuncionalidadReal } from "@/lib/funcionalidad-real";
 import { useRealFuncionality } from "@/hooks/use-real-funcionality";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 /**
@@ -43,19 +43,30 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {isFunctionalMode && (
-        <div className="bg-green-50 border-b border-green-100 py-2 px-4">
-          <Alert className="bg-transparent border-0 max-w-6xl mx-auto">
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <AlertTitle className="text-green-800 text-sm font-medium">
-              Sistema en Modo Operativo Real
-            </AlertTitle>
-            <AlertDescription className="text-green-700 text-xs">
-              Todas las funciones y verificaciones operan con validez legal según Ley 19.799
-            </AlertDescription>
-          </Alert>
+      <div className="bg-blue-50 border-b border-blue-100 py-2 px-4">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          {isFunctionalMode && (
+            <Alert className="bg-transparent border-0 flex-grow">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <AlertTitle className="text-green-800 text-sm font-medium">
+                Sistema en Modo Operativo Real
+              </AlertTitle>
+              <AlertDescription className="text-green-700 text-xs">
+                Todas las funciones y verificaciones operan con validez legal según Ley 19.799
+              </AlertDescription>
+            </Alert>
+          )}
+          <a 
+            href="/documentacion-tecnica.html" 
+            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md text-sm transition duration-150 ease-in-out"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            Documentación Técnica
+          </a>
         </div>
-      )}
+      </div>
       
       <Header />
       <Hero />
