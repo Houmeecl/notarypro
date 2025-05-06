@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { partners, users } from '@shared/schema';
 import { eq, and } from 'drizzle-orm';
 import paymentsRouter from './payments-api';
+import { comparePasswords } from '../auth';
 
 const router = express.Router();
 
