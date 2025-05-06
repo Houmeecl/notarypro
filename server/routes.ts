@@ -125,10 +125,11 @@ app.post('/api/qa/validate-code', isAuthenticated, async (req, res) => {
       isValid,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 horas
       permissions: {
-        skipIdentityVerification: true,
-        skipSignatureValidation: true,
-        skipNfcValidation: true,
-        allowAllFunctionality: true
+        skipIdentityVerification: false, // Forzar validaciones en modo real
+        skipSignatureValidation: false, // Forzar validaciones en modo real
+        skipNfcValidation: false, // Forzar validaciones en modo real
+        allowAllFunctionality: true,
+        forceRealMode: true // Forzar modo real
       }
     });
     

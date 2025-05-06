@@ -63,8 +63,8 @@ app.use((req, res, next) => {
   // ALWAYS serve the app on port 5501
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  // Cambiado a puerto 5000 para que coincida con la configuración del workflow de Replit
-  const port = 5000;
+  // Actualizado para evitar conflictos EADDRINUSE
+  const port = 5001;
   server.listen({
     port,
     host: "0.0.0.0",
