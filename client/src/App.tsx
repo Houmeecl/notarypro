@@ -692,6 +692,16 @@ function Router() {
           </Suspense>
         );
       }} />
+      
+      {/* Prueba de integración de Agora React UI Kit */}
+      <Route path="/ron-agora-kit-test/:code?" component={() => {
+        const RonAgoraKitTest = React.lazy(() => import("@/pages/ron-agora-kit-test"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback message="Cargando prueba Agora UI Kit..." />}>
+            <RonAgoraKitTest />
+          </Suspense>
+        );
+      }} />
 
       {/* Ayuda Legal */}
       <ProtectedRoute 

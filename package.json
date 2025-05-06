@@ -58,6 +58,7 @@
     "@types/react-helmet": "^6.1.11",
     "@types/uuid": "^10.0.0",
     "agora-access-token": "^2.0.4",
+    "agora-react-uikit": "^1.2.0",
     "agora-rtc-sdk-ng": "^4.23.3",
     "axios": "^1.9.0",
     "canvas-confetti": "^1.9.3",
