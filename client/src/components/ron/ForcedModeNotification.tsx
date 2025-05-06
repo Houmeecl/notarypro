@@ -40,12 +40,37 @@ const ForcedModeNotification = ({
       break;
     case 'forced':
     default:
-      icon = <Shield className="h-5 w-5 text-indigo-600 mr-2" />;
-      title = "Sistema en MODO FORZADO";
-      description = "Modo de producción activado manualmente con validez legal según Ley 19.799.";
-      alertClass = "bg-indigo-50 border-indigo-200 text-indigo-800";
+      icon = <Shield className="h-5 w-5 text-white mr-2" />;
+      title = "MODO FORZADO ACTIVO";
+      description = "Modo de producción activado manualmente con validez legal según Ley 19.799. Permite continuar con las operaciones incluso con limitaciones técnicas.";
+      alertClass = "bg-gradient-to-r from-indigo-700 to-indigo-900 border-indigo-600 text-white shadow-lg";
   }
 
+  // Para el modo forzado, usamos un diseño especial con más destaque
+  if (mode === 'forced') {
+    return (
+      <Alert className={`mb-4 border-2 ${alertClass}`}>
+        <div className="flex items-center">
+          <div className="bg-indigo-600 rounded-full p-1.5 mr-2">
+            {icon}
+          </div>
+          <span className="font-bold text-lg">{title}</span>
+          
+          <div className="ml-auto bg-indigo-600 text-white text-xs px-2 py-0.5 rounded">
+            ACTIVO
+          </div>
+        </div>
+        
+        {showDetails && (
+          <AlertDescription className="mt-3 ml-1">
+            {description}
+          </AlertDescription>
+        )}
+      </Alert>
+    );
+  }
+  
+  // Para los otros modos, mantenemos el diseño original
   return (
     <Alert className={`mb-4 border ${alertClass}`}>
       <div className="flex items-center">

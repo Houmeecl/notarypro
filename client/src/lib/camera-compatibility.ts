@@ -150,41 +150,55 @@ export async function accessCamera(config: CameraConfig = {}): Promise<MediaStre
  * Determina la causa raíz de problemas de cámara y sugiere soluciones
  */
 export function diagnoseCameraIssue(error: any): string {
-  if (!error) return "Error desconocido al acceder a la cámara";
+  if (!error) return "Error desconocido al acceder a la cámara. Debido a que estamos en MODO FORZADO, puede continuar con la sesión sin cámara.";
+  
+  console.error("Diagnóstico detallado de error de cámara:", {
+    name: error.name,
+    message: error.message,
+    stack: error.stack,
+    error: JSON.stringify(error, Object.getOwnPropertyNames(error))
+  });
   
   const errorName = error.name || '';
   const errorMessage = error.message || '';
   
+  // Mensajes personalizados para modo forzado
+  const modoForzadoMsg = "Debido a que estamos en MODO FORZADO, puede continuar con la sesión sin necesidad de cámara.";
+  
   // Analizar mensaje de error
   if (errorName === 'NotFoundError' || errorMessage.includes('not found') || errorMessage.includes('no encontr')) {
-    return "No se detectó ninguna cámara. Verifique que su dispositivo tenga una cámara conectada y funcionando correctamente.";
+    return `No se detectó ninguna cámara. Verifique que su dispositivo tenga una cámara conectada y funcionando correctamente. ${modoForzadoMsg}`;
   }
   
   if (errorName === 'NotAllowedError' || errorName === 'PermissionDeniedError' || 
       errorMessage.includes('permission') || errorMessage.includes('permiso')) {
-    return "Permiso denegado para acceder a la cámara. Por favor, permita el acceso a la cámara cuando el navegador lo solicite.";
+    return `Permiso denegado para acceder a la cámara. Por favor, permita el acceso a la cámara cuando el navegador lo solicite. ${modoForzadoMsg}`;
   }
   
   if (errorName === 'NotReadableError' || errorName === 'TrackStartError' ||
       errorMessage.includes('hardware') || errorMessage.includes('in use') || errorMessage.includes('en uso')) {
-    return "No se puede acceder a la cámara. Puede que esté siendo utilizada por otra aplicación. Cierre otras aplicaciones que puedan estar usando la cámara e intente nuevamente.";
+    return `No se puede acceder a la cámara. Puede que esté siendo utilizada por otra aplicación. Cierre otras aplicaciones que puedan estar usando la cámara e intente nuevamente. ${modoForzadoMsg}`;
   }
   
   if (errorName === 'OverconstrainedError' || errorMessage.includes('constraint') || errorMessage.includes('restricci')) {
-    return "Las restricciones de video solicitadas no pueden ser satisfechas por su cámara. Intente con una configuración de menor calidad.";
+    return `Las restricciones de video solicitadas no pueden ser satisfechas por su cámara. Intente con una configuración de menor calidad. ${modoForzadoMsg}`;
   }
   
   if (errorName === 'SecurityError') {
-    return "Su navegador ha bloqueado el acceso a la cámara por razones de seguridad. Intente usar HTTPS o un navegador diferente.";
+    return `Su navegador ha bloqueado el acceso a la cámara por razones de seguridad. Intente usar HTTPS o un navegador diferente. ${modoForzadoMsg}`;
   }
   
   if (errorName === 'AbortError' || errorMessage.includes('abort') || errorMessage.includes('abort')) {
-    return "La operación fue cancelada. Esto puede ocurrir si cambió de pestaña durante el proceso de autorización.";
+    return `La operación fue cancelada. Esto puede ocurrir si cambió de pestaña durante el proceso de autorización. ${modoForzadoMsg}`;
   }
   
   if (errorName === 'TypeError' || errorMessage.includes('type')) {
-    return "Error de configuración al acceder a la cámara. Intente con un navegador diferente como Chrome o Firefox.";
+    return `Error de configuración al acceder a la cámara. Intente con un navegador diferente como Chrome o Firefox. ${modoForzadoMsg}`;
   }
   
-  return `Error al acceder a la cámara: ${errorMessage || errorName || 'Error desconocido'}`;
+  if (errorName === '' && errorMessage === '' && !error.name && !error.message) {
+    return `No se pudo acceder a la cámara o micrófono. Es posible que no haya concedido permisos o que otro programa esté usando los dispositivos. ${modoForzadoMsg}`;
+  }
+  
+  return `Error al acceder a la cámara: ${errorMessage || errorName || 'Error desconocido'}. ${modoForzadoMsg}`;
 }

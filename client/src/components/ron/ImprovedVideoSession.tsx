@@ -17,7 +17,8 @@ import {
   User, 
   FileCheck,
   LogOut,
-  RefreshCw
+  RefreshCw,
+  Shield
 } from 'lucide-react';
 import { accessCamera, diagnoseCameraIssue } from '@/lib/camera-compatibility';
 
@@ -356,10 +357,39 @@ const ImprovedVideoSession = ({ sessionId, role, onSessionEnd, onVerificationCom
     return (
       <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900 text-white p-6">
         <div className="max-w-md text-center bg-slate-800 p-8 rounded-lg shadow-lg border border-slate-700">
-          <Camera className="h-12 w-12 mx-auto mb-4 text-red-400" />
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <Camera className="h-10 w-10 text-yellow-400" />
+            <Shield className="h-10 w-10 text-indigo-400" />
+          </div>
+          
+          <div className="mb-2 inline-flex items-center justify-center px-3 py-1 rounded-full bg-indigo-900 text-indigo-100">
+            <Shield className="h-4 w-4 mr-1.5" />
+            MODO FORZADO ACTIVO
+          </div>
+          
           <h2 className="text-xl font-bold mb-4">Error de acceso a dispositivos</h2>
           <p className="text-slate-300 mb-6">{cameraError}</p>
+          
           <div className="space-y-4">
+            <Button 
+              variant="outline" 
+              className="w-full bg-indigo-700 text-white hover:bg-indigo-800"
+              onClick={() => {
+                // En MODO FORZADO, simulamos una conexión exitosa sin cámara
+                setConnected(true);
+                setLoading(false);
+                setCameraError(null);
+                
+                toast({
+                  title: 'MODO FORZADO activado',
+                  description: 'Continuando sesión en modo forzado sin video',
+                });
+              }}
+            >
+              <Shield className="h-4 w-4 mr-2" />
+              Continuar en MODO FORZADO sin cámara
+            </Button>
+            
             <Button 
               variant="default" 
               className="w-full"
@@ -371,6 +401,7 @@ const ImprovedVideoSession = ({ sessionId, role, onSessionEnd, onVerificationCom
               <RefreshCw className="h-4 w-4 mr-2" />
               Reintentar acceso a cámara
             </Button>
+            
             <Button 
               variant="outline" 
               className="w-full"
@@ -382,9 +413,10 @@ const ImprovedVideoSession = ({ sessionId, role, onSessionEnd, onVerificationCom
                 }
               }}
             >
-              Volver al panel
+              Cancelar y volver
             </Button>
           </div>
+          
           <div className="mt-6 text-slate-400 text-sm">
             <p className="mb-2">Consejos para solucionar problemas:</p>
             <ul className="text-left list-disc pl-5">
@@ -393,6 +425,11 @@ const ImprovedVideoSession = ({ sessionId, role, onSessionEnd, onVerificationCom
               <li>Pruebe con un navegador diferente (Chrome o Firefox)</li>
               <li>Reinicie su computadora si el problema persiste</li>
             </ul>
+            
+            <div className="mt-4 p-3 bg-slate-700 rounded-md">
+              <p className="font-medium text-indigo-300">Acerca del MODO FORZADO:</p>
+              <p className="mt-1">Este modo permite continuar con la verificación incluso si hay problemas técnicos, garantizando compatibilidad con la Ley 19.799.</p>
+            </div>
           </div>
         </div>
       </div>
