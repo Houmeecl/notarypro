@@ -210,7 +210,7 @@ export default function RonSession() {
     completeSessionMutation.mutate();
   };
   
-  // Inicialización de sesión de certificación remota
+  // Inicialización de sesión de certificación remota y activación de cámara
   useEffect(() => {
     toast({
       title: "Sesión RON Iniciada",
@@ -219,6 +219,9 @@ export default function RonSession() {
     
     // Notificar inicio de sesión en producción
     console.log('RON iniciado en modo producción');
+    
+    // Iniciar cámara automáticamente
+    startLocalCamera();
     
     // Esperar conexión del otro participante
     setTimeout(() => {
@@ -279,7 +282,11 @@ export default function RonSession() {
       }
       
       const mediaStream = await requestUserMedia({
-        video: true,
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: "user"
+        },
         audio: micEnabled
       });
       
@@ -290,6 +297,7 @@ export default function RonSession() {
       }
       
       setCameraEnabled(true);
+      console.log('✅ Cámara iniciada correctamente para verificación legal');
     } catch (err) {
       console.error('Error al iniciar cámara local:', err);
       setCameraEnabled(false);
@@ -302,52 +310,100 @@ export default function RonSession() {
     }
   };
   
-  // Manejar la verificación de identidad en MODO PRODUCCIÓN
+  // Manejar la verificación de identidad con sistema real
   const handleIdentityVerification = (result: VerificationResult) => {
     setShowIdentityVerification(false);
     setVerificationInProgress(false);
     
-    // En modo producción para QA, siempre completamos la verificación exitosamente
-    // independientemente del resultado real para permitir pruebas completas del flujo
-    updateVerificationStep('biometricCheck', true);
-    
-    // Agregar un mensaje al chat
-    const newSystemMessage = {
-      sender: "system",
-      text: "✓ Verificación de identidad completada correctamente en MODO PRODUCCIÓN",
-      time: new Date().toLocaleTimeString()
-    };
-    
-    setChatMessages([...chatMessages, newSystemMessage]);
-    
-    toast({
-      title: "Verificación exitosa ✓",
-      description: "Identidad verificada correctamente en modo producción para pruebas QA",
-    });
+    // Verificar el resultado real de la verificación biométrica
+    if (result.success) {
+      updateVerificationStep('biometricCheck', true);
+      
+      // Agregar un mensaje al chat
+      const newSystemMessage = {
+        sender: "system",
+        text: "✓ Verificación de identidad completada correctamente",
+        time: new Date().toLocaleTimeString()
+      };
+      
+      setChatMessages([...chatMessages, newSystemMessage]);
+      
+      toast({
+        title: "Verificación exitosa ✓",
+        description: "Identidad verificada correctamente conforme a Ley 19.799",
+      });
+    } else {
+      // En caso de verificación fallida
+      updateVerificationStep('biometricCheck', false);
+      
+      // Agregar un mensaje al chat
+      const newSystemMessage = {
+        sender: "system",
+        text: "❌ Verificación de identidad fallida: " + (result.message || "Error en la verificación"),
+        time: new Date().toLocaleTimeString()
+      };
+      
+      setChatMessages([...chatMessages, newSystemMessage]);
+      
+      toast({
+        title: "Verificación fallida ❌",
+        description: result.message || "No se pudo verificar la identidad. Intente nuevamente.",
+        variant: "destructive",
+      });
+    }
   };
   
-  // Manejar la verificación de documento en MODO PRODUCCIÓN
+  // Manejar la verificación de documento con sistema real
   const handleDocumentVerification = (result: VerificationResult) => {
     setShowDocumentVerification(false);
     setVerificationInProgress(false);
     
-    // En modo producción para QA, siempre completamos la verificación exitosamente
-    // independientemente del resultado real para permitir pruebas completas del flujo
-    updateVerificationStep('documentCheck', true);
-    
-    // Agregar un mensaje al chat
-    const newSystemMessage = {
-      sender: "system",
-      text: "✓ Documento verificado correctamente en MODO PRODUCCIÓN",
-      time: new Date().toLocaleTimeString()
-    };
-    
-    setChatMessages([...chatMessages, newSystemMessage]);
-    
-    toast({
-      title: "Documento verificado ✓",
-      description: "Documento verificado correctamente en modo producción para pruebas QA",
-    });
+    // Verificar el resultado real de la verificación del documento
+    if (result.success) {
+      updateVerificationStep('documentCheck', true);
+      
+      // Agregar un mensaje al chat
+      const newSystemMessage = {
+        sender: "system",
+        text: "✓ Documento verificado correctamente",
+        time: new Date().toLocaleTimeString()
+      };
+      
+      setChatMessages([...chatMessages, newSystemMessage]);
+      
+      toast({
+        title: "Documento verificado ✓",
+        description: "Documento verificado correctamente conforme a Ley 19.799",
+      });
+      
+      // Registrar la verificación en el sistema
+      apiRequest("POST", `/api/ron/sessions/${params.id}/document-verification`, {
+        documentType: result.documentType || "ID",
+        documentNumber: result.documentNumber || "",
+        documentIssuer: result.documentIssuer || "Registro Civil",
+        verified: true
+      }).catch(err => {
+        console.error("Error al registrar verificación de documento:", err);
+      });
+    } else {
+      // En caso de verificación fallida
+      updateVerificationStep('documentCheck', false);
+      
+      // Agregar un mensaje al chat
+      const newSystemMessage = {
+        sender: "system",
+        text: "❌ Verificación de documento fallida: " + (result.message || "Error en la verificación"),
+        time: new Date().toLocaleTimeString()
+      };
+      
+      setChatMessages([...chatMessages, newSystemMessage]);
+      
+      toast({
+        title: "Verificación fallida ❌",
+        description: result.message || "No se pudo verificar el documento. Intente nuevamente.",
+        variant: "destructive",
+      });
+    }
   };
   
   return (
@@ -439,22 +495,21 @@ export default function RonSession() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
             
             {/* Video remoto (ocupa la mayor parte) */}
-            <div 
-              className="w-full h-full bg-cover bg-center"
-              style={{ 
-                backgroundImage: `url('https://images.unsplash.com/photo-1573497161161-c3e73707e25c?q=80&w=1000&auto=format&fit=crop')`,
-                filter: !cameraEnabled ? 'brightness(30%)' : 'none' 
-              }}
+            <video
+              ref={remoteVideoRef}
+              className="w-full h-full object-cover"
+              autoPlay
+              playsInline
             />
             
             {/* Video local (pequeña ventana en esquina) */}
             <div className="absolute bottom-4 right-4 w-48 h-36 bg-gray-800 rounded-lg overflow-hidden border border-gray-700 shadow-lg">
-              <div 
-                className="w-full h-full bg-cover bg-center"
-                style={{ 
-                  backgroundImage: `url('https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=300&auto=format&fit=crop')`,
-                  filter: !cameraEnabled ? 'brightness(30%)' : 'none'
-                }}
+              <video
+                ref={localVideoRef}
+                className="w-full h-full object-cover"
+                autoPlay
+                playsInline
+                muted
               />
               {!cameraEnabled && (
                 <div className="absolute inset-0 flex items-center justify-center">
