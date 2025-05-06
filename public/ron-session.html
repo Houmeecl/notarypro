@@ -280,7 +280,8 @@
       <div class="card-content">
         <div class="form-group">
           <label for="accessCode">Código de acceso RON</label>
-          <input type="text" id="accessCode" placeholder="Ejemplo: RON-12345">
+          <input type="text" id="accessCode" placeholder="Formato: RON-2025-001">
+          <small style="display: block; margin-top: 5px; color: #666;">Ingresa el código proporcionado por tu certificador notarial.</small>
         </div>
         <button id="joinButton" onclick="joinSession()">
           <span id="joinButtonText">Ingresar a la sesión</span>
@@ -421,8 +422,10 @@
     async function joinSession() {
       const accessCodeInput = document.getElementById("accessCode").value.trim();
       
-      if (!accessCodeInput || !accessCodeInput.startsWith("RON-")) {
-        alert("Por favor ingresa un código válido (formato: RON-XXXXX)");
+      // Validar formato real del código RON (formato: RON-YYYY-NNN)
+      const ronCodeRegex = /^RON-\d{4}-\d{3,}$/;
+      if (!accessCodeInput || !ronCodeRegex.test(accessCodeInput)) {
+        alert("Por favor ingresa un código RON válido (formato: RON-YYYY-NNN)");
         return;
       }
       
