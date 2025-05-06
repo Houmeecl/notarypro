@@ -1,0 +1,309 @@
+/**
+ * Componente NfcActivationQrCode
+ * 
+ * Este componente genera un código QR que, al ser escaneado con un dispositivo móvil,
+ * activa la función NFC del teléfono para leer la cédula de identidad.
+ */
+import React, { useState, useEffect } from 'react';
+import { QrCode, Smartphone, NfcIcon, ArrowDown, Share2, Copy, Check, RefreshCw } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+
+interface NfcActivationQrCodeProps {
+  onReadComplete?: (data: any) => void;
+  documentInfo?: {
+    type?: string;
+    number?: string;
+  };
+  sessionId?: string;
+}
+
+const NfcActivationQrCode: React.FC<NfcActivationQrCodeProps> = ({ 
+  onReadComplete,
+  documentInfo,
+  sessionId = 'session-' + Math.random().toString(36).substring(2, 9) 
+}) => {
+  // Estados
+  const [qrValue, setQrValue] = useState<string>('');
+  const [qrUrl, setQrUrl] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<string>('qrcode');
+  const [copied, setCopied] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(true);
+  
+  // Hooks
+  const { toast } = useToast();
+  
+  // Generar datos para el código QR
+  useEffect(() => {
+    generateQrData();
+  }, [documentInfo, sessionId]);
+  
+  // Función para generar datos del QR
+  const generateQrData = () => {
+    setIsGenerating(true);
+    
+    try {
+      // Crear objeto con los datos necesarios para activar NFC en el móvil
+      const qrData = {
+        action: 'read_nfc',
+        type: 'id_card',
+        document_type: documentInfo?.type || 'cedula_identidad',
+        document_number: documentInfo?.number || '',
+        session_id: sessionId,
+        timestamp: new Date().toISOString(),
+        callback_url: `${window.location.origin}/api/nfc/callback`,
+        redirect_url: `${window.location.origin}/verificacion-nfc-qr/success?session=${sessionId}`
+      };
+      
+      // Convertir a JSON para incluir en el QR
+      const qrDataString = JSON.stringify(qrData);
+      setQrValue(qrDataString);
+      
+      // Generar una URL para compartir o abrir directamente
+      // En formato: vecinosxpress://nfc-read?data=BASE64_ENCODED_DATA
+      const encodedData = btoa(qrDataString);
+      const deepLink = `vecinosxpress://nfc-read?data=${encodedData}`;
+      setQrUrl(deepLink);
+      
+      // Simular tiempo de generación
+      setTimeout(() => {
+        setIsGenerating(false);
+      }, 500);
+    } catch (error) {
+      console.error('Error al generar datos QR:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo generar el código QR para activación NFC.',
+        variant: 'destructive'
+      });
+      setIsGenerating(false);
+    }
+  };
+  
+  // Función para copiar la URL al portapapeles
+  const copyUrlToClipboard = () => {
+    if (!qrUrl) return;
+    
+    navigator.clipboard.writeText(qrUrl).then(() => {
+      setCopied(true);
+      toast({
+        title: 'Enlace copiado',
+        description: 'El enlace de activación NFC ha sido copiado al portapapeles.',
+      });
+      
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    }).catch(err => {
+      console.error('Error al copiar al portapapeles:', err);
+      toast({
+        title: 'Error',
+        description: 'No se pudo copiar el enlace al portapapeles.',
+        variant: 'destructive'
+      });
+    });
+  };
+  
+  // Función para compartir la URL (en dispositivos móviles)
+  const shareUrl = () => {
+    if (!qrUrl || !navigator.share) return;
+    
+    navigator.share({
+      title: 'Activar NFC para verificación',
+      text: 'Escanea la cédula de identidad con NFC',
+      url: qrUrl
+    }).then(() => {
+      toast({
+        title: 'Enlace compartido',
+        description: 'El enlace ha sido compartido exitosamente.',
+      });
+    }).catch(err => {
+      if (err.name !== 'AbortError') {
+        console.error('Error al compartir:', err);
+        toast({
+          title: 'Error',
+          description: 'No se pudo compartir el enlace.',
+          variant: 'destructive'
+        });
+      }
+    });
+  };
+  
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <NfcIcon className="h-5 w-5 text-primary" />
+            <CardTitle>Activación NFC</CardTitle>
+          </div>
+          <Badge variant="outline" className="bg-primary/10 text-primary">
+            Paso 1
+          </Badge>
+        </div>
+        <CardDescription>
+          Escanee este código QR con su teléfono para activar el lector NFC
+        </CardDescription>
+      </CardHeader>
+      
+      <CardContent className="space-y-4">
+        <Tabs defaultValue="qrcode" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid grid-cols-2">
+            <TabsTrigger value="qrcode">Código QR</TabsTrigger>
+            <TabsTrigger value="instructions">Instrucciones</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="qrcode" className="space-y-4">
+            {isGenerating ? (
+              <div className="flex flex-col items-center justify-center h-[300px] bg-muted/20 rounded-lg">
+                <RefreshCw className="h-12 w-12 text-muted-foreground animate-spin" />
+                <p className="mt-2 text-sm text-muted-foreground">Generando código QR...</p>
+              </div>
+            ) : qrValue ? (
+              <div className="flex flex-col items-center">
+                <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
+                  {/* En una implementación real, usaríamos un componente como QRCode.react para generar el QR */}
+                  <div className="w-64 h-64 bg-white relative overflow-hidden">
+                    <div className="absolute inset-2 border-2 border-black rounded-lg"></div>
+                    <div className="absolute inset-6 border-8 border-black rounded-lg"></div>
+                    <div className="absolute inset-20 border-4 border-black rounded-lg"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <NfcIcon className="h-16 w-16 text-black/50" />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Escanee este código con la cámara de su teléfono
+                  </p>
+                  <div className="flex items-center justify-center gap-2">
+                    <ArrowDown className="h-4 w-4 text-primary animate-bounce" />
+                    <Smartphone className="h-5 w-5 text-primary" />
+                    <ArrowDown className="h-4 w-4 text-primary animate-bounce" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Se abrirá la aplicación de lectura NFC automáticamente
+                  </p>
+                </div>
+                
+                <div className="flex gap-2 mt-4">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={copyUrlToClipboard}
+                    className="flex items-center gap-1"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="h-4 w-4" />
+                        <span>Copiado</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-4 w-4" />
+                        <span>Copiar enlace</span>
+                      </>
+                    )}
+                  </Button>
+                  
+                  {navigator.share && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={shareUrl}
+                      className="flex items-center gap-1"
+                    >
+                      <Share2 className="h-4 w-4" />
+                      <span>Compartir</span>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <Alert variant="destructive">
+                <QrCode className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>
+                  No se pudo generar el código QR. Por favor, refresque la página e intente nuevamente.
+                </AlertDescription>
+              </Alert>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="instructions" className="space-y-4">
+            <div className="space-y-4 p-2">
+              <h3 className="font-medium text-base">Cómo usar este código QR:</h3>
+              
+              <ol className="space-y-3 ml-5 list-decimal">
+                <li className="text-sm">
+                  <span className="font-medium">Escanee el código QR</span>
+                  <p className="text-muted-foreground">
+                    Abra la cámara de su teléfono y apunte al código QR mostrado en pantalla.
+                  </p>
+                </li>
+                
+                <li className="text-sm">
+                  <span className="font-medium">Permita abrir la aplicación</span>
+                  <p className="text-muted-foreground">
+                    Su teléfono le pedirá permiso para abrir la aplicación NFC o el navegador.
+                  </p>
+                </li>
+                
+                <li className="text-sm">
+                  <span className="font-medium">Active NFC en su teléfono</span>
+                  <p className="text-muted-foreground">
+                    Si no está activado, el sistema le pedirá que active NFC en su dispositivo.
+                  </p>
+                </li>
+                
+                <li className="text-sm">
+                  <span className="font-medium">Acerque su cédula al teléfono</span>
+                  <p className="text-muted-foreground">
+                    Coloque la cédula de identidad en la parte trasera del teléfono para leer el chip NFC.
+                  </p>
+                </li>
+                
+                <li className="text-sm">
+                  <span className="font-medium">Confirme la lectura</span>
+                  <p className="text-muted-foreground">
+                    Una vez leído el chip, el sistema verificará automáticamente la identidad.
+                  </p>
+                </li>
+              </ol>
+              
+              <Alert className="mt-4">
+                <Smartphone className="h-4 w-4" />
+                <AlertTitle>Nota importante</AlertTitle>
+                <AlertDescription>
+                  La ubicación exacta del sensor NFC varía según el modelo de teléfono. 
+                  Generalmente se encuentra en la parte central o superior de la parte trasera.
+                </AlertDescription>
+              </Alert>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+      
+      <CardFooter className="flex justify-between border-t pt-4">
+        <Button 
+          variant="outline" 
+          onClick={() => generateQrData()}
+        >
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Regenerar código
+        </Button>
+        
+        <Button onClick={() => setActiveTab(activeTab === 'qrcode' ? 'instructions' : 'qrcode')}>
+          {activeTab === 'qrcode' ? 'Ver instrucciones' : 'Ver código QR'}
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+};
+
+export default NfcActivationQrCode;

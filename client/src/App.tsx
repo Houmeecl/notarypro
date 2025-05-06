@@ -795,6 +795,22 @@ function Router() {
           </Suspense>
         );
       }} />
+      <Route path="/verificacion-nfc-puente" component={() => {
+        const VerificacionNfcPuente = React.lazy(() => import("@/pages/verificacion-nfc-puente"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <VerificacionNfcPuente />
+          </Suspense>
+        );
+      }} />
+      <Route path="/verificacion-nfc-puente/result/:sessionId" component={() => {
+        const VerificacionNfcPuente = React.lazy(() => import("@/pages/verificacion-nfc-puente"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <VerificacionNfcPuente />
+          </Suspense>
+        );
+      }} />
       <Route path="/verificacion-identidad-qr" component={() => {
         window.location.href = "/verificacion-nfc-qr";
         return null;
