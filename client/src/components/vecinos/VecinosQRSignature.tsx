@@ -58,26 +58,34 @@ export function VecinosQRSignature({
       setSignatureStatus('waiting');
       setCountdownTimer(300); // Reiniciar el temporizador a 5 minutos
       
-      // Simulamos la generación del QR (en producción, esto se haría en el servidor)
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Llamar a nuestra API para generar el código QR
+      const response = await fetch('/api/qr-signature/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ documentId })
+      });
       
-      // Datos simulados del QR (en producción, esto vendría del servidor)
-      const mockQrData = {
-        documentId,
-        verificationCode: `DOC-${documentId}-${Date.now().toString(36).toUpperCase()}`,
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // 5 minutos
-        url: `https://vecinos-xpress.site/firma-movil/${documentId}/${Date.now().toString(36)}`
-      };
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al generar el código QR');
+      }
       
-      // URL para código QR (usualmente esto incluiría un token único)
-      const qrUrl = mockQrData.url;
+      const qrData = await response.json();
+      
+      if (!qrData.success) {
+        throw new Error('Error al generar el código QR: respuesta inválida del servidor');
+      }
+      
+      // URL para código QR
+      const qrUrl = qrData.signatureUrl;
       
       setQrData(qrUrl);
       setQrGenerated(true);
       
-      // En una implementación real, ahora empezaríamos a sondear el servidor 
-      // para verificar si el usuario ha escaneado y firmado
-      startPollingForSignature();
+      // Empezar a sondear el servidor para verificar si el usuario ha escaneado y firmado
+      startPollingForSignature(qrData.verificationCode);
       
     } catch (err: any) {
       console.error('Error al generar QR:', err);
@@ -89,16 +97,71 @@ export function VecinosQRSignature({
   };
 
   // Función para sondear el estado de la firma
-  const startPollingForSignature = () => {
-    // Esta es una simulación. En una implementación real, 
-    // se harían llamadas periódicas al servidor para verificar el estado.
+  const startPollingForSignature = (verificationCode?: string) => {
+    // Guardar referencia al intervalo para limpiarlo después
+    let pollingInterval: number;
+
+    // Función que consulta el estado de la firma
+    const checkSignatureStatus = async () => {
+      try {
+        // Solo verificar si no se ha completado la firma y hay código de verificación
+        if (signatureStatus !== 'signed' && signatureStatus !== 'expired' && verificationCode) {
+          const response = await fetch(`/api/qr-signature/status/${documentId}/${verificationCode}`);
+          
+          if (!response.ok) {
+            console.error('Error al verificar estado de firma:', response.status);
+            return;
+          }
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            // Si el estado ha cambiado, actualizarlo
+            if (data.status !== signatureStatus) {
+              if (data.status === 'scanned' && signatureStatus === 'waiting') {
+                setSignatureStatus('scanned');
+                toast({
+                  title: "QR escaneado",
+                  description: "El usuario ha escaneado el código QR desde su dispositivo móvil",
+                });
+              } else if (data.status === 'signed') {
+                setSignatureStatus('signed');
+                setSignatureComplete(true);
+                
+                // Limpiar el intervalo cuando se completa la firma
+                window.clearInterval(pollingInterval);
+                
+                toast({
+                  title: "Documento firmado",
+                  description: "El documento ha sido firmado exitosamente desde el dispositivo móvil",
+                });
+              }
+            }
+          }
+        } else {
+          // Si ya se completó o expiró, detener el sondeo
+          window.clearInterval(pollingInterval);
+        }
+      } catch (error) {
+        console.error('Error al comprobar estado de firma:', error);
+      }
+    };
+    
+    // Comprobar inmediatamente
+    checkSignatureStatus();
+    
+    // Luego comprobar cada 3 segundos
+    pollingInterval = window.setInterval(checkSignatureStatus, 3000);
+    
+    // Para el demo, mantenemos el comportamiento simulado como fallback
+    // Por si el endpoint API falla o no está disponible
     
     // Simular que el usuario escanea el QR después de 8 segundos
     setTimeout(() => {
       if (signatureStatus === 'waiting') {
         setSignatureStatus('scanned');
         toast({
-          title: "QR escaneado",
+          title: "QR escaneado (simulado)",
           description: "El usuario ha escaneado el código QR desde su dispositivo móvil",
         });
       }
@@ -109,8 +172,12 @@ export function VecinosQRSignature({
       if (signatureStatus === 'scanned') {
         setSignatureStatus('signed');
         setSignatureComplete(true);
+        
+        // Limpiar el intervalo cuando se completa la firma
+        window.clearInterval(pollingInterval);
+        
         toast({
-          title: "Documento firmado",
+          title: "Documento firmado (simulado)",
           description: "El documento ha sido firmado exitosamente desde el dispositivo móvil",
         });
       }

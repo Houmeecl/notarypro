@@ -201,6 +201,7 @@ function Router() {
       <Route path="/document-sign/:id" component={DocumentSign} />
       <Route path="/document-signature/:documentId" component={DocumentSignatureFlowPage} />
       <Route path="/sign-mobile/:token" component={SignMobilePage} />
+      <Route path="/firma-movil/:documentId/:verificationCode" component={React.lazy(() => import("@/pages/firma-movil"))} />
 
       {/* Document routes */}
       <Route path="/document-categories" component={DocumentCategoriesPage} />
