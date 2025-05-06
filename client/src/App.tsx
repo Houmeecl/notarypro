@@ -641,6 +641,22 @@ function Router() {
         component={AyudaLegal} 
         allowedRoles={["lawyer", "certifier", "admin"]} 
       />
+      
+      {/* Estado de Servicios */}
+      <ProtectedRoute 
+        path="/servicios-status" 
+        component={() => {
+          const ServiciosStatus = React.lazy(() => import("@/pages/servicios-status"));
+          return (
+            <Suspense fallback={<div className="flex items-center justify-center h-screen">
+              <p className="text-xl">Cargando estado de servicios...</p>
+            </div>}>
+              <ServiciosStatus />
+            </Suspense>
+          );
+        }}
+        allowedRoles={["admin", "supervisor"]} 
+      />
 
       {/* Integraciones Demo */}
       <Route path="/integraciones-demo" component={IntegracionesDemo} />
