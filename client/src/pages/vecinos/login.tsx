@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Eye, EyeOff, Smartphone, Laptop, CheckSquare } from "lucide-react";
+import { Eye, EyeOff, Laptop, CheckSquare, FileCheck } from "lucide-react";
 import vecinoLogo from "@/assets/vecino-xpress-logo.svg";
 
 import { Button } from "@/components/ui/button";
@@ -25,8 +25,10 @@ const loginSchema = z.object({
 type LoginData = z.infer<typeof loginSchema>;
 
 export default function VecinosLogin() {
+  // Declaración de funciones y estados principales para la interfaz de login notarial
   const [_, setLocation] = useLocation();
   const [showPassword, setShowPassword] = useState(false);
+  // Solo usamos el tab web ya que eliminamos la opción mobile
   const [activeTab, setActiveTab] = useState<string>("web");
 
   // Configurar formulario con React Hook Form
@@ -54,10 +56,10 @@ export default function VecinosLogin() {
         localStorage.setItem("vecinos_token", data.token);
       }
       
-      // Mostrar mensaje de éxito
+      // Mostrar mensaje de éxito con terminología notarial
       toast({
-        title: "Inicio de sesión exitoso",
-        description: "Bienvenido a VecinoXpress",
+        title: "Acceso Autenticado",
+        description: "Bienvenido al Sistema Notarial VecinoXpress",
       });
       
       // Redirigir directamente a la página de selección de documentos para generar QR
@@ -65,8 +67,8 @@ export default function VecinosLogin() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error al iniciar sesión",
-        description: error.message,
+        title: "Error de Autenticación",
+        description: "Credenciales no válidas o acceso denegado. Verifique sus datos e intente nuevamente.",
         variant: "destructive",
       });
     },
@@ -87,18 +89,14 @@ export default function VecinosLogin() {
               <CardTitle className="text-2xl font-bold text-[#2d219b]">VecinoXpress</CardTitle>
             </div>
           </div>
-          <CardDescription className="mt-2">Accede a tu cuenta de socio</CardDescription>
+          <CardDescription className="mt-2">Acceso al Sistema Notarial de Gestión</CardDescription>
         </CardHeader>
 
         <Tabs defaultValue="web" onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-2 mx-6">
-            <TabsTrigger value="web">
+          <TabsList className="grid grid-cols-1 mx-6">
+            <TabsTrigger value="web" className="w-full">
               <Laptop className="h-4 w-4 mr-2" />
-              Acceso Web
-            </TabsTrigger>
-            <TabsTrigger value="mobile">
-              <Smartphone className="h-4 w-4 mr-2" />
-              Acceso App
+              Acceso Notarial
             </TabsTrigger>
           </TabsList>
           
@@ -166,130 +164,22 @@ export default function VecinosLogin() {
                     {loginMutation.isPending ? "Iniciando sesión..." : "Iniciar sesión"}
                   </Button>
                   
-                  {/* Ayuda con credenciales de demostración */}
+                  {/* Información de seguridad */}
                   <div className="bg-[#f2f1ff] border border-[#d8d4ff] rounded-md p-3 mt-4">
-                    <p className="text-sm text-[#2d219b] font-medium">Credenciales de demostración</p>
-                    <div className="grid grid-cols-2 gap-2 mt-2">
-                      <div className="text-xs p-1 bg-white rounded border border-[#d8d4ff]">
-                        <span className="font-medium">Usuario: demopartner</span>
-                        <p className="text-gray-500">Contraseña: password123</p>
-                      </div>
-                      <div className="text-xs p-1 bg-white rounded border border-[#d8d4ff]">
-                        <span className="font-medium">Tienda: Minimarket El Sol</span>
-                        <p className="text-gray-500">Código: LOCAL-XP125</p>
-                      </div>
+                    <div className="flex items-center">
+                      <CheckSquare className="h-4 w-4 text-[#2d219b] mr-2" />
+                      <p className="text-sm text-[#2d219b] font-medium">Aviso de Seguridad</p>
                     </div>
-                    <div className="mt-2 text-xs text-gray-500">
-                      <button
-                        type="button"
-                        className="text-[#2d219b] underline"
-                        onClick={() => {
-                          form.setValue("username", "demopartner");
-                          form.setValue("password", "password123");
-                        }}
-                      >
-                        Autocompletar credenciales de demo
-                      </button>
-                    </div>
+                    <p className="text-xs text-gray-600 mt-2">
+                      Este sistema es de uso exclusivo para personal autorizado de la notaría. Cualquier acceso indebido será registrado y podría acarrear consecuencias legales según la Ley 19.799.
+                    </p>
                   </div>
                 </form>
               </Form>
             </CardContent>
           </TabsContent>
           
-          <TabsContent value="mobile">
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Usuario</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Tu nombre de usuario"
-                            {...field}
-                            disabled={loginMutation.isPending}
-                            className="text-lg h-12"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
 
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Contraseña</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Input
-                              type={showPassword ? "text" : "password"}
-                              placeholder="Tu contraseña"
-                              {...field}
-                              disabled={loginMutation.isPending}
-                              className="text-lg h-12"
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="absolute right-0 top-0 h-full px-3"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? (
-                                <EyeOff className="h-5 w-5" />
-                              ) : (
-                                <Eye className="h-5 w-5" />
-                              )}
-                            </Button>
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <Button
-                    type="submit"
-                    className="w-full bg-[#2d219b] hover:bg-[#231c7c] h-14 text-lg"
-                    disabled={loginMutation.isPending}
-                  >
-                    {loginMutation.isPending ? "Iniciando sesión..." : "Iniciar sesión"}
-                  </Button>
-                  
-                  {/* Ayuda con credenciales de demostración */}
-                  <div className="bg-[#f2f1ff] border border-[#d8d4ff] rounded-md p-3 mt-4">
-                    <p className="text-sm text-[#2d219b] font-medium">Credenciales de demostración</p>
-                    <div className="grid grid-cols-1 gap-2 mt-2">
-                      <div className="text-sm p-2 bg-white rounded border border-[#d8d4ff]">
-                        <div className="font-medium">Usuario: demopartner</div>
-                        <div className="text-gray-500">Contraseña: password123</div>
-                        <div className="text-gray-500 mt-1">Tienda: Minimarket El Sol</div>
-                      </div>
-                    </div>
-                    <div className="mt-2 text-center">
-                      <button
-                        type="button"
-                        className="text-[#2d219b] underline text-sm"
-                        onClick={() => {
-                          form.setValue("username", "demopartner");
-                          form.setValue("password", "password123");
-                        }}
-                      >
-                        Autocompletar credenciales
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </Form>
-            </CardContent>
-          </TabsContent>
         </Tabs>
 
         <CardFooter className="flex flex-col space-y-2 text-center text-sm">
@@ -305,18 +195,9 @@ export default function VecinosLogin() {
               ¿Olvidaste tu contraseña?
             </a>
           </div>
-          <div>
-            ¿No tienes una cuenta?{" "}
-            <a 
-              href="#" 
-              className="text-[#2d219b] hover:underline"
-              onClick={(e) => {
-                e.preventDefault();
-                setLocation("/partners/registration-form");
-              }}
-            >
-              Regístrate aquí
-            </a>
+          <div className="text-xs text-gray-500 mt-2">
+            <FileCheck className="h-4 w-4 inline-block mr-1" />
+            Sistema exclusivo de la Notaría | Versión 2.5.3
           </div>
         </CardFooter>
       </Card>

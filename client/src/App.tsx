@@ -173,8 +173,16 @@ function Router() {
       <Route path="/landing" component={LandingPage} />
       <Route path="/auth" component={AuthPage} />
       
-      {/* Página de prueba para modo real */}
+      {/* Páginas de prueba y verificación del modo real */}
       <Route path="/testing-real-mode" component={TestingRealMode} />
+      <Route path="/verification-mode-status" component={() => {
+        const VerificationModeStatus = React.lazy(() => import("@/pages/verification-mode-status"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <VerificationModeStatus />
+          </Suspense>
+        );
+      }} />
 
       {/* User routes */}
       <ProtectedRoute 
