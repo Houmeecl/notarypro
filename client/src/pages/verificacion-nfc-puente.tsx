@@ -310,7 +310,7 @@ const VerificacionNfcPuente: React.FC = () => {
               <Button 
                 variant="secondary" 
                 className="w-full"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/verificacion-avanzada')}
               >
                 Volver al inicio
               </Button>

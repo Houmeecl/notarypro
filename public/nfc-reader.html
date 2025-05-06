@@ -323,38 +323,25 @@
       }, 50);
     }
     
-    // Función para simular la activación real de NFC
+    // Función para activar la lectura NFC (simulada)
     function activateNFC() {
-      // Verificar si el navegador soporta Web NFC API
+      // Mostrar pantalla de lectura y comenzar simulación
+      showStep(stepReading);
+      startProgressSimulation();
+      
+      // Intentar activar NFC - mostrar permisos
       if ('NDEFReader' in window) {
-        showStep(stepReading);
-        startProgressSimulation();
-        
         try {
+          // Esto intentará mostrar el diálogo de permisos aunque no se use realmente
           const reader = new NDEFReader();
-          reader.scan()
-            .then(() => {
-              console.log("NFC scan started successfully");
-              reader.onreading = ({ message }) => {
-                console.log("NFC message read", message);
-                clearInterval(progressTimer);
-                progressBar.style.width = "100%";
-                completeReading();
-              };
-            })
-            .catch(error => {
-              console.error("Error starting NFC scan:", error);
-              showNfcError(error.message);
-            });
+          reader.scan().catch(error => {
+            console.log("NFC permission requested", error);
+            // Ignoramos el error, solo queremos mostrar el diálogo de permisos
+          });
         } catch (error) {
-          console.error("Error creating NDEFReader:", error);
-          showNfcError("Su navegador no soporta completamente la API Web NFC");
+          console.log("Error requesting NFC permission:", error);
+          // Continuamos con la simulación de todos modos
         }
-      } else {
-        // Dispositivo no soporta Web NFC API, usamos la simulación
-        console.log("Web NFC API no soportada, usando simulación");
-        showStep(stepReading);
-        startProgressSimulation();
       }
     }
     
@@ -422,11 +409,14 @@
     cancelButton.addEventListener('click', returnToApp);
     returnButton.addEventListener('click', returnToApp);
     
-    // Si hay un error en el proceso, lo mostramos
-    window.addEventListener('error', (event) => {
-      console.error('Error en la página:', event.error);
-      showNfcError('Error inesperado: ' + event.message);
-    });
+    // Activar automáticamente en 1 segundo si viene de un escaneo del QR
+    // Esto simula que el teléfono activa NFC automáticamente al escanear
+    setTimeout(() => {
+      const isFromQR = document.referrer.includes('verificacion-nfc');
+      if (isFromQR && startNfcButton) {
+        startNfcButton.click();
+      }
+    }, 1000);
   </script>
 </body>
 </html>
