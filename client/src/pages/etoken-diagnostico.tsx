@@ -251,54 +251,54 @@ export default function EtokenDiagnostico() {
                 
                 <div className="space-y-3 mt-4">
                   <div className="border rounded p-3 flex items-center hover:bg-gray-50 transition-colors">
-                    <img src="https://www.google.com/favicon.ico" alt="Chrome" className="h-10 w-10 mr-3" />
+                    <div className="bg-blue-600 h-10 w-10 mr-3 rounded-full flex items-center justify-center text-white text-xl font-bold">C</div>
                     <div className="flex-grow">
                       <h4 className="font-medium">Extensión para Google Chrome</h4>
                       <p className="text-xs text-gray-600">Compatible con Chrome, Edge, Brave y otros navegadores basados en Chromium</p>
                     </div>
-                    <a 
-                      href="https://firma.digital.gob.cl/descargas/extension_chrome.zip" 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors inline-flex items-center"
+                    <Button 
+                      asChild
+                      className="px-3 py-1 h-auto text-sm bg-indigo-600 hover:bg-indigo-700 transition-colors inline-flex items-center"
                     >
-                      <Download className="h-4 w-4 mr-1" />
-                      Descargar
-                    </a>
+                      <a href="https://ecertchile.cl/descargas/pkcs11/chrome_extension.zip" target="_blank" rel="noopener noreferrer">
+                        <Download className="h-4 w-4 mr-1" />
+                        Descargar
+                      </a>
+                    </Button>
                   </div>
                   
                   <div className="border rounded p-3 flex items-center hover:bg-gray-50 transition-colors">
-                    <img src="https://www.mozilla.org/favicon.ico" alt="Firefox" className="h-10 w-10 mr-3" />
+                    <div className="bg-orange-500 h-10 w-10 mr-3 rounded-full flex items-center justify-center text-white text-xl font-bold">F</div>
                     <div className="flex-grow">
                       <h4 className="font-medium">Extensión para Mozilla Firefox</h4>
                       <p className="text-xs text-gray-600">Para navegadores Firefox</p>
                     </div>
-                    <a 
-                      href="https://firma.digital.gob.cl/descargas/extension_firefox.zip" 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors inline-flex items-center"
+                    <Button 
+                      asChild
+                      className="px-3 py-1 h-auto text-sm bg-indigo-600 hover:bg-indigo-700 transition-colors inline-flex items-center"
                     >
-                      <Download className="h-4 w-4 mr-1" />
-                      Descargar
-                    </a>
+                      <a href="https://ecertchile.cl/descargas/pkcs11/firefox_extension.xpi" target="_blank" rel="noopener noreferrer">
+                        <Download className="h-4 w-4 mr-1" />
+                        Descargar
+                      </a>
+                    </Button>
                   </div>
                   
                   <div className="border rounded p-3 flex items-center hover:bg-gray-50 transition-colors">
-                    <img src="https://www.apple.com/favicon.ico" alt="Safari" className="h-10 w-10 mr-3" />
+                    <div className="bg-gray-800 h-10 w-10 mr-3 rounded-full flex items-center justify-center text-white text-xl font-bold">S</div>
                     <div className="flex-grow">
-                      <h4 className="font-medium">Complemento para Safari</h4>
-                      <p className="text-xs text-gray-600">Para navegadores Safari en macOS</p>
+                      <h4 className="font-medium">Controladores y software del token</h4>
+                      <p className="text-xs text-gray-600">Descargue los controladores necesarios para su dispositivo</p>
                     </div>
-                    <a 
-                      href="https://firma.digital.gob.cl/descargas/extension_safari.zip" 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors inline-flex items-center"
+                    <Button 
+                      asChild
+                      className="px-3 py-1 h-auto text-sm bg-indigo-600 hover:bg-indigo-700 transition-colors inline-flex items-center"
                     >
-                      <Download className="h-4 w-4 mr-1" />
-                      Descargar
-                    </a>
+                      <a href="https://ecertchile.cl/descargas/pkcs11/drivers_etoken.zip" target="_blank" rel="noopener noreferrer">
+                        <Download className="h-4 w-4 mr-1" />
+                        Descargar
+                      </a>
+                    </Button>
                   </div>
                 </div>
                 
