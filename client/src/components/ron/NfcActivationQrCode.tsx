@@ -48,29 +48,16 @@ const NfcActivationQrCode: React.FC<NfcActivationQrCodeProps> = ({
     setIsGenerating(true);
     
     try {
-      // Crear una URL NFC que active directamente la funcionalidad NFC en el teléfono
-      // El esquema web+nfc:// es reconocido por teléfonos con NFC y activa la lectura
-      const nfcScheme = `web+nfc://read?id=${sessionId}&callback=${encodeURIComponent(`${window.location.origin}/verificacion-nfc-puente/result/${sessionId}`)}`;
-      
-      // URL alternativa para navegadores que no soportan el esquema web+nfc://
+      // Usar directamente la URL del lector NFC - mucho más simple y directo
       const webUrl = `${window.location.origin}/nfc-reader.html?id=${sessionId}&callback=${encodeURIComponent(`${window.location.origin}/verificacion-nfc-puente/result/${sessionId}`)}`;
       
-      // Generar un custom URI scheme que funciona en Android
-      const androidNfcUrl = `intent://scan/nfc?sessionId=${sessionId}&returnUrl=${encodeURIComponent(`${window.location.origin}/verificacion-nfc-puente/result/${sessionId}`)}#Intent;scheme=vecinosxpress;package=cl.vecinosxpress.app;end`;
+      // Para el QR usamos la URL directa - más compatible
+      setQrValue(webUrl);
       
-      // Codificar todos los esquemas en un único QR
-      const combinedScheme = JSON.stringify({
-        nfc: nfcScheme,
-        web: webUrl,
-        android: androidNfcUrl,
-        sessionId: sessionId
-      });
-      
-      // Para el QR usamos el esquema combinado (más compatible)
-      setQrValue(combinedScheme);
-      
-      // Para compartir usamos la URL web (más compatible)
+      // Para compartir usamos la misma URL
       setQrUrl(webUrl);
+      
+      console.log("URL del lector NFC:", webUrl);
       
       // Simular tiempo de generación
       setTimeout(() => {
@@ -113,27 +100,37 @@ const NfcActivationQrCode: React.FC<NfcActivationQrCodeProps> = ({
   
   // Función para compartir la URL (en dispositivos móviles)
   const shareUrl = () => {
-    if (!qrUrl || !navigator.share) return;
+    if (!qrUrl) return;
     
-    navigator.share({
-      title: 'Activar NFC para verificación',
-      text: 'Escanea la cédula de identidad con NFC',
-      url: qrUrl
-    }).then(() => {
-      toast({
-        title: 'Enlace compartido',
-        description: 'El enlace ha sido compartido exitosamente.',
-      });
-    }).catch(err => {
-      if (err.name !== 'AbortError') {
-        console.error('Error al compartir:', err);
+    // Si el navegador soporta Web Share API
+    if (navigator.share) {
+      navigator.share({
+        title: 'Activar NFC para verificación',
+        text: 'Escanea la cédula de identidad con NFC',
+        url: qrUrl
+      }).then(() => {
         toast({
-          title: 'Error',
-          description: 'No se pudo compartir el enlace.',
-          variant: 'destructive'
+          title: 'Enlace compartido',
+          description: 'El enlace ha sido compartido exitosamente.',
         });
-      }
-    });
+      }).catch(err => {
+        if (err.name !== 'AbortError') {
+          console.error('Error al compartir:', err);
+          toast({
+            title: 'Error',
+            description: 'No se pudo compartir el enlace.',
+            variant: 'destructive'
+          });
+        }
+      });
+    } else {
+      // Alternativa para navegadores sin Web Share API
+      window.open(qrUrl, '_blank');
+      toast({
+        title: 'NFC Reader abierto',
+        description: 'Se ha abierto el lector NFC en una nueva pestaña.'
+      });
+    }
   };
   
   return (
@@ -214,17 +211,15 @@ const NfcActivationQrCode: React.FC<NfcActivationQrCodeProps> = ({
                     )}
                   </Button>
                   
-                  {navigator.share && (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={shareUrl}
-                      className="flex items-center gap-1"
-                    >
-                      <Share2 className="h-4 w-4" />
-                      <span>Compartir</span>
-                    </Button>
-                  )}
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={shareUrl}
+                    className="flex items-center gap-1"
+                  >
+                    <Share2 className="h-4 w-4" />
+                    <span>Abrir lector NFC</span>
+                  </Button>
                 </div>
               </div>
             ) : (
