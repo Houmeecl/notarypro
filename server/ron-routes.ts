@@ -26,16 +26,63 @@ const isAuthenticated = (req: Request, res: Response, next: Function) => {
   res.status(401).json({ error: 'No autenticado' });
 };
 
-// Middleware para verificar rol de certificador
+// Middleware para verificar rol de certificador o administrador
 const isCertifier = (req: Request, res: Response, next: Function) => {
-  if (req.isAuthenticated() && req.user && req.user.role === 'certifier') {
+  if (req.isAuthenticated() && req.user && (req.user.role === 'certifier' || req.user.role === 'admin')) {
     return next();
   }
-  res.status(403).json({ error: 'Acceso denegado. Se requiere rol de certificador.' });
+  res.status(403).json({ error: 'Acceso denegado. Se requiere rol de certificador o administrador.' });
 };
 
 // Crear router
 const ronRouter = Router();
+
+// Ruta para login RON específico
+ronRouter.post('/login', async (req: Request, res: Response) => {
+  const { username, password } = req.body;
+  
+  if (!username || !password) {
+    return res.status(400).json({ 
+      error: 'Se requieren nombre de usuario y contraseña' 
+    });
+  }
+  
+  try {
+    // Verificar que sea un usuario administrador o certificador
+    const user = await certificationService.authenticateRONUser(username, password);
+    
+    if (!user) {
+      console.log(`RON Login: Autenticación fallida para ${username}`);
+      return res.status(401).json({ 
+        error: 'Credenciales inválidas o usuario sin permisos de RON' 
+      });
+    }
+    
+    // Si es admin, asignar también permisos de certificador
+    if (user.role === 'admin') {
+      console.log(`RON Login: Admin ${username} autenticado con permisos de RON`);
+      return res.status(200).json({
+        success: true, 
+        user: {
+          ...user,
+          canCertify: true
+        }
+      });
+    }
+    
+    // Si es certificador, devolver usuario normal
+    console.log(`RON Login: Certificador ${username} autenticado`);
+    return res.status(200).json({ 
+      success: true, 
+      user 
+    });
+  } catch (error) {
+    console.error('Error en login RON:', error);
+    return res.status(500).json({ 
+      error: 'Error en el servidor durante la autenticación' 
+    });
+  }
+});
 
 // Ruta para verificar configuración y estado de servicios RON
 ronRouter.get('/status', isAuthenticated, async (req: Request, res: Response) => {
