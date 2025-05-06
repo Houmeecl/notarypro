@@ -137,8 +137,10 @@ const LazyVecinosAdminUsersManagement = React.lazy(() => import("@/pages/vecinos
 const LazyVecinosAdminDocumentManager = React.lazy(() => import("@/pages/vecinos/admin/document-manager"));
 const LazyVecinosCertifierValidation = React.lazy(() => import("@/pages/vecinos/certifier-validation"));
 // Ahora utilizamos la página unificada de verificación
-// Ahora usamos verificacion-nfc-fixed en lugar del original
+// Importaciones para componentes con carga diferida
 const LazyVerificacionNFC = React.lazy(() => import("@/pages/verificacion-nfc-fixed"));
+const LazyDocumentoFuncional = React.lazy(() => import("@/pages/documento-funcional"));
+const LazyNotaryProChile = React.lazy(() => import("@/pages/notary-pro-chile"));
 
 function Router() {
   return (
@@ -338,6 +340,19 @@ function Router() {
           </Suspense>
         );
       }} />
+      {/* NUEVAS RUTAS FUNCIONALES - MODO REAL */}
+      <Route path="/documento-funcional" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyDocumentoFuncional />
+        </Suspense>
+      )} />
+      
+      <Route path="/notary-pro-chile" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyNotaryProChile />
+        </Suspense>
+      )} />
+
       <Route path="/verificar-documento" component={VerificarDocumento} />
       <Route path="/verificar-documento/:code" component={VerificarDocumento} />
       <Route path="/verificar/:id" component={() => {

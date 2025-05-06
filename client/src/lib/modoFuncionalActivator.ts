@@ -28,30 +28,30 @@ interface RonConfig {
 }
 
 /**
- * Activa el modo funcional para pruebas QA
- * Este modo permite que todas las verificaciones pasen automáticamente
+ * Activa el modo funcional REAL para sistemas de notarización
+ * Este modo conecta con sistemas reales siguiendo Ley 19.799
  */
 export function activarModoFuncional(): boolean {
   try {
-    // Configuración explícita para modo funcional
+    // Configuración explícita para modo funcional real
     const deviceModeConfig: DeviceModeConfig = {
       mode: 'real',
       demoDeviceIds: [],
       realDeviceIds: ['*'],
       forceDemoParameter: '',
       forceRealParameter: 'real',
-      skipVerification: true,
-      qaMode: true,
-      functionalMode: true
+      skipVerification: false, // No saltamos verificación en modo real
+      qaMode: false, // No es modo QA sino producción
+      functionalMode: true  // Modo funcional pero con verificaciones reales
     };
 
-    // Configuración para RON funcional sin restricciones
+    // Configuración para RON real con validaciones legales
     const ronConfig: RonConfig = {
       enabled: true,
       functionalMode: true,
-      skipIdentityCheck: true,
-      skipDocumentCheck: true,
-      skipSecurityQuestions: true,
+      skipIdentityCheck: false, // Verificaciones reales de identidad
+      skipDocumentCheck: false, // Verificaciones reales de documentos
+      skipSecurityQuestions: false, // Preguntas de seguridad habilitadas
       allowAllOperations: true
     };
 
@@ -61,12 +61,12 @@ export function activarModoFuncional(): boolean {
     // Guardar configuraciones en localStorage
     localStorage.setItem('vx_device_mode_config', JSON.stringify(deviceModeConfig));
     localStorage.setItem('vx_ron_config', JSON.stringify(ronConfig));
-    localStorage.setItem('vx_production_mode', 'functional');
-    localStorage.setItem('vx_skip_verification', 'true');
-    localStorage.setItem('vx_verification_mode', 'functional');
-    localStorage.setItem('vx_nfc_mode', 'functional');
+    localStorage.setItem('vx_production_mode', 'real');
+    localStorage.setItem('vx_skip_verification', 'false');
+    localStorage.setItem('vx_verification_mode', 'real');
+    localStorage.setItem('vx_nfc_mode', 'real');
 
-    // Actualizar configuración remota para modo funcional
+    // Actualizar configuración remota para modo real
     const remoteConfig = localStorage.getItem('remote_config');
     if (remoteConfig) {
       try {
@@ -76,7 +76,7 @@ export function activarModoFuncional(): boolean {
           parsedConfig.payment.functionalMode = true;
         }
         if (parsedConfig.verification) {
-          parsedConfig.verification.skipVerification = true;
+          parsedConfig.verification.skipVerification = false; // Verificación real
           parsedConfig.verification.functionalMode = true;
         }
         if (parsedConfig.ron) {
@@ -88,12 +88,12 @@ export function activarModoFuncional(): boolean {
       }
     }
 
-    console.log('✅ Modo FUNCIONAL activado correctamente');
-    console.log('🔧 Verificaciones internas y RON configurados en modo funcional QA');
+    console.log('✅ Modo FUNCIONAL REAL activado correctamente');
+    console.log('🔒 Verificaciones y validaciones legales habilitadas según Ley 19.799');
     
     return true;
   } catch (error) {
-    console.error('Error al activar modo funcional:', error);
+    console.error('Error al activar modo funcional real:', error);
     return false;
   }
 }
@@ -103,23 +103,27 @@ export function activarModoFuncional(): boolean {
  */
 export function esModoFuncionalActivo(): boolean {
   const modoProduccion = localStorage.getItem('vx_production_mode');
-  const skipVerificacion = localStorage.getItem('vx_skip_verification');
-  
-  return modoProduccion === 'functional' && skipVerificacion === 'true';
+  // En el modo real, verificamos que sea modo real, no si se salta la verificación
+  return modoProduccion === 'real' || modoProduccion === 'functional';
 }
 
 /**
- * Añade parámetros de modo funcional a una URL
+ * Añade parámetros de modo real funcional a una URL
+ * Añade los parámetros necesarios para que la URL funcione con sistemas reales
  */
 export function obtenerUrlModoFuncional(url: string): string {
   try {
     const urlObj = new URL(url);
     urlObj.searchParams.set('functional', 'true');
     urlObj.searchParams.set('real', 'true');
-    urlObj.searchParams.set('qa', 'true');
+    urlObj.searchParams.set('qa', 'false'); // No en modo de pruebas
+    urlObj.searchParams.set('production', 'true'); // En producción real
+    urlObj.searchParams.set('skip_verification', 'false'); // No saltar verificaciones
+    urlObj.searchParams.set('verify_identity', 'true'); // Verificar identidad
+    urlObj.searchParams.set('enforce_legal', 'true'); // Cumplir requisitos legales
     return urlObj.toString();
   } catch (error) {
-    console.error('Error al generar URL de modo funcional:', error);
+    console.error('Error al generar URL de modo funcional real:', error);
     return url;
   }
 }
