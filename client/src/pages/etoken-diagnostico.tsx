@@ -256,15 +256,15 @@ export default function EtokenDiagnostico() {
                       <h4 className="font-medium">Extensión para Google Chrome</h4>
                       <p className="text-xs text-gray-600">Compatible con Chrome, Edge, Brave y otros navegadores basados en Chromium</p>
                     </div>
-                    <Button 
-                      asChild
-                      className="px-3 py-1 h-auto text-sm bg-indigo-600 hover:bg-indigo-700 transition-colors inline-flex items-center"
+                    <a 
+                      href="https://ecertchile.cl/descargas/pkcs11/chrome_extension.zip" 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors inline-flex items-center"
                     >
-                      <a href="https://ecertchile.cl/descargas/pkcs11/chrome_extension.zip" target="_blank" rel="noopener noreferrer">
-                        <Download className="h-4 w-4 mr-1" />
-                        Descargar
-                      </a>
-                    </Button>
+                      <Download className="h-4 w-4 mr-1" />
+                      Descargar
+                    </a>
                   </div>
                   
                   <div className="border rounded p-3 flex items-center hover:bg-gray-50 transition-colors">
@@ -273,15 +273,15 @@ export default function EtokenDiagnostico() {
                       <h4 className="font-medium">Extensión para Mozilla Firefox</h4>
                       <p className="text-xs text-gray-600">Para navegadores Firefox</p>
                     </div>
-                    <Button 
-                      asChild
-                      className="px-3 py-1 h-auto text-sm bg-indigo-600 hover:bg-indigo-700 transition-colors inline-flex items-center"
+                    <a 
+                      href="https://ecertchile.cl/descargas/pkcs11/firefox_extension.xpi" 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors inline-flex items-center"
                     >
-                      <a href="https://ecertchile.cl/descargas/pkcs11/firefox_extension.xpi" target="_blank" rel="noopener noreferrer">
-                        <Download className="h-4 w-4 mr-1" />
-                        Descargar
-                      </a>
-                    </Button>
+                      <Download className="h-4 w-4 mr-1" />
+                      Descargar
+                    </a>
                   </div>
                   
                   <div className="border rounded p-3 flex items-center hover:bg-gray-50 transition-colors">
@@ -290,15 +290,15 @@ export default function EtokenDiagnostico() {
                       <h4 className="font-medium">Controladores y software del token</h4>
                       <p className="text-xs text-gray-600">Descargue los controladores necesarios para su dispositivo</p>
                     </div>
-                    <Button 
-                      asChild
-                      className="px-3 py-1 h-auto text-sm bg-indigo-600 hover:bg-indigo-700 transition-colors inline-flex items-center"
+                    <a 
+                      href="https://ecertchile.cl/descargas/pkcs11/drivers_etoken.zip" 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors inline-flex items-center"
                     >
-                      <a href="https://ecertchile.cl/descargas/pkcs11/drivers_etoken.zip" target="_blank" rel="noopener noreferrer">
-                        <Download className="h-4 w-4 mr-1" />
-                        Descargar
-                      </a>
-                    </Button>
+                      <Download className="h-4 w-4 mr-1" />
+                      Descargar
+                    </a>
                   </div>
                 </div>
                 
