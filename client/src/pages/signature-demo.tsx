@@ -11,11 +11,14 @@ import {
   Copy, 
   Download, 
   AlertCircle, 
-  Info
+  Info,
+  UserCheck
 } from 'lucide-react';
 import SignatureCanvas from '@/components/signatures/SignatureCanvas';
 import SignatureDisplay from '@/components/signatures/SignatureDisplay';
 import SignatureModal from '@/components/signatures/SignatureModal';
+import ETokenSigner from '@/components/signatures/ETokenSigner';
+import VerificacionSimple from '@/components/identity/VerificacionSimple';
 import PageHeader from '@/components/layout/PageHeader';
 import DocumentSignatureSection from '@/components/document/DocumentSignatureSection';
 import { useToast } from '@/hooks/use-toast';
@@ -35,6 +38,28 @@ export default function SignatureDemo() {
   const [certifierSignature, setCertifierSignature] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'client' | 'certifier'>('client');
+  
+  // Estados para los nuevos componentes
+  const [isVerificacionSimpleOpen, setIsVerificacionSimpleOpen] = useState(false);
+  const [isIdentidadVerificada, setIsIdentidadVerificada] = useState(false);
+  const [isETokenSignerOpen, setIsETokenSignerOpen] = useState(false);
+  
+  // Comprobar verificación de identidad antes de permitir firma
+  const verificarAntesDeModalFirma = (type: 'client' | 'certifier') => {
+    setModalType(type);
+    
+    if (type === 'client') {
+      // Para firma simple, verificar identidad primero
+      if (!isIdentidadVerificada) {
+        setIsVerificacionSimpleOpen(true);
+      } else {
+        setIsModalOpen(true);
+      }
+    } else {
+      // Para firma avanzada, abrir directamente el componente de eToken
+      setIsETokenSignerOpen(true);
+    }
+  };
 
   // Simulación de firma completada
   const handleSignatureComplete = (type: 'client' | 'certifier', data: string) => {
@@ -50,7 +75,20 @@ export default function SignatureDemo() {
     }
   };
 
-  // Apertura de modal según tipo
+  // Manejar la verificación de identidad completada
+  const handleVerificacionCompletada = () => {
+    setIsIdentidadVerificada(true);
+    // Abrir automáticamente el modal de firma después de la verificación
+    setIsModalOpen(true);
+  };
+  
+  // Manejar la firma con eToken completada
+  const handleETokenSignatureComplete = (data: string) => {
+    handleSignatureComplete('certifier', data);
+    setIsETokenSignerOpen(false);
+  };
+
+  // Apertura de modal según tipo (versión sin verificación - no se usa directamente ahora)
   const openModal = (type: 'client' | 'certifier') => {
     setModalType(type);
     setIsModalOpen(true);
@@ -60,6 +98,7 @@ export default function SignatureDemo() {
   const resetSignatures = () => {
     setClientSignature(null);
     setCertifierSignature(null);
+    setIsIdentidadVerificada(false);
     toast({
       title: 'Firmas restablecidas',
       description: 'Se han eliminado todas las firmas de demostración.',
@@ -127,11 +166,11 @@ export default function SignatureDemo() {
                         </Button>
                       ) : (
                         <Button 
-                          onClick={() => openModal('client')}
+                          onClick={() => verificarAntesDeModalFirma('client')}
                           className="bg-[#2d219b] hover:bg-[#221a7c]"
                         >
                           <PenTool className="h-4 w-4 mr-2" />
-                          Firmar ahora
+                          {isIdentidadVerificada ? 'Firmar ahora' : 'Verificar y firmar'}
                         </Button>
                       )}
                     </div>
@@ -180,11 +219,11 @@ export default function SignatureDemo() {
                         </Button>
                       ) : (
                         <Button 
-                          onClick={() => openModal('certifier')}
+                          onClick={() => verificarAntesDeModalFirma('certifier')}
                           className="bg-green-600 hover:bg-green-700"
                         >
                           <Shield className="h-4 w-4 mr-2" />
-                          Certificar
+                          Firmar con eToken
                         </Button>
                       )}
                     </div>
@@ -321,6 +360,21 @@ export default function SignatureDemo() {
             : 'Como certificador, utilice su eToken de eCert Chile para firmar digitalmente y otorgar validez legal según la Ley 19.799.'
         }
         signatureType={modalType}
+      />
+      
+      {/* Componente de verificación de identidad simple */}
+      <VerificacionSimple
+        isOpen={isVerificacionSimpleOpen}
+        onClose={() => setIsVerificacionSimpleOpen(false)}
+        onVerificacionCompletada={handleVerificacionCompletada}
+      />
+      
+      {/* Componente de firma con eToken */}
+      <ETokenSigner
+        isOpen={isETokenSignerOpen}
+        onClose={() => setIsETokenSignerOpen(false)}
+        onSignatureComplete={handleETokenSignatureComplete}
+        documentId={mockDocumentData.id}
       />
     </div>
   );
