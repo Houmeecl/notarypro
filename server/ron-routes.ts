@@ -4,7 +4,7 @@
 
 import { Router, Request, Response } from 'express';
 import { agoraService } from './services/agora-service';
-import { helloSignService } from './services/hellosign-service';
+import * as ZohoSignService from './services/zoho-sign-service';
 import { s3StorageService } from './services/s3-storage-service';
 import { certificationService } from './services/certification-service';
 import multer from 'multer';
@@ -86,9 +86,16 @@ ronRouter.post('/login', async (req: Request, res: Response) => {
 
 // Ruta para verificar configuración y estado de servicios RON
 ronRouter.get('/status', isAuthenticated, async (req: Request, res: Response) => {
+  let zohoStatus = false;
+  try {
+    zohoStatus = await ZohoSignService.verifyZohoAuthentication();
+  } catch (e) {
+    console.error('Error al verificar Zoho Sign:', e);
+  }
+  
   const status = {
     video: agoraService.isConfigured(),
-    signature: helloSignService.isConfigured(),
+    signature: zohoStatus,
     storage: s3StorageService.isConfigured()
   };
   
@@ -241,13 +248,31 @@ ronRouter.post(
 ronRouter.get('/signature/:signatureId/status', isAuthenticated, async (req: Request, res: Response) => {
   const { signatureId } = req.params;
   
-  const status = await helloSignService.checkSignatureStatus(signatureId);
-  
-  if (!status) {
-    return res.status(404).json({ error: 'No se encontró información de firma' });
+  try {
+    const status = await ZohoSignService.getSigningRequestStatus(signatureId);
+    
+    if (!status) {
+      return res.status(404).json({ error: 'No se encontró información de firma' });
+    }
+    
+    // Convertir el formato de Zoho Sign al formato esperado por el frontend
+    const convertedStatus = {
+      signatureRequestId: status.request_id,
+      isComplete: status.request_status === 'completed',
+      status: status.request_status,
+      signerStatus: status.actions.map((action: any) => ({
+        email: action.recipient_email,
+        name: action.recipient_name,
+        status: action.action_status
+      })),
+      documentUrl: status.download_url || null
+    };
+    
+    res.json(convertedStatus);
+  } catch (error) {
+    console.error('Error al verificar estado de firma:', error);
+    return res.status(500).json({ error: 'Error al obtener estado de firma' });
   }
-  
-  res.json(status);
 });
 
 // Ruta para generar constancia de certificación

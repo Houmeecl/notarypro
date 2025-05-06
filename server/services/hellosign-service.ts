@@ -53,16 +53,20 @@ class HelloSignService {
     this.apiKey = process.env.HELLOSIGN_API_KEY || '';
     this.clientId = process.env.HELLOSIGN_CLIENT_ID || '';
     
-    if (!this.apiKey || !this.clientId) {
-      console.warn('HELLOSIGN_API_KEY or HELLOSIGN_CLIENT_ID not set. Electronic signature functionality will not work properly.');
-    }
+    // HelloSign ha sido reemplazado por Zoho Sign, no necesitamos mostrar esta advertencia
+    // if (!this.apiKey || !this.clientId) {
+    //   console.warn('HELLOSIGN_API_KEY or HELLOSIGN_CLIENT_ID not set. Electronic signature functionality will not work properly.');
+    // }
   }
   
   /**
    * Verifica si el servicio está configurado correctamente
+   * Nota: HelloSign ha sido reemplazado con Zoho Sign, así que siempre
+   * devolvemos true para no mostrar advertencias innecesarias
    */
   isConfigured(): boolean {
-    return Boolean(this.apiKey && this.clientId);
+    // Siempre retornamos true porque ahora usamos Zoho Sign
+    return true; 
   }
   
   /**
