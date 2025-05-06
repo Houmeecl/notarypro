@@ -288,10 +288,10 @@ export default function EtokenDiagnostico() {
                     <div className="bg-gray-800 h-10 w-10 mr-3 rounded-full flex items-center justify-center text-white text-xl font-bold">D</div>
                     <div className="flex-grow">
                       <h4 className="font-medium">Controladores SafeNet eToken</h4>
-                      <p className="text-xs text-gray-600">Descargue los controladores oficiales de SafeNet para su dispositivo eToken</p>
+                      <p className="text-xs text-gray-600">Descargue los controladores oficiales para su dispositivo eToken</p>
                     </div>
                     <a 
-                      href="https://thalesdocs.com/gphsm/luna/7.4/docs/network/Content/Products/Client/drivers.htm" 
+                      href="https://supportportal.thalesgroup.com/csm?id=kb_article_view&sys_kb_id=3892fb0ddb9324503dbb03c1ca961987" 
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors inline-flex items-center"
