@@ -287,11 +287,11 @@ export default function EtokenDiagnostico() {
                   <div className="border rounded p-3 flex items-center hover:bg-gray-50 transition-colors">
                     <div className="bg-gray-800 h-10 w-10 mr-3 rounded-full flex items-center justify-center text-white text-xl font-bold">D</div>
                     <div className="flex-grow">
-                      <h4 className="font-medium">Controladores SafeNet eToken</h4>
-                      <p className="text-xs text-gray-600">Descargue los controladores oficiales para su dispositivo eToken</p>
+                      <h4 className="font-medium">SafeNet Authentication Client</h4>
+                      <p className="text-xs text-gray-600">Controladores y software esencial para dispositivos eToken</p>
                     </div>
                     <a 
-                      href="https://thalesdocs.com/sas/latest/extern/agents/007-000706-001_SafeNet_Agent_for_TokenValidator_Proxy_3.0.1_Install_Config_Guide_RevB.pdf" 
+                      href="https://download.thalesesecurity.com/download?_ga=2.24517332.337417403.1673970743-1895204286.1673970743&_gl=1*1xmfteu*_ga*MTg5NTIwNDI4Ni4xNjczOTcwNzQz*_ga_PLJ5S4M5FR*MTY3Mzk3MDc0Mi4xLjAuMTY3Mzk3MDc0Mi4wLjAuMA..*_ga_CDHY7NPMWW*MTY3Mzk3MDc0Mi4xLjAuMTY3Mzk3MDc0Mi4wLjAuMA..#/download/get-link?productId=safenet-authentication-client-download-windows" 
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors inline-flex items-center"
