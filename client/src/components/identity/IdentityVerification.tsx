@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Camera, Check, Upload, FileText, User, Scan } from 'lucide-react';
+import { Camera, Scan } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLocation } from 'wouter';
 
@@ -16,7 +16,7 @@ export interface VerificationResult {
   fullName: string;
   documentNumber: string;
   documentType: string;
-  verificationMethod: 'nfc' | 'document' | 'selfie' | 'simulate';
+  verificationMethod: 'nfc' | 'document' | 'selfie';
 }
 
 const IdentityVerification: React.FC<IdentityVerificationProps> = ({
@@ -28,9 +28,6 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
   
-  // Estado para el proceso simulado
-  const [simStep, setSimStep] = useState(0);
-  
   // Función para iniciar verificación NFC
   const startNFCVerification = () => {
     // Redireccionar a la página de verificación NFC
@@ -41,82 +38,6 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
   const startDocumentVerification = () => {
     // Redireccionar a la página de verificación de documento
     setLocation('/verificacion-selfie');
-  };
-  
-  // Función para simular verificación (para fines de demo)
-  const simulateVerification = async () => {
-    setIsVerifying(true);
-    setVerificationError(null);
-    setSimStep(1);
-    
-    try {
-      // Simulamos los pasos de verificación
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setSimStep(2);
-      
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setSimStep(3);
-      
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Datos simulados
-      const verificationData: VerificationResult = {
-        verified: true,
-        fullName: 'Juan Carlos Pérez',
-        documentNumber: '12.345.678-9',
-        documentType: 'Cédula de Identidad',
-        verificationMethod: 'simulate'
-      };
-      
-      onVerificationComplete(verificationData);
-      
-      toast({
-        title: 'Verificación completada',
-        description: 'Identidad verificada exitosamente',
-      });
-      
-    } catch (error) {
-      console.error('Error en la verificación simulada:', error);
-      setVerificationError('Error al realizar la verificación');
-      
-      toast({
-        title: 'Error de verificación',
-        description: 'No se pudo completar el proceso',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsVerifying(false);
-      setSimStep(0);
-    }
-  };
-  
-  // Renderizado de los pasos simulados
-  const renderSimulationStep = () => {
-    switch (simStep) {
-      case 1:
-        return (
-          <div className="flex flex-col items-center">
-            <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mb-4" />
-            <p>Escaneando documento...</p>
-          </div>
-        );
-      case 2:
-        return (
-          <div className="flex flex-col items-center">
-            <FileText className="w-8 h-8 text-blue-600 mb-4" />
-            <p>Validando información...</p>
-          </div>
-        );
-      case 3:
-        return (
-          <div className="flex flex-col items-center">
-            <User className="w-8 h-8 text-blue-600 mb-4" />
-            <p>Verificando identidad...</p>
-          </div>
-        );
-      default:
-        return null;
-    }
   };
   
   return (
@@ -133,7 +54,8 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
         
         {isVerifying ? (
           <div className="py-6 text-center">
-            {renderSimulationStep()}
+            <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mb-4" />
+            <p>Verificando...</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -154,17 +76,6 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
               <Camera className="mr-2 h-4 w-4" />
               Verificar con foto del documento
             </Button>
-            
-            {/* En modo simple ofrecemos opción rápida simulada */}
-            {mode === 'simple' && (
-              <Button 
-                className="w-full justify-start"
-                onClick={simulateVerification}
-              >
-                <Check className="mr-2 h-4 w-4" />
-                Verificación rápida (Simulada)
-              </Button>
-            )}
           </div>
         )}
       </CardContent>
