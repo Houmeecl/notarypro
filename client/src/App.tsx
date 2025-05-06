@@ -47,6 +47,7 @@ import CursoCertificador from "@/pages/curso-certificador";
 // Importamos la versión más nueva/actualizada de VecinosExpress
 // Importamos la App web de VecinosExpress 
 import VecinosExpress from "@/pages/vecinos-express";
+import VecinosSignDocument from "@/pages/vecinos-sign-document";
 import PartnerApplications from "@/pages/admin/partner-applications";
 import ServiceSelectionPage from "@/pages/service-selection";
 import RonVideocall from "@/pages/ron-videocall";
@@ -161,6 +162,7 @@ function Router() {
       <Route path="/acceso-directo" component={AccesoDirecto} />
       {/* VecinosExpress - Versión consolidada */}
       <Route path="/vecinos-express" component={VecinosExpress} />
+      <Route path="/vecinos-sign-document/:documentId?" component={VecinosSignDocument} />
       <Route path="/vecinos-express-new" component={() => {
         window.location.href = "/vecinos-express";
         return null;
