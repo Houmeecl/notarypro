@@ -3,10 +3,11 @@ import { useParams, useLocation } from 'wouter';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { FileText, Video, FileSignature, CheckCircle, ArrowLeft } from 'lucide-react';
+import { FileText, Video, FileSignature, CheckCircle, ArrowLeft, QrCode, Smartphone } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { VecinosETokenSignature } from '../components/vecinos/VecinosETokenSignature';
 import { VecinosRonVideoVerification } from '../components/vecinos/VecinosRonVideoVerification';
+import { VecinosQRSignature } from '../components/vecinos/VecinosQRSignature';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
 
 export default function VecinosCompleteVerificationPage() {
@@ -14,8 +15,8 @@ export default function VecinosCompleteVerificationPage() {
   const params = useParams();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [processStep, setProcessStep] = useState<'select' | 'sign' | 'verify' | 'complete'>('select');
-  const [verificationMethod, setVerificationMethod] = useState<'etoken' | 'video'>('etoken');
+  const [processStep, setProcessStep] = useState<'select' | 'sign' | 'verify' | 'qrsign' | 'complete'>('select');
+  const [verificationMethod, setVerificationMethod] = useState<'etoken' | 'video' | 'qr'>('etoken');
   const [document, setDocument] = useState<any>({
     id: parseInt(params.documentId || '1'),
     title: "Contrato de Prestación de Servicios",
@@ -31,16 +32,22 @@ export default function VecinosCompleteVerificationPage() {
   });
 
   const handleGoBack = () => {
-    if (processStep === 'sign' || processStep === 'verify') {
+    if (processStep === 'sign' || processStep === 'verify' || processStep === 'qrsign') {
       setProcessStep('select');
     } else {
       navigate('/vecinos-express');
     }
   };
 
-  const handleMethodSelection = (method: 'etoken' | 'video') => {
+  const handleMethodSelection = (method: 'etoken' | 'video' | 'qr') => {
     setVerificationMethod(method);
-    setProcessStep(method === 'etoken' ? 'sign' : 'verify');
+    if (method === 'etoken') {
+      setProcessStep('sign');
+    } else if (method === 'video') {
+      setProcessStep('verify');
+    } else if (method === 'qr') {
+      setProcessStep('qrsign');
+    }
   };
 
   const handleSignatureSuccess = (signatureData: any) => {
@@ -80,7 +87,9 @@ export default function VecinosCompleteVerificationPage() {
               <h2 className="text-2xl font-bold mb-2">¡Proceso completado!</h2>
               <p className="text-gray-600 mb-6">
                 {verificationMethod === 'etoken' 
-                  ? 'El documento ha sido firmado electrónicamente de manera exitosa.' 
+                  ? 'El documento ha sido firmado electrónicamente de manera exitosa con eToken.' 
+                  : verificationMethod === 'qr'
+                  ? 'El documento ha sido firmado electrónicamente desde un dispositivo móvil.'
                   : 'La verificación por video ha sido registrada correctamente.'}
               </p>
               <Alert className="mb-4 text-left">
@@ -137,6 +146,24 @@ export default function VecinosCompleteVerificationPage() {
       </div>
     );
   }
+  
+  if (processStep === 'qrsign') {
+    return (
+      <div className="container mx-auto mt-8 px-4 max-w-3xl">
+        <Button onClick={handleGoBack} variant="outline" className="mb-6">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Volver
+        </Button>
+        
+        <VecinosQRSignature 
+          documentId={document.id} 
+          documentName={document.title}
+          onSuccess={handleSignatureSuccess}
+          onCancel={handleGoBack}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto mt-8 px-4 max-w-3xl">
@@ -187,10 +214,10 @@ export default function VecinosCompleteVerificationPage() {
           </div>
           
           <h3 className="text-base font-medium mb-3">Seleccione el método de verificación:</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <Card className="overflow-hidden border-2 hover:border-indigo-500 cursor-pointer transition-all" onClick={() => handleMethodSelection('etoken')}>
               <CardHeader className="bg-indigo-50 pb-2">
-                <CardTitle className="flex items-center gap-2 text-indigo-800">
+                <CardTitle className="flex items-center gap-2 text-indigo-800 text-sm md:text-base">
                   <FileSignature className="h-5 w-5" />
                   Firma con eToken
                 </CardTitle>
@@ -215,9 +242,36 @@ export default function VecinosCompleteVerificationPage() {
               </CardContent>
             </Card>
             
+            <Card className="overflow-hidden border-2 hover:border-cyan-500 cursor-pointer transition-all" onClick={() => handleMethodSelection('qr')}>
+              <CardHeader className="bg-cyan-50 pb-2">
+                <CardTitle className="flex items-center gap-2 text-cyan-800 text-sm md:text-base">
+                  <QrCode className="h-5 w-5" />
+                  Firma por QR Móvil
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-3">
+                <p className="text-sm text-gray-600">
+                  Genere un código QR para que el cliente pueda firmar el documento desde su celular. Ideal cuando el firmante está en otra ubicación.
+                </p>
+                <div className="mt-3 flex justify-end">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="border-cyan-200 hover:bg-cyan-50"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMethodSelection('qr');
+                    }}
+                  >
+                    Seleccionar
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            
             <Card className="overflow-hidden border-2 hover:border-purple-500 cursor-pointer transition-all" onClick={() => handleMethodSelection('video')}>
               <CardHeader className="bg-purple-50 pb-2">
-                <CardTitle className="flex items-center gap-2 text-purple-800">
+                <CardTitle className="flex items-center gap-2 text-purple-800 text-sm md:text-base">
                   <Video className="h-5 w-5" />
                   Verificación por video
                 </CardTitle>
