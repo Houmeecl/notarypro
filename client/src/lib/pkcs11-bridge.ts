@@ -46,8 +46,8 @@ export async function checkExtensionAvailability(): Promise<boolean> {
     if (window.firmaDigitalChile) {
       try {
         window.firmaDigitalChile.isAvailable()
-          .then((available) => resolve(available))
-          .catch((error) => {
+          .then((available: boolean) => resolve(available))
+          .catch((error: any) => {
             console.error("Error al verificar disponibilidad de extensión:", error);
             resolve(false);
           });
