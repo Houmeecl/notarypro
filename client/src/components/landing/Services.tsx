@@ -85,10 +85,16 @@ export default function Services() {
                   <span className="text-gray-600 text-sm">Múltiples firmantes</span>
                 </li>
               </ul>
-              <Link href="/service-selection" className="text-primary font-medium hover:text-red-700 transition-colors duration-150 inline-flex items-center">
-                Seleccionar documento
+              <Link href="/notariza-funcional" className="text-primary font-medium hover:text-red-700 transition-colors duration-150 inline-flex items-center">
+                Firmar documento
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
+              {isFunctionalMode && (
+                <Badge className="mt-2 bg-green-100 text-green-800 hover:bg-green-200">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Validez Legal Real
+                </Badge>
+              )}
             </div>
           </motion.div>
 
@@ -129,10 +135,16 @@ export default function Services() {
                   <span className="text-gray-600 text-sm">Validez legal completa</span>
                 </li>
               </ul>
-              <Link href="/service-selection" className="text-blue-500 font-medium hover:text-blue-700 transition-colors duration-150 inline-flex items-center">
-                Seleccionar documento
+              <Link href="/firma-legal" className="text-blue-500 font-medium hover:text-blue-700 transition-colors duration-150 inline-flex items-center">
+                Firmar con validación
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
+              {isFunctionalMode && (
+                <Badge className="mt-2 bg-blue-100 text-blue-800 hover:bg-blue-200">
+                  <Shield className="h-3 w-3 mr-1" />
+                  Certificación Oficial
+                </Badge>
+              )}
             </div>
           </motion.div>
 

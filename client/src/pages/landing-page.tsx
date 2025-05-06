@@ -11,7 +11,7 @@ import Footer from "@/components/landing/Footer";
 import RonService from "@/components/landing/RonService";
 import ApkDownload from "@/components/landing/ApkDownload";
 import { activarFuncionalidadReal } from "@/lib/funcionalidad-real";
-import useRealFunctionality from "@/hooks/use-real-funcionality";
+import { useRealFuncionality } from "@/hooks/use-real-funcionality";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -21,7 +21,7 @@ import { useToast } from "@/hooks/use-toast";
  * Cumple con todas las normativas de la Ley 19.799 para servicios digitales
  */
 export default function LandingPage() {
-  const { isRealMode } = useRealFunctionality();
+  const { isFunctionalMode } = useRealFuncionality(true, false);
   const { toast } = useToast();
 
   // Activar funcionalidad real al cargar la página principal
@@ -43,7 +43,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {isRealMode && (
+      {isFunctionalMode && (
         <div className="bg-green-50 border-b border-green-100 py-2 px-4">
           <Alert className="bg-transparent border-0 max-w-6xl mx-auto">
             <CheckCircle className="h-4 w-4 text-green-600" />

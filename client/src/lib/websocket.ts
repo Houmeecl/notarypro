@@ -32,7 +32,8 @@ class WebSocketService {
 
     try {
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-      const wsUrl = `${protocol}//${window.location.host}/ws`;
+      // Aseguramos usar un path único para evitar conflictos con el HMR de Vite en Replit
+      const wsUrl = `${protocol}//${window.location.host}/api/websocket`;
       
       console.log("Intentando conectar a WebSocket:", wsUrl);
       
@@ -40,7 +41,7 @@ class WebSocketService {
       const connectionTimeout = setTimeout(() => {
         console.log("Timeout al conectar WebSocket - continuando sin él");
         this.disableConnection();
-      }, 3000);
+      }, 5000);
       
       this.socket = new WebSocket(wsUrl);
 

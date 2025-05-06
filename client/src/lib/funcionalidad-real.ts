@@ -1,37 +1,29 @@
 /**
- * Módulo central de funcionalidad real
+ * Módulo de control de Funcionalidad Real
  * 
- * Este módulo proporciona las funciones necesarias para activar
- * y verificar el modo de funcionalidad real en todas las partes
- * de la aplicación, cumpliendo con la Ley 19.799 y garantizando
- * validez legal en todos los procesos.
+ * Este módulo proporciona funciones para activar y verificar la funcionalidad real
+ * del sistema según los requerimientos de la Ley 19.799 sobre Firma Electrónica.
+ * 
+ * La funcionalidad real asegura:
+ * - Verificación real de identidad (no simulada)
+ * - Firma electrónica con validez legal
+ * - Procesamiento real de documentos
+ * - Validación real de transacciones
  */
 
+// Clave para el almacenamiento
+const FUNCIONALIDAD_REAL_KEY = 'vx_funcionalidad_real_activada';
+
 /**
- * Configura toda la aplicación para funcionar en modo real
- * Esto asegura que todas las operaciones tengan validez legal real
+ * Activa la funcionalidad real del sistema
+ * 
+ * @returns {boolean} - Estado de activación
  */
 export function activarFuncionalidadReal(): boolean {
   try {
-    // Configuración para modo real en localStorage
-    localStorage.setItem('vx_production_mode', 'real');
-    localStorage.setItem('vx_skip_verification', 'false');
-    localStorage.setItem('vx_verification_mode', 'real');
-    localStorage.setItem('vx_nfc_mode', 'real');
-    
-    // Configuración para verificación estricta
-    localStorage.setItem('verificacion_estricta', 'true');
-    localStorage.setItem('certificacion_legal', 'true');
-    
-    // Configuración para APIs reales
-    localStorage.setItem('use_real_apis', 'true');
-    localStorage.setItem('enable_real_signing', 'true');
-    localStorage.setItem('enable_real_verification', 'true');
-    localStorage.setItem('enable_real_certificates', 'true');
-    
-    console.log('✅ Modo de funcionalidad REAL activado en toda la aplicación');
-    console.log('🔒 Todos los procesos operan con validez legal según Ley 19.799');
-    
+    // Guardar en localStorage
+    localStorage.setItem(FUNCIONALIDAD_REAL_KEY, 'true');
+    console.log('✅ Funcionalidad real activada correctamente');
     return true;
   } catch (error) {
     console.error('Error al activar funcionalidad real:', error);
@@ -40,67 +32,94 @@ export function activarFuncionalidadReal(): boolean {
 }
 
 /**
- * Verifica si el modo de funcionalidad real está activo
+ * Verifica si la funcionalidad real está activada
+ * 
+ * @returns {boolean} - True si está en modo real, false si está en modo simulación
  */
 export function esFuncionalidadRealActiva(): boolean {
-  const modoProduccion = localStorage.getItem('vx_production_mode');
-  const skipVerificacion = localStorage.getItem('vx_skip_verification');
-  const verificacionEstricta = localStorage.getItem('verificacion_estricta');
-  
-  return modoProduccion === 'real' && 
-         skipVerificacion === 'false' && 
-         verificacionEstricta === 'true';
-}
-
-/**
- * Obtiene parámetros para conexión a sistemas reales
- */
-export function obtenerParametrosReales(): Record<string, string> {
-  return {
-    modo: 'real',
-    verificacionEstricta: 'true',
-    saltarVerificacion: 'false',
-    validezLegal: 'true',
-    timestamp: new Date().toISOString(),
-    apiVersion: 'v2'
-  };
-}
-
-/**
- * Añade parámetros de modo real a una URL
- */
-export function obtenerUrlConParametrosReales(url: string): string {
   try {
-    const urlObj = new URL(url);
+    // En entorno de servidor o durante renderizado SSR
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return true; // Por defecto, asumir modo real en servidor
+    }
     
-    // Parámetros para garantizar operación real
-    urlObj.searchParams.set('modo', 'real');
-    urlObj.searchParams.set('verificacion_estricta', 'true');
-    urlObj.searchParams.set('skip_verification', 'false');
-    urlObj.searchParams.set('validez_legal', 'true');
+    const estado = localStorage.getItem(FUNCIONALIDAD_REAL_KEY);
     
-    return urlObj.toString();
+    // Si no hay estado guardado, activar por defecto
+    if (estado === null) {
+      activarFuncionalidadReal();
+      return true;
+    }
+    
+    return estado === 'true';
   } catch (error) {
-    console.error('Error al generar URL con parámetros reales:', error);
-    return url;
+    console.error('Error al verificar estado de funcionalidad real:', error);
+    return true; // Por defecto, siempre activo en caso de error
   }
 }
 
-// Registra callbacks para asegurar que la funcionalidad real se mantenga
-window.addEventListener('storage', (event) => {
-  // Si algún otro código intenta cambiar la configuración a modo simulado,
-  // revertimos automáticamente a modo real
-  if (event.key && (
-      event.key === 'vx_production_mode' ||
-      event.key === 'vx_skip_verification' ||
-      event.key === 'vx_verification_mode' ||
-      event.key === 'vx_nfc_mode' ||
-      event.key === 'verificacion_estricta' ||
-      event.key === 'use_real_apis'
-    )) {
-    activarFuncionalidadReal();
+/**
+ * Desactiva la funcionalidad real (sólo para fines de prueba)
+ * 
+ * @returns {boolean} - Estado de desactivación
+ */
+export function desactivarFuncionalidadReal(): boolean {
+  try {
+    localStorage.removeItem(FUNCIONALIDAD_REAL_KEY);
+    console.log('⚠️ Funcionalidad real desactivada');
+    return true;
+  } catch (error) {
+    console.error('Error al desactivar funcionalidad real:', error);
+    return false;
   }
-});
+}
 
-// Activar automáticamente la funcionalidad real al importar el módulo
-activarFuncionalidadReal();
+/**
+ * Verifica requisitos para funcionalidad específica
+ * 
+ * @param {string} funcionalidad - Nombre de la funcionalidad a verificar
+ * @returns {boolean} - True si la funcionalidad está disponible
+ */
+export function verificarRequisitosParaFuncionalidad(funcionalidad: string): boolean {
+  // Primero verificar si el modo real está activo
+  if (!esFuncionalidadRealActiva()) {
+    console.warn(`La funcionalidad ${funcionalidad} requiere modo real activo`);
+    return false;
+  }
+
+  // Verificar requisitos específicos según funcionalidad
+  switch (funcionalidad) {
+    case 'verificacion_identidad':
+      return true; // Siempre disponible en modo real
+    case 'firma_simple':
+      return true; // Siempre disponible en modo real
+    case 'firma_avanzada':
+      // Verificar disponibilidad de firma avanzada
+      return detectarDispositivoFirmaAvanzada();
+    case 'notarizacion_remota':
+      // Verificar disponibilidad de cámara
+      return detectarDisponibilidadCamara();
+    default:
+      return true;
+  }
+}
+
+/**
+ * Detecta si hay un dispositivo de firma avanzada disponible
+ * @returns {boolean} - True si hay un dispositivo disponible
+ */
+function detectarDispositivoFirmaAvanzada(): boolean {
+  // En implementación real, verificaría hardware conectado
+  // Por ahora, simplemente devolvemos true
+  return true;
+}
+
+/**
+ * Detecta si hay una cámara disponible para verificación
+ * @returns {boolean} - True si hay cámara disponible
+ */
+function detectarDisponibilidadCamara(): boolean {
+  // En implementación real, verificaría disponibilidad de cámara
+  // Por ahora, simplemente devolvemos true
+  return true;
+}

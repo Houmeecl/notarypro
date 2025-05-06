@@ -70,7 +70,8 @@ export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
 
   // Configura WebSocket en una ruta específica
-  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+  // Usar una ruta diferente para evitar conflictos con HMR de Vite
+  const wss = new WebSocketServer({ server: httpServer, path: '/api/websocket' });
 
   wss.on('connection', (ws) => {
     console.log('Nueva conexión WebSocket establecida');

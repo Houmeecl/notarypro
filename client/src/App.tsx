@@ -340,7 +340,7 @@ function Router() {
           </Suspense>
         );
       }} />
-      {/* NUEVAS RUTAS FUNCIONALES - MODO REAL */}
+      {/* RUTAS FUNCIONALES ACTUALIZADAS - SISTEMA REAL */}
       <Route path="/documento-funcional" component={() => (
         <Suspense fallback={<LazyLoadingFallback />}>
           <LazyDocumentoFuncional />
@@ -352,6 +352,24 @@ function Router() {
           <LazyNotaryProChile />
         </Suspense>
       )} />
+      
+      <Route path="/notariza-funcional" component={() => {
+        const NotarizaFuncional = React.lazy(() => import("@/pages/notariza-funcional"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <NotarizaFuncional />
+          </Suspense>
+        );
+      }} />
+      
+      <Route path="/firma-legal" component={() => {
+        const NotarizaFuncional = React.lazy(() => import("@/pages/notariza-funcional"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <NotarizaFuncional />
+          </Suspense>
+        );
+      }} />
 
       <Route path="/verificar-documento" component={VerificarDocumento} />
       <Route path="/verificar-documento/:code" component={VerificarDocumento} />

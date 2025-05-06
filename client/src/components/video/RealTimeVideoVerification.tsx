@@ -41,7 +41,7 @@ import {
   MediaDeviceInfo
 } from '@/lib/camera-access';
 import { esFuncionalidadRealActiva } from '@/lib/funcionalidad-real';
-import { useRealFunctionality } from '@/hooks/use-real-funcionality';
+import { useRealFuncionality } from '@/hooks/use-real-funcionality';
 import { Badge } from '@/components/ui/badge';
 
 export interface VerificationResult {
@@ -97,7 +97,7 @@ export function RealTimeVideoVerification({
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
   
   const { toast } = useToast();
-  const { isRealMode } = useRealFunctionality();
+  const { isFunctionalMode } = useRealFuncionality();
 
   // Inicialización del componente con modo real activado
   useEffect(() => {
@@ -105,7 +105,7 @@ export function RealTimeVideoVerification({
       initializeCamera();
     }
     
-    if (isRealMode) {
+    if (isFunctionalMode) {
       console.log("✅ Componente de verificación video iniciado en MODO REAL");
     }
     
@@ -114,7 +114,7 @@ export function RealTimeVideoVerification({
       if (stream) stopMediaStream(stream);
       if (verificationTimeout.current) clearTimeout(verificationTimeout.current);
     };
-  }, [autoStart, isRealMode]);
+  }, [autoStart, isFunctionalMode]);
 
   // Inicializa la cámara y solicita permisos
   const initializeCamera = async () => {
