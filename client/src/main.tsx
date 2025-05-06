@@ -1,25 +1,16 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import { activarModoFuncional } from "./lib/modoFuncionalActivator";
 
-// Configuración inicial - Forzar modo real
-(() => {
-  // Eliminar cualquier forzado de modo demo
-  localStorage.removeItem('vx_force_demo');
-  
-  // Establecer configuración explícita para modo real
-  const deviceModeConfig = {
-    mode: 'real', // DeviceMode.REAL
-    demoDeviceIds: [], // No hay dispositivos en modo demo
-    realDeviceIds: ['*'], // Todos los dispositivos son reales
-    forceDemoParameter: '', // Parámetro deshabilitado para modo demo
-    forceRealParameter: 'real'
-  };
+// Activar explícitamente el modo funcional
+activarModoFuncional();
 
-  // Guardar configuración en localStorage
-  localStorage.setItem('vx_device_mode_config', JSON.stringify(deviceModeConfig));
-  
-  console.log('🔒 VecinoXpress iniciado en modo real exclusivo (notarial)');
-})();
+// Exponer la función de activación como global para consola de desarrollador
+(window as any).activarModoFuncional = activarModoFuncional;
+
+// Agregar logs adicionales de confirmación
+console.log('🔒 VecinoXpress iniciado en modo real funcional (QA sin verificaciones)');
+console.log('🔧 Todas las verificaciones internas y RON configurados para funcionar sin interrupciones');
 
 createRoot(document.getElementById("root")!).render(<App />);
