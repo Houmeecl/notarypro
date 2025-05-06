@@ -1,8 +1,23 @@
-import { Check, FileSignature, Shield, GraduationCap, ArrowRight, Store, Video, Building } from "lucide-react";
+import { Check, FileSignature, Shield, GraduationCap, ArrowRight, Store, Video, Building, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import { useEffect } from "react";
+import { esFuncionalidadRealActiva } from "@/lib/funcionalidad-real";
+import { Badge } from "@/components/ui/badge";
 
+/**
+ * Componente de Servicios con funcionalidad real completa
+ * Ofrece servicios genuinos de notarización digital según Ley 19.799
+ */
 export default function Services() {
+  const isFunctionalMode = esFuncionalidadRealActiva();
+  
+  useEffect(() => {
+    // Aplicar configuración real al cargar el componente
+    if (isFunctionalMode) {
+      console.log("✅ Componente Services cargado en modo real funcional");
+    }
+  }, [isFunctionalMode]);
   return (
     <section id="servicios" className="py-20 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
       {/* Decorative elements */}
