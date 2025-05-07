@@ -148,26 +148,52 @@ export default function DocumentWorkflow() {
   };
 
   // Iniciar proceso de firma
-  const startSigningProcess = () => {
-    setProcessingStep(true);
+  const [capturedSignature, setCapturedSignature] = useState<string | null>(null);
+  
+  // Manejar la captura de firma
+  const handleSignatureCapture = (signatureData: string) => {
+    setCapturedSignature(signatureData);
+    setDocumentSigned(true);
+    setProcessingStep(false);
     
-    // En producción, esto iniciaría el componente de firma electrónica
-    toast({
-      title: "Firma iniciada",
-      description: "Por favor firme el documento",
-    });
-    
-    // Para la demo, simularemos una firma exitosa después de unos segundos
-    setTimeout(() => {
-      setDocumentSigned(true);
-      setProcessingStep(false);
-      moveToNextStep();
-      
-      toast({
-        title: "Documento firmado",
-        description: "El documento ha sido firmado correctamente",
+    // Llamamos al servicio de firmas para validar y almacenar
+    import("@/services/signature-service").then(({ signatureService }) => {
+      signatureService.validateSignature(signatureData, { 
+        name: clientInfo.name, 
+        documentId: documentType 
+      }).then(result => {
+        if (result.valid) {
+          toast({
+            title: "Firma validada",
+            description: "La firma ha sido verificada correctamente",
+          });
+          
+          // Almacenar la firma
+          signatureService.storeSignature({
+            base64Data: signatureData,
+            signerId: clientInfo.name,
+            signerName: clientInfo.name,
+            documentId: documentType,
+            timestamp: new Date(),
+          }).then(() => {
+            moveToNextStep();
+          });
+        } else {
+          toast({
+            title: "Error de validación",
+            description: result.message || "No se pudo validar la firma",
+            variant: "destructive",
+          });
+          setDocumentSigned(false);
+        }
       });
-    }, 5000);
+    });
+  };
+  
+  // Iniciar proceso de firma
+  const startSigningProcess = () => {
+    // No es necesario hacer nada más, ya que el componente de firma
+    // se muestra automáticamente en el paso de firma
   };
 
   // Iniciar proceso de pago
@@ -477,16 +503,22 @@ export default function DocumentWorkflow() {
                     </div>
                   </div>
                   
-                  <div className="border rounded-lg p-6 flex flex-col items-center justify-center">
-                    <div className="border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg p-8 w-full max-w-md flex flex-col items-center justify-center">
-                      <p className="text-gray-500 mb-6 text-center">
-                        Firme en el área indicada usando el lápiz táctil o su dedo
-                      </p>
-                      <div className="h-40 w-full bg-white border rounded-lg mb-4"></div>
-                      <Button variant="outline" size="sm">
-                        Borrar firma
-                      </Button>
-                    </div>
+                  <div className="w-full">
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <div className="animate-spin w-8 h-8 border-4 border-[#2d219b] border-t-transparent rounded-full"></div>
+                      </div>
+                    }>
+                      {React.createElement(
+                        React.lazy(() => import("@/components/verification/SignaturePad")), 
+                        { 
+                          onSignatureCapture: handleSignatureCapture,
+                          clientName: clientInfo.name,
+                          title: "Firma Electrónica",
+                          description: "Firme el documento a continuación usando su dedo o mouse",
+                        }
+                      )}
+                    </Suspense>
                   </div>
                   
                   <Alert className="bg-blue-50 border-blue-200">
