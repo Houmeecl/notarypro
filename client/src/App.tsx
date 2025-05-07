@@ -171,11 +171,14 @@ function Router() {
       <Route path="/vecinos-complete-verification/:documentId?" component={React.lazy(() => import("./pages/vecinos-complete-verification"))} />
       
       {/* Landing page independiente para VecinosExpress Standalone */}
-      <Route path="/vecinos-landing" component={() => (
-        <Suspense fallback={<LazyLoadingFallback />}>
-          <LazyVecinosLandingStandalone />
-        </Suspense>
-      )} />
+      <Route path="/vecinos-landing" component={() => {
+        const VecinosLandingStandalone = React.lazy(() => import("@/pages/standalone/vecinos-landing"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <VecinosLandingStandalone />
+          </Suspense>
+        );
+      }} />
       
       {/* VecinosExpress - Versión independiente como aplicación standalone */}
       <Route path="/vecinos-standalone" component={() => (
