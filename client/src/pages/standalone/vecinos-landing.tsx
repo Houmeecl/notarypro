@@ -21,8 +21,8 @@ import {
 
 // Logo de Vecinos Express
 import vecinoLogo from "@/assets/new/vecino-xpress-logo-nuevo.png";
-// Importar la ilustración de personas conversando
-import PeopleConversation from "@/components/illustrations/PeopleConversation";
+// Importar imagen de minimarket con monos redondos
+import minimarketImage from "@/assets/new/minimarket-monos.png";
 
 /**
  * Landing Page para la versión standalone de VecinosExpress
@@ -91,8 +91,12 @@ export default function VecinosLandingStandalone() {
             <div className="md:w-1/2 flex justify-center">
               <div className="relative w-full max-w-md">
                 <div className="bg-white/10 rounded-lg p-6 border border-white/20 backdrop-blur-sm shadow-xl">
-                  <div className="aspect-video bg-purple-700/10 rounded flex items-center justify-center mb-4 overflow-hidden">
-                    <PeopleConversation width={320} height={200} className="transform scale-110" />
+                  <div className="aspect-video rounded flex items-center justify-center mb-4 overflow-hidden bg-white">
+                    <img 
+                      src={minimarketImage} 
+                      alt="Minimarket con personal atendiendo" 
+                      className="w-full h-auto object-cover"
+                    />
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center">
