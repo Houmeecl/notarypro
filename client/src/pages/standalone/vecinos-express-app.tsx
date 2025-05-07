@@ -236,21 +236,21 @@ export default function VecinosExpressStandalone() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card>
+          <Card className="border-t-4 border-[#2d219b] shadow-md hover:shadow-lg transition-all">
             <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-              <PlusCircle className="h-10 w-10 text-blue-600 mb-2" />
+              <PlusCircle className="h-10 w-10 text-[#2d219b] mb-2" />
               <h3 className="font-medium">Nuevo Documento</h3>
               <p className="text-sm text-gray-500 mb-2">Crea un nuevo documento para firma</p>
-              <Button className="mt-2 w-full" size="sm">Iniciar</Button>
+              <Button className="mt-2 w-full bg-[#2d219b] hover:bg-[#241a7d] text-white" size="sm">Iniciar</Button>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="border-t-4 border-[#4863f7] shadow-md hover:shadow-lg transition-all">
             <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-              <FileSignature className="h-10 w-10 text-green-600 mb-2" />
+              <FileSignature className="h-10 w-10 text-[#4863f7] mb-2" />
               <h3 className="font-medium">Firmar Documento</h3>
               <p className="text-sm text-gray-500 mb-2">Firma un documento pendiente</p>
-              <Button className="mt-2 w-full" size="sm" variant="outline">Revisar</Button>
+              <Button className="mt-2 w-full border-[#4863f7] text-[#4863f7] hover:bg-[#4863f7] hover:text-white" size="sm" variant="outline">Revisar</Button>
             </CardContent>
           </Card>
           
@@ -276,7 +276,7 @@ export default function VecinosExpressStandalone() {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-semibold">Mis Documentos</h2>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="border-[#2d219b] text-[#2d219b] hover:bg-[#2d219b] hover:text-white">
                   <FilePlus className="h-4 w-4 mr-2" />
                   Nuevo
                 </Button>
@@ -309,9 +309,9 @@ export default function VecinosExpressStandalone() {
                             </div>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <Button variant="outline" size="sm">Ver</Button>
+                            <Button variant="outline" size="sm" className="border-[#4863f7] text-[#4863f7] hover:bg-[#4863f7] hover:text-white">Ver</Button>
                             {doc.status !== 'completed' && (
-                              <Button size="sm">
+                              <Button size="sm" className="bg-[#2d219b] hover:bg-[#241a7d] text-white">
                                 {doc.status === 'signing' ? 'Firmar' : 'Procesar'}
                               </Button>
                             )}

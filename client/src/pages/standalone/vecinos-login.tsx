@@ -137,7 +137,7 @@ export default function VecinosLoginStandalone() {
                   <div className="pt-2">
                     <Button 
                       type="submit" 
-                      className="w-full"
+                      className="w-full bg-[#2d219b] hover:bg-[#241a7d] text-white font-medium transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
                       disabled={loading}
                     >
                       {loading ? (
