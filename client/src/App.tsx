@@ -48,6 +48,8 @@ import CursoCertificador from "@/pages/curso-certificador";
 // Importamos la App web de VecinosExpress 
 import VecinosExpress from "@/pages/vecinos-express";
 import VecinosSignDocument from "@/pages/vecinos-sign-document";
+// Importamos la aplicación independiente de VecinosExpress con Lazy Loading
+const VecinosExpressStandalone = React.lazy(() => import("@/pages/standalone/vecinos-express-app"));
 import PartnerApplications from "@/pages/admin/partner-applications";
 import ServiceSelectionPage from "@/pages/service-selection";
 import RonVideocall from "@/pages/ron-videocall";
@@ -166,6 +168,25 @@ function Router() {
       <Route path="/vecinos-express" component={VecinosExpress} />
       <Route path="/vecinos-sign-document/:documentId?" component={VecinosSignDocument} />
       <Route path="/vecinos-complete-verification/:documentId?" component={React.lazy(() => import("./pages/vecinos-complete-verification"))} />
+      
+      {/* VecinosExpress - Versión independiente como aplicación standalone */}
+      <Route path="/vecinos-standalone" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <VecinosExpressStandalone />
+        </Suspense>
+      )} />
+      
+      {/* Login independiente para VecinosExpress Standalone */}
+      <Route path="/vecinos-standalone-login" component={() => {
+        const VecinosLoginStandalone = React.lazy(() => import("@/pages/standalone/vecinos-login"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <VecinosLoginStandalone />
+          </Suspense>
+        );
+      }} />
+      
+      {/* Redireccionamiento para la ruta anterior */}
       <Route path="/vecinos-express-new" component={() => {
         window.location.href = "/vecinos-express";
         return null;

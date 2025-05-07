@@ -56,12 +56,12 @@ export default function VecinosExpressStandalone() {
         loadDemoData();
       } catch (error) {
         console.error('Error parsing stored user:', error);
-        // Si hay error en los datos del usuario, redirigir a login
-        window.location.href = '/vecinos/login';
+        // Si hay error en los datos del usuario, redirigir a login independiente
+        window.location.href = '/vecinos-standalone-login';
       }
     } else {
-      // Si no hay usuario, redirigir a login
-      window.location.href = '/vecinos/login';
+      // Si no hay usuario, redirigir a login independiente
+      window.location.href = '/vecinos-standalone-login';
     }
   }, []);
 
@@ -142,8 +142,8 @@ export default function VecinosExpressStandalone() {
       description: 'Has cerrado sesión correctamente.',
     });
     
-    // Redirigir a la página de login
-    window.location.href = '/vecinos/login';
+    // Redirigir a la página de login independiente
+    window.location.href = '/vecinos-standalone-login';
   };
 
   const formatDate = (dateString: string) => {
@@ -221,19 +221,19 @@ export default function VecinosExpressStandalone() {
               </div>
               
               <Button variant="ghost" className="justify-start" asChild>
-                <Link href="/vecinos/dashboard">
+                <Link href="/vecinos-standalone">
                   <Home className="h-4 w-4 mr-2" />
                   Inicio
                 </Link>
               </Button>
               <Button variant="ghost" className="justify-start" asChild>
-                <Link href="/vecinos/cuenta">
+                <Link href="/vecinos-standalone/cuenta">
                   <Settings className="h-4 w-4 mr-2" />
                   Mi Cuenta
                 </Link>
               </Button>
               <Button variant="ghost" className="justify-start" asChild>
-                <Link href="/vecinos/soporte">
+                <Link href="/vecinos-standalone/soporte">
                   <HelpCircle className="h-4 w-4 mr-2" />
                   Soporte
                 </Link>
@@ -436,10 +436,10 @@ export default function VecinosExpressStandalone() {
               </p>
             </div>
             <div className="flex space-x-4">
-              <Link href="/vecinos/soporte" className="text-sm text-gray-600 hover:text-blue-600">
+              <Link href="/vecinos-standalone/soporte" className="text-sm text-gray-600 hover:text-blue-600">
                 Soporte
               </Link>
-              <Link href="/vecinos/faq" className="text-sm text-gray-600 hover:text-blue-600">
+              <Link href="/vecinos-standalone/faq" className="text-sm text-gray-600 hover:text-blue-600">
                 Preguntas Frecuentes
               </Link>
               <Link href="/aviso-legal" className="text-sm text-gray-600 hover:text-blue-600">
