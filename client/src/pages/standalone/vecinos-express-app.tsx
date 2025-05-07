@@ -130,7 +130,7 @@ export default function VecinosExpressStandalone() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
         <div className="mb-4">
-          <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-16" />
+          <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-24" />
         </div>
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
         <p className="mt-4 text-gray-600">Cargando VecinoXpress...</p>
@@ -144,7 +144,7 @@ export default function VecinosExpressStandalone() {
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-10" />
+            <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-16" />
             <span className="font-bold text-xl text-[#2d219b]">VecinExpress</span>
           </div>
           
