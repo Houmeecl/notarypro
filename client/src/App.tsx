@@ -148,6 +148,7 @@ const LazyVecinosCertifierValidation = React.lazy(() => import("@/pages/vecinos/
 const LazyVerificacionNFC = React.lazy(() => import("@/pages/verificacion-nfc-fixed"));
 const LazyDocumentoFuncional = React.lazy(() => import("@/pages/documento-funcional"));
 const LazyNotaryProChile = React.lazy(() => import("@/pages/notary-pro-chile"));
+const LazyVecinosLandingStandalone = React.lazy(() => import("@/pages/standalone/vecinos-landing"));
 
 function Router() {
   return (
@@ -168,6 +169,13 @@ function Router() {
       <Route path="/vecinos-express" component={VecinosExpress} />
       <Route path="/vecinos-sign-document/:documentId?" component={VecinosSignDocument} />
       <Route path="/vecinos-complete-verification/:documentId?" component={React.lazy(() => import("./pages/vecinos-complete-verification"))} />
+      
+      {/* Landing page independiente para VecinosExpress Standalone */}
+      <Route path="/vecinos-landing" component={() => (
+        <Suspense fallback={<LazyLoadingFallback />}>
+          <LazyVecinosLandingStandalone />
+        </Suspense>
+      )} />
       
       {/* VecinosExpress - Versión independiente como aplicación standalone */}
       <Route path="/vecinos-standalone" component={() => (
