@@ -26,6 +26,9 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+// Importar el servicio independiente para Vecinos Express Standalone
+import VecinosStandaloneService from '@/services/vecinos-standalone-service';
+
 // Logo de Vecinos Express
 import vecinoLogo from "@/assets/vecino-xpress-logo.svg";
 
@@ -46,97 +49,60 @@ export default function VecinosExpressStandalone() {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Usar el servicio independiente para verificar la autenticación
-    if (VecinosStandaloneService.isAuthenticated()) {
-      try {
-        // Obtener datos del usuario desde el servicio independiente
-        const userData = VecinosStandaloneService.getCurrentUser();
-        setUser(userData);
-        setAuthenticated(true);
-        
-        // Cargar datos solo si está autenticado
-        loadDemoData();
-      } catch (error) {
-        console.error('Error obteniendo datos de usuario:', error);
-        // Si hay error, redirigir a login independiente
+    // Crear una función async dentro del useEffect
+    const initialize = async () => {
+      // Usar el servicio independiente para verificar la autenticación
+      if (VecinosStandaloneService.isAuthenticated()) {
+        try {
+          // Obtener datos del usuario desde el servicio independiente
+          const userData = VecinosStandaloneService.getCurrentUser();
+          setUser(userData);
+          setAuthenticated(true);
+          
+          // Cargar datos solo si está autenticado (ahora es una función async)
+          await loadDemoData();
+        } catch (error) {
+          console.error('Error obteniendo datos de usuario:', error);
+          // Si hay error, redirigir a login independiente
+          window.location.href = '/vecinos-standalone-login';
+        }
+      } else {
+        // Si no está autenticado, redirigir a login independiente
         window.location.href = '/vecinos-standalone-login';
       }
-    } else {
-      // Si no está autenticado, redirigir a login independiente
-      window.location.href = '/vecinos-standalone-login';
-    }
+    };
+    
+    // Llamar a la función async
+    initialize();
   }, []);
 
-  const loadDemoData = () => {
-    // Simular carga de datos
-    setTimeout(() => {
-      // Datos de documentos de ejemplo
-      setDocuments([
-        {
-          id: 1,
-          title: 'Contrato de Prestación de Servicios',
-          clientName: 'Juan Pérez González',
-          status: 'pending',
-          createdAt: '2025-05-02T10:15:00Z',
-          type: 'contract',
-          verificationCode: 'ABC12345'
-        },
-        {
-          id: 2,
-          title: 'Declaración Jurada Simple',
-          clientName: 'María Rodríguez Silva',
-          status: 'completed',
-          createdAt: '2025-05-01T08:30:00Z',
-          type: 'declaration',
-          verificationCode: 'DEF67890'
-        },
-        {
-          id: 3,
-          title: 'Poder Simple',
-          clientName: 'Carlos López Muñoz',
-          status: 'signing',
-          createdAt: '2025-04-30T14:45:00Z',
-          type: 'power',
-          verificationCode: 'GHI01234'
-        }
-      ]);
-
-      // Datos de transacciones de ejemplo
-      setTransactions([
-        {
-          id: 101,
-          description: 'Pago por servicio notarial',
-          amount: 15000,
-          status: 'completed',
-          date: '2025-05-02T11:30:00Z',
-          method: 'card'
-        },
-        {
-          id: 102,
-          description: 'Comisión por documento firmado',
-          amount: 5000,
-          status: 'completed',
-          date: '2025-05-01T09:45:00Z',
-          method: 'transfer'
-        },
-        {
-          id: 103,
-          description: 'Pago pendiente',
-          amount: 8000,
-          status: 'pending',
-          date: '2025-04-30T16:20:00Z',
-          method: 'pending'
-        }
-      ]);
-
+  const loadDemoData = async () => {
+    try {
+      setLoading(true);
+      
+      // Usar el servicio independiente para obtener documentos
+      const docsResponse = await VecinosStandaloneService.getDocuments();
+      setDocuments(docsResponse);
+      
+      // Usar el servicio independiente para obtener transacciones
+      const txResponse = await VecinosStandaloneService.getTransactions();
+      setTransactions(txResponse);
+      
+    } catch (error) {
+      console.error('Error al cargar datos:', error);
+      toast({
+        title: 'Error de carga',
+        description: 'No se pudieron cargar los datos. Intente nuevamente más tarde.',
+        variant: 'destructive',
+      });
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   const handleLogout = () => {
-    // Eliminar datos de usuario de localStorage
-    localStorage.removeItem('vecinos_user');
-    localStorage.removeItem('vecinos_token');
+    // Utilizar el servicio independiente para cerrar sesión
+    VecinosStandaloneService.logout();
     
     // Mostrar mensaje de cierre de sesión
     toast({
