@@ -14,8 +14,7 @@ import {
   Bell, 
   User, 
   PlusCircle, 
-  FileSignature, 
-  Video,
+  FileSignature,
   Home,
   Menu,
   X,
@@ -256,14 +255,9 @@ export default function VecinosExpressStandalone() {
             </CardContent>
           </Card>
           
-          <Card>
-            <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-              <Video className="h-10 w-10 text-purple-600 mb-2" />
-              <h3 className="font-medium">Sesión RON</h3>
-              <p className="text-sm text-gray-500 mb-2">Iniciar sesión de notarización remota</p>
-              <Button className="mt-2 w-full" size="sm" variant="outline">Comenzar</Button>
-            </CardContent>
-          </Card>
+          {/* Tercera tarjeta intencionalmente dejada invisible para mantener el layout de 3 columnas 
+          pero ocultando la funcionalidad RON como solicitado */}
+          <div className="hidden md:block"></div>
         </div>
 
         {/* Main Tabs */}
