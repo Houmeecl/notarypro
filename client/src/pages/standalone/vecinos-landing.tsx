@@ -29,7 +29,7 @@ export default function VecinosLandingStandalone() {
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex flex-col items-start">
             <div className="flex items-center space-x-2">
-              <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-16 w-auto" />
+              <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-20 w-auto" />
               <span className="font-bold text-2xl text-[#2d219b] hidden">VecinoExpress</span>
             </div>
             <span className="text-sm text-gray-600 ml-1 mt-1 italic">Transformando negocios locales con certificación digital</span>
@@ -286,7 +286,7 @@ export default function VecinosLandingStandalone() {
           <div className="flex flex-col md:flex-row justify-between">
             <div className="mb-8 md:mb-0">
               <div className="mb-4">
-                <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-12 w-auto" />
+                <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-16 w-auto" />
               </div>
               <p className="text-gray-400 max-w-md">
                 Plataforma de gestión documental con firma electrónica avanzada cumpliendo la normativa chilena (Ley 19.799).
