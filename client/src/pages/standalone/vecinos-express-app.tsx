@@ -129,7 +129,7 @@ export default function VecinosExpressStandalone() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
         <div className="mb-4">
-          <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-24" />
+          <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-28" />
         </div>
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
         <p className="mt-4 text-gray-600">Cargando VecinoXpress...</p>
@@ -142,9 +142,8 @@ export default function VecinosExpressStandalone() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-16" />
-            <span className="font-bold text-xl text-[#2d219b]">VecinExpress</span>
+          <div className="flex items-center">
+            <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-20" />
           </div>
           
           <div className="flex items-center space-x-2">
@@ -406,7 +405,8 @@ export default function VecinosExpressStandalone() {
       <footer className="bg-white border-t border-gray-200 py-4 mt-auto">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
+            <div className="mb-4 md:mb-0 flex flex-col items-center md:items-start">
+              <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-16 mb-2" />
               <p className="text-sm text-gray-600">
                 &copy; {new Date().getFullYear()} VecinoXpress - Todos los derechos reservados
               </p>
