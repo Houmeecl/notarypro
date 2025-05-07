@@ -361,8 +361,8 @@ export default function VecinosExpressStandalone() {
                               </p>
                               <Badge 
                                 className={
-                                  tx.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                  'bg-orange-100 text-orange-800'
+                                  tx.status === 'completed' ? 'bg-blue-100 text-blue-800' :
+                                  'bg-indigo-100 text-indigo-800'
                                 }
                               >
                                 {tx.status === 'completed' ? 'Completado' : 'Pendiente'}

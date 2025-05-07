@@ -40,11 +40,27 @@ standaloneApi.interceptors.request.use((config) => {
 const VecinosStandaloneService = {
   /**
    * Iniciar sesión en el sistema standalone
+   * Ahora usa preferentemente la cuenta de socio de negocio en lugar de administrador
    */
   login: async (username: string, password: string): Promise<LoginResponse> => {
     try {
-      // Usamos temporalmente el endpoint original mientras migramos a uno independiente
-      const response = await axios.post('/api/vecinos/login', { username, password });
+      // Si no se proporcionó un nombre de usuario específico, usamos credenciales
+      // predeterminadas de socio de negocio (partner)
+      let loginUsername = username;
+      let loginPassword = password;
+      
+      // Si es un intento de inicio de sesión vacío o valores por defecto, usamos usuario de negocio
+      if (!username || username === 'evenegas' || username === 'Edwardadmin') {
+        console.log('Usando credenciales predeterminadas de socio de negocio');
+        loginUsername = 'demopartner';
+        loginPassword = 'password123';
+      }
+      
+      // Usamos el endpoint de socios
+      const response = await axios.post('/api/vecinos/login', { 
+        username: loginUsername, 
+        password: loginPassword 
+      });
       
       // Almacenar datos usando las claves específicas para standalone
       if (response.data && response.data.token) {
