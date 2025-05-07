@@ -10,7 +10,7 @@ import { Loader2, User, Key, ChevronRight, AlertTriangle } from 'lucide-react';
 import VecinosStandaloneService from '@/services/vecinos-standalone-service';
 
 // Logo de Vecinos Express
-import vecinoLogo from "@/assets/vecino-xpress-logo.svg";
+import vecinoLogo from "@/assets/new/vecino-xpress-logo-nuevo.png";
 
 export default function VecinosLoginStandalone() {
   const { toast } = useToast();
@@ -77,7 +77,7 @@ export default function VecinosLoginStandalone() {
       <div className="flex flex-col justify-center items-center md:w-1/2 p-6">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
-            <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-16 mx-auto mb-4" />
+            <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-24 mx-auto mb-4" />
             <h1 className="text-3xl font-bold text-gray-800">VecinoExpress</h1>
             <p className="text-gray-600 mt-1">Accede a tu cuenta para gestionar documentos y trámites</p>
           </div>

@@ -30,7 +30,7 @@ import { useToast } from '@/hooks/use-toast';
 import VecinosStandaloneService from '@/services/vecinos-standalone-service';
 
 // Logo de Vecinos Express
-import vecinoLogo from "@/assets/vecino-xpress-logo.svg";
+import vecinoLogo from "@/assets/new/vecino-xpress-logo-nuevo.png";
 
 /**
  * Vecinos Express - Aplicación Independiente

@@ -6,7 +6,7 @@ import * as z from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Eye, EyeOff, Laptop, CheckSquare, FileCheck } from "lucide-react";
-import vecinoLogo from "@/assets/vecino-xpress-logo.svg";
+import vecinoLogo from "@/assets/new/vecino-xpress-logo-nuevo.png";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
