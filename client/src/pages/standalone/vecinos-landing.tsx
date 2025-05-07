@@ -32,7 +32,7 @@ export default function VecinosLandingStandalone() {
               <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-16 w-auto" />
               <span className="font-bold text-2xl text-[#2d219b] hidden">VecinoExpress</span>
             </div>
-            <span className="text-sm text-gray-600 ml-1 mt-1 italic">Certificación digital al alcance del barrio</span>
+            <span className="text-sm text-gray-600 ml-1 mt-1 italic">Transformando negocios locales con certificación digital</span>
           </div>
           
           <div className="flex items-center space-x-4">
@@ -47,31 +47,41 @@ export default function VecinosLandingStandalone() {
       </header>
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#2d219b] to-[#4338ca] text-white py-16 md:py-24">
-        <div className="container mx-auto px-4">
+      <section className="bg-gradient-to-br from-[#2d219b] to-[#4338ca] text-white py-16 md:py-24 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-10">
+          <div className="absolute top-10 left-10 w-64 h-64 rounded-full bg-purple-300 filter blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-indigo-400 filter blur-3xl"></div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="md:w-1/2 mb-8 md:mb-0">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Gestión documental digital simplificada</h1>
-              <p className="text-xl md:text-2xl text-white/80 mb-8">
-                Plataforma integral para firma electrónica avanzada y certificación de documentos conforme a la Ley 19.799
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">Transformando negocios locales</h1>
+              <p className="text-xl md:text-2xl text-white/90 mb-8">
+                Potencia tu empresa con nuestra plataforma integral de gestión documental y firma electrónica avanzada conforme a la Ley 19.799
               </p>
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 <Link href="/vecinos-standalone-login">
-                  <Button size="lg" className="bg-white text-[#2d219b] hover:bg-white/90">
+                  <Button size="lg" className="bg-white text-[#2d219b] hover:bg-white/90 shadow-lg">
                     Comenzar Ahora
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
+                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/20">
                   Saber Más
                 </Button>
               </div>
             </div>
             <div className="md:w-1/2 flex justify-center">
               <div className="relative w-full max-w-md">
-                <div className="bg-white/10 rounded-lg p-6 border border-white/20 backdrop-blur-sm">
+                <div className="bg-white/10 rounded-lg p-6 border border-white/20 backdrop-blur-sm shadow-xl">
                   <div className="aspect-video bg-white/5 rounded flex items-center justify-center mb-6">
-                    <FileSignature className="h-16 w-16 text-white/60" />
+                    <div className="relative">
+                      <div className="absolute -top-6 -left-6 w-12 h-12 bg-purple-400 rounded-full opacity-50"></div>
+                      <div className="absolute -bottom-6 -right-6 w-12 h-12 bg-indigo-500 rounded-full opacity-50"></div>
+                      <FileSignature className="h-16 w-16 text-white/80 relative z-10" />
+                    </div>
                   </div>
                   <div className="space-y-3">
                     <div className="h-4 w-3/4 bg-white/20 rounded"></div>
@@ -81,7 +91,7 @@ export default function VecinosLandingStandalone() {
                     <div className="h-10 w-full bg-white/20 rounded mt-6"></div>
                   </div>
                 </div>
-                <div className="absolute -bottom-5 -right-5 h-24 w-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center drop-shadow-lg">
+                <div className="absolute -bottom-5 -right-5 h-24 w-24 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center drop-shadow-lg transform hover:rotate-3 transition-transform">
                   <div className="text-white font-bold text-xs text-center">
                     <div className="text-xl">100%</div>
                     <div>LEGAL</div>
@@ -94,8 +104,12 @@ export default function VecinosLandingStandalone() {
       </section>
       
       {/* Features Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
+      <section className="py-16 bg-gray-50 relative overflow-hidden">
+        {/* Decorative background */}
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-purple-50 rounded-bl-full opacity-50"></div>
+        <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-indigo-50 rounded-tr-full opacity-50"></div>
+        
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">Características Principales</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
@@ -104,36 +118,36 @@ export default function VecinosLandingStandalone() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="border-none shadow-md hover:shadow-lg transition-shadow">
+            <Card className="border-none shadow-md hover:shadow-xl transition-all hover:-translate-y-1 duration-300">
               <CardContent className="p-6">
-                <div className="rounded-full w-12 h-12 flex items-center justify-center bg-blue-100 text-blue-600 mb-4">
-                  <FileSignature className="h-6 w-6" />
+                <div className="rounded-full w-14 h-14 flex items-center justify-center bg-purple-100 text-[#2d219b] mb-4 shadow-sm">
+                  <FileSignature className="h-7 w-7" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Firma Electrónica Avanzada</h3>
+                <h3 className="text-xl font-semibold mb-2 text-[#2d219b]">Firma Electrónica Avanzada</h3>
                 <p className="text-gray-600">
                   Firma documentos con validez legal desde cualquier dispositivo, con total conformidad a la normativa chilena.
                 </p>
               </CardContent>
             </Card>
             
-            <Card className="border-none shadow-md hover:shadow-lg transition-shadow">
+            <Card className="border-none shadow-md hover:shadow-xl transition-all hover:-translate-y-1 duration-300">
               <CardContent className="p-6">
-                <div className="rounded-full w-12 h-12 flex items-center justify-center bg-purple-100 text-purple-600 mb-4">
-                  <ShieldCheck className="h-6 w-6" />
+                <div className="rounded-full w-14 h-14 flex items-center justify-center bg-purple-100 text-[#2d219b] mb-4 shadow-sm">
+                  <ShieldCheck className="h-7 w-7" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Verificación de Identidad</h3>
+                <h3 className="text-xl font-semibold mb-2 text-[#2d219b]">Verificación de Identidad</h3>
                 <p className="text-gray-600">
                   Sistema biométrico avanzado para confirmar la identidad de los firmantes mediante tecnología NFC y reconocimiento facial.
                 </p>
               </CardContent>
             </Card>
             
-            <Card className="border-none shadow-md hover:shadow-lg transition-shadow">
+            <Card className="border-none shadow-md hover:shadow-xl transition-all hover:-translate-y-1 duration-300">
               <CardContent className="p-6">
-                <div className="rounded-full w-12 h-12 flex items-center justify-center bg-green-100 text-green-600 mb-4">
-                  <Smartphone className="h-6 w-6" />
+                <div className="rounded-full w-14 h-14 flex items-center justify-center bg-purple-100 text-[#2d219b] mb-4 shadow-sm">
+                  <Smartphone className="h-7 w-7" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Acceso Multiplataforma</h3>
+                <h3 className="text-xl font-semibold mb-2 text-[#2d219b]">Acceso Multiplataforma</h3>
                 <p className="text-gray-600">
                   Accede a tus documentos desde cualquier dispositivo: computador, tablet o smartphone con interfaz adaptada.
                 </p>
@@ -144,42 +158,45 @@ export default function VecinosLandingStandalone() {
       </section>
       
       {/* Benefits Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
+      <section className="py-16 bg-white relative overflow-hidden">
+        {/* Decorative background */}
+        <div className="absolute bottom-0 right-0 w-1/3 h-full bg-gradient-to-t from-purple-50 to-transparent opacity-70"></div>
+        
+        <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-8 md:mb-0">
               <div className="max-w-md">
-                <h2 className="text-3xl font-bold text-gray-800 mb-6">Beneficios del sistema</h2>
+                <h2 className="text-3xl font-bold text-[#2d219b] mb-6">Beneficios del sistema</h2>
                 
-                <div className="space-y-4">
-                  <div className="flex">
-                    <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
+                <div className="space-y-6">
+                  <div className="flex items-start bg-white rounded-lg p-4 shadow-sm border-l-4 border-[#2d219b]">
+                    <CheckCircle className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
                     <div>
-                      <h3 className="font-semibold">Ahorro de tiempo</h3>
+                      <h3 className="font-semibold text-[#2d219b]">Ahorro de tiempo</h3>
                       <p className="text-gray-600">Reduce hasta un 70% el tiempo de procesamiento de documentos</p>
                     </div>
                   </div>
                   
-                  <div className="flex">
-                    <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
+                  <div className="flex items-start bg-white rounded-lg p-4 shadow-sm border-l-4 border-[#2d219b]">
+                    <CheckCircle className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
                     <div>
-                      <h3 className="font-semibold">Seguridad garantizada</h3>
+                      <h3 className="font-semibold text-[#2d219b]">Seguridad garantizada</h3>
                       <p className="text-gray-600">Encriptación de extremo a extremo y almacenamiento seguro</p>
                     </div>
                   </div>
                   
-                  <div className="flex">
-                    <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
+                  <div className="flex items-start bg-white rounded-lg p-4 shadow-sm border-l-4 border-[#2d219b]">
+                    <CheckCircle className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
                     <div>
-                      <h3 className="font-semibold">Validez legal</h3>
+                      <h3 className="font-semibold text-[#2d219b]">Validez legal</h3>
                       <p className="text-gray-600">Cumplimiento total de la normativa chilena para firma electrónica</p>
                     </div>
                   </div>
                   
-                  <div className="flex">
-                    <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
+                  <div className="flex items-start bg-white rounded-lg p-4 shadow-sm border-l-4 border-[#2d219b]">
+                    <CheckCircle className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
                     <div>
-                      <h3 className="font-semibold">Trazabilidad completa</h3>
+                      <h3 className="font-semibold text-[#2d219b]">Trazabilidad completa</h3>
                       <p className="text-gray-600">Seguimiento del ciclo de vida completo del documento</p>
                     </div>
                   </div>
@@ -187,7 +204,7 @@ export default function VecinosLandingStandalone() {
                 
                 <div className="mt-8">
                   <Link href="/vecinos-standalone-login">
-                    <Button size="lg" className="bg-[#2d219b] hover:bg-[#231a78]">
+                    <Button size="lg" className="bg-[#2d219b] hover:bg-[#231a78] shadow-md">
                       Acceder ahora
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
@@ -198,26 +215,32 @@ export default function VecinosLandingStandalone() {
             
             <div className="md:w-1/2">
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gray-50 p-6 rounded-lg border border-gray-100">
-                  <Lock className="h-8 w-8 text-[#2d219b] mb-3" />
-                  <h3 className="font-semibold text-lg mb-1">Seguridad superior</h3>
+                <div className="bg-white p-6 rounded-lg shadow-md border border-purple-100 hover:shadow-lg transition-shadow">
+                  <div className="rounded-full w-12 h-12 flex items-center justify-center bg-purple-100 text-[#2d219b] mb-3">
+                    <Lock className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-1 text-[#2d219b]">Seguridad superior</h3>
                   <p className="text-gray-600 text-sm">Protección con estándares internacionales</p>
                 </div>
                 
-                <div className="bg-gray-50 p-6 rounded-lg border border-gray-100">
-                  <Users className="h-8 w-8 text-[#2d219b] mb-3" />
-                  <h3 className="font-semibold text-lg mb-1">Múltiples firmantes</h3>
+                <div className="bg-white p-6 rounded-lg shadow-md border border-purple-100 hover:shadow-lg transition-shadow">
+                  <div className="rounded-full w-12 h-12 flex items-center justify-center bg-purple-100 text-[#2d219b] mb-3">
+                    <Users className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-1 text-[#2d219b]">Múltiples firmantes</h3>
                   <p className="text-gray-600 text-sm">Gestión avanzada de firmantes y permisos</p>
                 </div>
                 
-                <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 col-span-2">
-                  <div className="flex items-center space-x-2 mb-4">
-                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                    <div className="text-sm font-medium">Sistema en línea 24/7</div>
+                <div className="bg-white p-6 rounded-lg shadow-md border border-purple-100 col-span-2 hover:shadow-lg transition-shadow">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="rounded-full w-8 h-8 flex items-center justify-center bg-purple-100 text-[#2d219b]">
+                      <div className="h-2 w-2 rounded-full bg-[#2d219b]"></div>
+                    </div>
+                    <div className="text-[#2d219b] font-medium">Sistema en línea 24/7</div>
                   </div>
                   <div className="space-y-2">
                     <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-green-500 rounded-full" style={{ width: '99.8%' }}></div>
+                      <div className="h-full bg-[#2d219b] rounded-full" style={{ width: '99.8%' }}></div>
                     </div>
                     <div className="flex justify-between text-xs text-gray-500">
                       <span>Tiempo de actividad</span>
@@ -232,18 +255,28 @@ export default function VecinosLandingStandalone() {
       </section>
       
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-[#2d219b] to-[#4338ca] text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-6">¿Listo para comenzar?</h2>
-          <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-            Únete a los cientos de profesionales que ya confían en VecinoExpress para la gestión documental digital
+      <section className="py-16 bg-gradient-to-r from-[#2d219b] to-[#4338ca] text-white relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-10">
+          <div className="absolute top-1/3 left-1/4 w-72 h-72 rounded-full bg-purple-300 filter blur-3xl"></div>
+          <div className="absolute top-1/2 right-1/4 w-80 h-80 rounded-full bg-indigo-400 filter blur-3xl"></div>
+        </div>
+        
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h2 className="text-3xl font-bold mb-6">¿Listo para transformar tu negocio?</h2>
+          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+            Únete a los cientos de negocios locales que ya están potenciando su crecimiento con VecinoExpress
           </p>
-          <Link href="/vecinos-standalone-login">
-            <Button size="lg" className="bg-white text-[#2d219b] hover:bg-white/90">
-              Iniciar sesión
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </Link>
+          <div className="inline-block relative">
+            <div className="absolute -top-10 -left-10 w-8 h-8 bg-purple-300 rounded-full opacity-50"></div>
+            <div className="absolute -bottom-6 -right-6 w-10 h-10 bg-indigo-300 rounded-full opacity-50"></div>
+            <Link href="/vecinos-standalone-login">
+              <Button size="lg" className="bg-white text-[#2d219b] hover:bg-white/90 shadow-lg px-8 py-6 text-lg">
+                Iniciar sesión
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
       
