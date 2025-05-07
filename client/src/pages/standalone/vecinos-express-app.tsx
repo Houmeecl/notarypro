@@ -46,22 +46,23 @@ export default function VecinosExpressStandalone() {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Comprobar si hay un usuario en localStorage
-    const storedUser = localStorage.getItem('vecinos_user');
-    if (storedUser) {
+    // Usar el servicio independiente para verificar la autenticación
+    if (VecinosStandaloneService.isAuthenticated()) {
       try {
-        setUser(JSON.parse(storedUser));
+        // Obtener datos del usuario desde el servicio independiente
+        const userData = VecinosStandaloneService.getCurrentUser();
+        setUser(userData);
         setAuthenticated(true);
         
         // Cargar datos solo si está autenticado
         loadDemoData();
       } catch (error) {
-        console.error('Error parsing stored user:', error);
-        // Si hay error en los datos del usuario, redirigir a login independiente
+        console.error('Error obteniendo datos de usuario:', error);
+        // Si hay error, redirigir a login independiente
         window.location.href = '/vecinos-standalone-login';
       }
     } else {
-      // Si no hay usuario, redirigir a login independiente
+      // Si no está autenticado, redirigir a login independiente
       window.location.href = '/vecinos-standalone-login';
     }
   }, []);

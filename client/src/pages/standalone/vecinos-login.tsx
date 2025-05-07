@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, User, Key, ChevronRight, AlertTriangle } from 'lucide-react';
-import axios from 'axios';
+
+// Importar el servicio independiente para Vecinos Express Standalone
+import VecinosStandaloneService from '@/services/vecinos-standalone-service';
 
 // Logo de Vecinos Express
 import vecinoLogo from "@/assets/vecino-xpress-logo.svg";
@@ -16,6 +18,14 @@ export default function VecinosLoginStandalone() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Verificar si ya hay una sesión activa al cargar el componente
+  useEffect(() => {
+    if (VecinosStandaloneService.isAuthenticated()) {
+      // Si ya está autenticado, redirigir a la aplicación principal
+      window.location.href = '/vecinos-standalone';
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,20 +39,17 @@ export default function VecinosLoginStandalone() {
     setError('');
 
     try {
-      const response = await axios.post('/api/vecinos/login', {
-        username,
-        password
-      });
+      // Usar el servicio independiente para el login
+      const response = await VecinosStandaloneService.login(username, password);
 
-      if (response.status === 200 && response.data) {
-        // Guardar datos de usuario en localStorage
-        localStorage.setItem('vecinos_user', JSON.stringify(response.data.user));
-        localStorage.setItem('vecinos_token', response.data.token);
-        
+      // Obtener los datos del usuario actual
+      const user = VecinosStandaloneService.getCurrentUser();
+      
+      if (user) {
         // Mostrar mensaje de éxito
         toast({
           title: '¡Bienvenido!',
-          description: `Sesión iniciada como ${response.data.user.fullName || response.data.user.username}`,
+          description: `Sesión iniciada como ${user.fullName || user.username}`,
         });
         
         // Redirigir a la aplicación independiente
