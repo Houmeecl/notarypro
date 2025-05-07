@@ -27,9 +27,12 @@ export default function VecinosLandingStandalone() {
       {/* Header */}
       <header className="bg-white border-b">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-10" />
-            <span className="font-bold text-xl text-[#2d219b]">VecinoExpress</span>
+          <div className="flex flex-col items-start">
+            <div className="flex items-center space-x-2">
+              <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-12" />
+              <span className="font-bold text-2xl text-[#2d219b]">VecinoExpress</span>
+            </div>
+            <span className="text-sm text-gray-600 ml-1 mt-1 italic">Certificación digital al alcance del barrio</span>
           </div>
           
           <div className="flex items-center space-x-4">
@@ -48,9 +51,9 @@ export default function VecinosLandingStandalone() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="md:w-1/2 mb-8 md:mb-0">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Gestión documental notarial simplificada</h1>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">Gestión documental digital simplificada</h1>
               <p className="text-xl md:text-2xl text-white/80 mb-8">
-                Plataforma integral para firma electrónica avanzada y trámites notariales digitales conforme a la Ley 19.799
+                Plataforma integral para firma electrónica avanzada y certificación de documentos conforme a la Ley 19.799
               </p>
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 <Link href="/vecinos-standalone-login">
@@ -233,7 +236,7 @@ export default function VecinosLandingStandalone() {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">¿Listo para comenzar?</h2>
           <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-            Únete a los cientos de profesionales que ya confían en VecinoExpress para la gestión documental notarial
+            Únete a los cientos de profesionales que ya confían en VecinoExpress para la gestión documental digital
           </p>
           <Link href="/vecinos-standalone-login">
             <Button size="lg" className="bg-white text-[#2d219b] hover:bg-white/90">
@@ -254,7 +257,7 @@ export default function VecinosLandingStandalone() {
                 <span className="font-bold text-xl">VecinoExpress</span>
               </div>
               <p className="text-gray-400 max-w-md">
-                Plataforma de gestión documental notarial con firma electrónica avanzada cumpliendo la normativa chilena (Ley 19.799).
+                Plataforma de gestión documental con firma electrónica avanzada cumpliendo la normativa chilena (Ley 19.799).
               </p>
             </div>
             
