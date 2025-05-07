@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 // Logo de Vecinos Express
-import vecinoLogo from "@/assets/vecino-xpress-logo-oficial.png";
+import vecinoLogo from "@/assets/new/vecino-xpress-logo-nuevo.png";
 
 /**
  * Landing Page para la versión standalone de VecinosExpress
