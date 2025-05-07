@@ -176,34 +176,34 @@ export default function VecinosLandingStandalone() {
                 
                 <div className="space-y-6">
                   <div className="flex items-start bg-white rounded-lg p-4 shadow-sm border-l-4 border-[#2d219b]">
-                    <CheckCircle className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
+                    <ShoppingBag className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
                     <div>
-                      <h3 className="font-semibold text-[#2d219b]">Ahorro de tiempo</h3>
-                      <p className="text-gray-600">Reduce hasta un 70% el tiempo de procesamiento de documentos</p>
+                      <h3 className="font-semibold text-[#2d219b]">Gestión de inventario</h3>
+                      <p className="text-gray-600">Maneja tu stock con alertas automáticas y reportes en tiempo real</p>
                     </div>
                   </div>
                   
                   <div className="flex items-start bg-white rounded-lg p-4 shadow-sm border-l-4 border-[#2d219b]">
-                    <CheckCircle className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
+                    <Receipt className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
                     <div>
-                      <h3 className="font-semibold text-[#2d219b]">Seguridad garantizada</h3>
-                      <p className="text-gray-600">Encriptación de extremo a extremo y almacenamiento seguro</p>
+                      <h3 className="font-semibold text-[#2d219b]">Boletas digitales</h3>
+                      <p className="text-gray-600">Emite comprobantes digitales con validez tributaria desde tu punto de venta</p>
                     </div>
                   </div>
                   
                   <div className="flex items-start bg-white rounded-lg p-4 shadow-sm border-l-4 border-[#2d219b]">
-                    <CheckCircle className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
+                    <DollarSign className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
                     <div>
-                      <h3 className="font-semibold text-[#2d219b]">Validez legal</h3>
-                      <p className="text-gray-600">Cumplimiento total de la normativa chilena para firma electrónica</p>
+                      <h3 className="font-semibold text-[#2d219b]">Control de ventas</h3>
+                      <p className="text-gray-600">Registra todas tus ventas con métodos de pago flexibles y cuadre de caja</p>
                     </div>
                   </div>
                   
                   <div className="flex items-start bg-white rounded-lg p-4 shadow-sm border-l-4 border-[#2d219b]">
-                    <CheckCircle className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
+                    <BarChart2 className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
                     <div>
-                      <h3 className="font-semibold text-[#2d219b]">Trazabilidad completa</h3>
-                      <p className="text-gray-600">Seguimiento del ciclo de vida completo del documento</p>
+                      <h3 className="font-semibold text-[#2d219b]">Reportes de negocio</h3>
+                      <p className="text-gray-600">Análisis de ventas, productos más vendidos y rentabilidad de tu tienda</p>
                     </div>
                   </div>
                 </div>
@@ -223,18 +223,18 @@ export default function VecinosLandingStandalone() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white p-6 rounded-lg shadow-md border border-purple-100 hover:shadow-lg transition-shadow">
                   <div className="rounded-full w-12 h-12 flex items-center justify-center bg-purple-100 text-[#2d219b] mb-3">
-                    <Lock className="h-6 w-6" />
+                    <Store className="h-6 w-6" />
                   </div>
-                  <h3 className="font-semibold text-lg mb-1 text-[#2d219b]">Seguridad superior</h3>
-                  <p className="text-gray-600 text-sm">Protección con estándares internacionales</p>
+                  <h3 className="font-semibold text-lg mb-1 text-[#2d219b]">Gestión de tienda</h3>
+                  <p className="text-gray-600 text-sm">Control completo de tu almacén o minimarket</p>
                 </div>
                 
                 <div className="bg-white p-6 rounded-lg shadow-md border border-purple-100 hover:shadow-lg transition-shadow">
                   <div className="rounded-full w-12 h-12 flex items-center justify-center bg-purple-100 text-[#2d219b] mb-3">
-                    <Users className="h-6 w-6" />
+                    <Clipboard className="h-6 w-6" />
                   </div>
-                  <h3 className="font-semibold text-lg mb-1 text-[#2d219b]">Múltiples firmantes</h3>
-                  <p className="text-gray-600 text-sm">Gestión avanzada de firmantes y permisos</p>
+                  <h3 className="font-semibold text-lg mb-1 text-[#2d219b]">Documentación legal</h3>
+                  <p className="text-gray-600 text-sm">Facturas, boletas y contratos con validez legal</p>
                 </div>
                 
                 <div className="bg-white p-6 rounded-lg shadow-md border border-purple-100 col-span-2 hover:shadow-lg transition-shadow">
@@ -295,18 +295,18 @@ export default function VecinosLandingStandalone() {
                 <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-24 w-auto" />
               </div>
               <p className="text-gray-400 max-w-md">
-                Plataforma de gestión documental con firma electrónica avanzada cumpliendo la normativa chilena (Ley 19.799).
+                Plataforma integral para la gestión de tiendas, minimarkets y almacenes con documentación digital certificada según la normativa chilena.
               </p>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
               <div>
-                <h3 className="font-semibold mb-4">Productos</h3>
+                <h3 className="font-semibold mb-4">Soluciones</h3>
                 <ul className="space-y-2">
-                  <li><a href="#" className="text-gray-400 hover:text-white">Firma Digital</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white">Verificación de Identidad</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white">Gestión Documental</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white">API de Integración</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Punto de Venta POS</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Control de Inventario</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Facturación Electrónica</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Reportes de Ventas</a></li>
                 </ul>
               </div>
               
