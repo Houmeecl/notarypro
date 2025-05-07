@@ -66,9 +66,9 @@ export default function VecinosLandingStandalone() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="md:w-1/2 mb-8 md:mb-0">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Tu Minimarket, Más Digital</h1>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">Documentación Legal para tu Minimarket</h1>
               <p className="text-xl md:text-2xl text-white/90 mb-8">
-                Revoluciona tu negocio de barrio con nuestra plataforma integral de gestión para almacenes y minimarkets. Documentación, ventas e inventario en un solo lugar.
+                Revoluciona tu negocio de barrio con nuestra plataforma de documentos legales diseñada especialmente para almacenes y minimarkets. Firma electrónica con validez legal.
               </p>
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 <Link href="/vecinos-standalone-login">
@@ -137,9 +137,9 @@ export default function VecinosLandingStandalone() {
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Tu Minimarket, Totalmente Digital</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Documentos Legales para Minimarkets</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              VecinoExpress transforma tu almacén o tienda de barrio con herramientas digitales pensadas para el pequeño comerciante
+              VecinoExpress ofrece documentación digital con validez legal especialmente diseñada para las necesidades específicas de almacenes y tiendas de barrio
             </p>
           </div>
           
@@ -147,11 +147,11 @@ export default function VecinosLandingStandalone() {
             <Card className="border-none shadow-md hover:shadow-xl transition-all hover:-translate-y-1 duration-300">
               <CardContent className="p-6">
                 <div className="rounded-full w-14 h-14 flex items-center justify-center bg-purple-100 text-[#2d219b] mb-4 shadow-sm">
-                  <Store className="h-7 w-7" />
+                  <FileSignature className="h-7 w-7" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-[#2d219b]">Gestión de tu Negocio</h3>
+                <h3 className="text-xl font-semibold mb-2 text-[#2d219b]">Firma Electrónica</h3>
                 <p className="text-gray-600">
-                  Maneja la documentación de tu almacén, minimarket o tienda de barrio con validez legal desde cualquier dispositivo.
+                  Firma digitalmente cualquier documento con validez legal según la Ley 19.799 desde tu dispositivo.
                 </p>
               </CardContent>
             </Card>
@@ -161,9 +161,9 @@ export default function VecinosLandingStandalone() {
                 <div className="rounded-full w-14 h-14 flex items-center justify-center bg-purple-100 text-[#2d219b] mb-4 shadow-sm">
                   <Receipt className="h-7 w-7" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-[#2d219b]">Facturación Digital</h3>
+                <h3 className="text-xl font-semibold mb-2 text-[#2d219b]">Documentos Legales</h3>
                 <p className="text-gray-600">
-                  Genera boletas, facturas y documentos tributarios digitales con validez legal para tu negocio local.
+                  Gestiona contratos, facturas y boletas electrónicas con validez legal para tu negocio local.
                 </p>
               </CardContent>
             </Card>
@@ -171,11 +171,11 @@ export default function VecinosLandingStandalone() {
             <Card className="border-none shadow-md hover:shadow-xl transition-all hover:-translate-y-1 duration-300">
               <CardContent className="p-6">
                 <div className="rounded-full w-14 h-14 flex items-center justify-center bg-purple-100 text-[#2d219b] mb-4 shadow-sm">
-                  <ShoppingBag className="h-7 w-7" />
+                  <Clipboard className="h-7 w-7" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-[#2d219b]">Control de Inventario</h3>
+                <h3 className="text-xl font-semibold mb-2 text-[#2d219b]">Verificación Digital</h3>
                 <p className="text-gray-600">
-                  Seguimiento de productos, gestión de stock y alertas de reposición en tiempo real para tu almacén o minimarket.
+                  Verifica la autenticidad de cualquier documento firmado en tu plataforma mediante códigos QR y certificados digitales.
                 </p>
               </CardContent>
             </Card>
@@ -196,34 +196,34 @@ export default function VecinosLandingStandalone() {
                 
                 <div className="space-y-6">
                   <div className="flex items-start bg-white rounded-lg p-4 shadow-sm border-l-4 border-[#2d219b]">
-                    <ShoppingBag className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
+                    <FileSignature className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
                     <div>
-                      <h3 className="font-semibold text-[#2d219b]">Gestión de inventario</h3>
-                      <p className="text-gray-600">Maneja tu stock con alertas automáticas y reportes en tiempo real</p>
+                      <h3 className="font-semibold text-[#2d219b]">Firma desde cualquier dispositivo</h3>
+                      <p className="text-gray-600">Accede a la firma electrónica desde tu celular, tablet o computador</p>
                     </div>
                   </div>
                   
                   <div className="flex items-start bg-white rounded-lg p-4 shadow-sm border-l-4 border-[#2d219b]">
-                    <Receipt className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
+                    <Lock className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
                     <div>
-                      <h3 className="font-semibold text-[#2d219b]">Boletas digitales</h3>
-                      <p className="text-gray-600">Emite comprobantes digitales con validez tributaria desde tu punto de venta</p>
+                      <h3 className="font-semibold text-[#2d219b]">Seguridad legal garantizada</h3>
+                      <p className="text-gray-600">Todos los documentos cumplen con la Ley 19.799 de firma electrónica</p>
                     </div>
                   </div>
                   
                   <div className="flex items-start bg-white rounded-lg p-4 shadow-sm border-l-4 border-[#2d219b]">
-                    <DollarSign className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
+                    <Smartphone className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
                     <div>
-                      <h3 className="font-semibold text-[#2d219b]">Control de ventas</h3>
-                      <p className="text-gray-600">Registra todas tus ventas con métodos de pago flexibles y cuadre de caja</p>
+                      <h3 className="font-semibold text-[#2d219b]">Verificación en tiempo real</h3>
+                      <p className="text-gray-600">Verifica la autenticidad de documentos al instante con códigos QR</p>
                     </div>
                   </div>
                   
                   <div className="flex items-start bg-white rounded-lg p-4 shadow-sm border-l-4 border-[#2d219b]">
-                    <BarChart2 className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
+                    <Clipboard className="h-6 w-6 text-[#2d219b] mr-4 flex-shrink-0 mt-1" />
                     <div>
-                      <h3 className="font-semibold text-[#2d219b]">Reportes de negocio</h3>
-                      <p className="text-gray-600">Análisis de ventas, productos más vendidos y rentabilidad de tu tienda</p>
+                      <h3 className="font-semibold text-[#2d219b]">Plantillas personalizadas</h3>
+                      <p className="text-gray-600">Documentos adaptados a las necesidades específicas de tu minimarket</p>
                     </div>
                   </div>
                 </div>
@@ -243,34 +243,32 @@ export default function VecinosLandingStandalone() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white p-6 rounded-lg shadow-md border border-purple-100 hover:shadow-lg transition-shadow">
                   <div className="rounded-full w-12 h-12 flex items-center justify-center bg-purple-100 text-[#2d219b] mb-3">
-                    <Store className="h-6 w-6" />
+                    <FileSignature className="h-6 w-6" />
                   </div>
-                  <h3 className="font-semibold text-lg mb-1 text-[#2d219b]">Gestión de tienda</h3>
-                  <p className="text-gray-600 text-sm">Control completo de tu almacén o minimarket</p>
+                  <h3 className="font-semibold text-lg mb-1 text-[#2d219b]">Firma Remota</h3>
+                  <p className="text-gray-600 text-sm">Firma documentos donde sea que estés</p>
                 </div>
                 
                 <div className="bg-white p-6 rounded-lg shadow-md border border-purple-100 hover:shadow-lg transition-shadow">
                   <div className="rounded-full w-12 h-12 flex items-center justify-center bg-purple-100 text-[#2d219b] mb-3">
                     <Clipboard className="h-6 w-6" />
                   </div>
-                  <h3 className="font-semibold text-lg mb-1 text-[#2d219b]">Documentación legal</h3>
-                  <p className="text-gray-600 text-sm">Facturas, boletas y contratos con validez legal</p>
+                  <h3 className="font-semibold text-lg mb-1 text-[#2d219b]">Plantillas para Minimarkets</h3>
+                  <p className="text-gray-600 text-sm">Documentos diseñados para tu tipo de negocio</p>
                 </div>
                 
                 <div className="bg-white p-6 rounded-lg shadow-md border border-purple-100 col-span-2 hover:shadow-lg transition-shadow">
                   <div className="flex items-center space-x-3 mb-4">
                     <div className="rounded-full w-8 h-8 flex items-center justify-center bg-purple-100 text-[#2d219b]">
-                      <div className="h-2 w-2 rounded-full bg-[#2d219b]"></div>
+                      <Lock className="h-4 w-4" />
                     </div>
-                    <div className="text-[#2d219b] font-medium">Sistema en línea 24/7</div>
+                    <div className="text-[#2d219b] font-medium">Validez legal garantizada</div>
                   </div>
                   <div className="space-y-2">
-                    <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#2d219b] rounded-full" style={{ width: '99.8%' }}></div>
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>Tiempo de actividad</span>
-                      <span>99.8%</span>
+                    <p className="text-gray-600 text-sm">Todos nuestros documentos cumplen con la Ley 19.799 de firma electrónica y tienen validez legal en Chile.</p>
+                    <div className="flex items-center text-[#2d219b] mt-3">
+                      <ShieldCheck className="h-5 w-5 mr-2" />
+                      <span className="text-sm font-medium">Certificación oficial</span>
                     </div>
                   </div>
                 </div>
@@ -315,18 +313,18 @@ export default function VecinosLandingStandalone() {
                 <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-24 w-auto" />
               </div>
               <p className="text-gray-400 max-w-md">
-                Plataforma integral para la gestión de tiendas, minimarkets y almacenes con documentación digital certificada según la normativa chilena.
+                Plataforma especializada en documentación digital con validez legal para minimarkets y almacenes según la Ley 19.799 de firma electrónica.
               </p>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
               <div>
-                <h3 className="font-semibold mb-4">Soluciones</h3>
+                <h3 className="font-semibold mb-4">Documentos</h3>
                 <ul className="space-y-2">
-                  <li><a href="#" className="text-gray-400 hover:text-white">Punto de Venta POS</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white">Control de Inventario</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Contratos Digitales</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Firmas Electrónicas</a></li>
                   <li><a href="#" className="text-gray-400 hover:text-white">Facturación Electrónica</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white">Reportes de Ventas</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Certificados Digitales</a></li>
                 </ul>
               </div>
               
