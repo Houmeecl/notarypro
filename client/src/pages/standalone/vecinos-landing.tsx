@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 // Logo de Vecinos Express
-import vecinoLogo from "@/assets/vecino-xpress-logo.svg";
+import vecinoLogo from "@/assets/vecino-xpress-logo-oficial.png";
 
 /**
  * Landing Page para la versión standalone de VecinosExpress
@@ -29,8 +29,8 @@ export default function VecinosLandingStandalone() {
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex flex-col items-start">
             <div className="flex items-center space-x-2">
-              <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-12" />
-              <span className="font-bold text-2xl text-[#2d219b]">VecinoExpress</span>
+              <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-16 w-auto" />
+              <span className="font-bold text-2xl text-[#2d219b] hidden">VecinoExpress</span>
             </div>
             <span className="text-sm text-gray-600 ml-1 mt-1 italic">Certificación digital al alcance del barrio</span>
           </div>
@@ -252,9 +252,8 @@ export default function VecinosLandingStandalone() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between">
             <div className="mb-8 md:mb-0">
-              <div className="flex items-center space-x-2 mb-4">
-                <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-8" />
-                <span className="font-bold text-xl">VecinoExpress</span>
+              <div className="mb-4">
+                <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-12 w-auto" />
               </div>
               <p className="text-gray-400 max-w-md">
                 Plataforma de gestión documental con firma electrónica avanzada cumpliendo la normativa chilena (Ley 19.799).
