@@ -1,854 +1,887 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'wouter';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Users,
-  FileText,
-  Settings,
-  Building,
-  ShieldCheck,
-  BarChart3,
-  Search,
-  UserPlus,
-  FilePlus,
-  PlusCircle,
-  MoreHorizontal,
-  LogOut,
-  ChevronLeft,
-  Home,
-  Bell,
-  Upload,
-  Download,
-  Trash2,
-  Clock
+import { useLocation } from 'wouter';
+import { 
+  Users, FileText, Store, Settings, PieChart, Database, 
+  UserPlus, FileSignature, LayoutDashboard, LogOut, 
+  Search, Plus, Filter, MoreVertical, Edit, Trash2, RefreshCw, 
+  FileUp, Download, FileCheck, CheckSquare
 } from 'lucide-react';
+
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-// Panel de administración independiente para Vecinos Express
-export default function VecinosAdminStandalone() {
+import vecinoLogo from '@/assets/new/vecino-xpress-logo-nuevo.png';
+
+// Datos de ejemplo para la demo
+import { samplePartners, sampleDocuments, sampleClients, DOCUMENT_TYPES } from './admin-demo-data';
+
+// Componente principal
+export default function VecinosAdmin() {
+  const [location, setLocation] = useLocation();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('usuarios');
-  const [users, setUsers] = useState<any[]>([]);
-  const [documents, setDocuments] = useState<any[]>([]);
-  const [partners, setPartners] = useState<any[]>([]);
-  const [userData, setUserData] = useState<any>(null);
-  const [, navigate] = useLocation();
-
-  useEffect(() => {
-    // Verificar si hay usuario autenticado y si es admin
-    const storedUser = localStorage.getItem('vecinos_user');
-    if (!storedUser) {
-      window.location.href = '/vecinos-standalone-login';
-      return;
-    }
-
-    try {
-      const user = JSON.parse(storedUser);
-      setUserData(user);
-
-      // Verificar si el usuario es administrador
-      if (user.role !== 'admin') {
-        toast({
-          title: 'Acceso denegado',
-          description: 'No tienes permisos para acceder al panel de administración',
-          variant: 'destructive'
-        });
-        window.location.href = '/vecinos-standalone';
-        return;
-      }
-
-      // Cargar datos de ejemplo
-      loadDemoData();
-
-    } catch (error) {
-      console.error('Error al procesar datos de usuario:', error);
-      window.location.href = '/vecinos-standalone-login';
-    }
-  }, [toast]);
-
-  const loadDemoData = () => {
-    // Datos de usuarios de ejemplo
-    setUsers([
-      {
-        id: 1,
-        username: 'juanperez',
-        fullName: 'Juan Pérez',
-        email: 'juan.perez@example.com',
-        role: 'user',
-        status: 'active',
-        createdAt: '2025-04-15T10:30:00Z'
-      },
-      {
-        id: 2,
-        username: 'mariarodriguez',
-        fullName: 'María Rodríguez',
-        email: 'maria.rodriguez@example.com',
-        role: 'certifier',
-        status: 'active',
-        createdAt: '2025-04-10T14:20:00Z'
-      },
-      {
-        id: 3,
-        username: 'carloslopez',
-        fullName: 'Carlos López',
-        email: 'carlos.lopez@example.com',
-        role: 'partner',
-        status: 'inactive',
-        createdAt: '2025-03-25T09:15:00Z'
-      }
-    ]);
-
-    // Datos de documentos de ejemplo
-    setDocuments([
-      {
-        id: 101,
-        title: 'Contrato de Prestación de Servicios',
-        type: 'contract',
-        user: 'Juan Pérez',
-        status: 'completed',
-        createdAt: '2025-05-01T10:20:00Z'
-      },
-      {
-        id: 102,
-        title: 'Declaración Jurada Simple',
-        type: 'declaration',
-        user: 'María Rodríguez',
-        status: 'pending',
-        createdAt: '2025-04-28T16:45:00Z'
-      },
-      {
-        id: 103,
-        title: 'Poder Notarial',
-        type: 'power',
-        user: 'Carlos López',
-        status: 'signing',
-        createdAt: '2025-04-25T11:30:00Z'
-      }
-    ]);
-
-    // Datos de socios de ejemplo
-    setPartners([
-      {
-        id: 201,
-        name: 'Estudio Jurídico González',
-        type: 'legal',
-        contact: 'Pedro González',
-        email: 'pedro@gonzalezlegal.com',
-        status: 'active',
-        joinedAt: '2025-03-15T00:00:00Z'
-      },
-      {
-        id: 202,
-        name: 'Notaría Martínez',
-        type: 'notary',
-        contact: 'Ana Martínez',
-        email: 'ana@notariamartinez.cl',
-        status: 'active',
-        joinedAt: '2025-02-20T00:00:00Z'
-      },
-      {
-        id: 203,
-        name: 'Asesorías Silva',
-        type: 'advisory',
-        contact: 'Roberto Silva',
-        email: 'roberto@asesoriassilva.cl',
-        status: 'inactive',
-        joinedAt: '2025-01-10T00:00:00Z'
-      }
-    ]);
-
-    setLoading(false);
+  
+  // Estado para las entidades
+  const [partners, setPartners] = useState(samplePartners);
+  const [documents, setDocuments] = useState(sampleDocuments);
+  const [clients, setClients] = useState(sampleClients);
+  
+  // Estado para diálogos
+  const [showAddPartnerDialog, setShowAddPartnerDialog] = useState(false);
+  const [showAddDocumentDialog, setShowAddDocumentDialog] = useState(false);
+  const [showAddClientDialog, setShowAddClientDialog] = useState(false);
+  
+  // Estado para nuevas entidades
+  const [newPartner, setNewPartner] = useState({
+    name: '',
+    businessType: '',
+    email: '',
+    phone: '',
+    address: '',
+    status: 'active'
+  });
+  
+  const [newDocument, setNewDocument] = useState({
+    title: '',
+    type: '',
+    description: '',
+    template: '',
+    price: ''
+  });
+  
+  const [newClient, setNewClient] = useState({
+    name: '',
+    rut: '',
+    email: '',
+    phone: '',
+    address: ''
+  });
+  
+  // Handlers para formularios
+  const handlePartnerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewPartner(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
-
-  const handleLogout = () => {
-    localStorage.removeItem('vecinos_user');
-    localStorage.removeItem('vecinos_token');
+  
+  const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewDocument(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  const handleDocumentSelectChange = (name: string, value: string) => {
+    setNewDocument(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  const handleClientChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewClient(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  // Funciones para agregar entidades
+  const addPartner = () => {
+    const id = 'partner-' + (partners.length + 1);
+    const partner = {
+      ...newPartner,
+      id,
+      dateAdded: new Date().toISOString(),
+      documents: 0,
+      sales: 0
+    };
     
-    toast({
-      title: 'Sesión cerrada',
-      description: 'Has cerrado sesión correctamente.'
+    setPartners(prev => [...prev, partner]);
+    setShowAddPartnerDialog(false);
+    setNewPartner({
+      name: '',
+      businessType: '',
+      email: '',
+      phone: '',
+      address: '',
+      status: 'active'
     });
     
-    window.location.href = '/vecinos-standalone-login';
+    toast({
+      title: "Socio agregado",
+      description: `Se ha agregado el socio ${partner.name}`
+    });
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="ml-2">Cargando panel de administración...</p>
-      </div>
-    );
-  }
-
-  // Función para formatear fechas
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return new Intl.DateTimeFormat('es-CL', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
+  
+  const addDocument = () => {
+    const id = 'doc-' + (documents.length + 1);
+    const document = {
+      ...newDocument,
+      id,
+      dateAdded: new Date().toISOString(),
+      usageCount: 0,
+      status: 'active',
+      price: parseFloat(newDocument.price) || 0
+    };
+    
+    setDocuments(prev => [...prev, document]);
+    setShowAddDocumentDialog(false);
+    setNewDocument({
+      title: '',
+      type: '',
+      description: '',
+      template: '',
+      price: ''
+    });
+    
+    toast({
+      title: "Documento agregado",
+      description: `Se ha agregado el documento ${document.title}`
+    });
   };
-
+  
+  const addClient = () => {
+    const id = 'client-' + (clients.length + 1);
+    const client = {
+      ...newClient,
+      id,
+      dateAdded: new Date().toISOString(),
+      documents: 0,
+      status: 'active'
+    };
+    
+    setClients(prev => [...prev, client]);
+    setShowAddClientDialog(false);
+    setNewClient({
+      name: '',
+      rut: '',
+      email: '',
+      phone: '',
+      address: ''
+    });
+    
+    toast({
+      title: "Cliente agregado",
+      description: `Se ha agregado el cliente ${client.name}`
+    });
+  };
+  
+  // Funciones para eliminar entidades
+  const deletePartner = (id: string) => {
+    setPartners(prev => prev.filter(partner => partner.id !== id));
+    
+    toast({
+      title: "Socio eliminado",
+      description: "Se ha eliminado el socio correctamente"
+    });
+  };
+  
+  const deleteDocument = (id: string) => {
+    setDocuments(prev => prev.filter(doc => doc.id !== id));
+    
+    toast({
+      title: "Documento eliminado",
+      description: "Se ha eliminado el documento correctamente"
+    });
+  };
+  
+  const deleteClient = (id: string) => {
+    setClients(prev => prev.filter(client => client.id !== id));
+    
+    toast({
+      title: "Cliente eliminado",
+      description: "Se ha eliminado el cliente correctamente"
+    });
+  };
+  
+  // Formato de fecha
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    };
+    return new Date(dateString).toLocaleDateString('es-CL', options);
+  };
+  
+  // Cerrar sesión
+  const handleLogout = () => {
+    toast({
+      title: "Sesión cerrada",
+      description: "Ha cerrado sesión correctamente"
+    });
+    
+    setLocation('/vecinos-standalone-login');
+  };
+  
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="mr-4"
-              onClick={() => navigate('/vecinos-standalone')}
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Volver
-            </Button>
-            <h1 className="font-bold text-xl flex items-center">
-              <ShieldCheck className="h-5 w-5 text-blue-600 mr-2" />
-              Panel de Administración
-            </h1>
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <div className="w-64 bg-white border-r hidden md:block">
+        <div className="p-4 border-b">
+          <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-10" />
+        </div>
+        
+        <div className="p-4">
+          <div className="flex items-center gap-3 mb-6">
+            <Avatar>
+              <AvatarImage src="https://ui.shadcn.com/avatars/01.png" />
+              <AvatarFallback>ED</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-medium text-sm">Administrador</p>
+              <p className="text-xs text-gray-500">admin@vecinoxpress.cl</p>
+            </div>
           </div>
           
-          <div className="flex items-center space-x-3">
-            <div className="hidden md:flex items-center space-x-1">
-              <Bell className="h-5 w-5 text-gray-500 cursor-pointer hover:text-blue-600" />
+          <nav className="space-y-1">
+            <Button variant="ghost" className="w-full justify-start" asChild>
+              <div>
+                <LayoutDashboard className="h-4 w-4 mr-2" />
+                Dashboard
+              </div>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start" asChild>
+              <div>
+                <FileText className="h-4 w-4 mr-2" />
+                Documentos
+              </div>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start" asChild>
+              <div>
+                <Users className="h-4 w-4 mr-2" />
+                Clientes
+              </div>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start" asChild>
+              <div>
+                <Store className="h-4 w-4 mr-2" />
+                Socios
+              </div>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start" asChild>
+              <div>
+                <PieChart className="h-4 w-4 mr-2" />
+                Reportes
+              </div>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start" asChild>
+              <div>
+                <Settings className="h-4 w-4 mr-2" />
+                Configuración
+              </div>
+            </Button>
+            
+            <Separator className="my-4" />
+            
+            <Button variant="ghost" className="w-full justify-start text-red-500" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Cerrar sesión
+            </Button>
+          </nav>
+        </div>
+      </div>
+      
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-auto">
+        {/* Navbar */}
+        <header className="bg-white border-b py-4 px-6 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-semibold">Panel de Administración</h1>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <div className="relative w-64">
+              <Search className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Buscar..."
+                className="pl-8"
+              />
             </div>
             
-            <div className="flex items-center">
-              <span className="text-sm font-medium mr-2 hidden md:inline">
-                {userData?.fullName || userData?.username}
-              </span>
-              <Badge className="mr-2 bg-blue-100 text-blue-800 hover:bg-blue-200">Admin</Badge>
-              <Button variant="ghost" size="icon" onClick={handleLogout}>
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </div>
+            <Button variant="outline">
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+            
+            <Button onClick={handleLogout} className="md:hidden">
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
-        </div>
-      </header>
-
-      {/* Content */}
-      <div className="flex flex-col md:flex-row flex-1">
-        {/* Sidebar */}
-        <aside className="w-full md:w-64 bg-white border-r border-gray-200 md:h-[calc(100vh-64px)] md:sticky md:top-16">
-          <div className="p-4">
-            <div className="mb-6">
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <Search className="h-4 w-4" />
-                </span>
+        </header>
+        
+        {/* Dashboard content */}
+        <main className="flex-1 overflow-auto p-6">
+          <Tabs defaultValue="documents" className="space-y-6">
+            <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto mb-6">
+              <TabsTrigger value="documents">Documentos</TabsTrigger>
+              <TabsTrigger value="clients">Clientes</TabsTrigger>
+              <TabsTrigger value="partners">Socios</TabsTrigger>
+            </TabsList>
+            
+            {/* Documentos */}
+            <TabsContent value="documents" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold">Gestión de Documentos</h2>
+                
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filtrar
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => setShowAddDocumentDialog(true)}
+                    className="bg-[#2d219b] hover:bg-[#241a7d] text-white"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nuevo Documento
+                  </Button>
+                </div>
+              </div>
+              
+              <Card>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Documento</TableHead>
+                        <TableHead>Tipo</TableHead>
+                        <TableHead>Precio</TableHead>
+                        <TableHead>Fecha</TableHead>
+                        <TableHead>Estado</TableHead>
+                        <TableHead className="text-right">Acciones</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {documents.map(doc => (
+                        <TableRow key={doc.id}>
+                          <TableCell>
+                            <div className="font-medium">{doc.title}</div>
+                            <div className="text-sm text-gray-500">{doc.id}</div>
+                          </TableCell>
+                          <TableCell>{doc.type}</TableCell>
+                          <TableCell>${doc.price.toLocaleString('es-CL')}</TableCell>
+                          <TableCell>{formatDate(doc.dateAdded)}</TableCell>
+                          <TableCell>
+                            <Badge className={
+                              doc.status === 'active' ? 'bg-green-100 text-green-800' :
+                              'bg-gray-100 text-gray-800'
+                            }>
+                              {doc.status === 'active' ? 'Activo' : 'Inactivo'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                                <DropdownMenuItem className="cursor-pointer">
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Editar
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="cursor-pointer">
+                                  <FileCheck className="h-4 w-4 mr-2" />
+                                  Ver plantilla
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="cursor-pointer text-red-600" onClick={() => deleteDocument(doc.id)}>
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Eliminar
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            {/* Clientes */}
+            <TabsContent value="clients" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold">Gestión de Clientes</h2>
+                
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filtrar
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => setShowAddClientDialog(true)}
+                    className="bg-[#2d219b] hover:bg-[#241a7d] text-white"
+                  >
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Nuevo Cliente
+                  </Button>
+                </div>
+              </div>
+              
+              <Card>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Cliente</TableHead>
+                        <TableHead>RUT</TableHead>
+                        <TableHead>Contacto</TableHead>
+                        <TableHead>Documentos</TableHead>
+                        <TableHead>Estado</TableHead>
+                        <TableHead className="text-right">Acciones</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {clients.map(client => (
+                        <TableRow key={client.id}>
+                          <TableCell>
+                            <div className="font-medium">{client.name}</div>
+                            <div className="text-sm text-gray-500">{client.id}</div>
+                          </TableCell>
+                          <TableCell>{client.rut}</TableCell>
+                          <TableCell>
+                            <div>{client.email}</div>
+                            <div className="text-sm text-gray-500">{client.phone}</div>
+                          </TableCell>
+                          <TableCell>{client.documents}</TableCell>
+                          <TableCell>
+                            <Badge className={
+                              client.status === 'active' ? 'bg-green-100 text-green-800' :
+                              'bg-gray-100 text-gray-800'
+                            }>
+                              {client.status === 'active' ? 'Activo' : 'Inactivo'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                                <DropdownMenuItem className="cursor-pointer">
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Editar
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="cursor-pointer">
+                                  <FileText className="h-4 w-4 mr-2" />
+                                  Ver documentos
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="cursor-pointer text-red-600" onClick={() => deleteClient(client.id)}>
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Eliminar
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            {/* Socios */}
+            <TabsContent value="partners" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold">Gestión de Socios</h2>
+                
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filtrar
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => setShowAddPartnerDialog(true)}
+                    className="bg-[#2d219b] hover:bg-[#241a7d] text-white"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nuevo Socio
+                  </Button>
+                </div>
+              </div>
+              
+              <Card>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Negocio</TableHead>
+                        <TableHead>Tipo</TableHead>
+                        <TableHead>Contacto</TableHead>
+                        <TableHead>Documentos</TableHead>
+                        <TableHead>Estado</TableHead>
+                        <TableHead className="text-right">Acciones</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {partners.map(partner => (
+                        <TableRow key={partner.id}>
+                          <TableCell>
+                            <div className="font-medium">{partner.name}</div>
+                            <div className="text-sm text-gray-500">{partner.id}</div>
+                          </TableCell>
+                          <TableCell>{partner.businessType}</TableCell>
+                          <TableCell>
+                            <div>{partner.email}</div>
+                            <div className="text-sm text-gray-500">{partner.phone}</div>
+                          </TableCell>
+                          <TableCell>{partner.documents}</TableCell>
+                          <TableCell>
+                            <Badge className={
+                              partner.status === 'active' ? 'bg-green-100 text-green-800' :
+                              'bg-gray-100 text-gray-800'
+                            }>
+                              {partner.status === 'active' ? 'Activo' : 'Inactivo'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                                <DropdownMenuItem className="cursor-pointer">
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Editar
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="cursor-pointer">
+                                  <Database className="h-4 w-4 mr-2" />
+                                  Ver transacciones
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="cursor-pointer text-red-600" onClick={() => deletePartner(partner.id)}>
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Eliminar
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </main>
+      </div>
+      
+      {/* Diálogo para agregar socio */}
+      <Dialog open={showAddPartnerDialog} onOpenChange={setShowAddPartnerDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Agregar Nuevo Socio</DialogTitle>
+            <DialogDescription>
+              Complete la información del nuevo socio comercial.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Nombre del Negocio</Label>
+              <Input
+                id="name"
+                name="name"
+                placeholder="Ej: Almacén Don Pedro"
+                value={newPartner.name}
+                onChange={handlePartnerChange}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="businessType">Tipo de Negocio</Label>
+              <Input
+                id="businessType"
+                name="businessType"
+                placeholder="Ej: Minimarket"
+                value={newPartner.businessType}
+                onChange={handlePartnerChange}
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  type="search"
-                  placeholder="Buscar..."
-                  className="h-9 pl-10"
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Ej: contacto@negocio.cl"
+                  value={newPartner.email}
+                  onChange={handlePartnerChange}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="phone">Teléfono</Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  placeholder="Ej: +56 9 1234 5678"
+                  value={newPartner.phone}
+                  onChange={handlePartnerChange}
                 />
               </div>
             </div>
             
-            <div className="space-y-1">
-              <Button 
-                variant={activeTab === 'usuarios' ? 'secondary' : 'ghost'} 
-                className="w-full justify-start" 
-                onClick={() => setActiveTab('usuarios')}
-              >
-                <Users className="h-4 w-4 mr-2" />
-                Usuarios
-              </Button>
-              <Button 
-                variant={activeTab === 'documentos' ? 'secondary' : 'ghost'} 
-                className="w-full justify-start" 
-                onClick={() => setActiveTab('documentos')}
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                Documentos
-              </Button>
-              <Button 
-                variant={activeTab === 'partners' ? 'secondary' : 'ghost'} 
-                className="w-full justify-start" 
-                onClick={() => setActiveTab('partners')}
-              >
-                <Building className="h-4 w-4 mr-2" />
-                Socios Comerciales
-              </Button>
-              <Button 
-                variant={activeTab === 'estadisticas' ? 'secondary' : 'ghost'} 
-                className="w-full justify-start" 
-                onClick={() => setActiveTab('estadisticas')}
-              >
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Estadísticas
-              </Button>
-              <Button 
-                variant={activeTab === 'configuracion' ? 'secondary' : 'ghost'} 
-                className="w-full justify-start" 
-                onClick={() => setActiveTab('configuracion')}
-              >
-                <Settings className="h-4 w-4 mr-2" />
-                Configuración
-              </Button>
+            <div className="space-y-2">
+              <Label htmlFor="address">Dirección</Label>
+              <Input
+                id="address"
+                name="address"
+                placeholder="Ej: Av. Ejemplo 123, Santiago"
+                value={newPartner.address}
+                onChange={handlePartnerChange}
+              />
             </div>
           </div>
-        </aside>
-
-        {/* Main Content */}
-        <main className="flex-1 p-4 md:p-6">
-          {/* Usuarios Tab */}
-          {activeTab === 'usuarios' && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">Gestión de Usuarios</h2>
-                <Button>
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Nuevo Usuario
-                </Button>
-              </div>
-              
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle>Lista de Usuarios</CardTitle>
-                  <CardDescription>Administra los usuarios del sistema</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">ID</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Nombre</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Usuario</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Email</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Rol</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Estado</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Creado</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {users.map(user => (
-                          <tr key={user.id} className="hover:bg-gray-50">
-                            <td className="py-3 px-4 border-b text-sm">{user.id}</td>
-                            <td className="py-3 px-4 border-b text-sm font-medium">{user.fullName}</td>
-                            <td className="py-3 px-4 border-b text-sm">{user.username}</td>
-                            <td className="py-3 px-4 border-b text-sm">{user.email}</td>
-                            <td className="py-3 px-4 border-b text-sm">
-                              <Badge 
-                                className={
-                                  user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
-                                  user.role === 'certifier' ? 'bg-blue-100 text-blue-800' :
-                                  user.role === 'partner' ? 'bg-orange-100 text-orange-800' :
-                                  'bg-gray-100 text-gray-800'
-                                }
-                              >
-                                {user.role === 'admin' ? 'Administrador' :
-                                 user.role === 'certifier' ? 'Certificador' :
-                                 user.role === 'partner' ? 'Socio' : 'Usuario'}
-                              </Badge>
-                            </td>
-                            <td className="py-3 px-4 border-b text-sm">
-                              <Badge 
-                                className={user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}
-                              >
-                                {user.status === 'active' ? 'Activo' : 'Inactivo'}
-                              </Badge>
-                            </td>
-                            <td className="py-3 px-4 border-b text-sm">
-                              {formatDate(user.createdAt)}
-                            </td>
-                            <td className="py-3 px-4 border-b text-sm">
-                              <div className="flex space-x-2">
-                                <Button variant="ghost" size="sm">Editar</Button>
-                                <Button variant="ghost" size="icon">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between border-t px-6 py-4">
-                  <div className="text-sm text-gray-500">
-                    Mostrando {users.length} usuarios
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" disabled>Anterior</Button>
-                    <Button variant="outline" size="sm" disabled>Siguiente</Button>
-                  </div>
-                </CardFooter>
-              </Card>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddPartnerDialog(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={addPartner}
+              className="bg-[#2d219b] hover:bg-[#241a7d] text-white"
+              disabled={!newPartner.name || !newPartner.businessType}
+            >
+              Agregar Socio
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Diálogo para agregar documento */}
+      <Dialog open={showAddDocumentDialog} onOpenChange={setShowAddDocumentDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Agregar Nuevo Documento</DialogTitle>
+            <DialogDescription>
+              Complete la información del nuevo tipo de documento.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">Título del Documento</Label>
+              <Input
+                id="title"
+                name="title"
+                placeholder="Ej: Poder Simple"
+                value={newDocument.title}
+                onChange={handleDocumentChange}
+              />
             </div>
-          )}
-
-          {/* Documentos Tab */}
-          {activeTab === 'documentos' && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">Gestión de Documentos</h2>
-                <Button>
-                  <FilePlus className="h-4 w-4 mr-2" />
-                  Nuevo Documento
-                </Button>
-              </div>
-              
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle>Lista de Documentos</CardTitle>
-                  <CardDescription>Administra los documentos del sistema</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">ID</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Título</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Tipo</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Usuario</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Estado</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Fecha</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {documents.map(doc => (
-                          <tr key={doc.id} className="hover:bg-gray-50">
-                            <td className="py-3 px-4 border-b text-sm">{doc.id}</td>
-                            <td className="py-3 px-4 border-b text-sm font-medium">{doc.title}</td>
-                            <td className="py-3 px-4 border-b text-sm">
-                              <Badge 
-                                className={
-                                  doc.type === 'contract' ? 'bg-blue-100 text-blue-800' :
-                                  doc.type === 'declaration' ? 'bg-green-100 text-green-800' :
-                                  'bg-purple-100 text-purple-800'
-                                }
-                              >
-                                {doc.type === 'contract' ? 'Contrato' :
-                                 doc.type === 'declaration' ? 'Declaración' : 'Poder'}
-                              </Badge>
-                            </td>
-                            <td className="py-3 px-4 border-b text-sm">{doc.user}</td>
-                            <td className="py-3 px-4 border-b text-sm">
-                              <Badge 
-                                className={
-                                  doc.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                  doc.status === 'signing' ? 'bg-orange-100 text-orange-800' :
-                                  'bg-blue-100 text-blue-800'
-                                }
-                              >
-                                {doc.status === 'completed' ? 'Completado' :
-                                 doc.status === 'signing' ? 'En firma' : 'Pendiente'}
-                              </Badge>
-                            </td>
-                            <td className="py-3 px-4 border-b text-sm">
-                              {formatDate(doc.createdAt)}
-                            </td>
-                            <td className="py-3 px-4 border-b text-sm">
-                              <div className="flex space-x-2">
-                                <Button variant="ghost" size="sm">Ver</Button>
-                                <Button variant="ghost" size="sm">
-                                  <Download className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="icon">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between border-t px-6 py-4">
-                  <div className="text-sm text-gray-500">
-                    Mostrando {documents.length} documentos
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" disabled>Anterior</Button>
-                    <Button variant="outline" size="sm" disabled>Siguiente</Button>
-                  </div>
-                </CardFooter>
-              </Card>
+            
+            <div className="space-y-2">
+              <Label htmlFor="type">Tipo de Documento</Label>
+              <Select 
+                value={newDocument.type} 
+                onValueChange={(value) => handleDocumentSelectChange('type', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione tipo de documento" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Tipos de Documento</SelectLabel>
+                    {DOCUMENT_TYPES.map(type => (
+                      <SelectItem key={type.id} value={type.name}>
+                        {type.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
-          )}
-
-          {/* Partners Tab */}
-          {activeTab === 'partners' && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">Socios Comerciales</h2>
-                <Button>
-                  <Building className="h-4 w-4 mr-2" />
-                  Nuevo Socio
-                </Button>
-              </div>
-              
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle>Lista de Socios</CardTitle>
-                  <CardDescription>Administra los socios comerciales</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">ID</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Nombre</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Tipo</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Contacto</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Email</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Estado</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Fecha</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 border-b">Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {partners.map(partner => (
-                          <tr key={partner.id} className="hover:bg-gray-50">
-                            <td className="py-3 px-4 border-b text-sm">{partner.id}</td>
-                            <td className="py-3 px-4 border-b text-sm font-medium">{partner.name}</td>
-                            <td className="py-3 px-4 border-b text-sm">
-                              <Badge 
-                                className={
-                                  partner.type === 'legal' ? 'bg-purple-100 text-purple-800' :
-                                  partner.type === 'notary' ? 'bg-blue-100 text-blue-800' :
-                                  'bg-green-100 text-green-800'
-                                }
-                              >
-                                {partner.type === 'legal' ? 'Estudio Jurídico' :
-                                 partner.type === 'notary' ? 'Notaría' : 'Asesoría'}
-                              </Badge>
-                            </td>
-                            <td className="py-3 px-4 border-b text-sm">{partner.contact}</td>
-                            <td className="py-3 px-4 border-b text-sm">{partner.email}</td>
-                            <td className="py-3 px-4 border-b text-sm">
-                              <Badge 
-                                className={partner.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}
-                              >
-                                {partner.status === 'active' ? 'Activo' : 'Inactivo'}
-                              </Badge>
-                            </td>
-                            <td className="py-3 px-4 border-b text-sm">
-                              {formatDate(partner.joinedAt)}
-                            </td>
-                            <td className="py-3 px-4 border-b text-sm">
-                              <div className="flex space-x-2">
-                                <Button variant="ghost" size="sm">Editar</Button>
-                                <Button variant="ghost" size="icon">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between border-t px-6 py-4">
-                  <div className="text-sm text-gray-500">
-                    Mostrando {partners.length} socios
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" disabled>Anterior</Button>
-                    <Button variant="outline" size="sm" disabled>Siguiente</Button>
-                  </div>
-                </CardFooter>
-              </Card>
+            
+            <div className="space-y-2">
+              <Label htmlFor="description">Descripción</Label>
+              <Input
+                id="description"
+                name="description"
+                placeholder="Ej: Documento para autorizar a un tercero"
+                value={newDocument.description}
+                onChange={handleDocumentChange}
+              />
             </div>
-          )}
-
-          {/* Estadísticas Tab */}
-          {activeTab === 'estadisticas' && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">Estadísticas del Sistema</h2>
-                <Button variant="outline">
-                  <Download className="h-4 w-4 mr-2" />
-                  Exportar Datos
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Total Usuarios</p>
-                        <h3 className="text-2xl font-bold mt-1">{users.length}</h3>
-                      </div>
-                      <div className="bg-blue-100 p-3 rounded-full">
-                        <Users className="h-6 w-6 text-blue-600" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Total Documentos</p>
-                        <h3 className="text-2xl font-bold mt-1">{documents.length}</h3>
-                      </div>
-                      <div className="bg-green-100 p-3 rounded-full">
-                        <FileText className="h-6 w-6 text-green-600" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Total Socios</p>
-                        <h3 className="text-2xl font-bold mt-1">{partners.length}</h3>
-                      </div>
-                      <div className="bg-purple-100 p-3 rounded-full">
-                        <Building className="h-6 w-6 text-purple-600" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-              
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle>Actividad Reciente</CardTitle>
-                  <CardDescription>Últimas acciones en el sistema</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-start space-x-4 pb-4 border-b border-gray-100">
-                      <div className="bg-blue-100 p-2 rounded-full">
-                        <UserPlus className="h-4 w-4 text-blue-600" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium">Nuevo usuario registrado</p>
-                        <p className="text-sm text-gray-600">Se ha registrado un nuevo usuario en el sistema</p>
-                        <p className="text-xs text-gray-500 mt-1">Hace 2 horas</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-4 pb-4 border-b border-gray-100">
-                      <div className="bg-green-100 p-2 rounded-full">
-                        <FileText className="h-4 w-4 text-green-600" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium">Documento actualizado</p>
-                        <p className="text-sm text-gray-600">Se ha actualizado un documento en el sistema</p>
-                        <p className="text-xs text-gray-500 mt-1">Hace 5 horas</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-4">
-                      <div className="bg-orange-100 p-2 rounded-full">
-                        <Clock className="h-4 w-4 text-orange-600" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium">Documento vencido</p>
-                        <p className="text-sm text-gray-600">Un documento ha vencido sin ser procesado</p>
-                        <p className="text-xs text-gray-500 mt-1">Hace 1 día</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Rendimiento del Sistema</CardTitle>
-                  <CardDescription>Resumen de rendimiento de los últimos 30 días</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-64 flex items-center justify-center border border-dashed border-gray-300 rounded-lg">
-                    <div className="text-center">
-                      <BarChart3 className="h-12 w-12 text-gray-300 mx-auto mb-2" />
-                      <p className="text-gray-500">El gráfico de estadísticas se mostrará aquí</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            
+            <div className="space-y-2">
+              <Label htmlFor="price">Precio (CLP)</Label>
+              <Input
+                id="price"
+                name="price"
+                type="number"
+                placeholder="Ej: 5000"
+                value={newDocument.price}
+                onChange={handleDocumentChange}
+              />
             </div>
-          )}
-
-          {/* Configuración Tab */}
-          {activeTab === 'configuracion' && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">Configuración del Sistema</h2>
-                <Button>
-                  <Settings className="h-4 w-4 mr-2" />
-                  Guardar Cambios
-                </Button>
+            
+            <div className="space-y-2">
+              <Label htmlFor="template">Plantilla HTML</Label>
+              <Input
+                id="template"
+                name="template"
+                placeholder="Ej: <div>Plantilla del documento</div>"
+                value={newDocument.template}
+                onChange={handleDocumentChange}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddDocumentDialog(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={addDocument}
+              className="bg-[#2d219b] hover:bg-[#241a7d] text-white"
+              disabled={!newDocument.title || !newDocument.type || !newDocument.price}
+            >
+              Agregar Documento
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Diálogo para agregar cliente */}
+      <Dialog open={showAddClientDialog} onOpenChange={setShowAddClientDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Agregar Nuevo Cliente</DialogTitle>
+            <DialogDescription>
+              Complete la información del nuevo cliente.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Nombre Completo</Label>
+              <Input
+                id="name"
+                name="name"
+                placeholder="Ej: Juan Pérez"
+                value={newClient.name}
+                onChange={handleClientChange}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="rut">RUT</Label>
+              <Input
+                id="rut"
+                name="rut"
+                placeholder="Ej: 12.345.678-9"
+                value={newClient.rut}
+                onChange={handleClientChange}
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Ej: cliente@ejemplo.com"
+                  value={newClient.email}
+                  onChange={handleClientChange}
+                />
               </div>
               
-              <Tabs defaultValue="general">
-                <TabsList className="mb-6">
-                  <TabsTrigger value="general">General</TabsTrigger>
-                  <TabsTrigger value="security">Seguridad</TabsTrigger>
-                  <TabsTrigger value="notifications">Notificaciones</TabsTrigger>
-                  <TabsTrigger value="backup">Respaldos</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="general">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Configuración General</CardTitle>
-                      <CardDescription>Configura los parámetros generales del sistema</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="company-name">Nombre de la Empresa</Label>
-                          <Input id="company-name" defaultValue="VecinoExpress" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="timezone">Zona Horaria</Label>
-                          <Input id="timezone" defaultValue="America/Santiago" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="language">Idioma</Label>
-                          <Input id="language" defaultValue="Español (Chile)" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="dateformat">Formato de Fecha</Label>
-                          <Input id="dateformat" defaultValue="DD/MM/YYYY" />
-                        </div>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="border-t px-6 py-4">
-                      <Button>Guardar Configuración</Button>
-                    </CardFooter>
-                  </Card>
-                </TabsContent>
-                
-                <TabsContent value="security">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Configuración de Seguridad</CardTitle>
-                      <CardDescription>Configura los parámetros de seguridad del sistema</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="password-policy">Política de Contraseñas</Label>
-                          <Input id="password-policy" defaultValue="Fuerte" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="session-timeout">Tiempo de Sesión (minutos)</Label>
-                          <Input type="number" id="session-timeout" defaultValue="30" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="auth-method">Método de Autenticación</Label>
-                          <Input id="auth-method" defaultValue="Usuario y Contraseña" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="ip-restriction">Restricción de IP</Label>
-                          <Input id="ip-restriction" defaultValue="Desactivado" />
-                        </div>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="border-t px-6 py-4">
-                      <Button>Guardar Configuración</Button>
-                    </CardFooter>
-                  </Card>
-                </TabsContent>
-                
-                <TabsContent value="notifications">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Configuración de Notificaciones</CardTitle>
-                      <CardDescription>Configura las notificaciones del sistema</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="email-notifications">Notificaciones por Email</Label>
-                          <Input id="email-notifications" defaultValue="Activado" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="sms-notifications">Notificaciones por SMS</Label>
-                          <Input id="sms-notifications" defaultValue="Desactivado" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="app-notifications">Notificaciones en la App</Label>
-                          <Input id="app-notifications" defaultValue="Activado" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="notification-frequency">Frecuencia de Notificaciones</Label>
-                          <Input id="notification-frequency" defaultValue="Inmediata" />
-                        </div>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="border-t px-6 py-4">
-                      <Button>Guardar Configuración</Button>
-                    </CardFooter>
-                  </Card>
-                </TabsContent>
-                
-                <TabsContent value="backup">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Configuración de Respaldos</CardTitle>
-                      <CardDescription>Configura los respaldos del sistema</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="backup-frequency">Frecuencia de Respaldo</Label>
-                          <Input id="backup-frequency" defaultValue="Diario" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="backup-time">Hora de Respaldo</Label>
-                          <Input id="backup-time" defaultValue="03:00 AM" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="backup-retention">Retención de Respaldos (días)</Label>
-                          <Input type="number" id="backup-retention" defaultValue="30" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="backup-location">Ubicación de Respaldos</Label>
-                          <Input id="backup-location" defaultValue="Servidor Local" />
-                        </div>
-                      </div>
-                      
-                      <div className="flex justify-between items-center pt-4">
-                        <Button variant="outline">
-                          <Download className="h-4 w-4 mr-2" />
-                          Descargar Respaldo
-                        </Button>
-                        <Button>
-                          <Upload className="h-4 w-4 mr-2" />
-                          Crear Respaldo Ahora
-                        </Button>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="border-t px-6 py-4">
-                      <Button>Guardar Configuración</Button>
-                    </CardFooter>
-                  </Card>
-                </TabsContent>
-              </Tabs>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Teléfono</Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  placeholder="Ej: +56 9 1234 5678"
+                  value={newClient.phone}
+                  onChange={handleClientChange}
+                />
+              </div>
             </div>
-          )}
-        </main>
-      </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="address">Dirección</Label>
+              <Input
+                id="address"
+                name="address"
+                placeholder="Ej: Av. Ejemplo 123, Santiago"
+                value={newClient.address}
+                onChange={handleClientChange}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddClientDialog(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={addClient}
+              className="bg-[#2d219b] hover:bg-[#241a7d] text-white"
+              disabled={!newClient.name || !newClient.rut}
+            >
+              Agregar Cliente
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
