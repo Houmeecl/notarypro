@@ -15,11 +15,14 @@ import {
   Receipt,
   Clipboard,
   BarChart2,
-  DollarSign
+  DollarSign,
+  Percent
 } from 'lucide-react';
 
 // Logo de Vecinos Express
 import vecinoLogo from "@/assets/new/vecino-xpress-logo-nuevo.png";
+// Importar la ilustración de personas conversando
+import PeopleConversation from "@/components/illustrations/PeopleConversation";
 
 /**
  * Landing Page para la versión standalone de VecinosExpress
@@ -63,44 +66,57 @@ export default function VecinosLandingStandalone() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="md:w-1/2 mb-8 md:mb-0">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Transformando negocios locales</h1>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">Tu Minimarket, Más Digital</h1>
               <p className="text-xl md:text-2xl text-white/90 mb-8">
-                Potencia tu empresa con nuestra plataforma integral de gestión documental y firma electrónica avanzada conforme a la Ley 19.799
+                Revoluciona tu negocio de barrio con nuestra plataforma integral de gestión para almacenes y minimarkets. Documentación, ventas e inventario en un solo lugar.
               </p>
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 <Link href="/vecinos-standalone-login">
                   <Button size="lg" className="bg-white text-[#2d219b] hover:bg-white/90 shadow-lg">
-                    Comenzar Ahora
+                    Digitaliza Tu Negocio
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
                 <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/20">
-                  Saber Más
+                  Ver Beneficios
                 </Button>
+              </div>
+              <div className="mt-6 bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+                <div className="flex items-center text-white">
+                  <Percent className="h-5 w-5 mr-2" />
+                  <p className="text-sm font-medium">Promoción Especial: 30 días gratis para negocios de barrio</p>
+                </div>
               </div>
             </div>
             <div className="md:w-1/2 flex justify-center">
               <div className="relative w-full max-w-md">
                 <div className="bg-white/10 rounded-lg p-6 border border-white/20 backdrop-blur-sm shadow-xl">
-                  <div className="aspect-video bg-white/5 rounded flex items-center justify-center mb-6">
-                    <div className="relative">
-                      <div className="absolute -top-6 -left-6 w-12 h-12 bg-purple-400 rounded-full opacity-50"></div>
-                      <div className="absolute -bottom-6 -right-6 w-12 h-12 bg-indigo-500 rounded-full opacity-50"></div>
-                      <FileSignature className="h-16 w-16 text-white/80 relative z-10" />
-                    </div>
+                  <div className="aspect-video bg-purple-700/10 rounded flex items-center justify-center mb-4 overflow-hidden">
+                    <PeopleConversation width={320} height={200} className="transform scale-110" />
                   </div>
                   <div className="space-y-3">
-                    <div className="h-4 w-3/4 bg-white/20 rounded"></div>
-                    <div className="h-4 w-full bg-white/20 rounded"></div>
-                    <div className="h-4 w-5/6 bg-white/20 rounded"></div>
-                    <div className="h-4 w-2/3 bg-white/20 rounded"></div>
-                    <div className="h-10 w-full bg-white/20 rounded mt-6"></div>
+                    <div className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-300 mr-2" />
+                      <div className="h-4 w-3/4 bg-white/20 rounded"></div>
+                    </div>
+                    <div className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-300 mr-2" />
+                      <div className="h-4 w-full bg-white/20 rounded"></div>
+                    </div>
+                    <div className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-300 mr-2" />
+                      <div className="h-4 w-5/6 bg-white/20 rounded"></div>
+                    </div>
+                    <div className="h-10 w-full bg-purple-500/30 rounded mt-6 flex items-center justify-center">
+                      <ShoppingBag className="h-6 w-6 text-white mr-2" />
+                      <span className="text-white font-medium">Tu Negocio Digital</span>
+                    </div>
                   </div>
                 </div>
                 <div className="absolute -bottom-5 -right-5 h-24 w-24 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center drop-shadow-lg transform hover:rotate-3 transition-transform">
                   <div className="text-white font-bold text-xs text-center">
                     <div className="text-xl">100%</div>
-                    <div>LEGAL</div>
+                    <div>DIGITAL</div>
                   </div>
                 </div>
               </div>
@@ -117,9 +133,9 @@ export default function VecinosLandingStandalone() {
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Características Principales</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Tu Minimarket, Totalmente Digital</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              VecinoExpress ofrece un conjunto completo de herramientas para la gestión documental segura y efectiva
+              VecinoExpress transforma tu almacén o tienda de barrio con herramientas digitales pensadas para el pequeño comerciante
             </p>
           </div>
           
