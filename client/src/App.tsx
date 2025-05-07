@@ -186,6 +186,26 @@ function Router() {
         );
       }} />
       
+      {/* Dashboard independiente para VecinosExpress Standalone */}
+      <Route path="/vecinos-standalone/dashboard" component={() => {
+        const VecinosDashboardStandalone = React.lazy(() => import("@/pages/standalone/vecinos-dashboard"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <VecinosDashboardStandalone />
+          </Suspense>
+        );
+      }} />
+      
+      {/* Panel de Administración independiente para VecinosExpress Standalone */}
+      <Route path="/vecinos-standalone/admin" component={() => {
+        const VecinosAdminStandalone = React.lazy(() => import("@/pages/standalone/vecinos-admin"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <VecinosAdminStandalone />
+          </Suspense>
+        );
+      }} />
+      
       {/* Redireccionamiento para la ruta anterior */}
       <Route path="/vecinos-express-new" component={() => {
         window.location.href = "/vecinos-express";

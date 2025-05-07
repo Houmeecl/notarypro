@@ -21,7 +21,8 @@ import {
   X,
   LogOut,
   Settings,
-  HelpCircle
+  HelpCircle,
+  ShieldCheck
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -199,6 +200,12 @@ export default function VecinosExpressStandalone() {
                 <User className="h-4 w-4 mr-1" />
                 <span className="hidden sm:inline">{user?.fullName || user?.username}</span>
               </Button>
+              {user?.role === 'admin' && (
+                <Button variant="outline" size="sm" onClick={() => window.location.href = '/vecinos-standalone/admin'}>
+                  <Settings className="h-4 w-4 mr-1" />
+                  <span className="hidden sm:inline">Admin</span>
+                </Button>
+              )}
               <Button variant="ghost" size="icon" onClick={handleLogout}>
                 <LogOut className="h-4 w-4" />
               </Button>
@@ -238,6 +245,14 @@ export default function VecinosExpressStandalone() {
                   Soporte
                 </Link>
               </Button>
+              {user?.role === 'admin' && (
+                <Button variant="ghost" className="justify-start" asChild>
+                  <Link href="/vecinos-standalone/admin">
+                    <ShieldCheck className="h-4 w-4 mr-2" />
+                    Panel de Administración
+                  </Link>
+                </Button>
+              )}
               <Button variant="outline" className="justify-start" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Cerrar Sesión
