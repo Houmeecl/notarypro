@@ -77,8 +77,7 @@ export default function VecinosLoginStandalone() {
       <div className="flex flex-col justify-center items-center md:w-1/2 p-6">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
-            <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-24 mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-gray-800">VecinoExpress</h1>
+            <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-32 mx-auto mb-4" />
             <p className="text-gray-600 mt-1">Accede a tu cuenta para gestionar documentos y trámites</p>
           </div>
 
@@ -93,7 +92,7 @@ export default function VecinosLoginStandalone() {
               <form onSubmit={handleLogin}>
                 <div className="space-y-4">
                   {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded flex items-start">
+                    <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded flex items-start">
                       <AlertTriangle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
                       <p className="text-sm">{error}</p>
                     </div>

@@ -40,17 +40,16 @@ standaloneApi.interceptors.request.use((config) => {
 const VecinosStandaloneService = {
   /**
    * Iniciar sesión en el sistema standalone
-   * Ahora usa preferentemente la cuenta de socio de negocio en lugar de administrador
+   * Si no hay credenciales, permite acceder con la cuenta de negocio por defecto
    */
   login: async (username: string, password: string): Promise<LoginResponse> => {
     try {
-      // Si no se proporcionó un nombre de usuario específico, usamos credenciales
-      // predeterminadas de socio de negocio (partner)
+      // Si no se proporcionó un nombre de usuario y contraseña, usamos credenciales predeterminadas
       let loginUsername = username;
       let loginPassword = password;
       
-      // Si es un intento de inicio de sesión vacío o valores por defecto, usamos usuario de negocio
-      if (!username || username === 'evenegas' || username === 'Edwardadmin') {
+      // Solo usamos credenciales por defecto si ambos campos están vacíos
+      if (!username && !password) {
         console.log('Usando credenciales predeterminadas de socio de negocio');
         loginUsername = 'demopartner';
         loginPassword = 'password123';
