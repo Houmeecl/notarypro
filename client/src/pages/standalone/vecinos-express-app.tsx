@@ -241,7 +241,13 @@ export default function VecinosExpressStandalone() {
               <PlusCircle className="h-10 w-10 text-[#2d219b] mb-2" />
               <h3 className="font-medium">Nuevo Documento</h3>
               <p className="text-sm text-gray-500 mb-2">Crea un nuevo documento para firma</p>
-              <Button className="mt-2 w-full bg-[#2d219b] hover:bg-[#241a7d] text-white" size="sm">Iniciar</Button>
+              <Button 
+                className="mt-2 w-full bg-[#2d219b] hover:bg-[#241a7d] text-white" 
+                size="sm"
+                onClick={() => setLocation("/vecinos-standalone/documento")}
+              >
+                Iniciar
+              </Button>
             </CardContent>
           </Card>
           

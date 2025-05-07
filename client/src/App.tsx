@@ -187,6 +187,26 @@ function Router() {
         </Suspense>
       )} />
       
+      {/* Ruta para el flujo de documentos */}
+      <Route path="/vecinos-standalone/documento" component={() => {
+        const DocumentWorkflow = React.lazy(() => import("@/pages/standalone/document-workflow"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <DocumentWorkflow />
+          </Suspense>
+        );
+      }} />
+
+      {/* Ruta para la verificación móvil */}
+      <Route path="/verificacion-movil/:sessionId?" component={() => {
+        const VerificacionMovil = React.lazy(() => import("@/pages/verificacion-movil"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback />}>
+            <VerificacionMovil />
+          </Suspense>
+        );
+      }} />
+      
       {/* Login independiente para VecinosExpress Standalone */}
       <Route path="/vecinos-standalone-login" component={() => {
         const VecinosLoginStandalone = React.lazy(() => import("@/pages/standalone/vecinos-login"));
