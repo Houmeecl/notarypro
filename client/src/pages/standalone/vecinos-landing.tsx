@@ -9,7 +9,13 @@ import {
   Lock,
   Users, 
   ArrowRight,
-  CheckCircle
+  CheckCircle,
+  ShoppingBag,
+  Store,
+  Receipt,
+  Clipboard,
+  BarChart2,
+  DollarSign
 } from 'lucide-react';
 
 // Logo de Vecinos Express
@@ -29,7 +35,7 @@ export default function VecinosLandingStandalone() {
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex flex-col items-start">
             <div className="flex items-center space-x-2">
-              <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-20 w-auto" />
+              <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-28 w-auto" />
               <span className="font-bold text-2xl text-[#2d219b] hidden">VecinoExpress</span>
             </div>
             <span className="text-sm text-gray-600 ml-1 mt-1 italic">Transformando negocios locales con certificación digital</span>
@@ -121,11 +127,11 @@ export default function VecinosLandingStandalone() {
             <Card className="border-none shadow-md hover:shadow-xl transition-all hover:-translate-y-1 duration-300">
               <CardContent className="p-6">
                 <div className="rounded-full w-14 h-14 flex items-center justify-center bg-purple-100 text-[#2d219b] mb-4 shadow-sm">
-                  <FileSignature className="h-7 w-7" />
+                  <Store className="h-7 w-7" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-[#2d219b]">Firma Electrónica Avanzada</h3>
+                <h3 className="text-xl font-semibold mb-2 text-[#2d219b]">Gestión de tu Negocio</h3>
                 <p className="text-gray-600">
-                  Firma documentos con validez legal desde cualquier dispositivo, con total conformidad a la normativa chilena.
+                  Maneja la documentación de tu almacén, minimarket o tienda de barrio con validez legal desde cualquier dispositivo.
                 </p>
               </CardContent>
             </Card>
@@ -133,11 +139,11 @@ export default function VecinosLandingStandalone() {
             <Card className="border-none shadow-md hover:shadow-xl transition-all hover:-translate-y-1 duration-300">
               <CardContent className="p-6">
                 <div className="rounded-full w-14 h-14 flex items-center justify-center bg-purple-100 text-[#2d219b] mb-4 shadow-sm">
-                  <ShieldCheck className="h-7 w-7" />
+                  <Receipt className="h-7 w-7" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-[#2d219b]">Verificación de Identidad</h3>
+                <h3 className="text-xl font-semibold mb-2 text-[#2d219b]">Facturación Digital</h3>
                 <p className="text-gray-600">
-                  Sistema biométrico avanzado para confirmar la identidad de los firmantes mediante tecnología NFC y reconocimiento facial.
+                  Genera boletas, facturas y documentos tributarios digitales con validez legal para tu negocio local.
                 </p>
               </CardContent>
             </Card>
@@ -145,11 +151,11 @@ export default function VecinosLandingStandalone() {
             <Card className="border-none shadow-md hover:shadow-xl transition-all hover:-translate-y-1 duration-300">
               <CardContent className="p-6">
                 <div className="rounded-full w-14 h-14 flex items-center justify-center bg-purple-100 text-[#2d219b] mb-4 shadow-sm">
-                  <Smartphone className="h-7 w-7" />
+                  <ShoppingBag className="h-7 w-7" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-[#2d219b]">Acceso Multiplataforma</h3>
+                <h3 className="text-xl font-semibold mb-2 text-[#2d219b]">Control de Inventario</h3>
                 <p className="text-gray-600">
-                  Accede a tus documentos desde cualquier dispositivo: computador, tablet o smartphone con interfaz adaptada.
+                  Seguimiento de productos, gestión de stock y alertas de reposición en tiempo real para tu almacén o minimarket.
                 </p>
               </CardContent>
             </Card>
@@ -286,7 +292,7 @@ export default function VecinosLandingStandalone() {
           <div className="flex flex-col md:flex-row justify-between">
             <div className="mb-8 md:mb-0">
               <div className="mb-4">
-                <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-16 w-auto" />
+                <img src={vecinoLogo} alt="VecinoXpress Logo" className="h-24 w-auto" />
               </div>
               <p className="text-gray-400 max-w-md">
                 Plataforma de gestión documental con firma electrónica avanzada cumpliendo la normativa chilena (Ley 19.799).
