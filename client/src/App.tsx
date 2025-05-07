@@ -229,12 +229,9 @@ function Router() {
       
       {/* Panel de Administración independiente para VecinosExpress Standalone */}
       <Route path="/vecinos-standalone/admin" component={() => {
-        const VecinosAdminStandalone = React.lazy(() => import("@/pages/standalone/vecinos-admin"));
-        return (
-          <Suspense fallback={<LazyLoadingFallback />}>
-            <VecinosAdminStandalone />
-          </Suspense>
-        );
+        // Usar el dashboard admin existente en lugar de crear uno nuevo
+        window.location.href = "/vecinos/admin";
+        return null;
       }} />
       
       {/* Redireccionamiento para la ruta anterior */}

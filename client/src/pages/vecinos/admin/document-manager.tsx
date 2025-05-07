@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { VecinosAdminLayout } from "@/components/vecinos/VecinosAdminLayout";
 import DocumentQRGenerator from "@/components/vecinos/DocumentQRGenerator";
 import BatchDocumentImport from "@/components/vecinos/BatchDocumentImport";
+import CameraCapture from "@/components/vecinos/CameraCapture";
 import { useRealFuncionality } from "@/hooks/use-real-funcionality";
 import { useToast } from "@/hooks/use-toast";
 import FunctionalModeIndicator from "@/components/document/FunctionalModeIndicator";
@@ -47,7 +48,8 @@ import {
   ArrowUpDown,
   History,
   QrCode,
-  ScanLine
+  ScanLine,
+  Camera
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -91,6 +93,8 @@ const DocumentManagerPage = () => {
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
   const [isBatchImportDialogOpen, setIsBatchImportDialogOpen] = useState(false);
+  const [isCameraDialogOpen, setIsCameraDialogOpen] = useState(false);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [selectedDocuments, setSelectedDocuments] = useState<number[]>([]);
   
   // Comprobar modo funcional al cargar
@@ -405,6 +409,41 @@ const DocumentManagerPage = () => {
         {/* Acciones y filtros */}
         <div className="flex flex-col md:flex-row justify-between gap-4">
           <div className="flex gap-2">
+            <Dialog open={isCameraDialogOpen} onOpenChange={setIsCameraDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="gap-2 bg-[#2d219b] hover:bg-[#241a7d] text-white">
+                  <Camera className="h-4 w-4" />
+                  Capturar con cámara
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Capturar documento con cámara</DialogTitle>
+                  <DialogDescription>
+                    Utilice la cámara para capturar documentos o identificaciones.
+                  </DialogDescription>
+                </DialogHeader>
+                
+                {isCameraDialogOpen && (
+                  <CameraCapture
+                    onCapture={(imgSrc) => {
+                      setCapturedImage(imgSrc);
+                      toast({
+                        title: "Imagen capturada",
+                        description: "Documento capturado correctamente con la cámara",
+                      });
+                      setIsCameraDialogOpen(false);
+                      
+                      // Aquí se procesaría la imagen capturada
+                      console.log("Imagen capturada:", imgSrc.substring(0, 50) + "...");
+                    }}
+                    onCancel={() => setIsCameraDialogOpen(false)}
+                    captureLabel="Capturar documento"
+                  />
+                )}
+              </DialogContent>
+            </Dialog>
+            
             <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="gap-2">
