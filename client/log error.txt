@@ -1,0 +1,1701 @@
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\App.tsx
+     1:1    error  Resolve error: unable to load resolver "alias"                                              import/no-unresolved
+     1:41   error  Unable to resolve path to module 'wouter'                                                   import/no-unresolved
+     2:29   error  Unable to resolve path to module './lib/queryClient'                                        import/no-unresolved
+     3:37   error  Unable to resolve path to module '@tanstack/react-query'                                    import/no-unresolved
+     4:25   error  Unable to resolve path to module '@/components/ui/toaster'                                  import/no-unresolved
+     5:33   error  Unable to resolve path to module '@/components/ui/tooltip'                                  import/no-unresolved
+     6:31   error  Unable to resolve path to module 'next-themes'                                              import/no-unresolved
+     7:22   error  Unable to resolve path to module '@/pages/not-found'                                        import/no-unresolved
+     8:39   error  Unable to resolve path to module '@/hooks/use-auth'                                         import/no-unresolved
+     9:36   error  Unable to resolve path to module '@/hooks/use-onboarding'                                   import/no-unresolved
+    10:29   error  Unable to resolve path to module '@/components/onboarding/OnboardingPopup'                  import/no-unresolved
+    11:24   error  Unable to resolve path to module '@/components/onboarding/HelpButton'                       import/no-unresolved
+    12:42   error  Unable to resolve path to module '@/hooks/use-micro-interactions'                           import/no-unresolved
+    13:41   error  Unable to resolve path to module '@/components/micro-interactions/MicroInteractionDisplay'  import/no-unresolved
+    14:32   error  Unable to resolve path to module './lib/protected-route'                                    import/no-unresolved
+    15:34   error  Unable to resolve path to module './lib/websocket'                                          import/no-unresolved
+    16:54   error  Unable to resolve path to module 'react'                                                    import/no-unresolved
+    18:25   error  Unable to resolve path to module 'lucide-react'                                             import/no-unresolved
+    19:28   error  Unable to resolve path to module '@/components/ui/DemoModeBanner'                           import/no-unresolved
+    22:25   error  Unable to resolve path to module '@/pages/landing-page'                                     import/no-unresolved
+    23:22   error  Unable to resolve path to module '@/pages/auth-page'                                        import/no-unresolved
+    24:29   error  Unable to resolve path to module '@/pages/testing-real-mode'                                import/no-unresolved
+    25:27   error  Unable to resolve path to module '@/pages/user-dashboard'                                   import/no-unresolved
+    26:32   error  Unable to resolve path to module '@/pages/certifier-dashboard'                              import/no-unresolved
+    27:36   error  Unable to resolve path to module '@/pages/certification-dashboard'                          import/no-unresolved
+    28:33   error  Unable to resolve path to module '@/pages/supervisor-dashboard'                             import/no-unresolved
+    29:29   error  Unable to resolve path to module '@/pages/seller-dashboard'                                 import/no-unresolved
+    30:29   error  Unable to resolve path to module '@/pages/lawyer-dashboard'                                 import/no-unresolved
+    31:28   error  Unable to resolve path to module '@/pages/admin-dashboard'                                  import/no-unresolved
+    32:24   error  Unable to resolve path to module '@/pages/course-page'                                      import/no-unresolved
+    33:26   error  Unable to resolve path to module '@/pages/document-sign'                                    import/no-unresolved
+    34:24   error  Unable to resolve path to module '@/pages/aviso-legal'                                      import/no-unresolved
+    35:36   error  Unable to resolve path to module '@/pages/servicios-empresariales'                          import/no-unresolved
+    36:28   error  Unable to resolve path to module '@/pages/notarize-online'                                  import/no-unresolved
+    37:35   error  Unable to resolve path to module '@/pages/certificacion-por-video'                          import/no-unresolved
+    38:27   error  Unable to resolve path to module '@/pages/unete-al-equipo'                                  import/no-unresolved
+    39:39   error  Unable to resolve path to module '@/pages/conversor-presencial-online'                      import/no-unresolved
+    40:30   error  Unable to resolve path to module '@/pages/quienes-somos'                                    import/no-unresolved
+    41:31   error  Unable to resolve path to module '@/pages/template-admin'                                   import/no-unresolved
+    42:27   error  Unable to resolve path to module '@/pages/contratos'                                        import/no-unresolved
+    43:32   error  Unable to resolve path to module '@/pages/verificar-documento'                              import/no-unresolved
+    44:38   error  Unable to resolve path to module '@/pages/document-verification-game'                       import/no-unresolved
+    45:36   error  Unable to resolve path to module '@/pages/videocall-interface-demo'                         import/no-unresolved
+    46:31   error  Unable to resolve path to module '@/pages/curso-certificador'                               import/no-unresolved
+    49:28   error  Unable to resolve path to module '@/pages/vecinos-express'                                  import/no-unresolved
+    50:33   error  Unable to resolve path to module '@/pages/vecinos-sign-document'                            import/no-unresolved
+    52:58   error  Unable to resolve path to module '@/pages/standalone/vecinos-express-app'                   import/no-unresolved
+    53:33   error  Unable to resolve path to module '@/pages/admin/partner-applications'                       import/no-unresolved
+    54:34   error  Unable to resolve path to module '@/pages/service-selection'                                import/no-unresolved
+    55:26   error  Unable to resolve path to module '@/pages/ron-videocall'                                    import/no-unresolved
+    56:34   error  Unable to resolve path to module '@/pages/ron-session-native'                               import/no-unresolved
+    57:31   error  Unable to resolve path to module '@/pages/video-consultation'                               import/no-unresolved
+    58:26   error  Unable to resolve path to module '@/pages/purchase-code'                                    import/no-unresolved
+    59:35   error  Unable to resolve path to module '@/pages/micro-interactions-demo'                          import/no-unresolved
+    60:34   error  Unable to resolve path to module '@/pages/share-achievement'                                import/no-unresolved
+    61:26   error  Unable to resolve path to module '@/pages/ron-login'                                        import/no-unresolved
+    62:25   error  Unable to resolve path to module '@/pages/ron-platform'                                     import/no-unresolved
+    63:24   error  Unable to resolve path to module '@/pages/ron-session'                                      import/no-unresolved
+    64:30   error  Unable to resolve path to module '@/pages/ron-session-option'                               import/no-unresolved
+    65:32   error  Unable to resolve path to module '@/pages/ron-session-external'                             import/no-unresolved
+    66:24   error  Unable to resolve path to module '@/pages/ayuda-legal'                                      import/no-unresolved
+    67:31   error  Unable to resolve path to module '@/pages/integraciones-demo'                               import/no-unresolved
+    68:39   error  Unable to resolve path to module '@/pages/integraciones-api-identidad'                      import/no-unresolved
+    69:26   error  Unable to resolve path to module '@/pages/partners/descargar-apk'                           import/no-unresolved
+    70:34   error  Unable to resolve path to module '@/pages/partners/confirmacion-descarga'                   import/no-unresolved
+    72:25   error  Unable to resolve path to module '@/pages/payment-demo'                                     import/no-unresolved
+    73:28   error  Unable to resolve path to module '@/pages/payment-options'                                  import/no-unresolved
+    74:30   error  Unable to resolve path to module '@/pages/documento-ejemplo'                                import/no-unresolved
+    75:39   error  Unable to resolve path to module '@/pages/verificacion-identidad-demo'                      import/no-unresolved
+    76:36   error  Unable to resolve path to module '@/pages/readid-verification'                              import/no-unresolved
+    77:27   error  Unable to resolve path to module '@/pages/acceso-directo'                                   import/no-unresolved
+    79:40   error  Unable to resolve path to module '@/pages/verificacion-biometrica'                          import/no-unresolved
+    81:25   error  Unable to resolve path to module '@/pages/pos-menu'                                         import/no-unresolved
+    82:28   error  Unable to resolve path to module '@/pages/pos-session'                                      import/no-unresolved
+    83:35   error  Unable to resolve path to module '@/pages/register-pos-device'                              import/no-unresolved
+    86:36   error  Unable to resolve path to module '@/pages/document-categories'                              import/no-unresolved
+    87:35   error  Unable to resolve path to module '@/pages/document-templates'                               import/no-unresolved
+    88:30   error  Unable to resolve path to module '@/pages/document-form'                                    import/no-unresolved
+    89:30   error  Unable to resolve path to module '@/pages/document-view'                                    import/no-unresolved
+    90:36   error  Unable to resolve path to module '@/pages/document-view-simple'                             import/no-unresolved
+    91:27   error  Unable to resolve path to module '@/pages/documents'                                        import/no-unresolved
+    92:31   error  Unable to resolve path to module '@/pages/document-processor'                               import/no-unresolved
+    93:34   error  Unable to resolve path to module '@/pages/document-explorer'                                import/no-unresolved
+    94:32   error  Unable to resolve path to module '@/pages/document-upload'                                  import/no-unresolved
+    95:27   error  Unable to resolve path to module '@/pages/signature-demo'                                   import/no-unresolved
+    96:39   error  Unable to resolve path to module '@/pages/document-signature-flow'                          import/no-unresolved
+    97:28   error  Unable to resolve path to module '@/pages/sign-mobile'                                      import/no-unresolved
+   100:32   error  Unable to resolve path to module '@/pages/partners/public-page'                             import/no-unresolved
+   101:37   error  Unable to resolve path to module '@/pages/partners/registration-form'                       import/no-unresolved
+   102:26   error  Unable to resolve path to module '@/pages/partners/partner-login'                           import/no-unresolved
+   103:32   error  Unable to resolve path to module '@/pages/partners/pos-integration'                         import/no-unresolved
+   104:28   error  Unable to resolve path to module '@/pages/partners/android-sdk-test'                        import/no-unresolved
+   105:31   error  Unable to resolve path to module '@/pages/partners/password-generator'                      import/no-unresolved
+   106:25   error  Unable to resolve path to module '@/pages/partners/webapp-login'                            import/no-unresolved
+   107:23   error  Unable to resolve path to module '@/pages/partners/webapp-pos'                              import/no-unresolved
+   108:21   error  Unable to resolve path to module '@/pages/partners/sdk-demo'                                import/no-unresolved
+   109:31   error  Unable to resolve path to module '@/pages/partners/webapp-pos-official'                     import/no-unresolved
+   112:31   error  Unable to resolve path to module '@/pages/admin/pos-management'                             import/no-unresolved
+   113:33   error  Unable to resolve path to module '@/pages/admin/api-integrations'                           import/no-unresolved
+   114:32   error  Unable to resolve path to module '@/pages/admin/dashboard'                                  import/no-unresolved
+   115:32   error  Unable to resolve path to module '@/pages/admin/documents'                                  import/no-unresolved
+   116:33   error  Unable to resolve path to module '@/pages/admin/certifiers'                                 import/no-unresolved
+   117:33   error  Unable to resolve path to module '@/pages/admin/ai-strategy'                                import/no-unresolved
+   118:35   error  Unable to resolve path to module '@/pages/admin/test-document-generator'                    import/no-unresolved
+   119:38   error  Unable to resolve path to module '@/pages/admin/document-templates-manager'                 import/no-unresolved
+   129:50   error  Unable to resolve path to module '@/pages/vecinos/index'                                    import/no-unresolved
+   130:50   error  Unable to resolve path to module '@/pages/vecinos/login'                                    import/no-unresolved
+   131:53   error  Unable to resolve path to module '@/pages/vecinos/registro'                                 import/no-unresolved
+   132:51   error  Unable to resolve path to module '@/pages/vecinos/pos-app'                                  import/no-unresolved
+   133:54   error  Unable to resolve path to module '@/pages/vecinos/dashboard'                                import/no-unresolved
+   134:51   error  Unable to resolve path to module '@/pages/vecinos/cuenta'                                   import/no-unresolved
+   135:52   error  Unable to resolve path to module '@/pages/vecinos/retiros'                                  import/no-unresolved
+   136:52   error  Unable to resolve path to module '@/pages/vecinos/soporte'                                  import/no-unresolved
+   137:48   error  Unable to resolve path to module '@/pages/vecinos/faq'                                      import/no-unresolved
+   138:56   error  Unable to resolve path to module '@/pages/vecinos/payment-demo'                             import/no-unresolved
+   139:50   error  Unable to resolve path to module '@/pages/vecinos/admin/index'                              import/no-unresolved
+   140:58   error  Unable to resolve path to module '@/pages/vecinos/admin/partners'                           import/no-unresolved
+   141:61   error  Unable to resolve path to module '@/pages/vecinos/admin/seller-forms'                       import/no-unresolved
+   142:66   error  Unable to resolve path to module '@/pages/vecinos/admin/express-dashboard'                  import/no-unresolved
+   143:65   error  Unable to resolve path to module '@/pages/vecinos/admin/users-management'                   import/no-unresolved
+   144:65   error  Unable to resolve path to module '@/pages/vecinos/admin/document-manager'                   import/no-unresolved
+   145:64   error  Unable to resolve path to module '@/pages/vecinos/certifier-validation'                     import/no-unresolved
+   148:53   error  Unable to resolve path to module '@/pages/verificacion-nfc-fixed'                           import/no-unresolved
+   149:56   error  Unable to resolve path to module '@/pages/documento-funcional'                              import/no-unresolved
+   150:52   error  Unable to resolve path to module '@/pages/notary-pro-chile'                                 import/no-unresolved
+   151:62   error  Unable to resolve path to module '@/pages/standalone/vecinos-landing'                       import/no-unresolved
+   171:100  error  Unable to resolve path to module './pages/vecinos-complete-verification'                    import/no-unresolved
+   175:66   error  Unable to resolve path to module '@/pages/standalone/vecinos-landing'                       import/no-unresolved
+   192:58   error  Unable to resolve path to module '@/pages/standalone/document-workflow'                     import/no-unresolved
+   202:59   error  Unable to resolve path to module '@/pages/verificacion-movil'                               import/no-unresolved
+   212:64   error  Unable to resolve path to module '@/pages/standalone/vecinos-login'                         import/no-unresolved
+   222:68   error  Unable to resolve path to module '@/pages/standalone/vecinos-dashboard'                     import/no-unresolved
+   245:56   error  Unable to resolve path to module '@/pages/emergency-entry'                                  import/no-unresolved
+   258:64   error  Unable to resolve path to module '@/pages/verification-mode-status'                         import/no-unresolved
+   266:61   error  Unable to resolve path to module '@/pages/qa-code-generator'                                import/no-unresolved
+   283:99   error  Unable to resolve path to module '@/pages/firma-movil'                                      import/no-unresolved
+   289:59   error  Unable to resolve path to module '@/pages/document-selection'                               import/no-unresolved
+   299:65   error  Unable to resolve path to module '@/pages/document-selection-simple'                        import/no-unresolved
+   309:56   error  Unable to resolve path to module '@/pages/iniciar-tramite'                                  import/no-unresolved
+   319:62   error  Unable to resolve path to module '@/pages/iniciar-tramite-simple'                           import/no-unresolved
+   329:60   error  Unable to resolve path to module '@/pages/verificacion-selfie'                              import/no-unresolved
+   339:66   error  Unable to resolve path to module '@/pages/verificacion-selfie-simple'                       import/no-unresolved
+   421:58   error  Unable to resolve path to module '@/pages/garantias-legales'                                import/no-unresolved
+   444:59   error  Unable to resolve path to module '@/pages/notariza-funcional'                               import/no-unresolved
+   453:59   error  Unable to resolve path to module '@/pages/notariza-funcional'                               import/no-unresolved
+   464:51   error  Unable to resolve path to module '@/pages/verificar'                                        import/no-unresolved
+   474:57   error  Unable to resolve path to module '@/pages/verificar-simple'                                 import/no-unresolved
+   489:52   error  Unable to resolve path to module '@/pages/test-etoken'                                      import/no-unresolved
+   497:59   error  Unable to resolve path to module '@/pages/etoken-diagnostico'                               import/no-unresolved
+   759:59   error  Unable to resolve path to module '@/pages/ron-client-mejorado'                              import/no-unresolved
+   769:57   error  Unable to resolve path to module '@/pages/ron-agora-kit-test'                               import/no-unresolved
+   788:59   error  Unable to resolve path to module '@/pages/servicios-status'                                 import/no-unresolved
+   815:57   error  Unable to resolve path to module '@/pages/verificacion-nfc-fixed'                           import/no-unresolved
+   829:57   error  Unable to resolve path to module '@/pages/verificacion-nfc-fixed'                           import/no-unresolved
+   839:55   error  Unable to resolve path to module '@/pages/nfc-validation'                                   import/no-unresolved
+   865:59   error  Unable to resolve path to module '@/pages/verificacion-nfc-qr'                              import/no-unresolved
+   873:63   error  Unable to resolve path to module '@/pages/verificacion-nfc-puente'                          import/no-unresolved
+   881:63   error  Unable to resolve path to module '@/pages/verificacion-nfc-puente'                          import/no-unresolved
+   897:62   error  Unable to resolve path to module '@/pages/verificacion-avanzada'                            import/no-unresolved
+   934:49   error  Unable to resolve path to module '@/pages/pos-menu'                                         import/no-unresolved
+   942:51   error  Unable to resolve path to module '@/pages/tablet-pos-payment'                               import/no-unresolved
+   950:49   error  Unable to resolve path to module '@/pages/real-pos-payment'                                 import/no-unresolved
+   958:49   error  Unable to resolve path to module '@/pages/test-pos-payment'                                 import/no-unresolved
+   968:56   error  Unable to resolve path to module '@/pages/payment-success'                                  import/no-unresolved
+  1015:55   error  Unable to resolve path to module '@/pages/pos-menu'                                         import/no-unresolved
+  1028:58   error  Unable to resolve path to module '@/pages/pos-session'                                      import/no-unresolved
+  1041:65   error  Unable to resolve path to module '@/pages/register-pos-device'                              import/no-unresolved
+  1053:59   error  Unable to resolve path to module '@/pages/documentacion-page'                               import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\PayPalButton.tsx
+  11:9  error  Parsing error: Unexpected token global
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\admin\AdminNavbar.tsx
+  25:25  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\certifier\CertifierLayout.tsx
+  20:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\certifier\DocumentValidator.tsx
+  41:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\certifier\PendingDocuments.tsx
+  47:70  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\certifier\VideoCallInterface.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"               import/no-unresolved
+   1:26  error  Unable to resolve path to module 'react'                     import/no-unresolved
+   2:24  error  Unable to resolve path to module '@/components/ui/button'    import/no-unresolved
+   3:58  error  Unable to resolve path to module '@/components/ui/tabs'      import/no-unresolved
+   4:58  error  Unable to resolve path to module '@/components/ui/card'      import/no-unresolved
+   5:26  error  Unable to resolve path to module '@/components/ui/textarea'  import/no-unresolved
+   6:23  error  Unable to resolve path to module '@/components/ui/input'     import/no-unresolved
+  21:8   error  Unable to resolve path to module 'lucide-react'              import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\certifier\VideoCallSystemExplanation.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"                        import/no-unresolved
+   1:24  error  Unable to resolve path to module '@/components/ui/button'             import/no-unresolved
+   8:8   error  Unable to resolve path to module '@/components/ui/card'               import/no-unresolved
+   9:34  error  Unable to resolve path to module '@/components/ui/explanatory-video'  import/no-unresolved
+  10:58  error  Unable to resolve path to module '@/components/ui/tabs'               import/no-unresolved
+  20:8   error  Unable to resolve path to module 'lucide-react'                       import/no-unresolved
+  21:22  error  Unable to resolve path to module 'wouter'                             import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\common\Logo.tsx
+  5:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\courses\CourseCard.tsx
+  18:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\courses\CourseContent.tsx
+  32:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\courses\CourseModuleView.tsx
+  28:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\courses\Quiz.tsx
+  29:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\DashboardBackButton.tsx
+  6:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\DocumentETokenSignature.tsx
+  9:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\DocumentHistory.tsx
+  7:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\DocumentPayment.tsx
+  17:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\DocumentSignatureCanvas.tsx
+  19:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\DocumentUpload.tsx
+  33:32  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\IdentityVerification.tsx
+  31:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\NotificationCenter.tsx
+  24:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\Sidebar.tsx
+  21:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\SignatureCanvas.tsx
+  14:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\StatCard.tsx
+  3:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\UserDashboardOnboarding.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"                               import/no-unresolved
+   1:27  error  Unable to resolve path to module 'react'                                     import/no-unresolved
+   2:31  error  Unable to resolve path to module '@/hooks/use-onboarding'                    import/no-unresolved
+   3:25  error  Unable to resolve path to module '@/hooks/use-auth'                          import/no-unresolved
+   4:34  error  Unable to resolve path to module '@/components/onboarding/FeatureHighlight'  import/no-unresolved
+   5:29  error  Unable to resolve path to module '@/components/onboarding/WelcomeTour'       import/no-unresolved
+  13:8   error  Unable to resolve path to module 'lucide-react'                              import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\charts\ActivityTimeline.tsx
+  14:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\charts\DocumentStats.tsx
+  12:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\charts\PerformanceMetrics.tsx
+  13:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\dashboard\charts\RevenueTrend.tsx
+  14:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\document-verification\VerificationRewards.tsx
+  26:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\document\CategoryDialog.tsx
+  53:8  error  Parsing error: Unexpected token type
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\document\DocumentSecurityInfo.tsx
+  8:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\document\DocumentSignatureSection.tsx
+  13:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\document\DocumentUploadDialog.tsx
+  45:6  error  Parsing error: Unexpected token DocumentCategory
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\document\DocumentVerificationQR.tsx
+  9:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\document\ETokenSupport.tsx
+  9:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\document\FunctionalModeIndicator.tsx
+  5:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\document\FunctionalTemplateCard.tsx
+  9:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\document\MultiSignatureControl.tsx
+  15:8  error  Parsing error: Unexpected token interface
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\document\PresentialToOnlineConverter.tsx
+  14:33  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\document\SignatureCanvas.tsx
+  19:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\document\TemplateEditor.tsx
+  38:6  error  Parsing error: Unexpected token FormSchemaProperty
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\document\TranslationWidget.tsx
+  5:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\functional\FlujoDeFirmaReal.tsx
+  22:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\gamification\gamification-modal.tsx
+  25:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\gamification\leaderboard.tsx
+  11:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\gamification\user-profile.tsx
+  29:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\gamification\verification-rewards.tsx
+  26:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\identity\AdvancedIdentityVerifier.tsx
+  32:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\identity\CameraErrorHandler.tsx
+  19:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\identity\IdentityVerification.tsx
+  10:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\identity\IdentityVerificationForm.tsx
+  36:6  error  Parsing error: Unexpected token IdentityFormValues
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\identity\InverIDVerifier.tsx
+  44:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\identity\NFCIdentityReader.tsx
+  18:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\identity\NFCMicroInteractions.tsx
+  3:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\identity\NFCReader.tsx
+  9:8  error  Parsing error: Unexpected token interface
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\identity\NfcErrorHandler.tsx
+  19:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\identity\QRVerification.tsx
+  10:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\identity\READIDVerifier.tsx
+  29:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\identity\VerificacionIntegrada.tsx
+  11:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\identity\VerificacionSimple.tsx
+  12:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\identity\readid-style\ReadIDVerificationFlow.tsx
+  31:8  error  Parsing error: Unexpected token type
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\illustrations\PeopleConversation.tsx
+  3:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\landing\ApkDownload.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+  1:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+  2:38  error  Unable to resolve path to module 'lucide-react'            import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\landing\CTA.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+  1:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+  2:22  error  Unable to resolve path to module 'wouter'                  import/no-unresolved
+  3:22  error  Unable to resolve path to module 'lucide-react'            import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\landing\Contact.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"               import/no-unresolved
+  1:26  error  Unable to resolve path to module 'react'                     import/no-unresolved
+  2:24  error  Unable to resolve path to module '@/components/ui/button'    import/no-unresolved
+  3:23  error  Unable to resolve path to module '@/components/ui/input'     import/no-unresolved
+  4:26  error  Unable to resolve path to module '@/components/ui/textarea'  import/no-unresolved
+  5:79  error  Unable to resolve path to module '@/components/ui/select'    import/no-unresolved
+  6:26  error  Unable to resolve path to module '@/components/ui/checkbox'  import/no-unresolved
+  7:77  error  Unable to resolve path to module 'lucide-react'              import/no-unresolved
+  8:26  error  Unable to resolve path to module '@/hooks/use-toast'         import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\landing\FAQ.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"                import/no-unresolved
+  1:26  error  Unable to resolve path to module 'react'                      import/no-unresolved
+  7:8   error  Unable to resolve path to module '@/components/ui/accordion'  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\landing\Footer.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"   import/no-unresolved
+  1:22  error  Unable to resolve path to module 'wouter'        import/no-unresolved
+  2:56  error  Unable to resolve path to module 'lucide-react'  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\landing\Header.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"                import/no-unresolved
+  1:26  error  Unable to resolve path to module 'react'                      import/no-unresolved
+  2:22  error  Unable to resolve path to module 'wouter'                     import/no-unresolved
+  3:25  error  Unable to resolve path to module '@/hooks/use-auth'           import/no-unresolved
+  4:24  error  Unable to resolve path to module '@/components/ui/button'     import/no-unresolved
+  5:25  error  Unable to resolve path to module 'lucide-react'               import/no-unresolved
+  6:21  error  Unable to resolve path to module '@/assets/logo12582620.png'  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\landing\Hero.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"                        import/no-unresolved
+  1:22  error  Unable to resolve path to module 'wouter'                             import/no-unresolved
+  2:24  error  Unable to resolve path to module '@/components/ui/button'             import/no-unresolved
+  3:70  error  Unable to resolve path to module 'lucide-react'                       import/no-unresolved
+  4:34  error  Unable to resolve path to module '@/components/ui/explanatory-video'  import/no-unresolved
+  5:21  error  Unable to resolve path to module '@/assets/logo12582620.png'          import/no-unresolved
+  6:24  error  Unable to resolve path to module 'framer-motion'                      import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\landing\HowItWorks.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+  1:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+  2:28  error  Unable to resolve path to module 'lucide-react'            import/no-unresolved
+  3:22  error  Unable to resolve path to module 'wouter'                  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\landing\Pricing.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+  1:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+  2:23  error  Unable to resolve path to module 'lucide-react'            import/no-unresolved
+  3:22  error  Unable to resolve path to module 'wouter'                  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\landing\RonService.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"                        import/no-unresolved
+  1:24  error  Unable to resolve path to module '@/components/ui/button'             import/no-unresolved
+  2:34  error  Unable to resolve path to module '@/components/ui/explanatory-video'  import/no-unresolved
+  3:23  error  Unable to resolve path to module '@/components/ui/badge'              import/no-unresolved
+  4:22  error  Unable to resolve path to module 'wouter'                             import/no-unresolved
+  5:57  error  Unable to resolve path to module 'lucide-react'                       import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\landing\Services.tsx
+  1:1    error  Resolve error: unable to load resolver "alias"                    import/no-unresolved
+  1:110  error  Unable to resolve path to module 'lucide-react'                   import/no-unresolved
+  2:24   error  Unable to resolve path to module 'framer-motion'                  import/no-unresolved
+  3:22   error  Unable to resolve path to module 'wouter'                         import/no-unresolved
+  4:27   error  Unable to resolve path to module 'react'                          import/no-unresolved
+  5:69   error  Unable to resolve path to module '@/lib/funcionalidad-real'       import/no-unresolved
+  6:23   error  Unable to resolve path to module '@/components/ui/badge'          import/no-unresolved
+  7:37   error  Unable to resolve path to module '@/hooks/use-real-funcionality'  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\layout\CertifierNavbar.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"                    import/no-unresolved
+   1:26  error  Unable to resolve path to module 'react'                          import/no-unresolved
+   2:22  error  Unable to resolve path to module 'wouter'                         import/no-unresolved
+  15:8   error  Unable to resolve path to module 'lucide-react'                   import/no-unresolved
+  16:25  error  Unable to resolve path to module '@/hooks/use-auth'               import/no-unresolved
+  23:8   error  Unable to resolve path to module '@/components/ui/sheet'          import/no-unresolved
+  31:8   error  Unable to resolve path to module '@/components/ui/dropdown-menu'  import/no-unresolved
+  32:24  error  Unable to resolve path to module '@/components/ui/button'         import/no-unresolved
+  33:53  error  Unable to resolve path to module '@/components/ui/avatar'         import/no-unresolved
+  34:27  error  Unable to resolve path to module '@/components/ui/separator'      import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\layout\DocumentNavbar.tsx
+  10:25  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\layout\LawyerNavbar.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"                    import/no-unresolved
+   1:26  error  Unable to resolve path to module 'react'                          import/no-unresolved
+   2:22  error  Unable to resolve path to module 'wouter'                         import/no-unresolved
+  17:8   error  Unable to resolve path to module 'lucide-react'                   import/no-unresolved
+  18:25  error  Unable to resolve path to module '@/hooks/use-auth'               import/no-unresolved
+  25:8   error  Unable to resolve path to module '@/components/ui/sheet'          import/no-unresolved
+  33:8   error  Unable to resolve path to module '@/components/ui/dropdown-menu'  import/no-unresolved
+  34:24  error  Unable to resolve path to module '@/components/ui/button'         import/no-unresolved
+  35:53  error  Unable to resolve path to module '@/components/ui/avatar'         import/no-unresolved
+  36:27  error  Unable to resolve path to module '@/components/ui/separator'      import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\layout\MainNavbar.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"                    import/no-unresolved
+   1:26  error  Unable to resolve path to module 'react'                          import/no-unresolved
+   2:22  error  Unable to resolve path to module 'wouter'                         import/no-unresolved
+  15:8   error  Unable to resolve path to module 'lucide-react'                   import/no-unresolved
+  16:25  error  Unable to resolve path to module '@/hooks/use-auth'               import/no-unresolved
+  23:8   error  Unable to resolve path to module '@/components/ui/sheet'          import/no-unresolved
+  31:8   error  Unable to resolve path to module '@/components/ui/dropdown-menu'  import/no-unresolved
+  32:24  error  Unable to resolve path to module '@/components/ui/button'         import/no-unresolved
+  33:53  error  Unable to resolve path to module '@/components/ui/avatar'         import/no-unresolved
+  34:27  error  Unable to resolve path to module '@/components/ui/separator'      import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\layout\PageHeader.tsx
+  3:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\micro-interactions\AchievementsList.tsx
+  14:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\micro-interactions\DocumentVerificationBadge.tsx
+  15:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\micro-interactions\DocumentVerificationShareModal.tsx
+  15:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\micro-interactions\MicroInteractionDisplay.tsx
+  8:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\micro-interactions\NFCMicroInteractions.tsx
+  6:6  error  Parsing error: Unexpected token NFCReadStatus
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\micro-interactions\ShareableBadge.tsx
+  14:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\micro-interactions\SocialShareButtonHelper.tsx
+  9:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\navigation\BackButton.tsx
+  7:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\navigation\PageNavigation.tsx
+  6:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\onboarding\ExplanatoryVideo.tsx
+  16:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\onboarding\FeatureHighlight.tsx
+  11:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\onboarding\HelpButton.tsx
+  16:6  error  Parsing error: Unexpected token TourOption
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\onboarding\OnboardingPopup.tsx
+  21:16  error  Parsing error: Unexpected token ;
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\onboarding\OnboardingWizard.tsx
+  25:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\onboarding\PersonalizedOnboarding.tsx
+  16:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\onboarding\WelcomeTour.tsx
+  13:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\payments\CoursePaymentForm.tsx
+  22:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\payments\MercadoPagoPayment.tsx
+  12:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\payments\TuuMobilePayment.tsx
+  15:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\payments\TuuPOSPayment.tsx
+  17:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\payments\TuuWebPayment.tsx
+  17:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\payments\VecinosPayment.tsx
+  36:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ron\AgoraVideoCall.tsx
+  13:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ron\BiometricNfcVerification.tsx
+  20:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ron\ExternalVideoService.tsx
+  10:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ron\ForcedModeNotification.tsx
+  5:6  error  Parsing error: Unexpected token Mode
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ron\ImprovedVideoSession.tsx
+  26:9  error  Parsing error: Unexpected token global
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ron\NfcActivationQrCode.tsx
+  17:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ron\NfcQrScanner.tsx
+  17:8  error  Parsing error: Unexpected token interface
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ron\RealIdentityVerification.tsx
+  15:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ron\VideoSession.tsx
+  20:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\seller\SellerLayout.tsx
+  23:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\shared\Chatbot.tsx
+  11:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\signature\ETokenSignature.tsx
+  36:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\signature\FunctionalSignature.tsx
+  10:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\signature\SignatureOptions.tsx
+  10:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\signatures\ETokenSigner.tsx
+  11:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\signatures\SignatureCanvas.tsx
+  3:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\signatures\SignatureDisplay.tsx
+  5:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\signatures\SignatureModal.tsx
+  9:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\supervisor\SupervisorLayout.tsx
+  23:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\DemoModeBanner.tsx
+  14:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\accordion.tsx
+  10:51  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\alert-dialog.tsx
+  14:56  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\alert.tsx
+  2:20  error  Parsing error: Unexpected token VariantProps
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\aspect-ratio.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"                   import/no-unresolved
+  1:39  error  Unable to resolve path to module '@radix-ui/react-aspect-ratio'  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\avatar.tsx
+  9:48  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\badge.tsx
+  2:20  error  Parsing error: Unexpected token VariantProps
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\breadcrumb.tsx
+  6:8  error  Parsing error: Unexpected token interface
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\button.tsx
+  3:20  error  Parsing error: Unexpected token VariantProps
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\calendar.tsx
+  8:8  error  Parsing error: Unexpected token type
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\card.tsx
+  7:3  error  Parsing error: Identifier 'React' has already been declared
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\carousel.tsx
+  3:8  error  Parsing error: Unexpected token UseEmblaCarouselType
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\chart.tsx
+  9:45  error  Parsing error: Unexpected token as
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\checkbox.tsx
+  8:50  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\collapsible.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"                  import/no-unresolved
+  3:39  error  Unable to resolve path to module '@radix-ui/react-collapsible'  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\command.tsx
+  2:15  error  Parsing error: Unexpected token DialogProps
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\confetti.tsx
+  4:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\context-menu.tsx
+  20:59  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\date-range-picker.tsx
+  16:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\demo-mode-banner.tsx
+  5:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\dialog.tsx
+  18:51  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\drawer.tsx
+  11:2  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\dropdown-menu.tsx
+  20:60  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\explanatory-video.tsx
+  7:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\form.tsx
+  10:8  error  Parsing error: Unexpected token ControllerProps
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\hover-card.tsx
+  13:54  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\input-otp.tsx
+  8:36  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\input.tsx
+  5:50  error  Parsing error: Identifier 'React' has already been declared
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\label.tsx
+  3:20  error  Parsing error: Unexpected token VariantProps
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\logo.tsx
+  5:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\logo\CorporateLogo.tsx
+  3:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\menubar.tsx
+  11:2  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\navigation-menu.tsx
+  9:56  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\pagination.tsx
+  7:44  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\popover.tsx
+  11:52  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\progress.tsx
+  9:50  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\radio-group.tsx
+  8:52  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\resizable.tsx
+  11:2  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\scroll-area.tsx
+  7:52  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\select.tsx
+  16:51  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\separator.tsx
+  7:51  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\sheet.tsx
+  5:20  error  Parsing error: Unexpected token VariantProps
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\sidebar.tsx
+  33:6  error  Parsing error: Unexpected token SidebarContextProps
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\skeleton.tsx
+  6:2  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\slider.tsx
+  7:48  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\stepper.tsx
+  5:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\steps.tsx
+  5:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\switch.tsx
+  7:49  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\table.tsx
+  7:3  error  Parsing error: Identifier 'React' has already been declared
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\tabs.tsx
+  9:46  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\textarea.tsx
+  7:3  error  Parsing error: Identifier 'React' has already been declared
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\toast.tsx
+  3:20  error  Parsing error: Unexpected token VariantProps
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\toaster.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"            import/no-unresolved
+  1:26  error  Unable to resolve path to module '@/hooks/use-toast'      import/no-unresolved
+  9:8   error  Unable to resolve path to module '@/components/ui/toast'  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\toggle-group.tsx
+  5:15  error  Parsing error: Unexpected token VariantProps
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\toggle.tsx
+  3:20  error  Parsing error: Unexpected token VariantProps
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\tooltip.tsx
+  15:52  error  Parsing error: Unexpected token ,
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\ui\video-upload-selector.tsx
+  15:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\utils\QACodeGenerator.tsx
+  13:22  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\utils\WebSocketDebugger.tsx
+  9:51  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\vecinos\BatchDocumentImport.tsx
+  30:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\vecinos\CameraCapture.tsx
+  7:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\vecinos\DocumentQRGenerator.tsx
+  28:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\vecinos\PartnerAnalytics.tsx
+  9:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\vecinos\VecinosAdminLayout.tsx
+  16:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\vecinos\VecinosETokenSignature.tsx
+  9:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\vecinos\VecinosIllustrations.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"  import/no-unresolved
+  1:44  error  Unable to resolve path to module 'react'        import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\vecinos\VecinosLayout.tsx
+  19:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\vecinos\VecinosPartnerChat.tsx
+  14:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\vecinos\VecinosPartnerMap.tsx
+  11:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\vecinos\VecinosQRSignature.tsx
+  8:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\vecinos\VecinosRonVideoVerification.tsx
+  9:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\verification\BiometricVerification.tsx
+  13:8  error  Parsing error: Unexpected token interface
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\verification\ExternalTokenSignature.tsx
+  12:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\verification\QRVerificationFlow.tsx
+  10:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\verification\SignaturePad.tsx
+  8:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\components\video\RealTimeVideoVerification.tsx
+  48:8  error  Parsing error: Unexpected token interface
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\hooks\use-auth.tsx
+  12:6  error  Parsing error: Unexpected token AuthContextType
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\hooks\use-device-features.tsx
+  4:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\hooks\use-local-storage.ts
+  3:32  error  Parsing error: Unexpected token <
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\hooks\use-micro-interactions.tsx
+  9:8  error  Parsing error: Unexpected token type
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\hooks\use-mobile.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"  import/no-unresolved
+  1:24  error  Unable to resolve path to module 'react'        import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\hooks\use-onboarding.tsx
+  7:6  error  Parsing error: Unexpected token OnboardingStep
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\hooks\use-real-funcionality.tsx
+  16:18  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\hooks\use-toast.ts
+  3:13  error  Parsing error: Unexpected token {
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\hooks\use-websocket.tsx
+  4:6  error  Parsing error: Unexpected token WebSocketStatus
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\camera-access.ts
+  6:8  error  Parsing error: Unexpected token interface
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\camera-compatibility.ts
+  8:8  error  Parsing error: Unexpected token interface
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\checkRealModeForced.ts
+  10:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\deviceModeDetector.ts
+  11:8  error  Parsing error: Unexpected token enum
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\document-forensics.ts
+  6:8  error  Parsing error: Unexpected token interface
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\document-functional-mode.ts
+  13:8  error  Parsing error: Unexpected token interface
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\errorReporting.ts
+  12:8  error  Parsing error: Unexpected token enum
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\etoken-signer.ts
+  9:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\funcionalidad-real.ts
+  24:57  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\getapi-validator.ts
+  11:8  error  Parsing error: Unexpected token interface
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\modoFuncionalActivator.ts
+  9:40  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\nfc-reader.ts
+  15:20  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\nfc-real.ts
+  9:8  error  Parsing error: Unexpected token enum
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\partner-sdk.ts
+  2:13  error  Parsing error: Unexpected token {
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\pkcs11-bridge.ts
+  13:8  error  Parsing error: Unexpected token enum
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\pos-config.ts
+  8:8  error  Parsing error: Unexpected token type
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\protected-route.tsx
+  9:2  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\queryClient.ts
+  3:35  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\remoteConfig.ts
+  13:8  error  Parsing error: Unexpected token interface
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\route-utils.tsx
+  41:25  error  Parsing error: Unexpected token <
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\types\firma-digital.d.ts
+  6:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\utils.ts
+  1:21  error  Parsing error: Unexpected token ClassValue
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\lib\websocket.ts
+  7:11  error  Parsing error: Unexpected token socket
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\main.tsx
+  8:43  error  Parsing error: Unexpected token !
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\acceso-directo.tsx
+  41:32  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\admin-dashboard.tsx
+  95:15  error  Parsing error: Unexpected token ;
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\admin\ai-strategy.tsx
+  119:19  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\admin\api-integrations.tsx
+  29:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\admin\certifiers.tsx
+  92:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\admin\dashboard.tsx
+  60:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\admin\document-templates-manager.tsx
+  17:50  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\admin\documents.tsx
+  73:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\admin\partner-applications.tsx
+   1:1    error  Resolve error: unable to load resolver "alias"               import/no-unresolved
+   1:26   error  Unable to resolve path to module 'react'                     import/no-unresolved
+   2:29   error  Unable to resolve path to module 'wouter'                    import/no-unresolved
+  15:8    error  Unable to resolve path to module 'lucide-react'              import/no-unresolved
+  23:8    error  Unable to resolve path to module '@/components/ui/card'      import/no-unresolved
+  24:24   error  Unable to resolve path to module '@/components/ui/button'    import/no-unresolved
+  25:23   error  Unable to resolve path to module '@/components/ui/badge'     import/no-unresolved
+  26:114  error  Unable to resolve path to module '@/components/ui/dialog'    import/no-unresolved
+  27:58   error  Unable to resolve path to module '@/components/ui/tabs'      import/no-unresolved
+  28:26   error  Unable to resolve path to module '@/components/ui/textarea'  import/no-unresolved
+  29:23   error  Unable to resolve path to module '@/components/ui/input'     import/no-unresolved
+  30:23   error  Unable to resolve path to module '@/components/ui/label'     import/no-unresolved
+  31:79   error  Unable to resolve path to module '@/components/ui/select'    import/no-unresolved
+  32:26   error  Unable to resolve path to module '@/hooks/use-toast'         import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\admin\pos-management.tsx
+  212:28  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\admin\test-document-generator.tsx
+  65:54  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\auth-page.tsx
+  44:6  error  Parsing error: Unexpected token LoginFormValues
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\aviso-legal.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"   import/no-unresolved
+  1:27  error  Unable to resolve path to module 'lucide-react'  import/no-unresolved
+  2:22  error  Unable to resolve path to module 'wouter'        import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\ayuda-legal.tsx
+  100:26  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\certificacion-por-video.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"                        import/no-unresolved
+   1:26  error  Unable to resolve path to module 'react'                              import/no-unresolved
+   2:22  error  Unable to resolve path to module 'wouter'                             import/no-unresolved
+   3:24  error  Unable to resolve path to module '@/components/ui/button'             import/no-unresolved
+   4:35  error  Unable to resolve path to module '@/components/ui/card'               import/no-unresolved
+  10:8   error  Unable to resolve path to module '@/components/ui/tabs'               import/no-unresolved
+  26:8   error  Unable to resolve path to module 'lucide-react'                       import/no-unresolved
+  27:34  error  Unable to resolve path to module '@/components/ui/explanatory-video'  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\certification-dashboard.tsx
+  77:24  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\certifier-dashboard-new.tsx
+  75:19  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\certifier-dashboard.tsx
+  75:19  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\comunicado-prensa-redaccion-documentos.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+  1:22  error  Unable to resolve path to module 'wouter'                  import/no-unresolved
+  2:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+  3:83  error  Unable to resolve path to module 'lucide-react'            import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\contratos.tsx
+  16:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\conversor-presencial-online.tsx
+    1:1   error  Resolve error: unable to load resolver "alias"                                        import/no-unresolved
+    1:22  error  Unable to resolve path to module 'wouter'                                             import/no-unresolved
+    2:24  error  Unable to resolve path to module '@/components/ui/button'                             import/no-unresolved
+    3:71  error  Unable to resolve path to module 'lucide-react'                                       import/no-unresolved
+    4:41  error  Unable to resolve path to module '@/components/document/PresentialToOnlineConverter'  import/no-unresolved
+  187:58  error  Unable to resolve path to module '@/components/ui/card'                               import/no-unresolved
+  188:23  error  Unable to resolve path to module '@/components/ui/badge'                              import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\course-page.tsx
+  44:92  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\courses\payment-failure.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"                         import/no-unresolved
+  1:27  error  Unable to resolve path to module 'react'                               import/no-unresolved
+  2:22  error  Unable to resolve path to module 'wouter'                              import/no-unresolved
+  3:41  error  Unable to resolve path to module 'lucide-react'                        import/no-unresolved
+  4:24  error  Unable to resolve path to module '@/components/ui/button'              import/no-unresolved
+  5:70  error  Unable to resolve path to module '@/components/ui/card'                import/no-unresolved
+  6:47  error  Unable to resolve path to module '@/components/ui/logo/CorporateLogo'  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\courses\payment-success.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"                         import/no-unresolved
+  1:37  error  Unable to resolve path to module 'react'                               import/no-unresolved
+  2:35  error  Unable to resolve path to module 'wouter'                              import/no-unresolved
+  3:50  error  Unable to resolve path to module 'lucide-react'                        import/no-unresolved
+  4:24  error  Unable to resolve path to module '@/components/ui/button'              import/no-unresolved
+  5:70  error  Unable to resolve path to module '@/components/ui/card'                import/no-unresolved
+  6:28  error  Unable to resolve path to module '@/lib/queryClient'                   import/no-unresolved
+  7:26  error  Unable to resolve path to module '@/hooks/use-toast'                   import/no-unresolved
+  8:47  error  Unable to resolve path to module '@/components/ui/logo/CorporateLogo'  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\curso-certificador.tsx
+  37:31  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\document-categories.tsx
+  18:76  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\document-explorer.tsx
+  73:38  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\document-form.tsx
+  22:6  error  Parsing error: Unexpected token FormSchemaProperty
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\document-processor.tsx
+  79:6  error  Parsing error: Unexpected token ClientFormValues
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\document-selection-simple.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"        import/no-unresolved
+  1:33  error  Unable to resolve path to module 'react'              import/no-unresolved
+  2:29  error  Unable to resolve path to module 'wouter'             import/no-unresolved
+  3:26  error  Unable to resolve path to module '@/hooks/use-toast'  import/no-unresolved
+  4:27  error  Unable to resolve path to module 'qrcode.react'       import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\document-selection.tsx
+  44:32  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\document-sign.tsx
+  83:46  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\document-signature-flow.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"                                    import/no-unresolved
+   1:44  error  Unable to resolve path to module 'react'                                          import/no-unresolved
+   2:39  error  Unable to resolve path to module 'wouter'                                         import/no-unresolved
+   3:37  error  Unable to resolve path to module '@/hooks/use-real-funcionality'                  import/no-unresolved
+   4:87  error  Unable to resolve path to module '@/components/ui/card'                           import/no-unresolved
+   5:24  error  Unable to resolve path to module '@/components/ui/button'                         import/no-unresolved
+   6:58  error  Unable to resolve path to module '@/components/ui/tabs'                           import/no-unresolved
+   7:27  error  Unable to resolve path to module '@/components/ui/separator'                      import/no-unresolved
+   8:26  error  Unable to resolve path to module '@/hooks/use-toast'                              import/no-unresolved
+   9:69  error  Unable to resolve path to module 'lucide-react'                                   import/no-unresolved
+  10:37  error  Unable to resolve path to module '@/components/document/FunctionalModeIndicator'  import/no-unresolved
+  11:35  error  Unable to resolve path to module '@/components/document/MultiSignatureControl'    import/no-unresolved
+  12:28  error  Unable to resolve path to module '@/components/layout/DocumentNavbar'             import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\document-templates.tsx
+  37:93  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\document-upload.tsx
+  124:42  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\document-verification-game.tsx
+  20:15  error  Parsing error: Unexpected token ClassValue
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\document-view-simple.tsx
+  11:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\document-view.tsx
+  18:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\documentacion-page.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+  1:19  error  Unable to resolve path to module 'react'                   import/no-unresolved
+  2:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+  3:87  error  Unable to resolve path to module '@/components/ui/card'    import/no-unresolved
+  4:22  error  Unable to resolve path to module 'wouter'                  import/no-unresolved
+  5:67  error  Unable to resolve path to module 'lucide-react'            import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\documento-ejemplo.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+  1:27  error  Unable to resolve path to module 'react'                   import/no-unresolved
+  2:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+  3:87  error  Unable to resolve path to module '@/components/ui/card'    import/no-unresolved
+  4:35  error  Unable to resolve path to module 'wouter'                  import/no-unresolved
+  5:51  error  Unable to resolve path to module 'lucide-react'            import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\documento-funcional.tsx
+  31:25  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\documents.tsx
+  41:51  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\emergency-entry.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"  import/no-unresolved
+  1:34  error  Unable to resolve path to module 'react'        import/no-unresolved
+  2:22  error  Unable to resolve path to module 'wouter'       import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\etoken-diagnostico.tsx
+  14:69  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\firma-movil.tsx
+  72:19  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\garantias-legales.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"                import/no-unresolved
+  12:8   error  Unable to resolve path to module 'lucide-react'               import/no-unresolved
+  13:58  error  Unable to resolve path to module '@/components/ui/tabs'       import/no-unresolved
+  14:75  error  Unable to resolve path to module '@/components/ui/card'       import/no-unresolved
+  15:24  error  Unable to resolve path to module '@/components/ui/button'     import/no-unresolved
+  23:8   error  Unable to resolve path to module '@/components/ui/table'      import/no-unresolved
+  24:53  error  Unable to resolve path to module '@/components/ui/alert'      import/no-unresolved
+  25:23  error  Unable to resolve path to module '@/components/ui/badge'      import/no-unresolved
+  26:27  error  Unable to resolve path to module '@/components/ui/separator'  import/no-unresolved
+  27:78  error  Unable to resolve path to module '@/components/ui/accordion'  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\iniciar-tramite-simple.tsx
+  15:32  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\iniciar-tramite.tsx
+  39:32  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\integraciones-api-identidad.tsx
+  19:31  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\integraciones-demo.tsx
+  28:21  error  Parsing error: Unexpected token ;
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\landing-page.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"                       import/no-unresolved
+   1:27  error  Unable to resolve path to module 'react'                             import/no-unresolved
+   2:22  error  Unable to resolve path to module 'wouter'                            import/no-unresolved
+   3:20  error  Unable to resolve path to module '@/components/landing/Header'       import/no-unresolved
+   4:18  error  Unable to resolve path to module '@/components/landing/Hero'         import/no-unresolved
+   5:22  error  Unable to resolve path to module '@/components/landing/Services'     import/no-unresolved
+   6:24  error  Unable to resolve path to module '@/components/landing/HowItWorks'   import/no-unresolved
+   7:21  error  Unable to resolve path to module '@/components/landing/Pricing'      import/no-unresolved
+   8:17  error  Unable to resolve path to module '@/components/landing/FAQ'          import/no-unresolved
+   9:21  error  Unable to resolve path to module '@/components/landing/Contact'      import/no-unresolved
+  10:17  error  Unable to resolve path to module '@/components/landing/CTA'          import/no-unresolved
+  11:20  error  Unable to resolve path to module '@/components/landing/Footer'       import/no-unresolved
+  12:24  error  Unable to resolve path to module '@/components/landing/RonService'   import/no-unresolved
+  13:25  error  Unable to resolve path to module '@/components/landing/ApkDownload'  import/no-unresolved
+  14:42  error  Unable to resolve path to module '@/lib/funcionalidad-real'          import/no-unresolved
+  15:37  error  Unable to resolve path to module '@/hooks/use-real-funcionality'     import/no-unresolved
+  16:53  error  Unable to resolve path to module '@/components/ui/alert'             import/no-unresolved
+  17:39  error  Unable to resolve path to module 'lucide-react'                      import/no-unresolved
+  18:26  error  Unable to resolve path to module '@/hooks/use-toast'                 import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\lawyer-dashboard.tsx
+  65:16  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\micro-interactions-demo.tsx
+  11:28  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\modo-funcional.tsx
+  27:24  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\nfc-validation.tsx
+  12:24  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\not-found.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+  1:35  error  Unable to resolve path to module '@/components/ui/card'    import/no-unresolved
+  2:47  error  Unable to resolve path to module 'lucide-react'            import/no-unresolved
+  3:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+  4:22  error  Unable to resolve path to module 'wouter'                  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\notariza-funcional.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"                               import/no-unresolved
+  1:34  error  Unable to resolve path to module 'react'                                     import/no-unresolved
+  2:24  error  Unable to resolve path to module 'react-helmet'                              import/no-unresolved
+  3:35  error  Unable to resolve path to module '@/components/ui/card'                      import/no-unresolved
+  4:53  error  Unable to resolve path to module '@/components/ui/alert'                     import/no-unresolved
+  5:23  error  Unable to resolve path to module '@/components/ui/badge'                     import/no-unresolved
+  6:69  error  Unable to resolve path to module '@/lib/funcionalidad-real'                  import/no-unresolved
+  7:30  error  Unable to resolve path to module '@/components/functional/FlujoDeFirmaReal'  import/no-unresolved
+  8:37  error  Unable to resolve path to module 'lucide-react'                              import/no-unresolved
+  9:26  error  Unable to resolve path to module '@/hooks/use-toast'                         import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\notarize-online.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+   1:26  error  Unable to resolve path to module 'react'                   import/no-unresolved
+   2:22  error  Unable to resolve path to module 'wouter'                  import/no-unresolved
+   3:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+   4:35  error  Unable to resolve path to module '@/components/ui/card'    import/no-unresolved
+  10:8   error  Unable to resolve path to module '@/components/ui/tabs'    import/no-unresolved
+  11:89  error  Unable to resolve path to module 'lucide-react'            import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\notary-dashboard.tsx
+  245:33  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\notary-pro-chile.tsx
+  34:21  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\android-sdk-test.tsx
+  13:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\confirmacion-descarga.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+  1:37  error  Unable to resolve path to module 'react'                   import/no-unresolved
+  2:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+  3:50  error  Unable to resolve path to module 'lucide-react'            import/no-unresolved
+  4:29  error  Unable to resolve path to module 'wouter'                  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\descargar-apk.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+  1:27  error  Unable to resolve path to module 'react'                   import/no-unresolved
+  2:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+  3:37  error  Unable to resolve path to module 'lucide-react'            import/no-unresolved
+  4:29  error  Unable to resolve path to module 'wouter'                  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\partner-login.tsx
+  57:28  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\password-generator.tsx
+  77:38  error  Parsing error: Unexpected token )
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\pos-integration.tsx
+  27:31  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\public-page.tsx
+  41:31  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\registration-form.tsx
+  116:23  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\sdk-demo.tsx
+  73:33  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\webapp-login.tsx
+  18:32  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\webapp-pos-alternativa.tsx
+  44:41  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\webapp-pos-buttons.tsx
+  43:65  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\webapp-pos-nfc.tsx
+  43:65  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\webapp-pos-official.tsx
+  244:44  error  Parsing error: Unexpected token as
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\webapp-pos-tramite.tsx
+  21:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\partners\webapp-pos.tsx
+  10:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\payment-demo.tsx
+  17:37  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\payment-options.tsx
+  83:32  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\payment-success.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"           import/no-unresolved
+   8:34  error  Unable to resolve path to module 'react'                 import/no-unresolved
+   9:29  error  Unable to resolve path to module 'lucide-react'          import/no-unresolved
+  10:22  error  Unable to resolve path to module '@/components/ui/card'  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\pos-menu.tsx
+  99:34  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\pos-session.tsx
+  57:6  error  Parsing error: Unexpected token OpenSessionValues
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\purchase-code.tsx
+  27:6  error  Parsing error: Unexpected token FormData
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\qa-code-generator.tsx
+  13:26  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\quienes-somos.tsx
+  11:23  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\readid-verification.tsx
+  9:34  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\real-pos-payment.tsx
+  37:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\register-pos-device.tsx
+  62:6  error  Parsing error: Unexpected token DeviceFormValues
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\ron-agora-kit-test.tsx
+  37:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\ron-certifier-session.tsx
+  26:9  error  Parsing error: Unexpected token global
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\ron-client-mejorado.tsx
+  102:29  error  Parsing error: Unexpected token as
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\ron-client-session.tsx
+  9:9  error  Parsing error: Unexpected token global
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\ron-login.tsx
+  37:35  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\ron-platform.tsx
+  72:23  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\ron-session-external.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"                            import/no-unresolved
+  1:19  error  Unable to resolve path to module 'react'                                  import/no-unresolved
+  2:40  error  Unable to resolve path to module 'wouter'                                 import/no-unresolved
+  3:26  error  Unable to resolve path to module '@/hooks/use-toast'                      import/no-unresolved
+  4:38  error  Unable to resolve path to module '@/components/ron/ExternalVideoService'  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\ron-session-native.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"                    import/no-unresolved
+  1:37  error  Unable to resolve path to module 'react'                          import/no-unresolved
+  2:26  error  Unable to resolve path to module 'wouter'                         import/no-unresolved
+  3:26  error  Unable to resolve path to module '@/hooks/use-toast'              import/no-unresolved
+  4:26  error  Unable to resolve path to module '@/components/ron/VideoSession'  import/no-unresolved
+  5:60  error  Unable to resolve path to module 'lucide-react'                   import/no-unresolved
+  6:24  error  Unable to resolve path to module '@/components/ui/button'         import/no-unresolved
+  7:70  error  Unable to resolve path to module '@/components/ui/card'           import/no-unresolved
+  8:23  error  Unable to resolve path to module '@/components/ui/badge'          import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\ron-session-option.tsx
+  54:65  error  Parsing error: Unexpected token as
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\ron-session.tsx
+  107:97  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\ron-videocall.tsx
+  14:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\seller-dashboard.tsx
+  129:34  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\seller\dashboard.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"                       import/no-unresolved
+   1:26  error  Unable to resolve path to module 'react'                             import/no-unresolved
+   2:26  error  Unable to resolve path to module '@tanstack/react-query'             import/no-unresolved
+   3:29  error  Unable to resolve path to module 'wouter'                            import/no-unresolved
+  20:8   error  Unable to resolve path to module 'lucide-react'                      import/no-unresolved
+  21:26  error  Unable to resolve path to module '@/hooks/use-toast'                 import/no-unresolved
+  22:25  error  Unable to resolve path to module '@/hooks/use-auth'                  import/no-unresolved
+  23:26  error  Unable to resolve path to module '@/components/seller/SellerLayout'  import/no-unresolved
+  24:24  error  Unable to resolve path to module '@/components/ui/button'            import/no-unresolved
+  25:23  error  Unable to resolve path to module '@/components/ui/input'             import/no-unresolved
+  26:87  error  Unable to resolve path to module '@/components/ui/card'              import/no-unresolved
+  27:23  error  Unable to resolve path to module '@/components/ui/badge'             import/no-unresolved
+  35:8   error  Unable to resolve path to module '@/components/ui/table'             import/no-unresolved
+  44:8   error  Unable to resolve path to module '@/components/ui/dialog'            import/no-unresolved
+  45:23  error  Unable to resolve path to module '@/components/ui/label'             import/no-unresolved
+  46:26  error  Unable to resolve path to module '@/components/ui/textarea'          import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\service-selection.tsx
+  83:35  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\servicios-empresariales.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+  1:95  error  Unable to resolve path to module 'lucide-react'            import/no-unresolved
+  2:22  error  Unable to resolve path to module 'wouter'                  import/no-unresolved
+  3:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+  4:35  error  Unable to resolve path to module '@/components/ui/card'    import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\servicios-status.tsx
+  50:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\share-achievement.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"                                                import/no-unresolved
+  1:44  error  Unable to resolve path to module 'react'                                                      import/no-unresolved
+  2:27  error  Unable to resolve path to module 'wouter'                                                     import/no-unresolved
+  3:26  error  Unable to resolve path to module '@tanstack/react-query'                                      import/no-unresolved
+  4:28  error  Unable to resolve path to module '@/lib/queryClient'                                          import/no-unresolved
+  5:46  error  Unable to resolve path to module 'lucide-react'                                               import/no-unresolved
+  6:24  error  Unable to resolve path to module '@/components/ui/button'                                     import/no-unresolved
+  7:39  error  Unable to resolve path to module '@/components/micro-interactions/DocumentVerificationBadge'  import/no-unresolved
+  8:22  error  Unable to resolve path to module 'wouter'                                                     import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\sign-mobile.tsx
+   1:1    error  Resolve error: unable to load resolver "alias"                                    import/no-unresolved
+   1:44   error  Unable to resolve path to module 'react'                                          import/no-unresolved
+   2:26   error  Unable to resolve path to module 'wouter'                                         import/no-unresolved
+   3:37   error  Unable to resolve path to module '@/hooks/use-real-funcionality'                  import/no-unresolved
+   4:87   error  Unable to resolve path to module '@/components/ui/card'                           import/no-unresolved
+   5:24   error  Unable to resolve path to module '@/components/ui/button'                         import/no-unresolved
+   6:27   error  Unable to resolve path to module '@/components/ui/separator'                      import/no-unresolved
+   7:102  error  Unable to resolve path to module 'lucide-react'                                   import/no-unresolved
+   8:37   error  Unable to resolve path to module '@/components/document/FunctionalModeIndicator'  import/no-unresolved
+   9:26   error  Unable to resolve path to module '@/hooks/use-toast'                              import/no-unresolved
+  10:58   error  Unable to resolve path to module '@/components/ui/tabs'                           import/no-unresolved
+  11:23   error  Unable to resolve path to module '@/components/ui/input'                          import/no-unresolved
+  12:23   error  Unable to resolve path to module '@/components/ui/label'                          import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\signature-demo.tsx
+  48:43  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\standalone\document-workflow.tsx
+  59:42  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\standalone\vecinos-admin.tsx
+  94:33  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\standalone\vecinos-dashboard.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+   1:44  error  Unable to resolve path to module 'react'                   import/no-unresolved
+   2:29  error  Unable to resolve path to module 'wouter'                  import/no-unresolved
+   3:58  error  Unable to resolve path to module '@/components/ui/card'    import/no-unresolved
+   4:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+   5:23  error  Unable to resolve path to module '@/components/ui/badge'   import/no-unresolved
+   6:58  error  Unable to resolve path to module '@/components/ui/tabs'    import/no-unresolved
+  25:8   error  Unable to resolve path to module 'lucide-react'            import/no-unresolved
+  26:26  error  Unable to resolve path to module '@/hooks/use-toast'       import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\standalone\vecinos-express-app.tsx
+  43:50  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\standalone\vecinos-landing.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"                                import/no-unresolved
+   1:19  error  Unable to resolve path to module 'react'                                      import/no-unresolved
+   2:22  error  Unable to resolve path to module 'wouter'                                     import/no-unresolved
+   3:24  error  Unable to resolve path to module '@/components/ui/button'                     import/no-unresolved
+   4:35  error  Unable to resolve path to module '@/components/ui/card'                       import/no-unresolved
+  20:8   error  Unable to resolve path to module 'lucide-react'                               import/no-unresolved
+  23:24  error  Unable to resolve path to module '@/assets/new/vecino-xpress-logo-nuevo.png'  import/no-unresolved
+  25:29  error  Unable to resolve path to module '@/assets/new/minimarket-monos.png'          import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\standalone\vecinos-login.tsx
+  30:31  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\supervisor-dashboard.tsx
+  116:34  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\supervisor\dashboard.tsx
+  81:33  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\tablet-pos-payment.tsx
+  32:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\template-admin.tsx
+  33:88  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\test-etoken.tsx
+  15:49  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\test-nfc.tsx
+  89:52  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\test-pos-payment.tsx
+  35:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\testing-real-mode.tsx
+  24:11  error  Parsing error: Unexpected token static
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\unete-al-equipo.tsx
+  53:27  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\user-badges.tsx
+  383:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\user-dashboard.tsx
+  77:75  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos-complete-verification.tsx
+  42:40  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos-express-new.tsx
+  91:31  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos-express.tsx
+  14:50  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos-sign-document.tsx
+  81:39  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\admin\accounting.tsx
+  180:38  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\admin\document-manager.tsx
+  98:69  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\admin\express-dashboard.tsx
+  102:31  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\admin\finance.tsx
+  186:25  error  Parsing error: Unexpected token as
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\admin\index.tsx
+  424:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\admin\partner-map.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"                              import/no-unresolved
+  2:19  error  Unable to resolve path to module 'react'                                    import/no-unresolved
+  3:36  error  Unable to resolve path to module '@/components/vecinos/VecinosAdminLayout'  import/no-unresolved
+  4:31  error  Unable to resolve path to module '@/components/vecinos/VecinosPartnerMap'   import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\admin\partners.tsx
+  137:37  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\admin\performance-metrics.tsx
+   1:1    error  Resolve error: unable to load resolver "alias"                              import/no-unresolved
+   2:19   error  Unable to resolve path to module 'react'                                    import/no-unresolved
+   3:36   error  Unable to resolve path to module '@/components/vecinos/VecinosAdminLayout'  import/no-unresolved
+  10:8    error  Unable to resolve path to module '@/components/ui/card'                     import/no-unresolved
+  11:58   error  Unable to resolve path to module '@/components/ui/tabs'                     import/no-unresolved
+  12:24   error  Unable to resolve path to module '@/components/ui/button'                   import/no-unresolved
+  13:23   error  Unable to resolve path to module '@/components/ui/badge'                    import/no-unresolved
+  14:22   error  Unable to resolve path to module 'wouter'                                   import/no-unresolved
+  26:8    error  Unable to resolve path to module 'lucide-react'                             import/no-unresolved
+  27:128  error  Unable to resolve path to module 'recharts'                                 import/no-unresolved
+  28:53   error  Unable to resolve path to module '@/components/ui/chart'                    import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\admin\seller-forms.tsx
+  153:31  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\admin\users-management.tsx
+  181:31  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\certifier-validation.tsx
+  135:69  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\cuenta.tsx
+  139:28  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\dashboard.tsx
+  28:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\faq.tsx
+  21:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\index.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+  1:26  error  Unable to resolve path to module 'react'                   import/no-unresolved
+  2:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+  3:87  error  Unable to resolve path to module '@/components/ui/card'    import/no-unresolved
+  4:24  error  Unable to resolve path to module 'framer-motion'           import/no-unresolved
+  5:29  error  Unable to resolve path to module 'wouter'                  import/no-unresolved
+  6:81  error  Unable to resolve path to module 'lucide-react'            import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\login.tsx
+  25:6  error  Parsing error: Unexpected token LoginData
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\payment-demo.tsx
+  93:47  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\pos-app.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+   1:37  error  Unable to resolve path to module 'react'                   import/no-unresolved
+   2:29  error  Unable to resolve path to module 'wouter'                  import/no-unresolved
+   3:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+   4:23  error  Unable to resolve path to module '@/components/ui/input'   import/no-unresolved
+   5:23  error  Unable to resolve path to module '@/components/ui/label'   import/no-unresolved
+   6:79  error  Unable to resolve path to module 'lucide-react'            import/no-unresolved
+   7:87  error  Unable to resolve path to module '@/components/ui/card'    import/no-unresolved
+  13:8   error  Unable to resolve path to module '@/components/ui/tabs'    import/no-unresolved
+  14:28  error  Unable to resolve path to module '@/lib/queryClient'       import/no-unresolved
+  15:23  error  Unable to resolve path to module '@/hooks/use-toast'       import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\registro.tsx
+  51:6  error  Parsing error: Unexpected token RegistrationData
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\retiros.tsx
+  38:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\vecinos\soporte.tsx
+  19:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\verificacion-avanzada.tsx
+  19:27  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\verificacion-biometrica.tsx
+  15:33  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\verificacion-etoken.tsx
+  37:49  error  Parsing error: Unexpected token ]
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\verificacion-identidad-demo.tsx
+  10:32  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\verificacion-movil.tsx
+  22:51  error  Parsing error: Unexpected token )
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\verificacion-nfc-fixed.tsx
+  15:3  error  Parsing error: Identifier 'CardFooter' has already been declared
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\verificacion-nfc-puente.tsx
+  22:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\verificacion-nfc-qr.tsx
+  17:24  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\verificacion-selfie-simple.tsx
+  168:8  error  Parsing error: Identifier 'React' has already been declared
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\verificacion-selfie.tsx
+   1:1   error  Resolve error: unable to load resolver "alias"             import/no-unresolved
+   1:52  error  Unable to resolve path to module 'react'                   import/no-unresolved
+   2:29  error  Unable to resolve path to module 'wouter'                  import/no-unresolved
+  10:8   error  Unable to resolve path to module '@/components/ui/card'    import/no-unresolved
+  11:24  error  Unable to resolve path to module '@/components/ui/button'  import/no-unresolved
+  12:26  error  Unable to resolve path to module '@/hooks/use-toast'       import/no-unresolved
+  13:28  error  Unable to resolve path to module '../lib/queryClient'      import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\verificar-documento.tsx
+  20:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\verificar-simple.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"        import/no-unresolved
+  1:44  error  Unable to resolve path to module 'react'              import/no-unresolved
+  2:39  error  Unable to resolve path to module 'wouter'             import/no-unresolved
+  3:26  error  Unable to resolve path to module '@/hooks/use-toast'  import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\verificar.tsx
+  60:37  error  Parsing error: Unexpected token :
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\verification-mode-status.tsx
+  12:80  error  Parsing error: Unexpected token |
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\video-consultation.tsx
+  68:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\pages\videocall-interface-demo.tsx
+  1:1   error  Resolve error: unable to load resolver "alias"                                import/no-unresolved
+  1:36  error  Unable to resolve path to module '@/components/certifier/VideoCallInterface'  import/no-unresolved
+  2:22  error  Unable to resolve path to module 'wouter'                                     import/no-unresolved
+  3:27  error  Unable to resolve path to module 'lucide-react'                               import/no-unresolved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\services\external-token-service.ts
+  10:8  error  Parsing error: Unexpected token interface
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\services\getapi-service.ts
+  9:8  error  Parsing error: Unexpected token interface
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\services\notification-service.ts
+  9:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\services\signature-service.ts
+  14:8  error  Parsing error: Unexpected token interface
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\services\vecinos-standalone-service.ts
+  14:1  error  Parsing error: The keyword 'interface' is reserved
+
+C:\Users\edwar\OneDrive\Desktop\NotaryPro\client\src\types\canvas-confetti.d.ts
+  1:9  error  Parsing error: Unexpected token module
+
+✖ 902 problems (902 errors, 0 warnings)
