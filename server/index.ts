@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { setupStaticRoutes } from "./static-routes";
+import { startReportScheduler } from "./services/report-scheduler";
 import path from "path";
 
 const app = express();
@@ -63,6 +64,9 @@ app.use((req, res, next) => {
       res.sendFile(path.join(__dirname, "public", "index.html"));
     });
   }
+
+  // Iniciar programación automática de reportes
+  startReportScheduler();
 
   // Puerto 5000 para Render
   const port = 5000;
