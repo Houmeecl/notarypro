@@ -523,6 +523,15 @@ R: Mediante verificación biométrica, validación de documentos oficiales, NFC 
 - [VecinosExpress_Manual_Tecnico.docx](https://notarypro.cl/docs/VecinosExpress_Manual_Tecnico.docx)
 - [VecinosExpress_Manual_Tecnico.md](https://notarypro.cl/docs/VecinosExpress_Manual_Tecnico.md)
 
+### 11.4 Automatización de Informes
+
+El servidor cuenta con un **programador de reportes** que envía de forma automática
+un resumen diario, semanal y mensual al correo del administrador principal. Este
+mecanismo se implementa en `server/services/report-scheduler.ts` y se activa
+al iniciar el servidor a través de `startReportScheduler()`. Los reportes incluyen
+el número de documentos creados y usuarios registrados en el período
+correspondiente.
+
 ## 12. Licencia y Derechos
 
 NotaryPro es un software propietario. Todos los derechos reservados © 2025 VecinosExpress SpA.
