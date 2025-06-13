@@ -1,0 +1,23 @@
+<svg width="400" height="100" viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Official VecinoXpress logo -->
+  <g transform="translate(30, 15)">
+    <!-- House/Document base -->
+    <path d="M0 0 L45 0 L45 70 L0 70 Z" fill="none" stroke="#2d219b" stroke-width="5"/>
+    
+    <!-- Angled overlay -->
+    <path d="M15 70 L60 70 L60 25 L40 0 L15 0" fill="none" stroke="#2d219b" stroke-width="5"/>
+    
+    <!-- Upward arrow -->
+    <path d="M25 50 L45 30" stroke="#2d219b" stroke-width="5"/>
+    <path d="M45 30 L35 30 L45 30 L45 40" stroke="#2d219b" stroke-width="5"/>
+    
+    <!-- Star -->
+    <path d="M20 35 L23 29 L17 25 L24 25 L27 18 L30 25 L37 25 L31 29 L34 35 L27 31 Z" fill="#2d219b"/>
+  </g>
+  
+  <!-- VecinoXpress Text -->
+  <text x="105" y="50" font-family="Arial, sans-serif" font-weight="bold" font-size="42" fill="#2d219b">VecinoXpress</text>
+  
+  <!-- Tagline -->
+  <text x="105" y="75" font-family="Arial, sans-serif" font-size="18" fill="#2d219b">Transformando negocios locales</text>
+</svg>

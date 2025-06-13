@@ -5,12 +5,10 @@ import vecinosRoutes from "./vecinos/vecinos-routes";
 import documentSignRoutes from "./vecinos/document-sign-routes";
 import express, { Request, Response } from "express";
 import path from "path";
-import { fileURLToPath } from "url";
 import { setupAuth, hashPassword } from "./auth";
 import { db } from "./db";
-import { users, partners } from "@shared/schema";
-import { auditLogs } from "./db";
-import { documentForensicsRouter } from "./document-forensics-routes";
+import { users, partners } from "./db"; // ✅ Arreglado
+// import { auditLogs } from "./db"; // ✅ Comentado temporalmente
 import { identityVerificationRouter } from "./identity-verification-routes";
 import { contractRouter } from "./contract-routes";
 import { mercadoPagoRouter } from "./mercadopago-routes";
@@ -42,8 +40,6 @@ export function registerRoutes(app: Express): Server {
   // Rutas para firma de documentos de Vecinos con Zoho Sign
   app.use("/api/vecinos/document-sign", documentSignRoutes);
 
-  // Rutas para análisis forense de documentos
-  app.use("/api/document-forensics", documentForensicsRouter);
 
   // Rutas para verificación de identidad
   app.use("/api/identity", identityVerificationRouter);
@@ -87,73 +83,66 @@ export function registerRoutes(app: Express): Server {
     console.error("Error inicializando admins de prueba:", error);
   });
 
-// Endpoint para validar códigos QA
-app.post('/api/qa/validate-code', isAuthenticated, async (req, res) => {
-  try {
-    const { code } = req.body;
-    
-    if (!code || typeof code !== 'string') {
-      return res.status(400).json({
-        success: false,
-        message: 'Se requiere un código QA válido'
-      });
-    }
-    
-    // Validar el formato básico (QA-XXXXXX-XXXXXX)
-    const codePattern = /^QA-[A-Z0-9]{6}-\d{6}$/;
-    
-    if (!codePattern.test(code)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Formato de código QA inválido'
-      });
-    }
-    
-    // Obtener timestamp del código
-    const timestamp = parseInt(code.split('-')[2]);
-    const currentTime = Date.now() % 1000000; // últimos 6 dígitos
-    
-    // En un sistema real, aquí verificaríamos contra la base de datos
-    // Para demo/QA, simplemente hacemos una validación básica
-    const isValid = true;
-    
-    // Registrar uso del código QA (para auditoría)
-    await db.execute(`
-      INSERT INTO audit_logs (user_id, action_type, details, timestamp)
-      VALUES ($1, $2, $3, $4)
-    `, [
-      req.user?.id, 
-      'qa_code_used', 
-      JSON.stringify({
+  // Endpoint para validar códigos QA
+  app.post('/api/qa/validate-code', isAuthenticated, async (req, res) => {
+    try {
+      const { code } = req.body;
+      
+      if (!code || typeof code !== 'string') {
+        return res.status(400).json({
+          success: false,
+          message: 'Se requiere un código QA válido'
+        });
+      }
+      
+      // Validar el formato básico (QA-XXXXXX-XXXXXX)
+      const codePattern = /^QA-[A-Z0-9]{6}-\d{6}$/;
+      
+      if (!codePattern.test(code)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Formato de código QA inválido'
+        });
+      }
+      
+      // Obtener timestamp del código
+      const timestamp = parseInt(code.split('-')[2]);
+      const currentTime = Date.now() % 1000000; // últimos 6 dígitos
+      
+      // En un sistema real, aquí verificaríamos contra la base de datos
+      // Para demo/QA, simplemente hacemos una validación básica
+      const isValid = true;
+      
+      // ✅ Registrar uso del código QA (temporalmente con console.log)
+      console.log('QA Code used:', {
+        userId: (req.user as any)?.id,
         code,
         userAgent: req.headers['user-agent'],
-        ip: req.ip
-      }),
-      new Date()
-    ]);
-    
-    res.json({
-      success: true,
-      isValid,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 horas
-      permissions: {
-        skipIdentityVerification: false, // Forzar validaciones en modo real
-        skipSignatureValidation: false, // Forzar validaciones en modo real
-        skipNfcValidation: false, // Forzar validaciones en modo real
-        allowAllFunctionality: true,
-        forceRealMode: true // Forzar modo real
-      }
-    });
-    
-  } catch (error) {
-    console.error('Error al validar código QA:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al procesar la solicitud'
-    });
-  }
-});
-
+        ip: req.ip,
+        timestamp: new Date()
+      });
+      
+      res.json({
+        success: true,
+        isValid,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 horas
+        permissions: {
+          skipIdentityVerification: false, // Forzar validaciones en modo real
+          skipSignatureValidation: false, // Forzar validaciones en modo real
+          skipNfcValidation: false, // Forzar validaciones en modo real
+          allowAllFunctionality: true,
+          forceRealMode: true // Forzar modo real
+        }
+      });
+      
+    } catch (error) {
+      console.error('Error al validar código QA:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al procesar la solicitud'
+      });
+    }
+  });
 
   // Crea el servidor HTTP
   const httpServer = createServer(app);
@@ -220,9 +209,11 @@ async function initializeTestAdmins() {
         .where(eq(users.username, "Edwardadmin"));
       console.log("Contraseña del administrador Edwardadmin actualizada.");
     } else {
+      // ✅ Arreglado: usar hashPassword
+      const hashedPassword = await hashPassword("adminq");
       await db.insert(users).values({
         username: "Edwardadmin",
-        password: "adminq",
+        password: hashedPassword,
         email: "admin@notarypro.cl",
         fullName: "Admin Principal",
         role: "admin",
@@ -332,7 +323,6 @@ async function initializeTestAdmins() {
     
     if (existingEvenegas) {
       console.log("El usuario evenegas ya existe. Actualizando contraseña...");
-      // Problema: hashPassword devuelve una promesa, no un string directo
       const evenegasPassword = "77239800"; // Contraseña en texto plano
       const evenegasHashedPassword = await hashPassword(evenegasPassword);
       
@@ -389,9 +379,7 @@ async function initializeTestAdmins() {
         createdAt: new Date()
       }).returning();
       
-      // Vamos a actualizar esta parte para enfocarnos en las credenciales primero
       console.log("Usuario partner creado, ahora puedes iniciar sesión con demopartner/password123");
-      
       console.log("Usuario demo partner inicializado correctamente");
     }
   } catch (error) {

@@ -4,7 +4,7 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["jq", "python3", "jdk", "pandoc", "glib", "fontconfig", "freetype", "cairo", "pango"]
+packages = ["jq", "python3", "jdk", "pandoc", "glib", "fontconfig", "freetype", "cairo", "pango", "python312Packages.open-interpreter", "zip", "wget", "yakut"]
 
 [deployment]
 deploymentTarget = "autoscale"
@@ -14,14 +14,6 @@ run = ["sh", "-c", "NODE_ENV=production node dist/index.js"]
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 5500
-externalPort = 3000
-
-[[ports]]
-localPort = 5501
-externalPort = 3001
 
 [workflows]
 runButton = "Start VecinosExpress POS"

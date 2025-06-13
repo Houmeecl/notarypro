@@ -1,15 +1,15 @@
 import express from 'express';
 import { db } from '../db';
 import jwt from 'jsonwebtoken';
-import { partners, users } from '@shared/schema';
+import { partners, users } from '../db'; // ✅ Corregido: import desde ../db
 import { eq, and } from 'drizzle-orm';
 import paymentsRouter from './payments-api';
-import { comparePasswords } from '../auth';
+import { comparePassword } from '../auth'; // ✅ Corregido: nombre de función
 
 const router = express.Router();
 
-// Middleware para verificar el token JWT de Vecinos
-const authenticateJWT = async (req: express.Request, res: express.Response, next: express.Function) => {
+// ✅ Middleware para verificar el token JWT de Vecinos
+const authenticateJWT = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const authHeader = req.headers.authorization;
 
   if (authHeader) {
@@ -27,27 +27,27 @@ const authenticateJWT = async (req: express.Request, res: express.Response, next
   }
 };
 
-// Middleware para verificar si el usuario es un socio Vecinos
-const isPartner = async (req: express.Request, res: express.Response, next: express.Function) => {
-  if (!req.user || req.user.role !== 'partner') {
+// ✅ Middleware para verificar si el usuario es un socio Vecinos
+const isPartner = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (!req.user || (req.user as any).role !== 'partner') {
     return res.status(403).json({ message: 'Acceso denegado. Se requiere rol de socio.' });
   }
 
   next();
 };
 
-// Middleware para verificar si el usuario es un vendedor
-const isSeller = async (req: express.Request, res: express.Response, next: express.Function) => {
-  if (!req.user || req.user.role !== 'seller') {
+// ✅ Middleware para verificar si el usuario es un vendedor
+const isSeller = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (!req.user || (req.user as any).role !== 'seller') {
     return res.status(403).json({ message: 'Acceso denegado. Se requiere rol de vendedor.' });
   }
 
   next();
 };
 
-// Middleware para verificar si el usuario es un supervisor
-const isSupervisor = async (req: express.Request, res: express.Response, next: express.Function) => {
-  if (!req.user || req.user.role !== 'supervisor') {
+// ✅ Middleware para verificar si el usuario es un supervisor
+const isSupervisor = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (!req.user || (req.user as any).role !== 'supervisor') {
     return res.status(403).json({ message: 'Acceso denegado. Se requiere rol de supervisor.' });
   }
 
@@ -61,7 +61,7 @@ router.post('/login', async (req, res) => {
   try {
     // MODO DE EMERGENCIA TEMPORAL
     if (username === "admin" && password === "admin123") {
-      console.log("⚠️ Acceso de emergencia concedido");
+      console.log("🚨 Acceso de emergencia concedido");
       const emergencyUser = {
         id: 99999,
         username: "admin",
@@ -72,17 +72,17 @@ router.post('/login', async (req, res) => {
       };
 
       const token = jwt.sign(
-        { 
-          id: emergencyUser.id, 
+        {
+          id: emergencyUser.id,
           username: emergencyUser.username,
-          role: emergencyUser.role 
-        }, 
+          role: emergencyUser.role
+        },
         process.env.JWT_SECRET || "vecinos-secret-key",
         { expiresIn: "1d" }
       );
 
-      return res.json({ 
-        user: emergencyUser, 
+      return res.json({
+        user: emergencyUser,
         token,
         role: "admin"
       });
@@ -97,16 +97,16 @@ router.post('/login', async (req, res) => {
     if (username === "vecinosadmin" && password === "vecinos123") {
       console.log("Login directo para vecinosadmin");
       const token = jwt.sign(
-        { 
-          id: 88888, 
+        {
+          id: 88888,
           username: "vecinosadmin",
-          role: "admin" 
-        }, 
+          role: "admin"
+        },
         process.env.JWT_SECRET || "vecinos-secret-key",
         { expiresIn: "1d" }
       );
 
-      return res.json({ 
+      return res.json({
         user: {
           id: 88888,
           username: "vecinosadmin",
@@ -114,7 +114,7 @@ router.post('/login', async (req, res) => {
           fullName: "Administrador VecinoXpress",
           role: "admin",
           platform: "vecinos"
-        }, 
+        },
         token,
         role: "admin"
       });
@@ -125,8 +125,8 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: "Credenciales inválidas" });
     }
 
-    // Verificar contraseña
-    const passwordValid = await comparePasswords(password, user.password);
+    // ✅ Verificar contraseña - función corregida
+    const passwordValid = await comparePassword(password, user.password);
     if (!passwordValid) {
       console.log(`Contraseña incorrecta para usuario: ${username}`);
       return res.status(401).json({ message: "Contraseña incorrecta" });
@@ -136,21 +136,21 @@ router.post('/login', async (req, res) => {
 
     // Generar token JWT
     const token = jwt.sign(
-      { 
-        id: user.id, 
+      {
+        id: user.id,
         username: user.username,
-        role: user.role 
-      }, 
+        role: user.role
+      },
       process.env.JWT_SECRET || "vecinos-secret-key",
       { expiresIn: "1d" }
     );
 
     // Devolver usuario y token (sin la contraseña)
     const { password: _, ...userWithoutPassword } = user;
-    res.json({ 
-      user: userWithoutPassword, 
+    res.json({
+      user: userWithoutPassword,
       token,
-      role: user.role 
+      role: user.role
     });
   } catch (error) {
     console.error("Error en login de Vecinos:", error);
@@ -158,7 +158,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Ruta para verificar el token y obtener información del usuario
+// ✅ Ruta para verificar el token y obtener información del usuario
 router.get('/profile', authenticateJWT, async (req, res) => {
   try {
     const [user] = await db.select({
@@ -170,7 +170,7 @@ router.get('/profile', authenticateJWT, async (req, res) => {
       platform: users.platform,
       createdAt: users.createdAt
     }).from(users).where(
-      eq(users.id, req.user.id)
+      eq(users.id, (req.user as any).id) // ✅ Corregido: type assertion
     ).limit(1);
 
     if (!user) {
@@ -197,6 +197,7 @@ router.get('/profile', authenticateJWT, async (req, res) => {
       partnerProfile
     });
   } catch (error) {
+    console.error("Error al obtener perfil:", error);
     res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
@@ -243,11 +244,11 @@ router.post('/register', async (req, res) => {
 
     // Crear token JWT
     const token = jwt.sign(
-      { 
-        id: newUser.id, 
-        username: newUser.username, 
+      {
+        id: newUser.id,
+        username: newUser.username,
         role: newUser.role,
-        partnerId: newPartner.id 
+        partnerId: newPartner.id
       },
       process.env.JWT_SECRET || 'vecinos-secret',
       { expiresIn: '24h' }

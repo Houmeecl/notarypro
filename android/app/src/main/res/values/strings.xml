@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">VecinoXpress</string>
-    <string name="title_activity_main">VecinoXpress</string>
-    <string name="package_name">cl.vecinoxpress.pos</string>
-    <string name="custom_url_scheme">cl.vecinoxpress.pos</string>
-</resources>
