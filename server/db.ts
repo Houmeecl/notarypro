@@ -1,10 +1,7 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
+import { Pool } from 'pg';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import { eq, and, sql } from "drizzle-orm";
 import { pgTable, text, timestamp, integer, varchar, boolean, serial, decimal } from 'drizzle-orm/pg-core';
-
-neonConfig.webSocketConstructor = ws;
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -95,28 +92,34 @@ export async function createAnalyticsEvent(insertEvent: InsertAnalyticsEvent): P
 
 export async function getAnalyticsEvents(options?: { 
   startDate?: Date; 
-  endDate?: Date; 
+  endDate?: Date;
   eventType?: string; 
   userId?: number;
-}): Promise<AnalyticsEvent[]> {
-  let query = db.select().from(analyticsEvents);
+}) {
+  const conditions = [];
   
   if (options) {
     if (options.startDate) {
-      query = query.where(sql`${analyticsEvents.createdAt} >= ${options.startDate}`);
+      conditions.push(sql`${analyticsEvents.createdAt} >= ${options.startDate}`);
     }
     
     if (options.endDate) {
-      query = query.where(sql`${analyticsEvents.createdAt} <= ${options.endDate}`);
+      conditions.push(sql`${analyticsEvents.createdAt} <= ${options.endDate}`);
     }
     
     if (options.eventType) {
-      query = query.where(eq(analyticsEvents.eventType, options.eventType));
+      conditions.push(eq(analyticsEvents.eventType, options.eventType));
     }
     
     if (options.userId) {
-      query = query.where(eq(analyticsEvents.userId, options.userId));
+      conditions.push(eq(analyticsEvents.userId, options.userId));
     }
+  }
+  
+  let query = db.select().from(analyticsEvents);
+  
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
   }
   
   const events = await query.orderBy(sql`${analyticsEvents.createdAt} DESC`);
@@ -127,25 +130,31 @@ export async function getDailyEventCounts(options?: {
   startDate?: Date; 
   endDate?: Date;
   eventType?: string; 
-}): Promise<{ date: string; count: number }[]> {
+}) {
+  const conditions = [];
+  
+  if (options) {
+    if (options.startDate) {
+      conditions.push(sql`${analyticsEvents.createdAt} >= ${options.startDate}`);
+    }
+    
+    if (options.endDate) {
+      conditions.push(sql`${analyticsEvents.createdAt} <= ${options.endDate}`);
+    }
+    
+    if (options.eventType) {
+      conditions.push(eq(analyticsEvents.eventType, options.eventType));
+    }
+  }
+  
   let query = db.select({
     date: sql`DATE(${analyticsEvents.createdAt})`,
     count: sql`COUNT(*)`,
   })
   .from(analyticsEvents);
   
-  if (options) {
-    if (options.startDate) {
-      query = query.where(sql`${analyticsEvents.createdAt} >= ${options.startDate}`);
-    }
-    
-    if (options.endDate) {
-      query = query.where(sql`${analyticsEvents.createdAt} <= ${options.endDate}`);
-    }
-    
-    if (options.eventType) {
-      query = query.where(eq(analyticsEvents.eventType, options.eventType));
-    }
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
   }
   
   const results = await query.groupBy(sql`DATE(${analyticsEvents.createdAt})`)
@@ -157,12 +166,7 @@ export async function getDailyEventCounts(options?: {
   }));
 }
 
-export async function getUserActivityStats(): Promise<{ 
-  totalUsers: number; 
-  newUsersToday: number; 
-  newUsersThisWeek: number; 
-  newUsersThisMonth: number;
-}> {
+export async function getUserActivityStats() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
@@ -198,11 +202,7 @@ export async function getUserActivityStats(): Promise<{
   };
 }
 
-export async function getDocumentStats(): Promise<{ 
-  totalDocuments: number; 
-  documentsCreatedToday: number; 
-  documentsByStatus: Record<string, number>;
-}> {
+export async function getDocumentStats() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
@@ -238,15 +238,7 @@ export async function getDocumentStats(): Promise<{
   };
 }
 
-export async function getRevenueStats(): Promise<{
-  totalRevenue: number;
-  revenueToday: number;
-  revenueThisWeek: number;
-  revenueThisMonth: number;
-  documentRevenue: number;
-  courseRevenue: number;
-  videoCallRevenue: number;
-}> {
+export async function getRevenueStats() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   

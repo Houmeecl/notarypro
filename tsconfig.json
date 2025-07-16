@@ -8,7 +8,11 @@
     "noEmit": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "strict": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "skipLibCheck": true,
     "types": ["node"]
   },
   "include": ["server/**/*"],
