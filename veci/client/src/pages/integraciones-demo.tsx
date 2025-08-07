@@ -286,7 +286,7 @@ export default function IntegracionesDemo() {
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center h-full text-center py-12 space-y-4">
-                      <div className="border border-border rounded-full p-6">
+                      <div className="border border-gray-200 rounded-full p-6">
                         <FileText className="h-12 w-12 text-muted-foreground" />
                       </div>
                       <div>
@@ -314,7 +314,7 @@ export default function IntegracionesDemo() {
             <CardContent className="flex flex-col items-center">
               {!isVideoCallStarted ? (
                 <div className="text-center py-10 space-y-6">
-                  <div className="border border-border rounded-full p-6 mx-auto w-fit">
+                  <div className="border border-gray-200 rounded-full p-6 mx-auto w-fit">
                     <Video className="h-16 w-16 text-muted-foreground" />
                   </div>
                   
