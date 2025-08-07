@@ -62,10 +62,6 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
@@ -129,10 +125,6 @@
 
 /* Global style enhancements */
 @layer base {
-  * {
-    @apply border-border;
-  }
-
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
