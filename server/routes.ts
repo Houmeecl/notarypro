@@ -21,6 +21,12 @@ import { posManagementRouter } from "./pos-management-routes";
 import { documentSignaturesRouter } from "./routes/document-signatures";
 import { secureDocumentRouter } from "./routes/secure-document-routes";
 import { qrSignatureRouter } from "./vecinos/qr-signature-routes";
+import { adminRouter } from "./admin/admin-routes";
+import { adminPosRouter } from "./admin/admin-pos-routes";
+import { integrationRouter } from "./admin/integration-routes";
+import { gamificationRouter } from "./gamification-routes";
+import { getApiRouter } from "./getapi-routes";
+import { translationRouter } from "./translation-routes";
 
 // Middleware de autenticación
 function isAuthenticated(req: Request, res: Response, next: any) {
@@ -73,6 +79,20 @@ export function registerRoutes(app: Express): Server {
   
   // Ruta para el sistema de firma con QR
   app.use("/api/qr-signature", qrSignatureRouter);
+  
+  // Rutas de administración
+  app.use("/api/admin", adminRouter);
+  app.use("/api/admin/pos", adminPosRouter);
+  app.use("/api/admin/integrations", integrationRouter);
+  
+  // Sistema de gamificación
+  app.use("/api/gamification", gamificationRouter);
+  
+  // API de GetAPI para verificación de identidad
+  app.use("/api/getapi", getApiRouter);
+  
+  // Servicio de traducción
+  app.use("/api/translation", translationRouter);
   
   // Ruta para servir archivos estáticos (documentos y contratos)
   app.use("/docs", express.static(path.join(process.cwd(), "docs")));
