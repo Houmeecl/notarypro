@@ -28,6 +28,7 @@ import { realDataRouter } from "./admin/real-data-routes";
 import { gamificationRouter } from "./gamification-routes";
 import { getApiRouter } from "./getapi-routes";
 import { translationRouter } from "./translation-routes";
+import { authJwtRouter } from "./auth-jwt-routes";
 
 // Middleware de autenticación
 function isAuthenticated(req: Request, res: Response, next: any) {
@@ -95,6 +96,9 @@ export function registerRoutes(app: Express): Server {
   
   // Servicio de traducción
   app.use("/api/translation", translationRouter);
+  
+  // Sistema de autenticación JWT
+  app.use("/api/auth", authJwtRouter);
   
   // Ruta para servir archivos estáticos (documentos y contratos)
   app.use("/docs", express.static(path.join(process.cwd(), "docs")));
