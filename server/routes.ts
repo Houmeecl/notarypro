@@ -36,6 +36,7 @@ import { realVecinosApiRouter } from "./vecinos/real-vecinos-api";
 import { realRonRouter } from "./real-ron-video-system";
 import { ronJitsiRouter } from "./ron-jitsi-routes";
 import { ronClientAccessRouter } from "./ron-client-access-routes";
+import { identityVerificationRouter } from "./identity-verification-routes";
 
 // Middleware de autenticación
 function isAuthenticated(req: Request, res: Response, next: any) {
@@ -128,6 +129,9 @@ export function registerRoutes(app: Express): Server {
   
   // Sistema de códigos de acceso para clientes RON
   app.use("/api/ron-client", ronClientAccessRouter);
+  
+  // Sistema completo de verificación de identidad
+  app.use("/api/identity", identityVerificationRouter);
   
   // Ruta para servir archivos estáticos (documentos y contratos)
   app.use("/docs", express.static(path.join(process.cwd(), "docs")));
