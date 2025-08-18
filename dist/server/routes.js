@@ -34,6 +34,13 @@ const gamification_routes_1 = require("./gamification-routes");
 const getapi_routes_1 = require("./getapi-routes");
 const translation_routes_1 = require("./translation-routes");
 const auth_jwt_routes_1 = require("./auth-jwt-routes");
+const real_document_manager_1 = require("./real-document-manager");
+const real_admin_dashboard_1 = require("./real-admin-dashboard");
+const real_certifier_panel_1 = require("./real-certifier-panel");
+const real_vecinos_api_1 = require("./vecinos/real-vecinos-api");
+const real_ron_video_system_1 = require("./real-ron-video-system");
+const ron_jitsi_routes_1 = require("./ron-jitsi-routes");
+const ron_client_access_routes_1 = require("./ron-client-access-routes");
 // Middleware de autenticación
 function isAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
@@ -83,6 +90,21 @@ function registerRoutes(app) {
     app.use("/api/translation", translation_routes_1.translationRouter);
     // Sistema de autenticación JWT
     app.use("/api/auth", auth_jwt_routes_1.authJwtRouter);
+    // === SISTEMAS REALES COMPLETOS ===
+    // Gestor documental real con base de datos
+    app.use("/api/real-documents", real_document_manager_1.realDocumentRouter);
+    // Dashboard admin real con datos de BD
+    app.use("/api/real-admin", real_admin_dashboard_1.realAdminRouter);
+    // Panel certificador real con documentos reales
+    app.use("/api/real-certifier", real_certifier_panel_1.realCertifierRouter);
+    // API Vecinos real con estadísticas reales
+    app.use("/api/vecinos/real", real_vecinos_api_1.realVecinosApiRouter);
+    // Sistema RON video real con Agora
+    app.use("/api/real-ron", real_ron_video_system_1.realRonRouter);
+    // Sistema RON video con Jitsi Meet
+    app.use("/api/ron-jitsi", ron_jitsi_routes_1.ronJitsiRouter);
+    // Sistema de códigos de acceso para clientes RON
+    app.use("/api/ron-client", ron_client_access_routes_1.ronClientAccessRouter);
     // Ruta para servir archivos estáticos (documentos y contratos)
     app.use("/docs", express_1.default.static(path_1.default.join(process.cwd(), "docs")));
     app.use("/uploads", express_1.default.static(path_1.default.join(process.cwd(), "uploads")));
