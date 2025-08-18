@@ -1,4 +1,5 @@
 import { seedDocumentTemplates } from "./document-templates";
+import { seedPosDevices } from "./seed-pos-devices";
 
 async function main() {
   try {
@@ -6,6 +7,9 @@ async function main() {
     
     // Ejecutar semillas de plantillas de documentos
     await seedDocumentTemplates();
+    
+    // Ejecutar semillas de dispositivos POS
+    await seedPosDevices();
     
     console.log("Proceso de semillas completado exitosamente.");
   } catch (error) {

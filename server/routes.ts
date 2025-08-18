@@ -382,6 +382,86 @@ async function initializeTestAdmins() {
       console.log("Usuario partner creado, ahora puedes iniciar sesión con demopartner/password123");
       console.log("Usuario demo partner inicializado correctamente");
     }
+
+    // Usuario POS/Operador Demo 1
+    const [existingPosUser1] = await db.select().from(users).where(
+      eq(users.username, "posoperator1")
+    );
+
+    if (existingPosUser1) {
+      console.log("El usuario posoperator1 ya existe. Actualizando contraseña...");
+      const hashedPassword = await hashPassword("pos123");
+      await db.update(users)
+        .set({ password: hashedPassword, role: "pos-user" })
+        .where(eq(users.username, "posoperator1"));
+      console.log("Credenciales del usuario posoperator1 actualizadas.");
+    } else {
+      const hashedPassword = await hashPassword("pos123");
+      await db.insert(users).values({
+        username: "posoperator1",
+        password: hashedPassword,
+        email: "pos1@notarypro.cl",
+        fullName: "Operador POS 1",
+        role: "pos-user",
+        platform: "notarypro",
+        createdAt: new Date()
+      });
+      console.log("Usuario POS Operador 1 creado correctamente");
+    }
+
+    // Usuario Operador Demo 2
+    const [existingOperator2] = await db.select().from(users).where(
+      eq(users.username, "operator2")
+    );
+
+    if (existingOperator2) {
+      console.log("El usuario operator2 ya existe. Actualizando contraseña...");
+      const hashedPassword = await hashPassword("operator123");
+      await db.update(users)
+        .set({ password: hashedPassword, role: "operator" })
+        .where(eq(users.username, "operator2"));
+      console.log("Credenciales del usuario operator2 actualizadas.");
+    } else {
+      const hashedPassword = await hashPassword("operator123");
+      await db.insert(users).values({
+        username: "operator2",
+        password: hashedPassword,
+        email: "operator2@notarypro.cl",
+        fullName: "Operador Terminal 2",
+        role: "operator",
+        platform: "notarypro",
+        createdAt: new Date()
+      });
+      console.log("Usuario Operador 2 creado correctamente");
+    }
+
+    // Usuario POS para VecinoXpress
+    const [existingVecinosPOS] = await db.select().from(users).where(
+      eq(users.username, "vecinospos")
+    );
+
+    if (existingVecinosPOS) {
+      console.log("El usuario vecinospos ya existe. Actualizando contraseña...");
+      const hashedPassword = await hashPassword("vecinos123pos");
+      await db.update(users)
+        .set({ password: hashedPassword, role: "pos-user", platform: "vecinos" })
+        .where(eq(users.username, "vecinospos"));
+      console.log("Credenciales del usuario vecinospos actualizadas.");
+    } else {
+      const hashedPassword = await hashPassword("vecinos123pos");
+      await db.insert(users).values({
+        username: "vecinospos",
+        password: hashedPassword,
+        email: "pos@vecinoxpress.cl",
+        fullName: "Operador POS Vecinos",
+        role: "pos-user",
+        platform: "vecinos",
+        businessName: "Terminal VecinoXpress",
+        createdAt: new Date()
+      });
+      console.log("Usuario POS VecinoXpress creado correctamente");
+    }
+
   } catch (error) {
     console.error("Error inicializando admins:", error);
   }
