@@ -1,0 +1,132 @@
+/* Estilos para PDF generado */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Source+Sans+Pro:wght@400;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  color: #333;
+  padding: 0;
+  margin: 0;
+  font-size: 11pt;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Source Sans Pro', sans-serif;
+  margin-top: 1.5em;
+  margin-bottom: 0.6em;
+  color: #000;
+  page-break-after: avoid;
+}
+
+h1 {
+  font-size: 22pt;
+  color: #1a56db;
+  text-align: center;
+  border-bottom: 2px solid #1a56db;
+  padding-bottom: 10px;
+  margin-bottom: 30px;
+}
+
+h2 {
+  font-size: 18pt;
+  color: #1a56db;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 5px;
+}
+
+h3 {
+  font-size: 14pt;
+  color: #2563eb;
+}
+
+h4 {
+  font-size: 12pt;
+  color: #3b82f6;
+}
+
+p, ul, ol {
+  margin-bottom: 1em;
+}
+
+a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+code {
+  font-family: Consolas, Monaco, 'Andale Mono', monospace;
+  font-size: 0.9em;
+  background-color: #f5f5f5;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+}
+
+pre {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 1em;
+  overflow: auto;
+  page-break-inside: avoid;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+}
+
+blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1em;
+  margin-left: 0;
+  color: #4b5563;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+table, th, td {
+  border: 1px solid #e5e7eb;
+}
+
+th, td {
+  padding: 0.5em;
+  text-align: left;
+}
+
+th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 2em 0;
+}
+
+@page {
+  @top-center {
+    content: "NotaryPro / VecinosExpress POS - Documentación Técnica";
+    font-size: 9pt;
+    color: #6b7280;
+  }
+  
+  @bottom-center {
+    content: "Página " counter(page) " de " counter(pages);
+    font-size: 9pt;
+    color: #6b7280;
+  }
+}

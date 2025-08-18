@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contrato de Compraventa con Firma Digital Avanzada</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    .document-container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .document-header {
+      text-align: center;
+      border-bottom: 2px solid #eee;
+      padding: 20px;
+      background-color: #fff;
+      position: relative;
+    }
+    .document-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    .document-subtitle {
+      font-size: 16px;
+      color: #666;
+    }
+    .document-reference {
+      text-align: right;
+      padding: 15px 20px;
+      color: #666;
+      font-size: 14px;
+      background-color: #f8f8f8;
+      border-bottom: 1px solid #eee;
+    }
+    .document-content {
+      padding: 25px;
+    }
+    .field {
+      margin-bottom: 20px;
+    }
+    .field-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #EC1C24;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    .field-value {
+      padding: 12px;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      border: 1px solid #eee;
+      font-size: 15px;
+    }
+    .signature-area {
+      margin-top: 40px;
+      border-top: 1px solid #eee;
+      padding: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #f8f8f8;
+    }
+    .signature-info {
+      max-width: 60%;
+    }
+    .signature-box {
+      border: 2px solid #EC1C24;
+      background-color: rgba(236, 28, 36, 0.05);
+      width: 200px;
+      padding: 20px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .signature-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #333;
+    }
+    .signature-date {
+      font-size: 13px;
+      color: #666;
+    }
+    .stamp {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #EC1C24;
+      border: 2px solid #EC1C24;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(-15deg);
+      font-size: 12px;
+      text-align: center;
+    }
+    .document-footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+      padding: 20px;
+      border-top: 1px solid #eee;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .logo img {
+      max-width: 150px;
+      height: auto;
+    }
+    .verification-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 30px 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+      border-radius: 8px;
+    }
+    .qr-code {
+      margin-right: 20px;
+    }
+    .verification-info {
+      max-width: 60%;
+    }
+    .verification-info h3 {
+      color: #EC1C24;
+      margin-bottom: 10px;
+    }
+    .verification-code {
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      font-family: monospace;
+      font-size: 16px;
+      letter-spacing: 1px;
+    }
+    .document-status {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #4CAF50;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+    .document-parties {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
+    .party {
+      flex: 1;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      margin: 0 10px;
+    }
+    .party h3 {
+      margin-top: 0;
+      color: #EC1C24;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="document-container">
+    <div class="document-header">
+      <div class="logo">
+        <img src="https://via.placeholder.com/150x50?text=CerfiDoc" alt="CerfiDoc Logo">
+      </div>
+      <div class="document-status">Verificado</div>
+      <div class="document-title">Contrato de Compraventa de Bienes Muebles</div>
+      <div class="document-subtitle">Documento Legal Certificado</div>
+    </div>
+
+    <div class="document-reference">
+      <div>Ref: DOC2025-0423</div>
+      <div>Fecha: 30/04/2025</div>
+      <div>Certificado por: Notario Pedro Jiménez (#458)</div>
+    </div>
+    
+    <div class="document-content">
+      <div class="document-parties">
+        <div class="party">
+          <h3>Vendedor</h3>
+          <p><strong>Nombre:</strong> Juan Pérez Rodríguez</p>
+          <p><strong>RUT:</strong> 12.345.678-9</p>
+          <p><strong>Domicilio:</strong> Av. Providencia 1234, Santiago</p>
+        </div>
+        <div class="party">
+          <h3>Comprador</h3>
+          <p><strong>Nombre:</strong> María González Torres</p>
+          <p><strong>RUT:</strong> 15.872.344-5</p>
+          <p><strong>Domicilio:</strong> Los Leones 567, Providencia</p>
+        </div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">Descripción del Bien</div>
+        <div class="field-value">Automóvil Marca Toyota, Modelo Corolla, Año 2020, Color Blanco, Placa ABCD-12</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">Precio de Venta</div>
+        <div class="field-value">$15.000.000 CLP (quince millones de pesos chilenos)</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">Forma de Pago</div>
+        <div class="field-value">Transferencia Bancaria a la cuenta corriente N° 123456789 del Banco Santander</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">Fecha de Entrega</div>
+        <div class="field-value">05/05/2025</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">Condiciones de Entrega</div>
+        <div class="field-value">El bien se entregará en las condiciones actuales que ambas partes declaran conocer. La entrega se realizará en la dirección del vendedor, siendo responsabilidad del comprador el transporte posterior.</div>
+      </div>
+    </div>
+    
+    <div class="signature-area">
+      <div class="signature-info">
+        <p><strong>Estado:</strong> Firmado y verificado</p>
+        <p><strong>Firma digital avanzada:</strong> Verificada según Ley 19.799</p>
+        <p><strong>Certificado por:</strong> Notario Pedro Jiménez (Notaría N° 458 de Santiago)</p>
+        <p><strong>Firma biométrica:</strong> Verificada</p>
+      </div>
+      
+      <div class="signature-box">
+        <p class="signature-title">Firmado Digitalmente</p>
+        <p class="signature-date">30 de abril de 2025 a las 14:32:56 GMT-3</p>
+        <div class="stamp">FIRMADO<br/>LEGAL</div>
+      </div>
+    </div>
+    
+    <div class="verification-section">
+      <div class="qr-code">
+        <img src="https://via.placeholder.com/150x150?text=QR+Code" alt="Código QR de verificación">
+      </div>
+      <div class="verification-info">
+        <h3>Verificación de Autenticidad</h3>
+        <p>Este documento cuenta con firma electrónica avanzada y puede ser verificado en cualquier momento.</p>
+        <p><strong>Código de verificación:</strong></p>
+        <div class="verification-code">CFDOC-95A728BF-2025-0430</div>
+        <p><small>Para verificar la autenticidad, escanee el código QR o visite <a href="#">cerfidoc.cl/verificar</a> e ingrese el código.</small></p>
+      </div>
+    </div>
+    
+    <div class="document-footer">
+      <p>Este documento es una representación digital del original con plena validez legal.</p>
+      <p>Generado por Vecinos NotaryPro el 30/04/2025 14:32:56</p>
+      <p>Protegido con tecnología blockchain | Hash: 7FCD3AD8591B21E232A98C11E1</p>
+    </div>
+  </div>
+</body>
+</html>

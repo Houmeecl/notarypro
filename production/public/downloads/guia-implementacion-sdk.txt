@@ -1,0 +1,110 @@
+# Guía de Implementación del SDK Vecinos NotaryPro Express
+
+## Introducción
+
+Esta guía proporciona instrucciones detalladas para la implementación y uso del SDK Vecinos NotaryPro Express en puntos de servicio asociados. El SDK ha sido diseñado para facilitar el procesamiento de documentos legales y la gestión de clientes de manera eficiente y segura.
+
+## Requisitos Previos
+
+- Tableta o smartphone con Android 5.0 o superior
+- Conexión a Internet (el SDK también funciona en modo offline)
+- Cuenta activa en el programa Vecinos NotaryPro Express
+- Opcional: Impresora térmica Bluetooth para recibos
+
+## Opciones de Instalación
+
+### 1. Aplicación Android POS (Recomendada)
+
+La forma más sencilla de utilizar el SDK es a través de nuestra aplicación Android POS, que ya tiene el SDK integrado:
+
+1. Descargue la aplicación VecinosPOS.apk
+2. En su dispositivo Android, vaya a Configuración > Seguridad y active "Orígenes desconocidos"
+3. Instale la aplicación APK descargada
+4. Abra la aplicación y acceda con sus credenciales de socio
+
+### 2. Integración Manual del SDK (Para desarrolladores)
+
+Si desea integrar el SDK en una aplicación personalizada:
+
+1. Descargue el archivo vecinos-notarypro-sdk.js
+2. Incluya el archivo en su proyecto web o aplicación Android WebView
+3. Inicialice el SDK:
+
+```javascript
+// Inicializar el SDK
+const pos = new VecinosPOS({
+  partnerId: "su_id_de_socio",
+  apiKey: "su_api_key",
+  modoOffline: false
+});
+```
+
+## Uso del SDK
+
+### 1. Registrar un Cliente
+
+```javascript
+const cliente = await pos.registrarCliente({
+  nombre: "Juan Pérez",
+  rut: "12345678-9",
+  email: "juan.perez@ejemplo.cl",
+  telefono: "+56912345678"
+});
+console.log("Cliente registrado:", cliente);
+```
+
+### 2. Procesar un Documento
+
+```javascript
+const documento = await pos.procesarDocumento({
+  tipo: TIPO_DOCUMENTO.DECLARACION_JURADA,
+  titulo: "Declaración jurada de residencia",
+  detalle: "El cliente declara que reside en la dirección indicada.",
+  monto: 5000,
+  metodoPago: METODO_PAGO.EFECTIVO
+}, cliente.id);
+console.log("Documento procesado:", documento);
+```
+
+### 3. Generar un Recibo
+
+```javascript
+const recibo = await pos.generarRecibo(documento.id);
+console.log("Recibo generado:", recibo);
+```
+
+### 4. Sincronización de Datos (Modo Offline)
+
+Si trabaja en modo offline, los datos se almacenan localmente y se sincronizan cuando vuelve la conexión:
+
+```javascript
+// Verificar si hay datos pendientes
+if (pos.offlineQueue.length > 0) {
+  try {
+    const resultado = await pos.sincronizar();
+    console.log("Sincronización exitosa:", resultado);
+  } catch (error) {
+    console.error("Error al sincronizar:", error);
+  }
+}
+```
+
+## Comisiones y Pagos
+
+Por cada documento procesado, recibirá automáticamente una comisión del 15% del monto. Los pagos se acumulan en su cuenta de socio y pueden retirarse mensualmente mediante transferencia bancaria.
+
+## Soporte Técnico
+
+Si necesita ayuda con la implementación o uso del SDK, contacte a nuestro equipo de soporte técnico:
+
+- Email: soporte@cerfidoc.cl
+- Teléfono: +5622123456
+- Horario: Lunes a Viernes, 9:00 - 18:00 hrs.
+
+## Actualizaciones
+
+Las actualizaciones del SDK se publican trimestralmente. Recomendamos mantener actualizada su instalación para acceder a nuevas funcionalidades y mejoras de seguridad.
+
+---
+
+© 2025 CerfiDoc. Todos los derechos reservados.

@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VecinoXpress - Sesión RON</title>
+  <script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
+  <style>
+    :root {
+      --primary: #2d219b;  /* Color principal VecinoXpress */
+      --primary-light: #4939c7;
+      --secondary: #3e3e3e;
+      --background: #f8f8f8;
+      --surface: #ffffff;
+      --error: #d32f2f;
+      --success: #388e3c;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--secondary);
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .logo img {
+      height: 60px;
+    }
+    
+    h1, h2, h3 {
+      color: var(--primary);
+      text-align: center;
+    }
+    
+    .card {
+      background-color: var(--surface);
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    
+    .card-header {
+      background-color: var(--primary);
+      color: white;
+      padding: 15px 20px;
+    }
+    
+    .card-header h2 {
+      margin: 0;
+      color: white;
+      font-size: 1.5rem;
+    }
+    
+    .card-content {
+      padding: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: background-color 0.3s;
+    }
+    
+    /* Estilos para los botones de acción */
+    .btn-action {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    
+    .btn-action:hover {
+      background-color: var(--primary-light);
+    }
+    
+    .btn-action:disabled {
+      background-color: #aaaaaa;
+      cursor: not-allowed;
+      width: 100%;
+    }
+    
+    button:hover {
+      background-color: var(--primary-light);
+    }
+    
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    
+    .video-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    @media (min-width: 768px) {
+      .video-container {
+        flex-direction: row;
+      }
+      
+      .video-box {
+        flex: 1;
+      }
+    }
+    
+    .video-box {
+      position: relative;
+    }
+    
+    .video-frame {
+      width: 100%;
+      height: 300px;
+      background-color: #222;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      gap: 10px;
+    }
+    
+    .control-button {
+      background-color: var(--secondary);
+      color: white;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .control-button:hover {
+      background-color: var(--primary);
+    }
+    
+    .session-info {
+      margin-top: 20px;
+    }
+    
+    .session-info dl {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 10px;
+    }
+    
+    .session-info dt {
+      font-weight: bold;
+    }
+    
+    .status-bar {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      text-align: center;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .btn-action {
+      background-color: var(--success);
+    }
+    
+    .btn-danger {
+      background-color: var(--error);
+    }
+    
+    .icon {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      vertical-align: middle;
+    }
+    
+    .verification-steps {
+      margin-top: 20px;
+      border-top: 1px solid #ddd;
+      padding-top: 20px;
+    }
+    
+    .step {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+    
+    .step.active {
+      opacity: 1;
+    }
+    
+    .step-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      background-color: var(--primary);
+      color: white;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    
+    .step-content {
+      flex: 1;
+    }
+    
+    .step-content h4 {
+      margin: 0 0 5px;
+    }
+    
+    .step-content p {
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="/logo.png" alt="VecinoXpress Logo" onerror="this.src='https://via.placeholder.com/200x60/2d219b/ffffff?text=VecinoXpress'">
+    </div>
+    
+    <h1>Sesión de Certificación RON</h1>
+    <p class="text-center">Verificación de identidad y firma electrónica en línea</p>
+    
+    <!-- Pantalla inicial de acceso -->
+    <div id="access-screen" class="card">
+      <div class="card-header">
+        <h2>Ingresa a tu sesión</h2>
+      </div>
+      <div class="card-content">
+        <div class="form-group">
+          <label for="accessCode">Código de acceso RON</label>
+          <input type="text" id="accessCode" placeholder="Formato: RON-2025-001">
+          <small style="display: block; margin-top: 5px; color: #666;">Ingresa el código proporcionado por tu certificador notarial.</small>
+        </div>
+        <button id="joinButton" onclick="joinSession()">
+          <span id="joinButtonText">Ingresar a la sesión</span>
+          <span id="joinButtonLoading" class="loading hidden"></span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Pantalla de sesión activa (inicialmente oculta) -->
+    <div id="session-screen" class="hidden">
+      <div class="video-container">
+        <!-- Mi cámara -->
+        <div class="video-box card">
+          <div class="card-header">
+            <h2>Mi cámara</h2>
+          </div>
+          <div class="card-content">
+            <div id="local-player" class="video-frame"></div>
+            <div class="controls">
+              <button id="videoToggle" class="control-button" onclick="toggleVideo()">
+                <span class="icon">📹</span>
+              </button>
+              <button id="audioToggle" class="control-button" onclick="toggleAudio()">
+                <span class="icon">🎤</span>
+              </button>
+              <button id="captureIDBtn" class="control-button" onclick="captureID()">
+                <span class="icon">🪪</span>
+              </button>
+            </div>
+            <div class="verification-controls" style="margin-top: 10px;">
+              <button id="verifyIdentityBtn" class="btn-action" style="width: 100%; margin-bottom: 5px;" onclick="verifyIdentity()">
+                Verificar Identidad
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Certificador -->
+        <div class="video-box card">
+          <div class="card-header">
+            <h2>Certificador</h2>
+          </div>
+          <div class="card-content">
+            <div id="remote-player" class="video-frame"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Detalles de sesión -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Detalles de la sesión</h2>
+        </div>
+        <div class="card-content">
+          <div class="session-info">
+            <dl>
+              <dt>ID de sesión:</dt>
+              <dd id="sessionId">-</dd>
+              
+              <dt>Documento:</dt>
+              <dd id="documentName">-</dd>
+              
+              <dt>Certificador:</dt>
+              <dd id="certifierName">-</dd>
+              
+              <dt>Estado:</dt>
+              <dd id="sessionStatus">En proceso</dd>
+            </dl>
+          </div>
+
+          <div class="document-management" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+            <h3 style="margin-bottom: 15px; text-align: center;">Gestión de Documentos</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+              <button id="viewDocumentBtn" class="btn-action" style="flex: 1;" onclick="viewDocument()">
+                Ver Documento
+              </button>
+              <button id="createDocumentBtn" class="btn-action" style="flex: 1;" onclick="createDocument()">
+                Crear Documento
+              </button>
+            </div>
+            <!-- Previsualización de documento cargado o creado -->
+            <div id="documentPreview" style="display: none; margin-bottom: 15px; max-height: 200px; overflow: auto; border: 1px solid #ddd; padding: 10px; border-radius: 4px;">
+              <div id="previewContent">
+                <!-- Contenido del documento se mostrará aquí -->
+              </div>
+            </div>
+          </div>
+          
+          <div class="signature-options" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+            <h3 style="margin-bottom: 15px; text-align: center;">Verificación y Firma</h3>
+            
+            <div style="background-color: #f5f7ff; border-radius: 6px; padding: 15px; margin-bottom: 15px; border-left: 3px solid var(--primary);">
+              <p style="margin:0; font-size: 14px; margin-bottom: 10px;">
+                <strong>Ley 19.799:</strong> Para garantizar la validez legal de los documentos y firmas electrónicas,
+                se debe verificar la identidad del firmante mediante métodos seguros.
+              </p>
+              
+              <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <div style="width: 6px; height: 6px; background-color: var(--primary); border-radius: 50%; margin-right: 8px;"></div>
+                <span style="font-size: 13px;"><strong>Firma simple:</strong> Para firmantes que no disponen de firma electrónica avanzada</span>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <div style="width: 6px; height: 6px; background-color: var(--primary); border-radius: 50%; margin-right: 8px;"></div>
+                <span style="font-size: 13px;"><strong>Firma eToken:</strong> Firma electrónica avanzada con validez legal plena</span>
+              </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <button id="captureIDBtn" class="btn-action" style="flex: 1; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background-color: var(--primary);" onclick="captureID()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3" y="6" width="18" height="12" rx="2" stroke="white" stroke-width="2"/>
+                  <circle cx="12" cy="12" r="3" stroke="white" stroke-width="2"/>
+                </svg>
+                <span>Verificar Documento</span>
+              </button>
+              <button id="verifyIdentityBtn" class="btn-action" style="flex: 1; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background-color: var(--primary);" onclick="verifyIdentity()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="8" r="4" stroke="white" stroke-width="2"/>
+                  <path d="M6 21v-1a6 6 0 0112 0v1" stroke="white" stroke-width="2"/>
+                </svg>
+                <span>Verificar Identidad</span>
+              </button>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <button id="simpleSignBtn" class="btn-action" style="flex: 1; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background-color: var(--primary);" onclick="initiateSimpleSign()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 17h2.4c1 0 1.8-.4 2.4-1l8.4-8.4a2 2 0 000-2.8l-1.6-1.6a2 2 0 00-2.8 0L3 12a3 3 0 00-1 2.4V17c0 .6.4 1 1 1z" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                  <line x1="15" y1="7" x2="18" y2="10" stroke="white" stroke-width="2"/>
+                </svg>
+                <span>Firma Simple</span>
+              </button>
+              <button id="eTokenSignBtn" class="btn-action" style="flex: 1; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background-color: var(--primary);" onclick="initiateETokenSign()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="white" stroke-width="2"/>
+                </svg>
+                <span>Firma eToken</span>
+              </button>
+            </div>
+          </div>
+          
+          <div class="verification-steps">
+            <div class="step active" id="step1">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h4>Conexión a la videollamada</h4>
+                <p>Asegúrate de que tu cámara y micrófono funcionen correctamente</p>
+              </div>
+            </div>
+            
+            <div class="step" id="step2">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h4>Verificación de identidad</h4>
+                <p>El certificador verificará tu identidad a través de la videollamada</p>
+              </div>
+            </div>
+            
+            <div class="step" id="step3">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h4>Firma electrónica</h4>
+                <p>Recibirás un correo para completar la firma electrónica con Zoho Sign</p>
+              </div>
+            </div>
+            
+            <div class="step" id="step4">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <h4>Certificación completada</h4>
+                <p>Recibirás el documento certificado por correo electrónico</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="status-bar" id="statusBar">
+            Esperando al certificador...
+          </div>
+          
+          <div style="margin-top: 20px; text-align: center;">
+            <button onclick="endSession()" class="btn-danger">Finalizar sesión</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
+  <script>
+    // Variables de estado
+    let client;
+    let localTracks = [];
+    let remoteUsers = {};
+    let isConnected = false;
+    let videoEnabled = true;
+    let audioEnabled = true;
+    let sessionData = null;
+    let appId = ""; // Se cargará desde la API
+    let agoraToken = ""; // Se cargará desde la API
+    
+    // Función para solicitar acceso a cámara/micrófono (Ley 19.799)
+    async function requestCameraAndMicrophone() {
+      try {
+        console.log("✅ Sistema verificación de identidad iniciado");
+        console.log("🔒 Verificación legal según Ley 19.799 activada");
+        
+        // Solicitar permisos de cámara y micrófono con máxima calidad para verificación legal
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: {
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            frameRate: { ideal: 30 },
+            facingMode: "user"
+          }, 
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          } 
+        });
+        
+        const videoElement = document.getElementById('local-player');
+        
+        if (!videoElement) {
+          const tempVideoElement = document.createElement('video');
+          tempVideoElement.id = 'local-video';
+          tempVideoElement.autoplay = true;
+          tempVideoElement.muted = true;
+          tempVideoElement.playsInline = true; // Importante para iOS
+          
+          const container = document.getElementById('local-player') || document.body;
+          container.appendChild(tempVideoElement);
+          tempVideoElement.srcObject = stream;
+        } else if (videoElement.querySelector('video')) {
+          videoElement.querySelector('video').srcObject = stream;
+        } else {
+          const tempVideoElement = document.createElement('video');
+          tempVideoElement.autoplay = true;
+          tempVideoElement.muted = true;
+          tempVideoElement.playsInline = true; // Importante para iOS
+          videoElement.appendChild(tempVideoElement);
+          tempVideoElement.srcObject = stream;
+        }
+        
+        // Añadir información legal al inicializar la cámara
+        if (!document.getElementById('legalDisclaimer')) {
+          const legalDiv = document.createElement('div');
+          legalDiv.id = 'legalDisclaimer';
+          legalDiv.style.position = 'fixed';
+          legalDiv.style.bottom = '10px';
+          legalDiv.style.right = '10px';
+          legalDiv.style.backgroundColor = 'rgba(45, 33, 155, 0.8)';
+          legalDiv.style.color = 'white';
+          legalDiv.style.padding = '8px 12px';
+          legalDiv.style.borderRadius = '4px';
+          legalDiv.style.fontSize = '12px';
+          legalDiv.style.zIndex = '1000';
+          legalDiv.style.maxWidth = '300px';
+          legalDiv.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+          legalDiv.innerHTML = 'Verificación de identidad según Ley 19.799';
+          
+          document.body.appendChild(legalDiv);
+          
+          // Auto-ocultar después de 5 segundos
+          setTimeout(() => {
+            legalDiv.style.opacity = '0';
+            legalDiv.style.transition = 'opacity 1s ease-out';
+            setTimeout(() => {
+              if (legalDiv.parentNode) {
+                legalDiv.parentNode.removeChild(legalDiv);
+              }
+            }, 1000);
+          }, 5000);
+        }
+        
+        console.log("✅ Cámara y micrófono activos en modo LEGAL");
+        return stream;
+      } catch (error) {
+        console.error("Error al acceder a dispositivos:", error);
+        alert("Debe habilitar cámara y micrófono para cumplir con la verificación legal requerida por la Ley 19.799");
+        throw error;
+      }
+    }
+    
+    // Funciones para verificación de identidad y firma - SISTEMA REAL
+    // Funciones para mostrar/cerrar modal de verificación
+    function showVerificationModal(title = "Verificación de documento de identidad") {
+      // Crear modal si no existe
+      if (!document.getElementById('verificationModal')) {
+        const modal = document.createElement('div');
+        modal.id = 'verificationModal';
+        modal.style.display = 'flex';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+        modal.style.zIndex = '1000';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        
+        const modalContent = document.createElement('div');
+        modalContent.id = 'verificationModalContent';
+        modalContent.style.backgroundColor = '#fff';
+        modalContent.style.borderRadius = '8px';
+        modalContent.style.width = '90%';
+        modalContent.style.maxWidth = '500px';
+        modalContent.style.maxHeight = '90vh';
+        modalContent.style.overflowY = 'auto';
+        modalContent.style.padding = '20px';
+        modalContent.style.position = 'relative';
+        
+        const modalTitle = document.createElement('h2');
+        modalTitle.id = 'verificationModalTitle';
+        modalTitle.textContent = title;
+        modalTitle.style.marginBottom = '15px';
+        modalTitle.style.color = 'var(--primary)';
+        
+        const modalDescription = document.createElement('p');
+        modalDescription.id = 'verificationModalDescription';
+        modalDescription.textContent = 'Este proceso verifica la autenticidad del documento de identidad mediante análisis de la cámara';
+        modalDescription.style.marginBottom = '20px';
+        modalDescription.style.color = '#666';
+        
+        const modalStatus = document.createElement('div');
+        modalStatus.id = 'verificationStatus';
+        modalStatus.style.margin = '20px 0';
+        modalStatus.style.padding = '15px';
+        modalStatus.style.borderRadius = '5px';
+        modalStatus.style.textAlign = 'center';
+        modalStatus.textContent = 'Preparando verificación...';
+        modalStatus.className = 'status-loading';
+        
+        const closeButton = document.createElement('button');
+        closeButton.id = 'closeModalBtn';
+        closeButton.innerHTML = '&times;';
+        closeButton.style.position = 'absolute';
+        closeButton.style.top = '10px';
+        closeButton.style.right = '10px';
+        closeButton.style.background = 'none';
+        closeButton.style.border = 'none';
+        closeButton.style.fontSize = '24px';
+        closeButton.style.cursor = 'pointer';
+        closeButton.style.color = '#666';
+        closeButton.addEventListener('click', closeVerificationModal);
+        
+        const modalContent2 = document.createElement('div');
+        modalContent2.id = 'modalIframeContainer';
+        modalContent2.style.display = 'flex';
+        modalContent2.style.flexDirection = 'column';
+        modalContent2.style.alignItems = 'center';
+        modalContent2.style.marginTop = '20px';
+        
+        const legalInfo = document.createElement('div');
+        legalInfo.style.marginTop = '15px';
+        legalInfo.style.padding = '10px';
+        legalInfo.style.backgroundColor = '#f5f5f7';
+        legalInfo.style.borderRadius = '5px';
+        legalInfo.style.fontSize = '12px';
+        legalInfo.innerHTML = `
+          <strong>Conforme a la Ley 19.799 sobre Documentos Electrónicos:</strong>
+          <p>La verificación de identidad es un requisito legal para la firma electrónica avanzada.</p>
+          <p>Este proceso cumple con los estándares legales requeridos por la normativa chilena.</p>
+        `;
+        
+        modalContent.appendChild(closeButton);
+        modalContent.appendChild(modalTitle);
+        modalContent.appendChild(modalDescription);
+        modalContent.appendChild(modalStatus);
+        modalContent.appendChild(modalContent2);
+        modalContent.appendChild(legalInfo);
+        modal.appendChild(modalContent);
+        
+        document.body.appendChild(modal);
+      } else {
+        // Si ya existe, actualizar título y mostrar
+        document.getElementById('verificationModalTitle').textContent = title;
+        document.getElementById('verificationModal').style.display = 'flex';
+      }
+    }
+    
+    function closeVerificationModal() {
+      const modal = document.getElementById('verificationModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+    
+    function updateVerificationModalStatus(status, message) {
+      const statusElement = document.getElementById('verificationStatus');
+      if (!statusElement) return;
+      
+      statusElement.textContent = message;
+      statusElement.className = ''; // Limpiar clases anteriores
+      
+      switch (status) {
+        case 'loading':
+          statusElement.className = 'status-loading';
+          break;
+        case 'success':
+          statusElement.className = 'status-success';
+          break;
+        case 'error':
+          statusElement.className = 'status-error';
+          break;
+        case 'warning':
+          statusElement.className = 'status-warning';
+          break;
+      }
+    }
+    
+    // Función para inicializar cámara y audio (Videollamada - Ley 19.799)
+    async function initializeCamera() {
+      if (localTracks.length < 2) {
+        try {
+          console.log("Iniciando cámara para verificación legal");
+          
+          // Primero verificamos soporte del navegador para WebRTC
+          if (!AgoraRTC.checkSystemRequirements()) {
+            throw new Error("Su navegador no es compatible con los requisitos técnicos para firma electrónica según Ley 19.799");
+          }
+          
+          // Solicitar permisos explícitamente antes de crear Agora tracks
+          // Esto es necesario para evitar problemas de permisos en algunos dispositivos
+          const videoConfig = { 
+            video: {
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+              facingMode: "user"
+            }, 
+            audio: true
+          };
+          
+          // Solicitar acceso directo vía navigator.mediaDevices (WebRTC estándar)
+          console.log("Solicitando acceso a dispositivos de cámara y audio");
+          const mediaStream = await navigator.mediaDevices.getUserMedia(videoConfig);
+          
+          // Una vez que tenemos permisos explícitos, liberamos el stream nativo
+          mediaStream.getTracks().forEach(track => track.stop());
+          
+          // Ahora usamos Agora para crear tracks optimizados para videollamada
+          // Crear tracks con configuración optimizada para mejor calidad en verificación de identidad
+          const [microphoneTrack, cameraTrack] = await AgoraRTC.createMicrophoneAndCameraTracks({
+            audioConfig: {
+              AEC: true, // Echo Cancellation
+              AGC: true, // Auto Gain Control
+              ANS: true, // Automatic Noise Suppression
+              microphoneId: undefined // Usar dispositivo predeterminado
+            },
+            videoConfig: {
+              encoderConfig: "1080p_2", // Alta calidad para mejor verificación
+              facingMode: "user",
+              mirrorMode: "auto"
+            }
+          });
+          
+          // Guardar tracks para uso posterior
+          localTracks = [microphoneTrack, cameraTrack];
+          
+          // Reproducir video local
+          cameraTrack.play("local-player");
+          
+          // Si estamos en una sala Agora activa, publicamos los tracks
+          if (client && isConnected) {
+            try {
+              await client.publish(localTracks);
+              console.log("Tracks publicados en la sesión RON");
+            } catch (publishError) {
+              console.error("Error al publicar tracks:", publishError);
+              // No interrumpimos la función si falla la publicación
+              // pero mantenemos la cámara activa para la verificación local
+            }
+          }
+          
+          console.log("Cámara y micrófono inicializados correctamente");
+          return true;
+        } catch (error) {
+          console.error("Error al inicializar dispositivos multimedia:", error);
+          throw new Error("Para cumplir con los requisitos de verificación de la Ley 19.799, debe permitir acceso a su cámara y micrófono");
+        }
+      }
+      
+      return true;
+    }
+    
+    // Función para capturar documento de identidad - CUMPLIMIENTO LEGAL
+    async function captureID() {
+      // Mostrar modal de verificación de identidad
+      showVerificationModal("Verificación de documento de identidad");
+      
+      if (!isConnected) {
+        updateVerificationModalStatus("error", "Debe estar conectado a la sesión para verificar identidad");
+        return;
+      }
+      
+      try {
+        // Intentar activar cámara si aún no está activa
+        if (localTracks.length < 2) {
+          updateVerificationModalStatus("loading", "Iniciando cámara...");
+          await initializeCamera();
+        }
+        
+        // Si después de intentar inicializar, todavía no hay track de video
+        if (localTracks.length < 2) {
+          throw new Error("No se pudo activar la cámara");
+        }
+        
+        // Mostrar instrucciones específicas según Ley 19.799
+        updateVerificationModalStatus("loading", "Por favor, muestre su cédula/pasaporte frente a la cámara");
+        const modalContainer = document.getElementById('modalIframeContainer');
+        if (modalContainer) {
+          modalContainer.innerHTML = `
+            <div style="text-align: center; margin-bottom: 15px;">
+              <svg width="100" height="70" viewBox="0 0 100 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="5" y="10" width="90" height="50" rx="5" stroke="#2d219b" stroke-width="2"/>
+                <circle cx="50" cy="35" r="15" stroke="#2d219b" stroke-width="2"/>
+                <rect x="20" y="55" width="60" height="10" rx="2" fill="#f0f0f0" stroke="#2d219b" stroke-width="1"/>
+              </svg>
+              <p style="margin-top: 10px; font-weight: bold;">Coloque el documento frente a la cámara</p>
+            </div>
+            <div style="display: flex; justify-content: space-between; width: 100%;">
+              <button id="captureNowBtn" style="flex: 1; margin-right: 10px; padding: 10px; background-color: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Capturar documento
+              </button>
+              <button id="cancelCaptureBtn" style="flex: 1; margin-left: 10px; padding: 10px; background-color: #f0f0f0; border: none; border-radius: 5px; cursor: pointer;">
+                Cancelar
+              </button>
+            </div>
+          `;
+          
+          // Eventos para botones
+          document.getElementById('captureNowBtn').addEventListener('click', async () => {
+            try {
+              updateVerificationModalStatus("loading", "Capturando documento...");
+              
+              // Tomar una captura de la cámara para documento de identidad
+              const videoTrack = localTracks[1];
+              const videoEl = document.querySelector('#local-player video');
+              
+              if (!videoEl) {
+                throw new Error("No se encontró el elemento de video");
+              }
+              
+              // Crear un canvas para procesar la imagen
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+              
+              // Configurar tamaño del canvas
+              canvas.width = videoEl.videoWidth;
+              canvas.height = videoEl.videoHeight;
+              
+              // Dibujar el frame actual en el canvas
+              ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+              
+              // Convertir canvas a imagen base64
+              const imageData = canvas.toDataURL('image/jpeg', 0.9);
+              
+              updateVerificationModalStatus("loading", "Verificando documento según Ley 19.799...");
+              
+              // Enviar imagen al servidor
+              const response = await fetch(`/api/ron/session/${sessionData.sessionId}/capture-id`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                  image: imageData,
+                  captureType: 'id-document',
+                  verificationMethod: 'legal-compliant' // Campo para cumplimiento legal
+                })
+              });
+              
+              if (!response.ok) {
+                throw new Error("Error al procesar documento de identidad");
+              }
+              
+              const result = await response.json();
+              
+              if (result.success) {
+                // Actualizar UI con información legal
+                document.getElementById("captureIDBtn").style.backgroundColor = "var(--success)";
+                updateVerificationModalStatus("success", "Documento verificado correctamente");
+                
+                // Mostrar información legal adicional
+                const legalInfo = document.createElement('div');
+                legalInfo.style.marginTop = '15px';
+                legalInfo.style.padding = '10px';
+                legalInfo.style.backgroundColor = '#f5f5f7';
+                legalInfo.style.borderRadius = '5px';
+                legalInfo.innerHTML = `
+                  <h4 style="margin-top:0">Verificación conforme a Ley 19.799</h4>
+                  <p>- Documento capturado: Cédula/pasaporte</p>
+                  <p>- Verificación realizada por: ${sessionData.certifierName}</p>
+                  <p>- Fecha y hora: ${new Date().toLocaleString('es-CL')}</p>
+                  <p>- Estado: Verificación legal completada</p>
+                `;
+                
+                const modalContent = document.getElementById('verificationModalContent');
+                modalContent.appendChild(legalInfo);
+                
+                // Cerrar modal después de un tiempo
+                setTimeout(() => {
+                  closeVerificationModal();
+                }, 5000);
+              } else {
+                throw new Error(result.message || "Error en la verificación legal del documento");
+              }
+              
+            } catch (error) {
+              console.error("Error en captura de documento:", error);
+              updateVerificationModalStatus("error", "Error: " + error.message);
+              
+              // Crear opción para reintentar
+              const retryButton = document.createElement('button');
+              retryButton.style.width = '100%';
+              retryButton.style.padding = '10px';
+              retryButton.style.backgroundColor = '#f0f0f0';
+              retryButton.style.border = 'none';
+              retryButton.style.borderRadius = '5px';
+              retryButton.style.cursor = 'pointer';
+              retryButton.style.marginTop = '15px';
+              retryButton.textContent = 'Reintentar captura';
+              retryButton.addEventListener('click', () => {
+                // Cerrar y reabrir el modal para reiniciar el proceso
+                closeVerificationModal();
+                setTimeout(() => captureID(), 500);
+              });
+              
+              modalContainer.appendChild(retryButton);
+            }
+          });
+          
+          document.getElementById('cancelCaptureBtn').addEventListener('click', () => {
+            closeVerificationModal();
+          });
+        }
+        
+      } catch (error) {
+        console.error("Error al capturar imagen:", error);
+        updateVerificationModalStatus("error", "Error: " + error.message);
+        
+        // Opción para mostrar mensaje de error detallado
+        const modalContent = document.getElementById('verificationModalContent');
+        if (modalContent) {
+          const errorMessage = document.createElement('div');
+          errorMessage.innerHTML = `
+            <div style="margin-top: 15px; padding: 15px; background-color: #f8d7da; border-radius: 5px; border-left: 4px solid #dc3545;">
+              <h4 style="margin-top:0; color: #721c24;">Error de verificación</h4>
+              <p>No se pudo completar la verificación de identidad requerida por la Ley 19.799.</p>
+              <p>Por favor, asegúrese de permitir el acceso a su cámara e intente nuevamente.</p>
+              <p><strong>Detalles técnicos:</strong> ${error.message}</p>
+            </div>
+          `;
+          
+          modalContent.appendChild(errorMessage);
+          
+          // Botón para reintentar
+          const retryButton = document.createElement('button');
+          retryButton.style.width = '100%';
+          retryButton.style.padding = '10px';
+          retryButton.style.backgroundColor = '#f0f0f0';
+          retryButton.style.border = 'none';
+          retryButton.style.borderRadius = '5px';
+          retryButton.style.cursor = 'pointer';
+          retryButton.style.marginTop = '15px';
+          retryButton.textContent = 'Reintentar verificación';
+          retryButton.addEventListener('click', () => {
+            // Cerrar y reabrir el modal para reiniciar el proceso
+            closeVerificationModal();
+            setTimeout(() => captureID(), 500);
+          });
+          
+          modalContent.appendChild(retryButton);
+        }
+      }
+    }
+    
+    async function verifyIdentity() {
+      // Mostrar modal de verificación legal
+      showVerificationModal("Verificación de identidad - Ley 19.799");
+      
+      if (!isConnected) {
+        updateVerificationModalStatus("error", "Debe estar conectado a la sesión para verificar identidad");
+        return;
+      }
+      
+      try {
+        // Actualizar UI inicial
+        document.getElementById("verifyIdentityBtn").disabled = true;
+        document.getElementById("verifyIdentityBtn").textContent = "Verificación en proceso...";
+        
+        // Mostrar información de cumplimiento legal al usuario
+        updateVerificationModalStatus("loading", "Iniciando verificación conforme a la Ley 19.799...");
+        
+        const modalContainer = document.getElementById('modalIframeContainer');
+        if (modalContainer) {
+          modalContainer.innerHTML = `
+            <div style="padding: 15px; background-color: #f0f7ff; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid var(--primary);">
+              <h3 style="margin-top: 0; color: var(--primary);">Verificación legal de identidad</h3>
+              <p>Este proceso de verificación de identidad está diseñado para cumplir con los requisitos de la <strong>Ley 19.799</strong> sobre documentos electrónicos y firma electrónica.</p>
+              <p>El certificador validará su identidad a través de:</p>
+              <ol style="margin-left: 20px;">
+                <li>Verificación de su documento de identidad</li>
+                <li>Comprobación facial en tiempo real</li>
+                <li>Verificación de datos personales</li>
+              </ol>
+              <p>La información recopilada será protegida conforme a la Ley de Protección de Datos Personales.</p>
+            </div>
+            <button id="startIdentityVerificationBtn" style="width: 100%; padding: 12px; background-color: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+              Comenzar verificación legal de identidad
+            </button>
+          `;
+          
+          // Evento para iniciar verificación
+          document.getElementById('startIdentityVerificationBtn').addEventListener('click', async () => {
+            try {
+              // Intentar activar cámara si aún no está activa
+              if (localTracks.length < 2) {
+                updateVerificationModalStatus("loading", "Iniciando cámara para verificación biométrica...");
+                await initializeCamera();
+              }
+              
+              // Si después de intentar inicializar, todavía no hay track de video
+              if (localTracks.length < 2) {
+                throw new Error("No se pudo activar la cámara para la verificación biométrica");
+              }
+              
+              updateVerificationModalStatus("loading", "Realizando verificación biométrica...");
+              modalContainer.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                  <p style="font-weight: bold; margin-bottom: 10px;">Por favor, centre su rostro en la cámara</p>
+                  <div style="width: 100%; height: 200px; border: 2px dashed var(--primary); border-radius: 5px; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 15px;">
+                    <div id="faceVerificationPreview" style="width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                      <!-- La previsualización irá aquí -->
+                    </div>
+                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 2px solid transparent; border-radius: 5px; box-shadow: 0 0 0 2px rgba(255,255,255,0.5); pointer-events: none;"></div>
+                  </div>
+                  <button id="captureFaceBtn" style="padding: 10px 20px; background-color: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Capturar imagen para verificación
+                  </button>
+                </div>
+              `;
+              
+              // Crear previsualización de video
+              const videoTrack = localTracks[1];
+              const videoEl = document.createElement('video');
+              videoEl.autoplay = true;
+              videoEl.muted = true;
+              videoEl.style.width = '100%';
+              videoEl.style.height = '100%';
+              videoEl.style.objectFit = 'cover';
+              
+              // Mostrar previsualización
+              document.getElementById('faceVerificationPreview').appendChild(videoEl);
+              videoTrack.play(videoEl);
+              
+              // Evento para capturar rostro
+              document.getElementById('captureFaceBtn').addEventListener('click', async () => {
+                try {
+                  updateVerificationModalStatus("loading", "Capturando imagen para verificación biométrica...");
+                  
+                  // Crear un canvas para procesar la imagen
+                  const canvas = document.createElement('canvas');
+                  const ctx = canvas.getContext('2d');
+                  
+                  // Configurar tamaño del canvas
+                  canvas.width = videoEl.videoWidth;
+                  canvas.height = videoEl.videoHeight;
+                  
+                  // Dibujar el frame actual en el canvas
+                  ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+                  
+                  // Convertir canvas a imagen base64
+                  const imageData = canvas.toDataURL('image/jpeg', 0.9);
+                  
+                  updateVerificationModalStatus("loading", "Enviando datos para verificación legal de identidad...");
+                  
+                  // Enviar solicitud de verificación al servidor
+                  const response = await fetch(`/api/ron/session/${sessionData.sessionId}/verify-identity`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                      image: imageData,
+                      verificationMethod: 'legal-face-verification',
+                      legalCompliance: true
+                    })
+                  });
+                  
+                  if (!response.ok) {
+                    throw new Error("Error en la verificación legal de identidad");
+                  }
+                  
+                  const result = await response.json();
+                  
+                  if (result.success) {
+                    // Actualizar UI principal
+                    updateUI("identityVerified");
+                    document.getElementById("verifyIdentityBtn").textContent = "Identidad Verificada ✓";
+                    document.getElementById("verifyIdentityBtn").style.backgroundColor = "var(--success)";
+                    
+                    // Actualizar modal con información legal de verificación exitosa
+                    updateVerificationModalStatus("success", "Verificación legal de identidad completada exitosamente");
+                    
+                    modalContainer.innerHTML = `
+                      <div style="text-align: center; margin: 20px 0;">
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="32" cy="32" r="28" stroke="#388e3c" stroke-width="2" fill="#ecffef"/>
+                          <path d="M20 32 L28 40 L44 24" stroke="#388e3c" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <h3 style="margin-top: 15px; color: #388e3c;">Verificación de identidad completada</h3>
+                      </div>
+                      
+                      <div style="padding: 15px; background-color: #f0f7ff; border-radius: 5px; margin-bottom: 20px; text-align: left;">
+                        <h4 style="margin-top: 0;">Certificado de Verificación</h4>
+                        <p><strong>Fecha y hora:</strong> ${new Date().toLocaleString('es-CL')}</p>
+                        <p><strong>Certificador:</strong> ${sessionData.certifierName || "Certificador autorizado"}</p>
+                        <p><strong>Método:</strong> Verificación biométrica en vivo</p>
+                        <p><strong>ID de verificación:</strong> ${result.verificationId || "VID-" + Date.now()}</p>
+                        <p><strong>Estado:</strong> Verificado conforme a Ley 19.799</p>
+                      </div>
+                      
+                      <button id="closeVerificationBtn" style="width: 100%; padding: 10px; background-color: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Cerrar
+                      </button>
+                    `;
+                    
+                    document.getElementById('closeVerificationBtn').addEventListener('click', () => {
+                      closeVerificationModal();
+                    });
+                    
+                  } else {
+                    throw new Error(result.message || "Error en la verificación legal de identidad");
+                  }
+                  
+                } catch (error) {
+                  console.error("Error en verificación facial:", error);
+                  updateVerificationModalStatus("error", error.message);
+                  
+                  // Crear botón para reintentar
+                  const retryButton = document.createElement('button');
+                  retryButton.style.width = '100%';
+                  retryButton.style.padding = '10px';
+                  retryButton.style.backgroundColor = '#f0f0f0';
+                  retryButton.style.border = 'none';
+                  retryButton.style.borderRadius = '5px';
+                  retryButton.style.cursor = 'pointer';
+                  retryButton.style.marginTop = '15px';
+                  retryButton.textContent = 'Reintentar verificación';
+                  retryButton.addEventListener('click', () => {
+                    // Cerrar y reabrir el modal para reiniciar el proceso
+                    closeVerificationModal();
+                    setTimeout(() => verifyIdentity(), 500);
+                  });
+                  
+                  modalContainer.appendChild(retryButton);
+                }
+              });
+              
+            } catch (error) {
+              console.error("Error en verificación de identidad:", error);
+              updateVerificationModalStatus("error", "Error: " + error.message);
+              
+              // Restaurar botón principal
+              document.getElementById("verifyIdentityBtn").disabled = false;
+              document.getElementById("verifyIdentityBtn").textContent = "Verificar Identidad";
+              
+              // Crear mensaje de error detallado
+              const errorMessage = document.createElement('div');
+              errorMessage.innerHTML = `
+                <div style="margin-top: 15px; padding: 15px; background-color: #f8d7da; border-radius: 5px; border-left: 4px solid #dc3545;">
+                  <h4 style="margin-top:0; color: #721c24;">Error de verificación</h4>
+                  <p>No se pudo completar la verificación de identidad requerida por la Ley 19.799.</p>
+                  <p>Por favor, asegúrese de permitir el acceso a su cámara e intente nuevamente.</p>
+                  <p><strong>Detalles técnicos:</strong> ${error.message}</p>
+                </div>
+              `;
+              
+              modalContainer.appendChild(errorMessage);
+              
+              // Botón para reintentar
+              const retryButton = document.createElement('button');
+              retryButton.style.width = '100%';
+              retryButton.style.padding = '10px';
+              retryButton.style.backgroundColor = '#f0f0f0';
+              retryButton.style.border = 'none';
+              retryButton.style.borderRadius = '5px';
+              retryButton.style.cursor = 'pointer';
+              retryButton.style.marginTop = '15px';
+              retryButton.textContent = 'Reintentar verificación';
+              retryButton.addEventListener('click', () => {
+                // Cerrar y reabrir el modal para reiniciar el proceso
+                closeVerificationModal();
+                setTimeout(() => verifyIdentity(), 500);
+              });
+              
+              modalContainer.appendChild(retryButton);
+            }
+          });
+        }
+        
+      } catch (error) {
+        console.error("Error al verificar identidad:", error);
+        updateVerificationModalStatus("error", "Error: " + error.message);
+        
+        // Restaurar botón principal
+        document.getElementById("verifyIdentityBtn").disabled = false;
+        document.getElementById("verifyIdentityBtn").textContent = "Verificar Identidad";
+        
+        // Mostrar mensaje de error detallado
+        const modalContent = document.getElementById('verificationModalContent');
+        if (modalContent) {
+          const errorMessage = document.createElement('div');
+          errorMessage.innerHTML = `
+            <div style="margin-top: 15px; padding: 15px; background-color: #f8d7da; border-radius: 5px; border-left: 4px solid #dc3545;">
+              <h4 style="margin-top:0; color: #721c24;">Error de verificación</h4>
+              <p>No se pudo completar la verificación de identidad requerida por la Ley 19.799.</p>
+              <p>Por favor, asegúrese de permitir el acceso a su cámara e intente nuevamente.</p>
+              <p><strong>Detalles técnicos:</strong> ${error.message}</p>
+            </div>
+          `;
+          
+          modalContent.appendChild(errorMessage);
+          
+          // Botón para reintentar
+          const retryButton = document.createElement('button');
+          retryButton.style.width = '100%';
+          retryButton.style.padding = '10px';
+          retryButton.style.backgroundColor = '#f0f0f0';
+          retryButton.style.border = 'none';
+          retryButton.style.borderRadius = '5px';
+          retryButton.style.cursor = 'pointer';
+          retryButton.style.marginTop = '15px';
+          retryButton.textContent = 'Reintentar verificación';
+          retryButton.addEventListener('click', () => {
+            // Cerrar y reabrir el modal para reiniciar el proceso
+            closeVerificationModal();
+            setTimeout(() => verifyIdentity(), 500);
+          });
+          
+          modalContent.appendChild(retryButton);
+        }
+      }
+    }
+    
+    async function initiateSimpleSign() {
+      if (!isConnected) {
+        alert("Debe estar conectado a la sesión para iniciar la firma");
+        return;
+      }
+      
+      try {
+        // Actualizar UI
+        document.getElementById("simpleSignBtn").disabled = true;
+        document.getElementById("eTokenSignBtn").disabled = true;
+        document.getElementById("simpleSignBtn").textContent = "Firma simple iniciada...";
+        
+        // Enviar solicitud de firma simple al servidor
+        const response = await fetch(`/api/ron/session/${sessionData.sessionId}/initiate-simple-sign`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error("Error al iniciar proceso de firma simple");
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          // Actualizar UI con información de la firma
+          updateUI("signingStarted");
+          document.getElementById("simpleSignBtn").textContent = "Firma simple en proceso ✓";
+          document.getElementById("simpleSignBtn").style.backgroundColor = "var(--success)";
+          
+          // Mostrar información adicional
+          alert(`Proceso de firma simple iniciado. ${result.message || "Recibirá un correo para completar el proceso."}`);
+        } else {
+          throw new Error(result.message || "Error al iniciar firma simple");
+        }
+        
+      } catch (error) {
+        console.error("Error al iniciar firma simple:", error);
+        alert("Error al iniciar firma simple: " + error.message);
+        
+        // Restaurar botones
+        document.getElementById("simpleSignBtn").disabled = false;
+        document.getElementById("eTokenSignBtn").disabled = false;
+        document.getElementById("simpleSignBtn").textContent = "Firma Simple";
+      }
+    }
+    
+    async function initiateETokenSign() {
+      if (!isConnected) {
+        alert("Debe estar conectado a la sesión para iniciar la firma");
+        return;
+      }
+      
+      try {
+        // Actualizar UI
+        document.getElementById("eTokenSignBtn").disabled = true;
+        document.getElementById("simpleSignBtn").disabled = true;
+        document.getElementById("eTokenSignBtn").textContent = "Preparando eToken...";
+        
+        // Solicitar información para firma con eToken
+        const response = await fetch(`/api/ron/session/${sessionData.sessionId}/initiate-etoken-sign`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error("Error al iniciar proceso de firma con eToken");
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          // Actualizar UI
+          document.getElementById("eTokenSignBtn").textContent = "Conecte su eToken...";
+          
+          // Mostrar información al usuario
+          alert(`Conecte su dispositivo eToken y siga las instrucciones. ${result.message || ""}`);
+          
+          // Iniciar verificación de eToken (polling o WebUSB)
+          if (result.signUrl) {
+            // Si hay una URL de firma externa, abrir en ventana nueva
+            window.open(result.signUrl, '_blank');
+          }
+          
+          // Consultar estado de la firma
+          let signStatus = "pending";
+          const checkInterval = setInterval(async () => {
+            try {
+              const statusResponse = await fetch(`/api/ron/session/${sessionData.sessionId}/sign-status`);
+              if (statusResponse.ok) {
+                const statusResult = await statusResponse.json();
+                signStatus = statusResult.status;
+                
+                if (signStatus === "completed") {
+                  clearInterval(checkInterval);
+                  updateUI("signingStarted");
+                  document.getElementById("eTokenSignBtn").textContent = "Firma eToken completada ✓";
+                  document.getElementById("eTokenSignBtn").style.backgroundColor = "var(--success)";
+                } else if (signStatus === "failed") {
+                  clearInterval(checkInterval);
+                  throw new Error(statusResult.message || "Error en la firma con eToken");
+                }
+              }
+            } catch (err) {
+              console.error("Error al verificar estado de firma:", err);
+            }
+          }, 5000);
+          
+        } else {
+          throw new Error(result.message || "Error al iniciar firma con eToken");
+        }
+        
+      } catch (error) {
+        console.error("Error al iniciar firma con eToken:", error);
+        alert("Error al iniciar firma con eToken: " + error.message);
+        
+        // Restaurar botones
+        document.getElementById("eTokenSignBtn").disabled = false;
+        document.getElementById("simpleSignBtn").disabled = false;
+        document.getElementById("eTokenSignBtn").textContent = "Firma eToken (Avanzada)";
+      }
+    }
+    
+    // Función para cargar el AppId de Agora
+    async function loadAppId() {
+      try {
+        const response = await fetch('/api/ron/public/app-id');
+        const data = await response.json();
+        appId = data.appId;
+        console.log("App ID cargado correctamente");
+      } catch (error) {
+        console.error("Error al cargar App ID:", error);
+        alert("Error al cargar la configuración. Por favor intenta nuevamente.");
+      }
+    }
+    
+    // Cargar AppId al iniciar
+    loadAppId();
+    
+    // Función para unirse a la sesión RON
+    async function joinSession() {
+      const accessCodeInput = document.getElementById("accessCode").value.trim();
+      
+      // Validar formato real del código RON (formato: RON-YYYY-NNN)
+      const ronCodeRegex = /^RON-\d{4}-\d{3,}$/;
+      if (!accessCodeInput || !ronCodeRegex.test(accessCodeInput)) {
+        alert("Por favor ingresa un código RON válido (formato: RON-YYYY-NNN)");
+        return;
+      }
+      
+      // Mostrar indicador de carga
+      document.getElementById("joinButtonText").classList.add("hidden");
+      document.getElementById("joinButtonLoading").classList.remove("hidden");
+      document.getElementById("joinButton").disabled = true;
+      
+      try {
+        // Verificar el código con el backend
+        const sessionResponse = await fetch(`/api/ron/public/session/${accessCodeInput}`);
+        if (!sessionResponse.ok) {
+          throw new Error('Código de sesión inválido o sesión no encontrada');
+        }
+        
+        const sessionInfo = await sessionResponse.json();
+        
+        // Obtener tokens para la videollamada
+        const tokensResponse = await fetch(`/api/ron/public/session/${accessCodeInput}/tokens`);
+        if (!tokensResponse.ok) {
+          throw new Error('Error al obtener tokens para la videollamada');
+        }
+        
+        const tokensInfo = await tokensResponse.json();
+        
+        const sessionId = accessCodeInput;
+        const channelName = tokensInfo.channelName;
+        agoraToken = tokensInfo.token;
+        
+        // Inicializar cliente Agora
+        client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+        
+        // Configurar eventos
+        client.on("user-published", handleUserPublished);
+        client.on("user-unpublished", handleUserUnpublished);
+        
+        // Unirse al canal con token
+        await client.join(appId, channelName, agoraToken, null);
+        
+        // Crear tracks locales
+        localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
+        const [audioTrack, videoTrack] = localTracks;
+        
+        // Mostrar video local
+        videoTrack.play("local-player");
+        
+        // Publicar tracks
+        await client.publish(localTracks);
+        
+        console.log("Joined channel successfully");
+        
+        // Usar datos de sesión del servidor
+        sessionData = {
+          sessionId: sessionId,
+          documentName: sessionInfo.documentName || "Documento pendiente de firma",
+          certifierName: sessionInfo.certifierName || "Certificador asignado",
+          status: sessionInfo.status || "en-proceso"
+        };
+        
+        // Actualizar información de sesión en la UI
+        updateSessionInfo();
+        
+        // Cambiar a la pantalla de sesión
+        document.getElementById("access-screen").classList.add("hidden");
+        document.getElementById("session-screen").classList.remove("hidden");
+        
+        isConnected = true;
+        
+      } catch (error) {
+        console.error("Error joining channel:", error);
+        alert("Error al unirse a la sesión: " + error.message);
+        
+        // Restaurar botón
+        document.getElementById("joinButtonText").classList.remove("hidden");
+        document.getElementById("joinButtonLoading").classList.add("hidden");
+        document.getElementById("joinButton").disabled = false;
+      }
+    }
+    
+    // Manejar cuando otro usuario publica video/audio
+    async function handleUserPublished(user, mediaType) {
+      // Suscribirse al usuario remoto
+      await client.subscribe(user, mediaType);
+      
+      // Si es video, mostrarlo en el contenedor remoto
+      if (mediaType === "video") {
+        user.videoTrack.play("remote-player");
+        
+        // Actualizar interfaz
+        updateUI("certifierJoined");
+      }
+      
+      // Si es audio, reproducirlo
+      if (mediaType === "audio") {
+        user.audioTrack.play();
+      }
+      
+      // Guardar usuario remoto
+      remoteUsers[user.uid] = user;
+    }
+    
+    // Manejar cuando otro usuario deja de publicar video/audio
+    function handleUserUnpublished(user, mediaType) {
+      if (mediaType === "video") {
+        // Limpiar contenedor de video remoto
+        const playerElement = document.getElementById("remote-player");
+        playerElement.innerHTML = "";
+        
+        // Actualizar interfaz
+        updateUI("certifierLeft");
+      }
+      
+      // Eliminar usuario remoto
+      delete remoteUsers[user.uid];
+    }
+    
+    // Actualizar información de sesión en la UI
+    function updateSessionInfo() {
+      if (!sessionData) return;
+      
+      document.getElementById("sessionId").textContent = sessionData.sessionId || "-";
+      document.getElementById("documentName").textContent = sessionData.documentName || "-";
+      document.getElementById("certifierName").textContent = sessionData.certifierName || "-";
+      document.getElementById("sessionStatus").textContent = formatStatus(sessionData.status) || "En proceso";
+    }
+    
+    // Formatear estado para mostrar en UI
+    function formatStatus(status) {
+      const statusMap = {
+        "pending": "Pendiente",
+        "en-proceso": "En proceso",
+        "identity-verified": "Identidad verificada",
+        "signing": "Firmando",
+        "completed": "Completado",
+        "cancelled": "Cancelado"
+      };
+      
+      return statusMap[status] || status;
+    }
+    
+    // Funciones para gestionar documentos (definidas aquí)
+    async function viewDocument() {
+      if (!isConnected) {
+        alert("Debe estar conectado a la sesión para ver documentos");
+        return;
+      }
+      
+      try {
+        // Mostrar indicador de carga
+        document.getElementById("viewDocumentBtn").disabled = true;
+        document.getElementById("viewDocumentBtn").textContent = "Cargando...";
+        
+        // Solicitar documentos disponibles 
+        const response = await fetch(`/api/ron/session/${sessionData.sessionId}/documents`);
+        
+        if (!response.ok) {
+          throw new Error("Error al obtener documentos");
+        }
+        
+        const result = await response.json();
+        
+        if (result.documents && result.documents.length > 0) {
+          // Mostrar el primer documento (o permitir selección si hay varios)
+          const documentId = result.documents[0].id;
+          const documentResponse = await fetch(`/api/ron/document/${documentId}`);
+          
+          if (!documentResponse.ok) {
+            throw new Error("Error al cargar el documento");
+          }
+          
+          const documentData = await documentResponse.json();
+          
+          // Mostrar el documento (sea HTML o PDF)
+          const previewDiv = document.getElementById("documentPreview");
+          const previewContent = document.getElementById("previewContent");
+          
+          if (documentData.contentType === "application/pdf") {
+            // Si es PDF, mostrar previsualización o enlace
+            previewContent.innerHTML = `
+              <div style="text-align: center; padding: 10px;">
+                <p><strong>Documento PDF:</strong> ${documentData.filename || "Documento.pdf"}</p>
+                <a href="/api/ron/document/${documentId}/download" target="_blank" class="btn-action" style="display: inline-block; margin-top: 10px;">Abrir PDF</a>
+              </div>
+            `;
+          } else {
+            // Si es HTML o texto, mostrar contenido
+            previewContent.innerHTML = documentData.content || "No hay contenido disponible";
+          }
+          
+          previewDiv.style.display = "block";
+          
+        } else {
+          alert("No hay documentos disponibles. Por favor, crea un nuevo documento.");
+        }
+        
+      } catch (error) {
+        console.error("Error al cargar documentos:", error);
+        alert("Error: " + error.message);
+      } finally {
+        document.getElementById("viewDocumentBtn").disabled = false;
+        document.getElementById("viewDocumentBtn").textContent = "Ver Documento";
+      }
+    }
+    
+    async function createDocument() {
+      if (!isConnected) {
+        alert("Debe estar conectado a la sesión para crear documentos");
+        return;
+      }
+      
+      try {
+        // Solicitar al servidor la creación de un documento desde plantilla
+        const response = await fetch(`/api/ron/session/${sessionData.sessionId}/create-document`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            templateId: "default", // Puedes tener diferentes plantillas
+            title: "Documento de sesión RON",
+            data: {
+              // Datos para completar la plantilla (se pueden obtener de sessionData)
+              client: sessionData.client || "Cliente",
+              date: new Date().toLocaleDateString("es-CL")
+            }
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error("Error al crear documento");
+        }
+        
+        const result = await response.json();
+        
+        if (result.success && result.documentId) {
+          alert("Documento creado correctamente. Ya puede verlo y firmarlo.");
+          
+          // Mostrar automáticamente el documento creado
+          const documentResponse = await fetch(`/api/ron/document/${result.documentId}`);
+          
+          if (documentResponse.ok) {
+            const documentData = await documentResponse.json();
+            
+            // Mostrar el documento
+            const previewDiv = document.getElementById("documentPreview");
+            const previewContent = document.getElementById("previewContent");
+            
+            previewContent.innerHTML = documentData.content || "Documento creado correctamente";
+            previewDiv.style.display = "block";
+          }
+          
+        } else {
+          throw new Error(result.message || "Error al crear el documento");
+        }
+        
+      } catch (error) {
+        console.error("Error al crear documento:", error);
+        alert("Error: " + error.message);
+      }
+    }
+    
+    // Actualizar UI basado en eventos
+    function updateUI(event) {
+      const statusBar = document.getElementById("statusBar");
+      
+      switch (event) {
+        case "certifierJoined":
+          statusBar.textContent = "Certificador conectado. Iniciando verificación...";
+          document.getElementById("step2").classList.add("active");
+          break;
+          
+        case "certifierLeft":
+          statusBar.textContent = "Certificador desconectado. Esperando reconexión...";
+          break;
+          
+        case "identityVerified":
+          statusBar.textContent = "Identidad verificada con éxito. Preparando firma electrónica...";
+          document.getElementById("step3").classList.add("active");
+          break;
+          
+        case "signingStarted":
+          statusBar.textContent = "Firma electrónica iniciada. Revisa tu correo.";
+          break;
+          
+        case "sessionCompleted":
+          statusBar.textContent = "Sesión completada. Gracias por utilizar nuestro servicio.";
+          document.getElementById("step4").classList.add("active");
+          break;
+      }
+    }
+    
+    // Activar/desactivar cámara
+    async function toggleVideo() {
+      if (!isConnected || localTracks.length < 2) return;
+      
+      const videoTrack = localTracks[1];
+      
+      if (videoEnabled) {
+        await videoTrack.setEnabled(false);
+        document.getElementById("videoToggle").innerHTML = '<span class="icon">🚫</span>';
+      } else {
+        await videoTrack.setEnabled(true);
+        document.getElementById("videoToggle").innerHTML = '<span class="icon">📹</span>';
+      }
+      
+      videoEnabled = !videoEnabled;
+    }
+    
+    // Activar/desactivar micrófono
+    async function toggleAudio() {
+      if (!isConnected || localTracks.length < 1) return;
+      
+      const audioTrack = localTracks[0];
+      
+      if (audioEnabled) {
+        await audioTrack.setEnabled(false);
+        document.getElementById("audioToggle").innerHTML = '<span class="icon">🔇</span>';
+      } else {
+        await audioTrack.setEnabled(true);
+        document.getElementById("audioToggle").innerHTML = '<span class="icon">🎤</span>';
+      }
+      
+      audioEnabled = !audioEnabled;
+    }
+    
+    // Finalizar sesión RON (Remota Online Notary) - Ley 19.799
+    async function endSession() {
+      if (confirm("¿Estás seguro de que deseas finalizar la sesión de certificación electrónica?")) {
+        try {
+          // Registrar cierre de sesión según requerimientos legales
+          if (sessionData && sessionData.sessionId) {
+            try {
+              await fetch(`/api/ron/session/${sessionData.sessionId}/client-left`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  disconnectReason: 'user_terminated',
+                  leaveTime: new Date().toISOString(),
+                  sessionStatus: 'closed_by_client',
+                  qaMode: QA_MODE
+                })
+              });
+              console.log("Sessión RON registrada como finalizada en servidor");
+            } catch (registerError) {
+              console.error("Error al registrar cierre de sesión:", registerError);
+              // No interrumpir el cierre de sesión si esto falla
+            }
+          }
+          
+          // Mostrar diálogo legal en caso de QA_MODE
+          if (QA_MODE) {
+            const sessionTerminationElement = document.createElement('div');
+            sessionTerminationElement.innerHTML = `
+              <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                          background: rgba(255,255,255,0.95); z-index: 9999; display: flex; 
+                          flex-direction: column; justify-content: center; align-items: center; padding: 20px;">
+                <div style="background: white; max-width: 500px; padding: 30px; border-radius: 10px; 
+                            box-shadow: 0 5px 20px rgba(0,0,0,0.2); text-align: center;">
+                  <h2 style="color: var(--primary); margin-top: 0;">Sesión finalizada en modo QA</h2>
+                  <p style="margin: 15px 0;">La sesión ha sido terminada correctamente en entorno de pruebas.</p>
+                  <p style="margin: 10px 0; font-size: 14px; color: #666;">
+                    Este mensaje solo aparece en modo QA y es para fines de prueba.
+                  </p>
+                  <button style="background: var(--primary); color: white; border: none; 
+                                padding: 10px 20px; border-radius: 5px; margin-top: 15px; cursor: pointer;"
+                          onclick="this.parentNode.parentNode.remove()">
+                    Cerrar mensaje
+                  </button>
+                </div>
+              </div>
+            `;
+            document.body.appendChild(sessionTerminationElement);
+            
+            // Este diálogo se autocerra después de 3 segundos
+            setTimeout(() => {
+              if (sessionTerminationElement.parentNode) {
+                sessionTerminationElement.remove();
+              }
+            }, 3000);
+          }
+          
+          if (localTracks.length > 0) {
+            // Detener y cerrar tracks locales
+            localTracks.forEach((track) => {
+              track.stop();
+              track.close();
+            });
+          }
+          
+          // Abandonar canal Agora RTC
+          if (client) {
+            await client.leave();
+            console.log("Canal de comunicación cerrado correctamente");
+          }
+          
+          // Actualizar UI
+          document.getElementById("session-screen").classList.add("hidden");
+          document.getElementById("access-screen").classList.remove("hidden");
+          
+          document.getElementById("joinButtonText").style.display = "inline";
+          document.getElementById("joinButtonLoading").classList.add("hidden");
+          document.getElementById("joinButton").disabled = false;
+          
+          // Reiniciar variables
+          localTracks = [];
+          remoteUsers = {};
+          isConnected = false;
+          videoEnabled = true;
+          audioEnabled = true;
+          sessionData = null;
+          
+          console.log("Session ended successfully");
+          
+        } catch (error) {
+          console.error("Error ending session:", error);
+          alert("Error al finalizar sesión: " + error.message);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
