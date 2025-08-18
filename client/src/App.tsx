@@ -784,6 +784,26 @@ function Router() {
         );
       }} />
 
+      {/* Acceso de cliente RON con código */}
+      <Route path="/ron-client-access/:code?" component={() => {
+        const RonClientAccess = React.lazy(() => import("@/pages/ron-client-access"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback message="Validando código de acceso..." />}>
+            <RonClientAccess />
+          </Suspense>
+        );
+      }} />
+
+      {/* Generar código de cliente RON */}
+      <Route path="/ron-generate-client-code" component={() => {
+        const RonGenerateClientCode = React.lazy(() => import("@/pages/ron-generate-client-code"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback message="Cargando generador de códigos..." />}>
+            <RonGenerateClientCode />
+          </Suspense>
+        );
+      }} />
+
       {/* Ayuda Legal */}
       <ProtectedRoute 
         path="/ayuda-legal" 

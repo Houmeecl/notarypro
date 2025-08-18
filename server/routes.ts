@@ -35,6 +35,7 @@ import { realCertifierRouter } from "./real-certifier-panel";
 import { realVecinosApiRouter } from "./vecinos/real-vecinos-api";
 import { realRonRouter } from "./real-ron-video-system";
 import { ronJitsiRouter } from "./ron-jitsi-routes";
+import { ronClientAccessRouter } from "./ron-client-access-routes";
 
 // Middleware de autenticación
 function isAuthenticated(req: Request, res: Response, next: any) {
@@ -124,6 +125,9 @@ export function registerRoutes(app: Express): Server {
   
   // Sistema RON video con Jitsi Meet
   app.use("/api/ron-jitsi", ronJitsiRouter);
+  
+  // Sistema de códigos de acceso para clientes RON
+  app.use("/api/ron-client", ronClientAccessRouter);
   
   // Ruta para servir archivos estáticos (documentos y contratos)
   app.use("/docs", express.static(path.join(process.cwd(), "docs")));
