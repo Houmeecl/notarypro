@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONTRATO DE ARRENDAMIENTO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-size: 18px;
+        }
+        .content {
+            margin-bottom: 30px;
+        }
+        .clause {
+            margin-bottom: 20px;
+        }
+        .clause h2 {
+            font-size: 14px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        .signatures {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature {
+            border-top: 1px solid #000;
+            width: 200px;
+            padding-top: 10px;
+            text-align: center;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 10px;
+        }
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 60px;
+            color: rgba(0,0,0,0.05);
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark">DEMO CERFIDOC</div>
+    
+    <div class="header">
+        <h1>CONTRATO DE ARRENDAMIENTO DE INMUEBLE</h1>
+        <p>Santiago de Chile, <span id="current-date">2 de mayo de 2025</span></p>
+    </div>
+    
+    <div class="content">
+        <p>En Santiago de Chile, a <span id="current-date-text">2 de mayo de 2025</span>, entre:</p>
+        
+        <p><strong>ARRENDADOR:</strong> Don <span class="fill-data">[NOMBRE COMPLETO ARRENDADOR]</span>, de nacionalidad chilena, cédula de identidad N° <span class="fill-data">[RUT ARRENDADOR]</span>, domiciliado para estos efectos en <span class="fill-data">[DOMICILIO ARRENDADOR]</span>, comuna de <span class="fill-data">[COMUNA ARRENDADOR]</span>, ciudad de <span class="fill-data">[CIUDAD ARRENDADOR]</span>, en adelante el "Arrendador"; y</p>
+        
+        <p><strong>ARRENDATARIO:</strong> Don <span class="fill-data">[NOMBRE COMPLETO ARRENDATARIO]</span>, de nacionalidad chilena, cédula de identidad N° <span class="fill-data">[RUT ARRENDATARIO]</span>, domiciliado para estos efectos en <span class="fill-data">[DOMICILIO ARRENDATARIO]</span>, comuna de <span class="fill-data">[COMUNA ARRENDATARIO]</span>, ciudad de <span class="fill-data">[CIUDAD ARRENDATARIO]</span>, en adelante el "Arrendatario";</p>
+        
+        <p>Se ha convenido el siguiente contrato de arrendamiento:</p>
+    </div>
+    
+    <div class="clauses">
+        <div class="clause">
+            <h2>PRIMERO: Propiedad</h2>
+            <p>El Arrendador es dueño del inmueble ubicado en <span class="fill-data">[DIRECCIÓN PROPIEDAD COMPLETA]</span>, comuna de <span class="fill-data">[COMUNA PROPIEDAD]</span>, ciudad de <span class="fill-data">[CIUDAD PROPIEDAD]</span>, la cual consta de <span class="fill-data">[NÚMERO DE HABITACIONES]</span> habitaciones, <span class="fill-data">[NÚMERO DE BAÑOS]</span> baños, <span class="fill-data">[OTRAS DEPENDENCIAS]</span>, en adelante, la "Propiedad".</p>
+        </div>
+        
+        <div class="clause">
+            <h2>SEGUNDO: Objeto del contrato</h2>
+            <p>Por el presente instrumento, el Arrendador da en arrendamiento al Arrendatario, quien acepta para sí, la Propiedad individualizada en la cláusula primera, con todos sus usos, costumbres, derechos y servidumbres activas y pasivas, para destinarla exclusivamente a vivienda.</p>
+        </div>
+        
+        <div class="clause">
+            <h2>TERCERO: Plazo</h2>
+            <p>El presente contrato de arrendamiento tendrá una duración de <span class="fill-data">[NÚMERO]</span> meses a contar de la fecha de su celebración. Al vencimiento del plazo señalado, el contrato se renovará automática y sucesivamente por períodos iguales de <span class="fill-data">[NÚMERO]</span> meses, a menos que cualquiera de las partes manifieste a la otra su intención de no renovarlo, mediante comunicación escrita enviada con a lo menos 30 días de anticipación a la fecha de término del contrato o cualquiera de sus prórrogas.</p>
+        </div>
+        
+        <div class="clause">
+            <h2>CUARTO: Renta de arrendamiento</h2>
+            <p>La renta mensual de arrendamiento será la suma de $<span class="fill-data">[MONTO EN NÚMEROS]</span> (<span class="fill-data">[MONTO EN PALABRAS]</span> pesos), que el Arrendatario pagará por mes anticipado, dentro de los primeros <span class="fill-data">[NÚMERO]</span> días de cada mes, mediante <span class="fill-data">[FORMA DE PAGO]</span>.</p>
+            <p>La renta se reajustará cada <span class="fill-data">[PERIODO DE REAJUSTE]</span> meses conforme a la variación que experimente el Índice de Precios al Consumidor (IPC) determinado por el Instituto Nacional de Estadísticas, o el organismo que lo reemplace.</p>
+        </div>
+        
+        <div class="clause">
+            <h2>QUINTO: Garantía</h2>
+            <p>A fin de garantizar la conservación de la Propiedad y su restitución en el mismo estado en que se recibe, el cumplimiento de las obligaciones que le impone este contrato, y los perjuicios que puedan ocasionarse a la Propiedad durante la vigencia de este contrato, el Arrendatario entrega en este acto al Arrendador la suma de $<span class="fill-data">[MONTO GARANTÍA EN NÚMEROS]</span> (<span class="fill-data">[MONTO GARANTÍA EN PALABRAS]</span> pesos) equivalente a <span class="fill-data">[NÚMERO]</span> mes(es) de renta.</p>
+            <p>Esta garantía será devuelta al Arrendatario dentro de los 15 días siguientes a la restitución de la Propiedad, siempre y cuando ésta se devuelva en las mismas condiciones en que fue recibida y se hayan pagado todos los consumos y servicios a su cargo.</p>
+        </div>
+        
+        <div class="clause">
+            <h2>SEXTO: Estado de la Propiedad</h2>
+            <p>El Arrendatario declara recibir la Propiedad en perfecto estado de conservación, con todos sus vidrios, cerraduras, llaves, instalaciones eléctricas, sanitarias y de agua potable funcionando correctamente.</p>
+            <p>Se adjunta como Anexo N°1 al presente contrato un Inventario y un set fotográfico de la Propiedad, que forma parte integrante del mismo.</p>
+        </div>
+        
+        <div class="clause">
+            <h2>SÉPTIMO: Obligaciones del Arrendatario</h2>
+            <p>Serán obligaciones del Arrendatario:</p>
+            <ol>
+                <li>Mantener la Propiedad en perfecto estado de conservación, respondiendo hasta de culpa leve en su uso.</li>
+                <li>Efectuar oportunamente y a su costo las reparaciones locativas a que haya lugar, entendiendo por tales las que según la costumbre son de cargo de los arrendatarios.</li>
+                <li>Pagar oportunamente las cuentas de consumos básicos, como agua, electricidad, gas, telefonía, internet, televisión por cable, gastos comunes si los hubiere, etc.</li>
+                <li>No destinar la Propiedad a un objeto distinto al señalado en este contrato.</li>
+                <li>No ceder el contrato ni subarrendar la Propiedad sin autorización previa y por escrito del Arrendador.</li>
+                <li>Dar aviso inmediato al Arrendador de cualquier deterioro, desperfecto o problema que afecte a la Propiedad.</li>
+                <li>Permitir el examen de la Propiedad por parte del Arrendador o quien lo represente, previo aviso con a lo menos 24 horas de anticipación.</li>
+            </ol>
+        </div>
+        
+        <div class="clause">
+            <h2>OCTAVO: Prohibiciones</h2>
+            <p>Queda estrictamente prohibido al Arrendatario:</p>
+            <ol>
+                <li>Hacer modificaciones o mejoras en la Propiedad sin autorización previa y por escrito del Arrendador.</li>
+                <li>Causar molestias a los vecinos mediante ruidos molestos, olores u otras perturbaciones.</li>
+                <li>Tener mascotas en la Propiedad sin autorización previa y por escrito del Arrendador.</li>
+                <li>Usar la Propiedad para un destino distinto al estipulado en el presente contrato.</li>
+                <li>Almacenar sustancias peligrosas, inflamables o que pudieran causar daños a la Propiedad.</li>
+            </ol>
+        </div>
+        
+        <div class="clause">
+            <h2>NOVENO: Término anticipado</h2>
+            <p>El Arrendador podrá poner término anticipado al presente contrato, sin necesidad de declaración judicial previa, en los siguientes casos:</p>
+            <ol>
+                <li>Si el Arrendatario no paga la renta mensual dentro del plazo estipulado.</li>
+                <li>Si el Arrendatario causa deterioros a la Propiedad o la destina a un objeto distinto al señalado en este contrato.</li>
+                <li>Si el Arrendatario cede el contrato o subarrienda la Propiedad sin autorización previa y por escrito del Arrendador.</li>
+                <li>Si el Arrendatario incumple cualquiera de las obligaciones que le impone este contrato.</li>
+            </ol>
+            <p>Por su parte, el Arrendatario podrá poner término anticipado al contrato dando aviso al Arrendador con a lo menos 30 días de anticipación, debiendo pagar la totalidad de la renta correspondiente a dicho período.</p>
+        </div>
+        
+        <div class="clause">
+            <h2>DÉCIMO: Domicilio y competencia</h2>
+            <p>Para todos los efectos legales derivados del presente contrato, las partes fijan su domicilio en la ciudad de Santiago y se someten a la competencia de sus Tribunales de Justicia.</p>
+        </div>
+    </div>
+    
+    <div class="signatures">
+        <div class="signature">
+            <p>_____________________________</p>
+            <p><strong>ARRENDADOR</strong></p>
+            <p><span class="fill-data">[NOMBRE ARRENDADOR]</span></p>
+            <p>RUT: <span class="fill-data">[RUT ARRENDADOR]</span></p>
+        </div>
+        
+        <div class="signature">
+            <p>_____________________________</p>
+            <p><strong>ARRENDATARIO</strong></p>
+            <p><span class="fill-data">[NOMBRE ARRENDATARIO]</span></p>
+            <p>RUT: <span class="fill-data">[RUT ARRENDATARIO]</span></p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Este documento ha sido generado por CerfiDoc - Todos los derechos reservados.</p>
+        <p>Número de folio: <span id="folio">XP-123456</span> | Fecha: <span id="footer-date">2 de mayo de 2025</span></p>
+        <p>Para verificar la autenticidad de este documento, visite www.cerfidoc.cl y utilice el código de verificación: <span id="verification-code">VF-987654321</span></p>
+    </div>
+</body>
+</html>

@@ -8,6 +8,15 @@
 
 import express, { Router, Request, Response } from 'express';
 import { sendAgoraTokens, sendAgoraAppId } from './services/agora-service';
+import { 
+  createRonSession, 
+  getRonVideoTokens, 
+  finishRonSession,
+  getCertifierSessions,
+  getRonSessionInfo,
+  isAgoraConfigured,
+  getDemoConfig
+} from './services/ron-video-service';
 import { storage } from './storage';
 import { comparePasswords } from './auth';
 

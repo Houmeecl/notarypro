@@ -153,7 +153,7 @@ const VerificationRewards: React.FC<VerificationRewardsProps> = ({
               
               {/* Logros de verificación */}
               {verificationAchievement && (
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-md shadow-sm border border-border">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-md shadow-sm border border">
                   <div className="flex items-start gap-3">
                     <div className="bg-primary-50 dark:bg-primary-900/20 p-2 rounded-full">
                       <Award className="h-6 w-6 text-primary" />
@@ -205,7 +205,7 @@ const VerificationRewards: React.FC<VerificationRewardsProps> = ({
             </div>
           ) : (
             // Si el usuario no está autenticado, mostrar invitación a unirse
-            <div className="bg-white dark:bg-gray-800 p-4 rounded-md shadow-sm border border-border">
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-md shadow-sm border border">
               <div className="flex items-start gap-3">
                 <div className="bg-primary-50 dark:bg-primary-900/20 p-2 rounded-full">
                   <User className="h-6 w-6 text-primary" />

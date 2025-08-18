@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contrato de Compraventa de Vehículo</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      border: 1px solid #ddd;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #2d219b;
+      padding-bottom: 10px;
+    }
+    .logo {
+      max-width: 150px;
+      margin-bottom: 10px;
+    }
+    h1 {
+      color: #2d219b;
+      margin-bottom: 5px;
+      font-size: 24px;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: #666;
+      margin-top: 0;
+    }
+    .verification-code {
+      text-align: center;
+      margin: 20px 0;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+      font-family: monospace;
+      font-size: 16px;
+    }
+    .verification-note {
+      font-size: 12px;
+      text-align: center;
+      color: #777;
+      margin-bottom: 20px;
+    }
+    .contract-section {
+      margin-bottom: 15px;
+    }
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #2d219b;
+    }
+    .signatures {
+      margin-top: 50px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .signature {
+      width: 45%;
+      border-top: 1px solid #333;
+      padding-top: 10px;
+      text-align: center;
+    }
+    .footer {
+      margin-top: 50px;
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+    }
+    .data-field {
+      font-weight: bold;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>CONTRATO DE COMPRAVENTA DE VEHÍCULO</h1>
+      <p class="subtitle">Documento legal válido según Ley 19.799 sobre Documentos Electrónicos</p>
+    </div>
+
+    <div class="verification-code">
+      Código de Verificación: {{verificationCode}}
+    </div>
+    <div class="verification-note">
+      Este documento puede ser verificado en https://vecinoxpress.cl/verificar-documento con el código anterior.
+    </div>
+
+    <div class="contract-section">
+      <p>En <span class="data-field">{{ciudad}}</span>, a <span class="data-field">{{fecha}}</span>, entre:</p>
+    </div>
+
+    <div class="contract-section">
+      <div class="section-title">VENDEDOR:</div>
+      <p>Don(ña) <span class="data-field">{{nombreVendedor}}</span>, de nacionalidad <span class="data-field">{{nacionalidadVendedor}}</span>, cédula de identidad N° <span class="data-field">{{rutVendedor}}</span>, domiciliado en <span class="data-field">{{domicilioVendedor}}</span>, en adelante "EL VENDEDOR";</p>
+    </div>
+
+    <div class="contract-section">
+      <div class="section-title">COMPRADOR:</div>
+      <p>Don(ña) <span class="data-field">{{nombreComprador}}</span>, de nacionalidad <span class="data-field">{{nacionalidadComprador}}</span>, cédula de identidad N° <span class="data-field">{{rutComprador}}</span>, domiciliado en <span class="data-field">{{domicilioComprador}}</span>, en adelante "EL COMPRADOR";</p>
+    </div>
+
+    <div class="contract-section">
+      <div class="section-title">PRIMERO: OBJETO DE LA COMPRAVENTA</div>
+      <p>El Vendedor vende, cede y transfiere al Comprador, quien compra, acepta y adquiere para sí el siguiente vehículo:</p>
+      <ul>
+        <li>Marca: <span class="data-field">{{marcaVehiculo}}</span></li>
+        <li>Modelo: <span class="data-field">{{modeloVehiculo}}</span></li>
+        <li>Año: <span class="data-field">{{añoVehiculo}}</span></li>
+        <li>Color: <span class="data-field">{{colorVehiculo}}</span></li>
+        <li>Número de Motor: <span class="data-field">{{numeroMotor}}</span></li>
+        <li>Número de Chasis: <span class="data-field">{{numeroChasis}}</span></li>
+        <li>Placa Patente: <span class="data-field">{{placaPatente}}</span></li>
+      </ul>
+    </div>
+
+    <div class="contract-section">
+      <div class="section-title">SEGUNDO: PRECIO Y FORMA DE PAGO</div>
+      <p>El precio de la compraventa es la suma de <span class="data-field">{{precioVehiculo}}</span> pesos, que el Comprador paga al Vendedor de la siguiente manera: <span class="data-field">{{formaPago}}</span>.</p>
+    </div>
+
+    <div class="contract-section">
+      <div class="section-title">TERCERO: DECLARACIONES DEL VENDEDOR</div>
+      <p>El Vendedor declara:</p>
+      <p>a) Que es el único y exclusivo dueño del vehículo objeto de esta compraventa.</p>
+      <p>b) Que el vehículo no tiene gravámenes, prohibiciones, embargos, medidas precautorias ni limitaciones al dominio de ninguna especie.</p>
+      <p>c) Que el vehículo está al día en el pago de todos sus impuestos, permisos de circulación y multas de tránsito.</p>
+      <p>d) Que entrega al Comprador toda la documentación legal del vehículo.</p>
+    </div>
+
+    <div class="contract-section">
+      <div class="section-title">CUARTO: ENTREGA DEL VEHÍCULO</div>
+      <p>El Vendedor hace entrega material del vehículo al Comprador en este acto, declarando este último haberlo recibido a su entera conformidad.</p>
+    </div>
+
+    <div class="contract-section">
+      <div class="section-title">QUINTO: RESPONSABILIDAD</div>
+      <p>A partir de la fecha de este contrato, el Comprador será el único responsable de cualquier infracción, multa o daño que se produzca con el vehículo objeto de esta compraventa.</p>
+    </div>
+
+    <div class="contract-section">
+      <div class="section-title">SEXTO: TRÁMITE DE TRANSFERENCIA</div>
+      <p>El trámite de transferencia del vehículo ante el Registro Civil e Identificación será de cargo y responsabilidad de <span class="data-field">{{responsableTransferencia}}</span>.</p>
+    </div>
+
+    <div class="contract-section">
+      <div class="section-title">SÉPTIMO: DOMICILIO</div>
+      <p>Para todos los efectos legales derivados del presente contrato, las partes fijan su domicilio en la ciudad de <span class="data-field">{{ciudadDomicilio}}</span> y se someten a la jurisdicción de sus tribunales.</p>
+    </div>
+
+    <div class="signatures">
+      <div class="signature">
+        <p>___________________________</p>
+        <p>{{nombreVendedor}}</p>
+        <p>RUT: {{rutVendedor}}</p>
+        <p>VENDEDOR</p>
+      </div>
+      <div class="signature">
+        <p>___________________________</p>
+        <p>{{nombreComprador}}</p>
+        <p>RUT: {{rutComprador}}</p>
+        <p>COMPRADOR</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Documento generado electrónicamente el {{fechaGeneracion}} a través de VecinoXpress.</p>
+      <p>Este contrato está protegido por la Ley 19.799 sobre Documentos Electrónicos, Firma Electrónica y Servicios de Certificación.</p>
+    </div>
+  </div>
+</body>
+</html>

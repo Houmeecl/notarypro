@@ -1,0 +1,51 @@
+=====================================================
+ACTUALIZACIÓN v1.3.1 - VECINOS NOTARYPRO EXPRESS
+=====================================================
+
+Fecha: Mayo 2, 2025
+
+Estimado Partner de Vecinos NotaryPro Express:
+
+Hemos lanzado una actualización importante del SDK y la aplicación POS que contiene los siguientes cambios:
+
+CAMBIOS IMPORTANTES:
+-------------------
+1. SOLO SE ACEPTA PAGO CON TARJETA
+   - A partir de esta versión, SOLO se acepta pago con tarjeta de crédito/débito
+   - Los métodos de pago en efectivo y transferencia ya no están disponibles
+   - Todos los recibos mostrarán "Tarjeta" como método de pago
+
+2. CAMBIO DE DOMINIO
+   - Las URLs del servicio ahora utilizan el dominio tuu.cl en lugar de cerfidoc.cl
+   - Los códigos QR de verificación ahora redirigen a tuu.cl/verificar
+
+3. INTEGRACIÓN DE PAGO INTER-APP
+   - Ahora es posible integrar con aplicaciones de pago externas
+   - Implementación simplificada a través de URI schemes
+   - Documentación específica: https://developers.tuu.cl/docs/integración-de-aplicaciones-de-pago-inter-app
+   - Ejemplo de implementación incluido en la descarga (ejemplo-integracion-pago-interapp.js)
+
+4. DOCUMENTACIÓN AMPLIADA
+   - Acceda a documentación detallada y ejemplos adicionales en:
+     https://developers.tuu.cl/docs/getting-started
+
+INSTRUCCIONES DE ACTUALIZACIÓN:
+------------------------------
+1. Para la aplicación web: No es necesario realizar ninguna acción, la actualización
+   se aplicará automáticamente la próxima vez que inicies sesión.
+
+2. Para la aplicación Android:
+   - Descarga la nueva versión desde: tuu.cl/partners/descargar-apk
+   - Desinstala la versión anterior antes de instalar la nueva
+   - Instala el archivo APK descargado en tu dispositivo Android
+   - Inicia sesión con tus credenciales habituales
+
+Si tienes alguna pregunta o enfrentas problemas durante la actualización,
+por favor contacta al equipo de soporte:
+
+Email: soporte@tuu.cl
+Teléfono: +56 9 5555 1234
+WhatsApp: +56 9 5555 1234
+
+Atentamente,
+El equipo de NotaryPro

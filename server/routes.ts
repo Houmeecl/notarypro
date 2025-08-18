@@ -21,6 +21,22 @@ import { posManagementRouter } from "./pos-management-routes";
 import { documentSignaturesRouter } from "./routes/document-signatures";
 import { secureDocumentRouter } from "./routes/secure-document-routes";
 import { qrSignatureRouter } from "./vecinos/qr-signature-routes";
+import { adminRouter } from "./admin/admin-routes";
+import { adminPosRouter } from "./admin/admin-pos-routes";
+import { integrationRouter } from "./admin/integration-routes";
+import { realDataRouter } from "./admin/real-data-routes";
+import { gamificationRouter } from "./gamification-routes";
+import { getApiRouter } from "./getapi-routes";
+import { translationRouter } from "./translation-routes";
+import { authJwtRouter } from "./auth-jwt-routes";
+import { realDocumentRouter } from "./real-document-manager";
+import { realAdminRouter } from "./real-admin-dashboard";
+import { realCertifierRouter } from "./real-certifier-panel";
+import { realVecinosApiRouter } from "./vecinos/real-vecinos-api";
+import { realRonRouter } from "./real-ron-video-system";
+import { ronJitsiRouter } from "./ron-jitsi-routes";
+import { ronClientAccessRouter } from "./ron-client-access-routes";
+import { identityVerificationRouter } from "./identity-verification-routes";
 
 // Middleware de autenticación
 function isAuthenticated(req: Request, res: Response, next: any) {
@@ -73,6 +89,49 @@ export function registerRoutes(app: Express): Server {
   
   // Ruta para el sistema de firma con QR
   app.use("/api/qr-signature", qrSignatureRouter);
+  
+  // Rutas de administración
+  app.use("/api/admin", adminRouter);
+  app.use("/api/admin/pos", adminPosRouter);
+  app.use("/api/admin/integrations", integrationRouter);
+  app.use("/api/admin/real-data", realDataRouter);
+  
+  // Sistema de gamificación
+  app.use("/api/gamification", gamificationRouter);
+  
+  // API de GetAPI para verificación de identidad
+  app.use("/api/getapi", getApiRouter);
+  
+  // Servicio de traducción
+  app.use("/api/translation", translationRouter);
+  
+  // Sistema de autenticación JWT
+  app.use("/api/auth", authJwtRouter);
+  
+  // === SISTEMAS REALES COMPLETOS ===
+  // Gestor documental real con base de datos
+  app.use("/api/real-documents", realDocumentRouter);
+  
+  // Dashboard admin real con datos de BD
+  app.use("/api/real-admin", realAdminRouter);
+  
+  // Panel certificador real con documentos reales
+  app.use("/api/real-certifier", realCertifierRouter);
+  
+  // API Vecinos real con estadísticas reales
+  app.use("/api/vecinos/real", realVecinosApiRouter);
+  
+  // Sistema RON video real con Agora
+  app.use("/api/real-ron", realRonRouter);
+  
+  // Sistema RON video con Jitsi Meet
+  app.use("/api/ron-jitsi", ronJitsiRouter);
+  
+  // Sistema de códigos de acceso para clientes RON
+  app.use("/api/ron-client", ronClientAccessRouter);
+  
+  // Sistema completo de verificación de identidad
+  app.use("/api/identity", identityVerificationRouter);
   
   // Ruta para servir archivos estáticos (documentos y contratos)
   app.use("/docs", express.static(path.join(process.cwd(), "docs")));
@@ -382,6 +441,86 @@ async function initializeTestAdmins() {
       console.log("Usuario partner creado, ahora puedes iniciar sesión con demopartner/password123");
       console.log("Usuario demo partner inicializado correctamente");
     }
+
+    // Usuario POS/Operador Demo 1
+    const [existingPosUser1] = await db.select().from(users).where(
+      eq(users.username, "posoperator1")
+    );
+
+    if (existingPosUser1) {
+      console.log("El usuario posoperator1 ya existe. Actualizando contraseña...");
+      const hashedPassword = await hashPassword("pos123");
+      await db.update(users)
+        .set({ password: hashedPassword, role: "pos-user" })
+        .where(eq(users.username, "posoperator1"));
+      console.log("Credenciales del usuario posoperator1 actualizadas.");
+    } else {
+      const hashedPassword = await hashPassword("pos123");
+      await db.insert(users).values({
+        username: "posoperator1",
+        password: hashedPassword,
+        email: "pos1@notarypro.cl",
+        fullName: "Operador POS 1",
+        role: "pos-user",
+        platform: "notarypro",
+        createdAt: new Date()
+      });
+      console.log("Usuario POS Operador 1 creado correctamente");
+    }
+
+    // Usuario Operador Demo 2
+    const [existingOperator2] = await db.select().from(users).where(
+      eq(users.username, "operator2")
+    );
+
+    if (existingOperator2) {
+      console.log("El usuario operator2 ya existe. Actualizando contraseña...");
+      const hashedPassword = await hashPassword("operator123");
+      await db.update(users)
+        .set({ password: hashedPassword, role: "operator" })
+        .where(eq(users.username, "operator2"));
+      console.log("Credenciales del usuario operator2 actualizadas.");
+    } else {
+      const hashedPassword = await hashPassword("operator123");
+      await db.insert(users).values({
+        username: "operator2",
+        password: hashedPassword,
+        email: "operator2@notarypro.cl",
+        fullName: "Operador Terminal 2",
+        role: "operator",
+        platform: "notarypro",
+        createdAt: new Date()
+      });
+      console.log("Usuario Operador 2 creado correctamente");
+    }
+
+    // Usuario POS para VecinoXpress
+    const [existingVecinosPOS] = await db.select().from(users).where(
+      eq(users.username, "vecinospos")
+    );
+
+    if (existingVecinosPOS) {
+      console.log("El usuario vecinospos ya existe. Actualizando contraseña...");
+      const hashedPassword = await hashPassword("vecinos123pos");
+      await db.update(users)
+        .set({ password: hashedPassword, role: "pos-user", platform: "vecinos" })
+        .where(eq(users.username, "vecinospos"));
+      console.log("Credenciales del usuario vecinospos actualizadas.");
+    } else {
+      const hashedPassword = await hashPassword("vecinos123pos");
+      await db.insert(users).values({
+        username: "vecinospos",
+        password: hashedPassword,
+        email: "pos@vecinoxpress.cl",
+        fullName: "Operador POS Vecinos",
+        role: "pos-user",
+        platform: "vecinos",
+        businessName: "Terminal VecinoXpress",
+        createdAt: new Date()
+      });
+      console.log("Usuario POS VecinoXpress creado correctamente");
+    }
+
   } catch (error) {
     console.error("Error inicializando admins:", error);
   }
