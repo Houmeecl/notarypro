@@ -774,6 +774,16 @@ function Router() {
         );
       }} />
 
+      {/* Sistema RON con Jitsi Meet */}
+      <Route path="/ron-jitsi/:sessionId" component={() => {
+        const RonJitsiSession = React.lazy(() => import("@/pages/ron-jitsi-session"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback message="Cargando sesión RON con Jitsi..." />}>
+            <RonJitsiSession />
+          </Suspense>
+        );
+      }} />
+
       {/* Ayuda Legal */}
       <ProtectedRoute 
         path="/ayuda-legal" 
