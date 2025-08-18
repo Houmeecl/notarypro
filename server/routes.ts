@@ -29,6 +29,11 @@ import { gamificationRouter } from "./gamification-routes";
 import { getApiRouter } from "./getapi-routes";
 import { translationRouter } from "./translation-routes";
 import { authJwtRouter } from "./auth-jwt-routes";
+import { realDocumentRouter } from "./real-document-manager";
+import { realAdminRouter } from "./real-admin-dashboard";
+import { realCertifierRouter } from "./real-certifier-panel";
+import { realVecinosApiRouter } from "./vecinos/real-vecinos-api";
+import { realRonRouter } from "./real-ron-video-system";
 
 // Middleware de autenticación
 function isAuthenticated(req: Request, res: Response, next: any) {
@@ -99,6 +104,22 @@ export function registerRoutes(app: Express): Server {
   
   // Sistema de autenticación JWT
   app.use("/api/auth", authJwtRouter);
+  
+  // === SISTEMAS REALES COMPLETOS ===
+  // Gestor documental real con base de datos
+  app.use("/api/real-documents", realDocumentRouter);
+  
+  // Dashboard admin real con datos de BD
+  app.use("/api/real-admin", realAdminRouter);
+  
+  // Panel certificador real con documentos reales
+  app.use("/api/real-certifier", realCertifierRouter);
+  
+  // API Vecinos real con estadísticas reales
+  app.use("/api/vecinos/real", realVecinosApiRouter);
+  
+  // Sistema RON video real con Agora
+  app.use("/api/real-ron", realRonRouter);
   
   // Ruta para servir archivos estáticos (documentos y contratos)
   app.use("/docs", express.static(path.join(process.cwd(), "docs")));
