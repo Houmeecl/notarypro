@@ -9,16 +9,26 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.864.0",
+    "@aws-sdk/s3-request-presigner": "^3.864.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "axios": "^1.11.0",
     "bcrypt": "^5.1.1",
+    "connect-pg-simple": "^10.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.28.5",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
+    "form-data": "^4.0.4",
+    "memorystore": "^1.6.7",
     "multer": "^1.4.5-lts.1",
+    "nanoid": "^5.1.5",
+    "openai": "^5.12.2",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "pg": "^8.11.3",
+    "vite": "^7.1.2",
     "ws": "^8.14.2"
   },
   "devDependencies": {
