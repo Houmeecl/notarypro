@@ -94,6 +94,7 @@ export class VecinosPOS {
     this.modoOffline = false;
     this.documentosPendientes = [];
     this.clientesPendientes = [];
+    this.sincronizando = false;
     
     // Verificar si hay conexión a internet
     this.verificarConexion();
@@ -140,12 +141,130 @@ export class VecinosPOS {
    */
   async sincronizar() {
     if (this.modoOffline) return;
-    
+
+    // Evitamos ejecuciones simultáneas (el temporizador de verificarConexion
+    // podría dispararse mientras ya estamos sincronizando)
+    if (this.sincronizando) return;
+
+    // Si no hay nada pendiente, no hacemos nada
+    if (this.clientesPendientes.length === 0 && this.documentosPendientes.length === 0) {
+      return;
+    }
+
+    this.sincronizando = true;
     console.log('🔄 Sincronizando datos pendientes...');
-    
-    // TODO: Implementar sincronización de datos pendientes
-    // Esta función enviaría los documentos y clientes guardados
-    // localmente al servidor una vez que hay conexión
+
+    try {
+      // ----------------------------------------------------------------
+      // PASO 1: Sincronizar clientes pendientes
+      // Los documentos hacen referencia al id del cliente, por lo que
+      // primero subimos los clientes para obtener sus ids reales.
+      // ----------------------------------------------------------------
+      const mapaIdsClientes = {};   // idTemporal -> idReal
+      const clientesRestantes = [];
+
+      for (const cliente of this.clientesPendientes) {
+        // Solo separamos los datos del cliente, sin el id temporal
+        const { id: idTemporal, ...datosCliente } = cliente;
+
+        try {
+          const respuesta = await fetch(`${this.apiUrl}/api/pos/clientes`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-API-KEY": this.config.apiKey
+            },
+            body: JSON.stringify({
+              ...datosCliente,
+              partnerId: this.config.id
+            })
+          });
+
+          if (!respuesta.ok) {
+            throw new Error("Error al sincronizar cliente en el servidor");
+          }
+
+          const resultado = await respuesta.json();
+          mapaIdsClientes[idTemporal] = resultado.id;
+          console.log(`✓ Cliente sincronizado: ${datosCliente.nombre}`);
+        } catch (error) {
+          // Si falla, activamos modo offline y detenemos la sincronización.
+          // El cliente (y sus documentos) quedan pendientes para el próximo intento.
+          console.error('⚠️ Error al sincronizar cliente:', error.message);
+          this.modoOffline = true;
+          clientesRestantes.push(cliente);
+        }
+      }
+
+      // Conservamos los clientes que no se pudieron sincronizar
+      this.clientesPendientes = clientesRestantes;
+
+      // Si se cayó la conexión durante la sincronización de clientes, abortamos.
+      if (this.modoOffline) {
+        console.log('📴 Sincronización interrumpida. Se reintentará más tarde.');
+        return;
+      }
+
+      // ----------------------------------------------------------------
+      // PASO 2: Sincronizar documentos pendientes
+      // Antes de enviarlos, reemplazamos cualquier id temporal de cliente
+      // por su id real recién obtenido.
+      // ----------------------------------------------------------------
+      const documentosRestantes = [];
+
+      for (const documento of this.documentosPendientes) {
+        // Reconciliamos el id temporal del cliente con su id real
+        const clienteId = mapaIdsClientes[documento.clienteId] ?? documento.clienteId;
+
+        try {
+          const respuesta = await fetch(`${this.apiUrl}/api/pos/documentos`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-API-KEY": this.config.apiKey
+            },
+            body: JSON.stringify({
+              clienteId,
+              partnerId: this.config.id,
+              tipo: documento.tipo,
+              titulo: documento.titulo,
+              detalle: documento.detalle || "",
+              monto: documento.monto,
+              metodoPago: documento.metodoPago
+            })
+          });
+
+          if (!respuesta.ok) {
+            throw new Error("Error al sincronizar documento en el servidor");
+          }
+
+          const resultado = await respuesta.json();
+          console.log(`✓ Documento sincronizado: ${documento.titulo}`);
+
+          // Registramos la comisión automáticamente (15%), igual que procesarDocumento
+          this.registrarComision(resultado.id, documento.monto).catch(() => {
+            console.log('ℹ️ La comisión se registrará más tarde');
+          });
+        } catch (error) {
+          console.error('⚠️ Error al sincronizar documento:', error.message);
+          this.modoOffline = true;
+          // Guardamos el documento con el clienteId ya reconciliado para el reintento
+          documentosRestantes.push({ ...documento, clienteId });
+        }
+      }
+
+      // Conservamos los documentos que no se pudieron sincronizar
+      this.documentosPendientes = documentosRestantes;
+
+      const pendientes = this.clientesPendientes.length + this.documentosPendientes.length;
+      if (pendientes === 0) {
+        console.log('✅ Sincronización completada. No quedan datos pendientes.');
+      } else {
+        console.log(`ℹ️ Sincronización parcial. Quedan ${pendientes} elementos pendientes.`);
+      }
+    } finally {
+      this.sincronizando = false;
+    }
   }
   
   /**
