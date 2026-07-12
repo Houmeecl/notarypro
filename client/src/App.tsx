@@ -12,6 +12,7 @@ import HelpButton from "@/components/onboarding/HelpButton";
 import { MicroInteractionProvider } from "@/hooks/use-micro-interactions";
 import { MicroInteractionDisplay } from "@/components/micro-interactions/MicroInteractionDisplay";
 import { ProtectedRoute } from "./lib/protected-route";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { webSocketService } from "./lib/websocket";
 import React, { useEffect, useState, Suspense } from "react";
 // WebSocketDebugger desactivado para mejorar la estabilidad
@@ -81,6 +82,8 @@ import VerificacionBiometricaPage from "@/pages/verificacion-biometrica";
 import POSMenuPage from "@/pages/pos-menu";
 import POSSessionPage from "@/pages/pos-session";
 import RegisterPOSDevicePage from "@/pages/register-pos-device";
+import NotaryDashboard from "@/pages/notary-dashboard";
+import UserBadges from "@/pages/user-badges";
 
 // Document pages
 import DocumentCategoriesPage from "@/pages/document-categories";
@@ -153,16 +156,14 @@ const LazyVecinosLandingStandalone = React.lazy(() => import("@/pages/standalone
 function Router() {
   return (
     <Switch>
-      {/* Página principal con redirección a acceso directo si es necesario */}
-      <Route path="/" component={() => {
-        try {
-          return <LandingPage />;
-        } catch (error) {
-          console.error("Error al cargar la página principal:", error);
-          window.location.href = "/acceso-directo";
-          return null;
-        }
-      }} />
+      {/* Página principal envuelta en un límite de error para evitar la pantalla
+          en blanco: si la landing (o cualquiera de sus hijos) falla al renderizar,
+          se muestra una interfaz de recuperación con acceso alternativo. */}
+      <Route path="/" component={() => (
+        <ErrorBoundary fallbackPath="/acceso-directo">
+          <LandingPage />
+        </ErrorBoundary>
+      )} />
       {/* Página de acceso directo - evita problemas de navegación */}
       <Route path="/acceso-directo" component={AccesoDirecto} />
       {/* VecinosExpress - Versión consolidada */}
@@ -1060,6 +1061,28 @@ function Router() {
         );
       }} />
 
+      {/* Panel de notario (mejorar existente) */}
+      <ProtectedRoute
+        path="/notary-dashboard"
+        component={NotaryDashboard}
+        allowedRoles={["notary", "admin"]}
+      />
+      <Route path="/notary-profile"><Redirect to="/notary-dashboard" /></Route>
+
+      {/* Insignias del usuario */}
+      <ProtectedRoute
+        path="/user-badges"
+        component={UserBadges}
+        allowedRoles={["user", "certifier", "admin"]}
+      />
+
+      {/* Alias / redirecciones para enlaces heredados que apuntaban a rutas
+          inexistentes (evita que botones de los navbars caigan en 404). */}
+      <Route path="/dashboard"><Redirect to="/user-dashboard" /></Route>
+      <Route path="/profile"><Redirect to="/user-dashboard" /></Route>
+      <Route path="/settings"><Redirect to="/user-dashboard" /></Route>
+      <Route path="/notary-documents/upload"><Redirect to="/documents" /></Route>
+
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
@@ -1143,7 +1166,9 @@ function App() {
                 <HelpButton />
                 <DemoModeBanner variant="prominent" position="top" dismissible={true} />
                 {/* WebSocketDebugger completamente desactivado para evitar problemas de conectividad */}
-                <Router />
+                <ErrorBoundary>
+                  <Router />
+                </ErrorBoundary>
               </TooltipProvider>
             </ThemeProvider>
           </MicroInteractionProvider>

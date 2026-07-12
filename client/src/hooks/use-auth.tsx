@@ -8,6 +8,7 @@ import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { redirectPathForRole } from "@/lib/role-redirect";
 
 type AuthContextType = {
   user: SelectUser | null;
@@ -59,13 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       
       // Redirect based on user role
-      if (user.role === "certifier") {
-        setLocation("/certifier-dashboard");
-      } else if (user.role === "admin") {
-        setLocation("/admin-dashboard");
-      } else {
-        setLocation("/user-dashboard");
-      }
+      setLocation(redirectPathForRole(user.role));
     },
     onError: (error: Error) => {
       toast({
@@ -89,13 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       
       // Redirect based on user role
-      if (user.role === "certifier") {
-        setLocation("/certifier-dashboard");
-      } else if (user.role === "admin") {
-        setLocation("/admin-dashboard");
-      } else {
-        setLocation("/user-dashboard");
-      }
+      setLocation(redirectPathForRole(user.role));
     },
     onError: (error: Error) => {
       toast({

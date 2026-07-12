@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
+import { redirectPathForRole } from "@/lib/role-redirect";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -52,13 +53,7 @@ export default function AuthPage() {
   // If user is already logged in, redirect based on role
   useEffect(() => {
     if (user) {
-      if (user.role === "certifier") {
-        setLocation("/certifier-dashboard");
-      } else if (user.role === "admin") {
-        setLocation("/admin-dashboard");
-      } else {
-        setLocation("/user-dashboard");
-      }
+      setLocation(redirectPathForRole(user.role));
     }
   }, [user, setLocation]);
 
