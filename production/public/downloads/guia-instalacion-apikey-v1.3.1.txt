@@ -1,0 +1,110 @@
+=====================================================
+GUÍA DE INSTALACIÓN DE API KEY - VECINOS NOTARYPRO POS v1.3.1
+=====================================================
+
+Fecha: Mayo 2, 2025
+
+Esta guía explica paso a paso cómo instalar y configurar correctamente 
+la API key en los dispositivos POS para asegurar una conexión segura con 
+los servidores de tuu.cl.
+
+-----------------------------------------------------
+INSTALACIÓN EN LA APLICACIÓN ANDROID
+-----------------------------------------------------
+
+1. ABRE LA APLICACIÓN VECINOS POS EN TU DISPOSITIVO
+   - Localiza el ícono de Vecinos POS en tu pantalla de inicio
+   - Toca para abrir la aplicación
+
+2. ACCEDE A LA CONFIGURACIÓN
+   - En la pantalla principal, toca el botón "Menú" (☰) en la esquina superior derecha
+   - Selecciona "Configuración" o "Ajustes" en el menú desplegable
+
+3. INGRESA EN "CONFIGURACIÓN DE API"
+   - Busca y toca la opción "Configuración de API" o "Datos de conexión"
+
+4. INGRESA LA API KEY
+   - En el campo "API Key", ingresa exactamente este texto:
+     J7GwlMX4gMhqXDfkugL4VmDRnazq5hzo1n3FTuRakdZeqT8I45gxgMhItyXUKZvuInFU1YPtiAG4qL4RUoyz6WqunW2iBMDikimIJrIa6hlEpYqxPWh3ZRGdvH2Iru
+   - Es importante copiar la clave completa sin espacios adicionales
+
+5. GUARDA LA CONFIGURACIÓN
+   - Toca el botón "Guardar" o "Confirmar"
+   - La aplicación mostrará un mensaje confirmando que la API key ha sido guardada
+
+6. VERIFICA LA CONEXIÓN
+   - Toca "Probar conexión" para verificar que la API key funciona correctamente
+   - Si la conexión es exitosa, verás un mensaje de confirmación
+
+-----------------------------------------------------
+INSTALACIÓN EN LA VERSIÓN WEB
+-----------------------------------------------------
+
+1. ACCEDE A LA PLATAFORMA WEB
+   - Abre tu navegador y ve a: https://tuu.cl/partners/webapp-pos
+   - Inicia sesión con tus credenciales de partner
+
+2. ABRE LA CONFIGURACIÓN
+   - Haz clic en tu nombre de usuario en la esquina superior derecha
+   - Selecciona "Configuración de la tienda" en el menú desplegable
+
+3. NAVEGA A CONFIGURACIÓN DE API
+   - En el panel lateral izquierdo, haz clic en "Configuración de API"
+
+4. INGRESA LA API KEY
+   - En el campo correspondiente, ingresa la API key proporcionada:
+     J7GwlMX4gMhqXDfkugL4VmDRnazq5hzo1n3FTuRakdZeqT8I45gxgMhItyXUKZvuInFU1YPtiAG4qL4RUoyz6WqunW2iBMDikimIJrIa6hlEpYqxPWh3ZRGdvH2Iru
+
+5. GUARDA LOS CAMBIOS
+   - Haz clic en el botón "Guardar cambios"
+   - Recibirás una notificación de confirmación
+
+-----------------------------------------------------
+CONFIGURACIÓN EN EL CÓDIGO (PARA DESARROLLADORES)
+-----------------------------------------------------
+
+Si estás integrando el SDK directamente en tu aplicación, configura la API key así:
+
+```javascript
+// Inicializa el punto de servicio con la API key
+const pos = new VecinosPOS({
+  id: "TU_ID_DE_TIENDA",
+  nombre: "Nombre de tu tienda",
+  direccion: "Dirección física",
+  region: "Tu región",
+  comuna: "Tu comuna",
+  apiKey: "J7GwlMX4gMhqXDfkugL4VmDRnazq5hzo1n3FTuRakdZeqT8I45gxgMhItyXUKZvuInFU1YPtiAG4qL4RUoyz6WqunW2iBMDikimIJrIa6hlEpYqxPWh3ZRGdvH2Iru"
+});
+```
+
+-----------------------------------------------------
+SOLUCIÓN DE PROBLEMAS
+-----------------------------------------------------
+
+Si encuentras errores al configurar la API key:
+
+1. Verifica que la API key se haya copiado exactamente como aparece
+   en este documento, sin espacios adicionales al inicio o al final.
+
+2. Asegúrate de tener una conexión a internet estable.
+
+3. Confirma que estás utilizando la versión 1.3.1 o posterior de la aplicación.
+   Si tienes una versión anterior, actualiza siguiendo las instrucciones en
+   el documento de actualización.
+
+4. Si el problema persiste, contacta al soporte técnico:
+   - Email: soporte@tuu.cl
+   - Teléfono: +56 9 5555 1234
+
+-----------------------------------------------------
+INFORMACIÓN DE SEGURIDAD
+-----------------------------------------------------
+
+• NUNCA compartas tu API key con terceros no autorizados.
+• La API key es única para tu punto de servicio.
+• Todas las transacciones realizadas con tu API key quedan registradas.
+• Si sospechas que tu API key ha sido comprometida, contacta inmediatamente
+  al equipo de soporte para solicitar una nueva.
+
+Atentamente,
+El equipo de NotaryPro

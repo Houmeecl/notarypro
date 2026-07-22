@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VecinoXpress - RON con Agora App Builder</title>
+  <style>
+    :root {
+      --primary: #2d219b;  /* Color principal VecinoXpress */
+      --primary-light: #4939c7;
+      --secondary: #3e3e3e;
+      --background: #f8f8f8;
+      --surface: #ffffff;
+      --error: #d32f2f;
+      --success: #388e3c;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--secondary);
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .logo img {
+      height: 60px;
+    }
+    
+    h1, h2, h3 {
+      color: var(--primary);
+      text-align: center;
+    }
+    
+    .card {
+      background-color: var(--surface);
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    
+    .card-header {
+      background-color: var(--primary);
+      color: white;
+      padding: 15px 20px;
+    }
+    
+    .card-header h2 {
+      margin: 0;
+      color: white;
+      font-size: 1.5rem;
+    }
+    
+    .card-content {
+      padding: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: background-color 0.3s;
+      width: 100%;
+    }
+    
+    button:hover {
+      background-color: var(--primary-light);
+    }
+    
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    #videoContainer {
+      width: 100%;
+      height: 600px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="/logo.png" alt="VecinoXpress Logo" onerror="this.src='https://via.placeholder.com/200x60/2d219b/ffffff?text=VecinoXpress'">
+    </div>
+    
+    <h1>Sesión de Certificación RON</h1>
+    <p class="text-center">Verificación de identidad y firma electrónica en línea</p>
+    
+    <!-- Pantalla inicial de acceso -->
+    <div id="access-screen" class="card">
+      <div class="card-header">
+        <h2>Ingresa a tu sesión</h2>
+      </div>
+      <div class="card-content">
+        <div class="form-group">
+          <label for="accessCode">Código de acceso RON</label>
+          <input type="text" id="accessCode" placeholder="Ejemplo: RON-12345">
+        </div>
+        <button id="joinButton" onclick="joinSession()">
+          <span id="joinButtonText">Ingresar a la sesión</span>
+          <span id="joinButtonLoading" class="loading hidden"></span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Pantalla de sesión activa (inicialmente oculta) -->
+    <div id="session-screen" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>Sesión RON en progreso</h2>
+        </div>
+        <div class="card-content">
+          <div id="videoContainer"></div>
+          
+          <div style="margin-top: 20px; text-align: center;">
+            <button onclick="endSession()" style="width: auto; background-color: var(--error);">Finalizar sesión</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Agora App Builder SDK -->
+  <script src="https://solutions-3.agora.io/tools_static/customization-api/latest/customization-api.bundle.js"></script>
+  
+  <script>
+    // Inicializar Agora Customization API
+    let customizationAPI = null;
+    let sessionId = null;
+    
+    // Función para unirse a la sesión RON
+    async function joinSession() {
+      const accessCodeInput = document.getElementById("accessCode").value.trim();
+      
+      if (!accessCodeInput || !accessCodeInput.startsWith("RON-")) {
+        alert("Por favor ingresa un código válido (formato: RON-XXXXX)");
+        return;
+      }
+      
+      // Mostrar indicador de carga
+      document.getElementById("joinButtonText").classList.add("hidden");
+      document.getElementById("joinButtonLoading").classList.remove("hidden");
+      document.getElementById("joinButton").disabled = true;
+      
+      try {
+        // Obtener configuración desde el servidor
+        sessionId = accessCodeInput;
+        
+        // Obtener configuración del API
+        const response = await fetch(`/api/ron/public/app-builder-config/${sessionId}`);
+        
+        if (!response.ok) {
+          throw new Error("No se pudo obtener la configuración para la sesión");
+        }
+        
+        const config = await response.json();
+        
+        if (!config.success) {
+          throw new Error(config.error || "Error al obtener configuración de la sesión");
+        }
+        
+        // Configurar Agora App Builder
+        customizationAPI = new AgoraCustomizationAPI({
+          // El elemento donde se montará la UI
+          mountDiv: document.getElementById("videoContainer"),
+          
+          // Configuración de la videollamada
+          config: {
+            // ID de la aplicación Agora
+            APP_ID: config.appId,
+            
+            // Configuración del canal
+            CHANNEL_NAME: config.channelName,
+            
+            // Rol del usuario (Host o Audience)
+            ROLE: config.role || "host",
+            
+            // Token de autenticación
+            TOKEN: config.token,
+            
+            // UID del usuario (opcional)
+            UID: config.uid,
+            
+            // Diseño de la videollamada
+            LAYOUT: config.layout || {
+              mode: "grid",
+              grid: {
+                max: 4
+              }
+            },
+            
+            // Permisos para los usuarios
+            USER_PERMISSIONS: {
+              LOCAL_USER: {
+                defaultPermission: "ADVANCED",
+                permissionsMap: ["video", "audio", "screenShare"]
+              },
+            },
+            
+            // Configuración de audio/video
+            AUDIO: true,
+            VIDEO: true,
+            
+            // Configuración de grabación
+            RECORDING: {
+              ENABLED: false
+            },
+            
+            // Configuración del chat
+            CHAT: false,
+            
+            // Ajustes de UI
+            UI_CONFIG: config.uiConfig || {
+              NAVBAR: {
+                LOGO: "VecinoXpress",
+                TITLE: "Sesión RON",
+                COLOR: "#2d219b"
+              },
+              THEME: {
+                PRIMARY_COLOR: "#2d219b",
+                SECONDARY_COLOR: "#4939c7",
+                BACKGROUND_COLOR: "#f8f8f8"
+              }
+            }
+          }
+        });
+        
+        // Iniciar la videollamada
+        await customizationAPI.launch();
+        
+        // Obtener información de la sesión
+        const sessionInfoResponse = await fetch(`/api/ron/public/session/${sessionId}`);
+        if (sessionInfoResponse.ok) {
+          const sessionInfo = await sessionInfoResponse.json();
+          console.log("Información de sesión RON:", sessionInfo);
+        }
+        
+        // Capturar eventos de la videollamada
+        customizationAPI.on("userJoined", (user) => {
+          console.log("Usuario unido:", user);
+        });
+        
+        customizationAPI.on("userLeft", (user) => {
+          console.log("Usuario salió:", user);
+        });
+        
+        // Cambiar a la pantalla de sesión
+        document.getElementById("access-screen").classList.add("hidden");
+        document.getElementById("session-screen").classList.remove("hidden");
+        
+      } catch (error) {
+        console.error("Error al unirse a la sesión:", error);
+        alert("Error al unirse a la sesión: " + error.message);
+        
+        // Restaurar botón
+        document.getElementById("joinButtonText").classList.remove("hidden");
+        document.getElementById("joinButtonLoading").classList.add("hidden");
+        document.getElementById("joinButton").disabled = false;
+      }
+    }
+    
+    // Finalizar sesión
+    async function endSession() {
+      if (customizationAPI) {
+        try {
+          // Destruir la instancia de Agora App Builder
+          await customizationAPI.destroy();
+          customizationAPI = null;
+          
+          // Volver a la pantalla de acceso
+          document.getElementById("session-screen").classList.add("hidden");
+          document.getElementById("access-screen").classList.remove("hidden");
+          
+          // Restaurar botón
+          document.getElementById("joinButtonText").classList.remove("hidden");
+          document.getElementById("joinButtonLoading").classList.add("hidden");
+          document.getElementById("joinButton").disabled = false;
+          
+          // Limpiar campos
+          document.getElementById("accessCode").value = "";
+          
+        } catch (error) {
+          console.error("Error al finalizar sesión:", error);
+          alert("Error al finalizar la sesión: " + error.message);
+        }
+      }
+    }
+    
+    // Manejar cierre de ventana
+    window.addEventListener("beforeunload", () => {
+      if (customizationAPI) {
+        customizationAPI.destroy();
+      }
+    });
+  </script>
+</body>
+</html>

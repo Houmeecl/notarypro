@@ -1,0 +1,42 @@
+{
+  "app": {
+    "name": "VecinoXpress NFC",
+    "version": "1.0.0",
+    "apiUrl": "https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev",
+    "initialPath": "/verificacion-nfc"
+  },
+  "nfc": {
+    "enabled": true,
+    "timeout": 60000,
+    "retryInterval": 1000,
+    "maxRetries": 3
+  },
+  "ui": {
+    "theme": {
+      "primaryColor": "#2d219b",
+      "secondaryColor": "#50e3c2",
+      "backgroundColor": "#ffffff",
+      "textColor": "#333333"
+    },
+    "logo": "assets/logo.png",
+    "splashScreen": {
+      "backgroundColor": "#2d219b",
+      "showSpinner": true,
+      "duration": 2000
+    }
+  },
+  "authentication": {
+    "defaultUser": "miadmin",
+    "defaultPassword": "miadmin123",
+    "tokenExpirationTime": 86400
+  },
+  "tablet": {
+    "orientation": "portrait",
+    "keepScreenOn": true,
+    "cameraPreference": "back"
+  },
+  "demo": {
+    "enabled": true,
+    "sampleDataPath": "sample/data.json"
+  }
+}

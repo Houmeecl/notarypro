@@ -1,0 +1,53 @@
+INSTRUCCIONES PARA INSTALACIÓN EN TABLET LENOVO
+=============================================
+
+CONTENIDO DEL PAQUETE:
+---------------------
+1. Carpeta config/ - Archivos de configuración
+2. Archivos de documentación (*.md) - Guías detalladas
+
+ALTERNATIVAS DE ACCESO:
+----------------------
+A. APK (VER INSTRUCCIONES EN CREAR_APK_LENOVO_TABLET.md)
+B. ACCESO DIRECTO WEB (MÉTODO RÁPIDO)
+
+INSTALACIÓN RÁPIDA (MÉTODO WEB):
+------------------
+**IMPORTANTE**: El método web tiene limitaciones con NFC en tablets Lenovo.
+Ver LIMITACIONES_WEB_NFC.md para los detalles.
+
+1. Abre Chrome en la tablet
+2. Ve a esta URL:
+   https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/nfc-validation
+3. Para diagnóstico, o a:
+   https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/verificacion-nfc
+4. Inicia sesión con:
+   Usuario: miadmin
+   Contraseña: miadmin123
+
+CONFIGURACIÓN NFC:
+-----------------
+1. Ve a Configuración > Conexiones > NFC
+2. Activa NFC
+3. Abre la aplicación VecinoXpress NFC
+4. Sigue las instrucciones en pantalla
+
+SOLUCIÓN DE PROBLEMAS:
+---------------------
+Si tienes problemas, consulta los archivos:
+- SOLUCIONAR_PROBLEMAS_NFC_LENOVO.md
+- VERIFICACION_NFC_TABLETS_LENOVO.md
+
+ACCESO DIRECTO EN PANTALLA DE INICIO:
+----------------------------------
+1. Abre Chrome y ve a la URL:
+   https://efad5f4d-d814-4e6d-886e-d786af273b3e-00-2ov6r7zg15uqi.riker.replit.dev/nfc-validation
+2. Toca el menú (tres puntos arriba a la derecha)
+3. Selecciona "Añadir a pantalla de inicio"
+4. Nombra el acceso directo "VecinoXpress NFC"
+5. Ahora tendrás un ícono en la pantalla principal
+
+SOPORTE:
+-------
+Para ayuda adicional, contacta a:
+soporte@vecinoxpress.cl

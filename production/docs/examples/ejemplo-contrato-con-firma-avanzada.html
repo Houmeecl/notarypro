@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contrato de Arrendamiento - Documento con Firma Avanzada</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    .document-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      border: 1px solid #eee;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+    .timestamp-bar {
+      background-color: #f8f9fa;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+      padding: 8px 15px;
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    .document-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .document-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .document-subtitle {
+      font-size: 16px;
+      color: #666;
+    }
+    .document-reference {
+      text-align: right;
+      margin-bottom: 20px;
+      color: #666;
+      font-size: 14px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #EC1C24;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+    .field {
+      margin-bottom: 15px;
+    }
+    .field-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+      font-weight: bold;
+    }
+    .field-value {
+      padding: 8px;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      border: 1px solid #eee;
+    }
+    .clause {
+      margin-bottom: 15px;
+    }
+    .clause-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .clause-content {
+      margin-left: 15px;
+    }
+    .advanced-seal {
+      border: 2px solid #EC1C24;
+      background-color: rgba(236, 28, 36, 0.05);
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+    }
+    .seal-icon {
+      width: 40px;
+      height: 40px;
+      margin-right: 15px;
+      color: #EC1C24;
+    }
+    .seal-text {
+      flex: 1;
+    }
+    .seal-text h4 {
+      margin: 0 0 5px 0;
+      color: #EC1C24;
+    }
+    .seal-text p {
+      margin: 0;
+      font-size: 12px;
+    }
+    .signature-area {
+      margin-top: 40px;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .signature-box {
+      width: 45%;
+      text-align: center;
+    }
+    .signature-line {
+      border-bottom: 1px solid #333;
+      padding-bottom: 10px;
+      margin-bottom: 5px;
+    }
+    .signature-name {
+      font-weight: bold;
+    }
+    .signature-rut {
+      font-size: 12px;
+      color: #666;
+    }
+    .signature-date {
+      font-size: 12px;
+      color: #666;
+      margin-top: 8px;
+    }
+    .qr-section {
+      margin-top: 40px;
+      border-top: 1px dashed #ccc;
+      padding-top: 20px;
+      display: flex;
+      align-items: center;
+    }
+    .qr-code {
+      width: 100px;
+      height: 100px;
+      margin-right: 20px;
+      background-color: #f9f9f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #eee;
+    }
+    .qr-text {
+      flex: 1;
+      font-size: 12px;
+    }
+    .verification-code {
+      font-weight: bold;
+      font-family: monospace;
+      background-color: #f9f9f9;
+      padding: 3px 8px;
+      border-radius: 3px;
+      border: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+  <div class="document-container">
+    <!-- Barra de estampa de tiempo -->
+    <div class="timestamp-bar">
+      Documento generado y firmado a través de NotaryPro · Estampa de tiempo: 01/05/2025 20:45:32 · 
+      Firma avanzada según Ley 19.799 sobre documentos electrónicos y firma electrónica
+    </div>
+    
+    <!-- Sello de firma avanzada -->
+    <div class="advanced-seal">
+      <div class="seal-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <div class="seal-text">
+        <h4>Firma Electrónica Avanzada</h4>
+        <p>Este documento ha sido firmado con firma electrónica avanzada según lo establecido en la Ley 19.799 de Chile, 
+        y cuenta con estampa de tiempo certificada y verificable. Validez legal equivalente a la firma manuscrita.</p>
+      </div>
+    </div>
+    
+    <!-- Encabezado del documento -->
+    <div class="document-header">
+      <div class="document-title">CONTRATO DE ARRENDAMIENTO DE INMUEBLE</div>
+      <div class="document-subtitle">Uso habitacional</div>
+    </div>
+    
+    <div class="document-reference">
+      Ref: CA-2025-05-1001<br>
+      Fecha: 01/05/2025
+    </div>
+    
+    <!-- Sección de partes contratantes -->
+    <div class="section">
+      <div class="section-title">PARTES CONTRATANTES</div>
+      
+      <div class="field">
+        <div class="field-label">ARRENDADOR:</div>
+        <div class="field-value">Carlos Alejandro Muñoz Soto</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">RUT ARRENDADOR:</div>
+        <div class="field-value">12.345.678-9</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">DIRECCIÓN ARRENDADOR:</div>
+        <div class="field-value">Av. Providencia 1500, Depto. 803, Providencia, Santiago</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">ARRENDATARIO:</div>
+        <div class="field-value">María Francisca González Pérez</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">RUT ARRENDATARIO:</div>
+        <div class="field-value">18.765.432-1</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">DIRECCIÓN ARRENDATARIO:</div>
+        <div class="field-value">Calle Los Laureles 456, Las Condes, Santiago</div>
+      </div>
+    </div>
+    
+    <!-- Sección de propiedad -->
+    <div class="section">
+      <div class="section-title">PROPIEDAD OBJETO DEL CONTRATO</div>
+      
+      <div class="field">
+        <div class="field-label">DIRECCIÓN DEL INMUEBLE:</div>
+        <div class="field-value">Calle San Ignacio 785, Depto. 504, Santiago Centro, Santiago</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">TIPO DE INMUEBLE:</div>
+        <div class="field-value">Departamento</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">SUPERFICIE (m²):</div>
+        <div class="field-value">65 m²</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">Nº DE DORMITORIOS:</div>
+        <div class="field-value">2</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">Nº DE BAÑOS:</div>
+        <div class="field-value">1</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">ESTACIONAMIENTO:</div>
+        <div class="field-value">Sí (1) - Nº 35</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">BODEGA:</div>
+        <div class="field-value">Sí - Nº 12</div>
+      </div>
+    </div>
+    
+    <!-- Sección de condiciones -->
+    <div class="section">
+      <div class="section-title">CONDICIONES ECONÓMICAS</div>
+      
+      <div class="field">
+        <div class="field-label">RENTA MENSUAL:</div>
+        <div class="field-value">$450.000 (cuatrocientos cincuenta mil pesos)</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">FECHA DE PAGO:</div>
+        <div class="field-value">Dentro de los primeros 5 días de cada mes</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">MÉTODO DE PAGO:</div>
+        <div class="field-value">Transferencia bancaria a Cuenta Corriente Nº 123456789, Banco Santander, a nombre de Carlos Alejandro Muñoz Soto, RUT 12.345.678-9</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">GARANTÍA:</div>
+        <div class="field-value">$450.000 (cuatrocientos cincuenta mil pesos) - Equivalente a 1 mes de renta</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">DURACIÓN DEL CONTRATO:</div>
+        <div class="field-value">12 meses</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">RENOVACIÓN:</div>
+        <div class="field-value">Automática por períodos de 12 meses, salvo aviso por escrito con 60 días de anticipación</div>
+      </div>
+    </div>
+    
+    <!-- Cláusulas -->
+    <div class="section">
+      <div class="section-title">CLÁUSULAS DEL CONTRATO</div>
+      
+      <div class="clause">
+        <div class="clause-title">PRIMERA: Objeto del Contrato</div>
+        <div class="clause-content">
+          El ARRENDADOR da en arrendamiento al ARRENDATARIO, y éste lo recibe para sí, el inmueble individualizado en el presente contrato, para ser destinado exclusivamente a vivienda del ARRENDATARIO y su familia.
+        </div>
+      </div>
+      
+      <div class="clause">
+        <div class="clause-title">SEGUNDA: Plazo del Contrato</div>
+        <div class="clause-content">
+          El presente contrato tendrá una duración de 12 meses, contados desde el 01 de Mayo de 2025 hasta el 30 de Abril de 2026. El contrato se renovará automáticamente por períodos iguales y sucesivos de 12 meses cada uno, a menos que alguna de las partes manifieste su intención de no perseverar en el contrato mediante aviso escrito enviado a la otra parte con una anticipación mínima de 60 días a la fecha de término del período original o de cualquiera de sus prórrogas.
+        </div>
+      </div>
+      
+      <div class="clause">
+        <div class="clause-title">TERCERA: Renta de Arrendamiento</div>
+        <div class="clause-content">
+          La renta mensual de arrendamiento será la suma de $450.000 (cuatrocientos cincuenta mil pesos), que se pagará por mes anticipado dentro de los primeros 5 días de cada mes, mediante transferencia bancaria a la cuenta indicada del ARRENDADOR. La renta de arrendamiento no incluye gastos comunes ni consumos básicos, los cuales serán de cargo exclusivo del ARRENDATARIO.
+        </div>
+      </div>
+      
+      <div class="clause">
+        <div class="clause-title">CUARTA: Garantía</div>
+        <div class="clause-content">
+          El ARRENDATARIO entrega en este acto al ARRENDADOR la suma de $450.000 (cuatrocientos cincuenta mil pesos) en garantía del fiel cumplimiento de las obligaciones del presente contrato, especialmente para responder de los deterioros que se produzcan en el inmueble y sus servicios, de los perjuicios que se causen al edificio o a los vecinos, de los gastos por reparaciones que sean de cargo del ARRENDATARIO, y del pago de los servicios de electricidad, agua, gas, y otros. Esta garantía será devuelta al ARRENDATARIO al término del contrato, una vez que haya acreditado el cumplimiento íntegro de sus obligaciones.
+        </div>
+      </div>
+      
+      <div class="clause">
+        <div class="clause-title">QUINTA: Estado de Recepción del Inmueble</div>
+        <div class="clause-content">
+          El ARRENDATARIO declara recibir el inmueble en óptimas condiciones de habitabilidad, con todos sus artefactos, instalaciones y accesorios funcionando correctamente, y se obliga a restituirlo en el mismo estado al término del contrato, habida consideración del desgaste producido por el uso legítimo.
+        </div>
+      </div>
+    </div>
+    
+    <!-- Firmas -->
+    <div class="signature-area">
+      <div class="signature-box">
+        <div class="signature-line">Firma Digital Avanzada</div>
+        <div class="signature-name">Carlos Alejandro Muñoz Soto</div>
+        <div class="signature-rut">RUT: 12.345.678-9</div>
+        <div class="signature-date">Fecha: 01/05/2025 20:45:32</div>
+      </div>
+      
+      <div class="signature-box">
+        <div class="signature-line">Firma Digital Avanzada</div>
+        <div class="signature-name">María Francisca González Pérez</div>
+        <div class="signature-rut">RUT: 18.765.432-1</div>
+        <div class="signature-date">Fecha: 01/05/2025 20:45:32</div>
+      </div>
+    </div>
+    
+    <!-- Sección de verificación -->
+    <div class="qr-section">
+      <div class="qr-code">
+        <!-- Aquí iría un código QR real generado con los datos del documento -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 40 40">
+          <path fill="#000000" d="M1,1h7v7h-7zM10,1h1v1h-1zM12,1h3v1h-3zM16,1h2v4h-1v-3h-1zM19,1h1v1h-1zM21,1h1v1h-1zM24,1h1v2h-1zM27,1h2v1h-2zM30,1h1v1h-1zM32,1h7v7h-7zM2,2v5h5v-5zM12,2h1v4h-1zM14,2h1v2h-1zM20,2h1v4h-1zM23,2h1v1h-1zM26,2h1v1h-1zM28,2h1v1h-1zM33,2v5h5v-5zM3,3h3v3h-3zM9,3h1v1h-1zM22,3h1v1h-1zM25,3h1v3h-1zM34,3h3v3h-3zM9,4h2v1h-2zM15,4h1v1h-1zM21,4h1v1h-1zM26,4h1v2h-1zM29,4h1v1h-1zM9,5h1v1h-1zM11,5h1v1h-1zM16,5h3v1h-3zM21,5h2v1h-2zM27,5h2v1h-2zM9,6h1v3h-1zM11,6h1v1h-1zM13,6h3v1h-3zM18,6h1v2h-1zM21,6h1v2h-1zM24,6h1v1h-1zM27,6h1v2h-1zM30,6h1v1h-1zM1,9h1v3h-1zM3,9h1v1h-1zM6,9h1v1h-1zM10,9h1v1h-1zM15,9h1v1h-1zM19,9h1v1h-1zM22,9h1v1h-1zM24,9h1v1h-1zM29,9h1v1h-1zM32,9h2v1h-2zM36,9h1v3h-1zM38,9h1v1h-1zM2,10h1v1h-1zM4,10h2v1h-2zM8,10h1v1h-1zM11,10h1v2h-1zM13,10h1v2h-1zM17,10h1v3h-1zM20,10h1v1h-1zM25,10h2v1h-2zM28,10h1v2h-1zM30,10h1v3h-1zM34,10h1v1h-1zM37,10h1v1h-1zM3,11h1v1h-1zM7,11h1v2h-1zM15,11h1v1h-1zM19,11h1v1h-1zM21,11h3v1h-3zM26,11h1v1h-1zM31,11h3v1h-3zM35,11h1v1h-1zM38,11h1v1h-1zM1,12h1v1h-1zM4,12h2v1h-2zM9,12h1v1h-1zM12,12h1v2h-1zM15,12h1v1h-1zM18,12h1v1h-1zM20,12h1v2h-1zM25,12h1v2h-1zM27,12h1v1h-1zM32,12h1v1h-1zM34,12h1v1h-1zM37,12h1v1h-1zM2,13h1v1h-1zM5,13h2v1h-2zM8,13h1v1h-1zM14,13h1v4h-1zM16,13h1v2h-1zM19,13h1v1h-1zM22,13h1v3h-1zM26,13h1v1h-1zM29,13h1v1h-1zM31,13h1v2h-1zM33,13h1v2h-1zM35,13h1v1h-1zM38,13h1v1h-1zM1,14h1v1h-1zM3,14h1v1h-1zM6,14h1v2h-1zM9,14h2v1h-2zM18,14h1v1h-1zM24,14h1v1h-1zM27,14h1v1h-1zM36,14h1v1h-1zM2,15h1v1h-1zM4,15h1v1h-1zM7,15h2v1h-2zM10,15h1v1h-1zM13,15h1v4h-1zM15,15h1v1h-1zM17,15h1v2h-1zM19,15h1v1h-1zM23,15h1v1h-1zM25,15h2v2h-1v-1h-1zM28,15h2v2h-1v-1h-1zM32,15h1v1h-1zM34,15h1v1h-1zM38,15h1v1h-1zM1,16h7v1h-7zM10,16h1v1h-1zM12,16h1v3h-1zM16,16h1v3h-1zM19,16h1v3h-1zM21,16h1v1h-1zM23,16h1v3h-1zM30,16h1v1h-1zM33,16h1v1h-1zM35,16h1v1h-1zM37,16h1v1h-1zM10,17h1v1h-1zM18,17h1v1h-1zM20,17h1v2h-1zM27,17h1v2h-1zM31,17h2v2h-1v-1h-1zM34,17h1v1h-1zM36,17h1v1h-1zM38,17h1v1h-1zM1,19h1v1h-1zM3,19h1v2h-1zM5,19h1v1h-1zM9,19h1v1h-1zM11,19h1v1h-1zM22,19h1v2h-1zM24,19h1v1h-1zM26,19h1v1h-1zM28,19h2v1h-2zM34,19h1v1h-1zM37,19h1v1h-1zM2,20h1v1h-1zM6,20h3v1h-3zM10,20h1v1h-1zM13,20h3v1h-3zM17,20h2v1h-2zM21,20h1v1h-1zM23,20h1v3h-1zM27,20h1v2h-1zM29,20h1v1h-1zM31,20h1v1h-1zM33,20h1v1h-1zM35,20h1v1h-1zM38,20h1v1h-1zM1,21h1v1h-1zM4,21h1v1h-1zM7,21h2v2h-2zM10,21h1v1h-1zM12,21h1v2h-1zM15,21h2v1h-2zM18,21h1v1h-1zM20,21h1v1h-1zM25,21h1v2h-1zM28,21h1v1h-1zM30,21h1v1h-1zM32,21h1v1h-1zM34,21h1v1h-1zM36,21h1v1h-1zM2,22h2v1h-2zM5,22h1v1h-1zM9,22h1v1h-1zM13,22h1v1h-1zM16,22h1v1h-1zM19,22h1v1h-1zM21,22h1v1h-1zM26,22h1v1h-1zM29,22h1v1h-1zM31,22h1v1h-1zM33,22h1v1h-1zM35,22h1v1h-1zM37,22h1v1h-1zM1,23h1v1h-1zM6,23h1v1h-1zM10,23h1v1h-1zM14,23h1v1h-1zM17,23h1v1h-1zM20,23h1v1h-1zM24,23h1v2h-1zM27,23h1v1h-1zM30,23h1v2h-1zM32,23h2v1h-2zM36,23h1v1h-1zM38,23h1v2h-1zM3,24h1v2h-1zM5,24h1v2h-1zM9,24h1v1h-1zM11,24h1v1h-1zM13,24h1v3h-1zM16,24h1v2h-1zM18,24h1v2h-1zM21,24h1v1h-1zM25,24h2v2h-1v-1h-1zM28,24h1v3h-1zM31,24h1v1h-1zM33,24h1v2h-1zM35,24h1v1h-1zM37,24h1v1h-1zM1,25h1v1h-1zM4,25h1v1h-1zM8,25h1v1h-1zM10,25h2v1h-2zM15,25h1v1h-1zM20,25h1v1h-1zM22,25h1v1h-1zM27,25h1v1h-1zM29,25h1v1h-1zM31,25h1v1h-1zM36,25h1v1h-1zM2,26h1v2h-1zM6,26h1v1h-1zM8,26h2v2h-1v-1h-1zM14,26h1v1h-1zM17,26h1v1h-1zM19,26h1v1h-1zM22,26h1v1h-1zM24,26h1v1h-1zM26,26h1v1h-1zM30,26h1v1h-1zM32,26h1v1h-1zM34,26h2v3h-1v-2h-1zM38,26h1v1h-1zM4,27h1v1h-1zM7,27h1v1h-1zM10,27h1v1h-1zM14,27h1v2h-1zM16,27h1v3h-1zM18,27h1v1h-1zM20,27h1v1h-1zM23,27h1v2h-1zM25,27h1v1h-1zM29,27h1v1h-1zM33,27h1v2h-1zM37,27h1v1h-1zM1,28h1v1h-1zM3,28h2v1h-2zM6,28h1v1h-1zM9,28h1v1h-1zM11,28h2v1h-2zM17,28h1v1h-1zM21,28h1v1h-1zM24,28h1v1h-1zM26,28h1v3h-1zM30,28h2v2h-1v-1h-1zM32,28h1v2h-1zM36,28h1v1h-1zM38,28h1v1h-1zM5,29h1v2h-1zM8,29h1v1h-1zM10,29h1v1h-1zM15,29h1v1h-1zM19,29h1v1h-1zM22,29h1v1h-1zM25,29h1v1h-1zM27,29h1v2h-1zM29,29h1v1h-1zM35,29h1v1h-1zM37,29h1v1h-1zM1,30h1v1h-1zM3,30h1v1h-1zM6,30h1v1h-1zM9,30h1v1h-1zM11,30h1v2h-1zM13,30h1v1h-1zM17,30h1v1h-1zM20,30h2v1h-2zM24,30h1v1h-1zM28,30h1v1h-1zM34,30h1v1h-1zM36,30h1v1h-1zM38,30h1v1h-1zM2,31h1v1h-1zM4,31h1v1h-1zM7,31h1v1h-1zM10,31h1v1h-1zM14,31h1v1h-1zM16,31h1v4h-1zM18,31h1v1h-1zM21,31h1v2h-1zM23,31h1v1h-1zM25,31h1v2h-1zM29,31h1v2h-1zM31,31h1v1h-1zM33,31h1v2h-1zM35,31h1v2h-1zM1,32h7v7h-7zM12,32h1v3h-1zM17,32h1v1h-1zM19,32h1v2h-1zM24,32h1v1h-1zM26,32h1v1h-1zM28,32h1v1h-1zM30,32h1v1h-1zM32,32h1v4h-1zM36,32h1v1h-1zM38,32h1v1h-1zM2,33v5h5v-5zM9,33h1v1h-1zM11,33h1v1h-1zM14,33h1v1h-1zM18,33h1v2h-1zM22,33h1v2h-1zM27,33h1v1h-1zM30,33h1v1h-1zM34,33h1v1h-1zM37,33h2v1h-2zM3,34h3v3h-3zM9,34h1v1h-1zM13,34h1v3h-1zM15,34h1v2h-1zM17,34h1v1h-1zM20,34h1v1h-1zM24,34h1v1h-1zM26,34h1v2h-1zM28,34h1v1h-1zM31,34h1v1h-1zM36,34h1v1h-1zM38,34h1v1h-1zM9,35h1v1h-1zM11,35h2v1h-2zM14,35h1v1h-1zM21,35h1v1h-1zM23,35h1v1h-1zM25,35h1v2h-1zM27,35h1v1h-1zM29,35h1v1h-1zM33,35h1v1h-1zM35,35h1v1h-1zM37,35h1v1h-1zM9,36h1v1h-1zM17,36h2v1h-2zM20,36h1v2h-1zM22,36h1v1h-1zM24,36h1v2h-1zM28,36h1v2h-1zM30,36h1v1h-1zM34,36h1v1h-1zM36,36h1v1h-1zM38,36h1v1h-1zM9,37h1v1h-1zM14,37h1v1h-1zM18,37h1v1h-1zM21,37h1v1h-1zM23,37h1v1h-1zM26,37h1v1h-1zM29,37h1v1h-1zM31,37h1v1h-1zM33,37h1v1h-1zM35,37h1v1h-1zM37,37h1v1h-1zM11,38h1v1h-1zM13,38h3v1h-3zM17,38h1v1h-1zM19,38h1v1h-1zM22,38h1v1h-1zM25,38h1v1h-1zM27,38h1v1h-1zM30,38h1v1h-1zM32,38h1v1h-1zM34,38h1v1h-1zM36,38h1v1h-1zM38,38h1v1h-1z"/>
+        </svg>
+      </div>
+      <div class="qr-text">
+        <p>Verifique la autenticidad de este documento escaneando el código QR o ingresando el siguiente código de verificación en <strong>https://www.notarypro.cl/verificar-documento</strong></p>
+        <p>Código de verificación: <span class="verification-code">CDF-001235-JX7B9K2L</span></p>
+        <p>Este documento fue firmado electrónicamente el 01/05/2025 a las 20:45:32 hrs. mediante firma electrónica avanzada, 
+        conforme a la Ley 19.799 sobre documentos electrónicos y firma electrónica.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -774,6 +774,66 @@ function Router() {
         );
       }} />
 
+      {/* Sistema RON con Jitsi Meet */}
+      <Route path="/ron-jitsi/:sessionId" component={() => {
+        const RonJitsiSession = React.lazy(() => import("@/pages/ron-jitsi-session"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback message="Cargando sesión RON con Jitsi..." />}>
+            <RonJitsiSession />
+          </Suspense>
+        );
+      }} />
+
+      {/* Acceso de cliente RON con código */}
+      <Route path="/ron-client-access/:code?" component={() => {
+        const RonClientAccess = React.lazy(() => import("@/pages/ron-client-access"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback message="Validando código de acceso..." />}>
+            <RonClientAccess />
+          </Suspense>
+        );
+      }} />
+
+      {/* Generar código de cliente RON */}
+      <Route path="/ron-generate-client-code" component={() => {
+        const RonGenerateClientCode = React.lazy(() => import("@/pages/ron-generate-client-code"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback message="Cargando generador de códigos..." />}>
+            <RonGenerateClientCode />
+          </Suspense>
+        );
+      }} />
+
+      {/* Verificación de identidad */}
+      <Route path="/identity-verification" component={() => {
+        const IdentityVerification = React.lazy(() => import("@/pages/identity-verification"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback message="Cargando verificación de identidad..." />}>
+            <IdentityVerification />
+          </Suspense>
+        );
+      }} />
+
+      {/* Sesión colaborativa certificador-cliente */}
+      <Route path="/session/:sessionId" component={() => {
+        const CertifierClientSession = React.lazy(() => import("@/pages/certifier-client-session"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback message="Cargando sesión colaborativa..." />}>
+            <CertifierClientSession />
+          </Suspense>
+        );
+      }} />
+
+      {/* Vista preliminar de documento */}
+      <Route path="/document-preview/:documentId" component={() => {
+        const DocumentPreview = React.lazy(() => import("@/pages/document-preview"));
+        return (
+          <Suspense fallback={<LazyLoadingFallback message="Cargando vista preliminar..." />}>
+            <DocumentPreview />
+          </Suspense>
+        );
+      }} />
+
       {/* Ayuda Legal */}
       <ProtectedRoute 
         path="/ayuda-legal" 

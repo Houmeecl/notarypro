@@ -4,13 +4,18 @@
     "moduleResolution": "Node",
     "target": "ES2020",
     "outDir": "dist",
-    "rootDir": "server",
+    "rootDir": ".",
     "noEmit": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "strict": true,
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["shared/*"]
+    },
+    "skipLibCheck": true
   },
-  "include": ["server/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["server/**/*", "shared/**/*"],
+  "exclude": ["node_modules", "client/**/*"]
 }

@@ -426,7 +426,7 @@ const BadgeCard: React.FC<BadgeCardProps> = ({ userBadge }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="overflow-hidden border-border hover:shadow-md transition-shadow duration-300">
+      <Card className="overflow-hidden border hover:shadow-md transition-shadow duration-300">
         <CardHeader className="p-4 pb-0">
           <div className="flex justify-between items-start">
             <div>

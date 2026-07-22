@@ -1,0 +1,69 @@
+{
+  "readers": [
+    {
+      "model": "Lenovo Tab M10",
+      "position": "central",
+      "nfcAntennaPosition": "center-back",
+      "compatibilityNotes": "Funciona mejor con cédulas chilenas nuevas",
+      "recommendedDistance": "0-2cm"
+    },
+    {
+      "model": "Lenovo Tab P11",
+      "position": "top",
+      "nfcAntennaPosition": "top-back near camera",
+      "compatibilityNotes": "Buena compatibilidad con todos los tipos de cédulas",
+      "recommendedDistance": "0-3cm"
+    },
+    {
+      "model": "Lenovo Yoga Tab",
+      "position": "logo",
+      "nfcAntennaPosition": "near Lenovo logo on back",
+      "compatibilityNotes": "Puede requerir posicionamiento exacto",
+      "recommendedDistance": "0-1cm"
+    },
+    {
+      "model": "Generic Lenovo Tablet",
+      "position": "multiple",
+      "nfcAntennaPosition": "try various positions on back",
+      "compatibilityNotes": "Probar diferentes posiciones en la parte trasera",
+      "recommendedDistance": "0-2cm"
+    }
+  ],
+  "troubleshooting": {
+    "noDetection": [
+      "Verificar que NFC esté activado en Configuración",
+      "Reiniciar la tablet",
+      "Quitar fundas o protectores",
+      "Probar con otras tarjetas NFC"
+    ],
+    "inconsistentReading": [
+      "Mantener la tarjeta inmóvil durante la lectura",
+      "Evitar superficies metálicas",
+      "Cargar la batería por encima del 15%",
+      "Desactivar Bluetooth temporalmente"
+    ],
+    "errorMessages": {
+      "TAG_LOST": "La tarjeta se movió durante la lectura",
+      "TIMEOUT": "Tiempo de espera agotado, intentar nuevamente",
+      "NOT_SUPPORTED": "Este tipo de tarjeta no es compatible",
+      "IO_ERROR": "Error de comunicación, reintentar"
+    }
+  },
+  "compatibleCards": [
+    {
+      "type": "Cédula de identidad chilena",
+      "description": "Cédulas nuevas con chip NFC",
+      "compatibility": "alta"
+    },
+    {
+      "type": "Tarjetas bancarias",
+      "description": "Tarjetas con tecnología NFC/contactless",
+      "compatibility": "media"
+    },
+    {
+      "type": "Tarjetas de transporte",
+      "description": "Bip, TNE y similares",
+      "compatibility": "alta"
+    }
+  ]
+}

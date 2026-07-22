@@ -1,0 +1,21 @@
+[Unit]
+Description=NotaryVecino - Sistema de Notarización Digital
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/workspace/production
+ExecStart=/usr/bin/node dist/index.js
+Restart=always
+RestartSec=10
+Environment=NODE_ENV=production
+EnvironmentFile=/workspace/production/.env.production
+
+# Logging
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=notaryvecino
+
+[Install]
+WantedBy=multi-user.target

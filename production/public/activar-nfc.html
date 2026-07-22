@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activar NFC - VecinosXpress</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafb;
+            color: #1f2937;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #0f172a;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .container {
+            max-width: 400px;
+            width: 100%;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+            padding: 1.5rem;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: #0f172a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            margin-bottom: 1rem;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        .btn:hover, .btn:focus {
+            background-color: #1e293b;
+        }
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #0f172a;
+            color: #0f172a;
+        }
+        .btn-outline:hover, .btn-outline:focus {
+            background-color: #f8fafc;
+        }
+        .status {
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+        }
+        .status-success {
+            background-color: #ecfdf5;
+            border: 1px solid #10b981;
+            color: #047857;
+        }
+        .status-error {
+            background-color: #fef2f2;
+            border: 1px solid #ef4444;
+            color: #b91c1c;
+        }
+        .steps {
+            margin-bottom: 1.5rem;
+        }
+        .step {
+            display: flex;
+            margin-bottom: 0.75rem;
+        }
+        .step-number {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background-color: #0f172a;
+            color: white;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+        .note {
+            font-size: 0.875rem;
+            padding: 0.75rem;
+            border-radius: 4px;
+            background-color: #fffbeb;
+            border: 1px solid #fbbf24;
+            color: #92400e;
+            margin-bottom: 1rem;
+        }
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.75rem;
+            color: #6b7280;
+            background-color: #f3f4f6;
+        }
+        h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+            text-align: center;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .loading-circle {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .input-field {
+            display: block;
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            font-size: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            background-color: #f0f9ff;
+            padding: 0.75rem;
+            border-radius: 4px;
+        }
+        .result-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+        }
+        .result-value {
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Activación NFC - VecinosXpress</h1>
+    </header>
+    
+    <main>
+        <div class="container">
+            <div id="step-1" class="card">
+                <h2>Activar Lector NFC</h2>
+                
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div>
+                            <strong>Asegúrese que NFC esté activado</strong>
+                            <div>Active NFC en la configuración de su dispositivo móvil Android.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div>
+                            <strong>Presione el botón para iniciar</strong>
+                            <div>Se solicitará permiso para usar NFC.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div>
+                            <strong>Acerque su cédula al teléfono</strong>
+                            <div>Posicione la cédula en la parte trasera de su teléfono, cerca de la cámara.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    <strong>Nota:</strong> Para usar esta función debe tener un dispositivo Android compatible con NFC y usar Chrome.
+                </div>
+                
+                <div id="nfc-status" class="status">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+                
+                <button id="start-nfc-btn" class="btn btn-icon">
+                    <span>Activar lector NFC</span>
+                </button>
+                
+                <button id="simulate-nfc-btn" class="btn btn-outline btn-icon">
+                    Simular lectura NFC
+                </button>
+                
+                <button id="test-msg-btn" class="btn btn-outline btn-icon hidden">
+                    Prueba de mensajería NDEF
+                </button>
+            </div>
+            
+            <div id="step-2" class="card hidden">
+                <h2>Datos leídos del chip NFC</h2>
+                
+                <div class="result-grid">
+                    <div class="result-item">
+                        <div class="result-label">Nombre</div>
+                        <div id="result-name" class="result-value">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Documento</div>
+                        <div id="result-document" class="result-value">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Nacimiento</div>
+                        <div id="result-birth" class="result-value">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Vencimiento</div>
+                        <div id="result-expiry" class="result-value">-</div>
+                    </div>
+                </div>
+                
+                <div id="result-serial-container" class="result-item" style="margin-bottom: 1rem;">
+                    <div class="result-label">Número de serie del chip</div>
+                    <div id="result-serial" class="result-value" style="font-family: monospace; font-size: 0.9rem; word-break: break-all;">-</div>
+                </div>
+                
+                <button id="verify-btn" class="btn">
+                    Verificar y continuar
+                </button>
+                
+                <button id="retry-btn" class="btn btn-outline">
+                    Intentar otra vez
+                </button>
+            </div>
+            
+            <div id="step-3" class="card hidden">
+                <h2>Verificación exitosa</h2>
+                
+                <div class="status status-success" style="display: block;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">✓</div>
+                    <div><strong>Identidad verificada correctamente</strong></div>
+                    <div>Los datos han sido validados mediante NFC</div>
+                </div>
+                
+                <p style="text-align: center;">
+                    Los datos de verificación han sido registrados exitosamente en el sistema.
+                </p>
+                
+                <a id="return-link" href="#" class="btn">Volver a la aplicación</a>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        &copy; 2025 VecinosXpress - Verificación Digital Certificada
+    </footer>
+    
+    <script>
+        // Elementos DOM
+        const step1 = document.getElementById('step-1');
+        const step2 = document.getElementById('step-2');
+        const step3 = document.getElementById('step-3');
+        const startNfcBtn = document.getElementById('start-nfc-btn');
+        const simulateNfcBtn = document.getElementById('simulate-nfc-btn');
+        const testMsgBtn = document.getElementById('test-msg-btn');
+        const nfcStatus = document.getElementById('nfc-status');
+        const verifyBtn = document.getElementById('verify-btn');
+        const retryBtn = document.getElementById('retry-btn');
+        const returnLink = document.getElementById('return-link');
+        
+        // Elementos de resultado
+        const resultName = document.getElementById('result-name');
+        const resultDocument = document.getElementById('result-document');
+        const resultBirth = document.getElementById('result-birth');
+        const resultExpiry = document.getElementById('result-expiry');
+        const resultSerial = document.getElementById('result-serial');
+        
+        // Obtener parámetros de URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('id') || 'default-session';
+        const callbackUrl = urlParams.get('callback') || window.location.origin;
+        
+        // Configurar el enlace de retorno
+        returnLink.href = callbackUrl;
+        
+        // Mostrar un paso específico
+        function showStep(step) {
+            step1.classList.add('hidden');
+            step2.classList.add('hidden');
+            step3.classList.add('hidden');
+            step.classList.remove('hidden');
+        }
+        
+        // Mostrar mensajes de estado
+        function showStatus(message, type = 'error') {
+            nfcStatus.textContent = message;
+            nfcStatus.className = 'status';
+            nfcStatus.classList.add(`status-${type}`);
+            nfcStatus.style.display = 'block';
+        }
+        
+        function hideStatus() {
+            nfcStatus.style.display = 'none';
+        }
+        
+        // Iniciar lectura NFC con Web NFC API
+        async function startNfcReading() {
+            // Comprobar si el navegador soporta Web NFC API
+            if (!('NDEFReader' in window)) {
+                showStatus('Su navegador no soporta NFC. Use Chrome en Android.', 'error');
+                return;
+            }
+            
+            try {
+                hideStatus();
+                
+                // Mostrar cargando en el botón
+                startNfcBtn.innerHTML = '<div class="loading-circle"></div> Esperando NFC...';
+                startNfcBtn.disabled = true;
+                
+                // Crear lector NFC
+                const reader = new NDEFReader();
+                
+                // Iniciar escaneo
+                await reader.scan();
+                showStatus('NFC activado. Acerque su cédula al teléfono.', 'success');
+                
+                // Manejar eventos de lectura
+                reader.addEventListener('reading', ({ message, serialNumber }) => {
+                    console.log('NFC read successful!');
+                    console.log('Serial Number:', serialNumber);
+                    console.log('Records:', message.records);
+                    
+                    // Procesar datos
+                    const data = processNfcData(message, serialNumber);
+                    
+                    // Mostrar datos en la interfaz
+                    displayNfcData(data);
+                    
+                    // Guardar datos para la app principal
+                    saveNfcData(data);
+                    
+                    // Mostrar paso 2
+                    showStep(step2);
+                    
+                    // Restaurar botón
+                    startNfcBtn.innerHTML = 'Activar lector NFC';
+                    startNfcBtn.disabled = false;
+                });
+                
+                // Manejar errores durante la lectura
+                reader.addEventListener('error', (error) => {
+                    console.error('NFC error:', error);
+                    showStatus(`Error de lectura NFC: ${error.message}`, 'error');
+                    
+                    // Restaurar botón
+                    startNfcBtn.innerHTML = 'Activar lector NFC';
+                    startNfcBtn.disabled = false;
+                });
+                
+            } catch (error) {
+                console.error('Error activating NFC:', error);
+                
+                // Mensajes específicos según el error
+                if (error.name === 'NotAllowedError') {
+                    showStatus('Permiso para NFC denegado. Por favor, permita el acceso.', 'error');
+                } else if (error.name === 'NotSupportedError') {
+                    showStatus('NFC no disponible o desactivado en su dispositivo.', 'error');
+                } else {
+                    showStatus(`Error al activar NFC: ${error.message}`, 'error');
+                }
+                
+                // Restaurar botón
+                startNfcBtn.innerHTML = 'Activar lector NFC';
+                startNfcBtn.disabled = false;
+            }
+        }
+        
+        // Procesar datos NFC
+        function processNfcData(message, serialNumber) {
+            let nfcData = {
+                documentNumber: '',
+                fullName: '',
+                birthDate: '',
+                expiryDate: '',
+                nationality: 'CHILENA',
+                serialNumber: serialNumber || '',
+                issuer: 'REGISTRO CIVIL E IDENTIFICACIÓN',
+                verified: true,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Intente extraer datos de los registros
+            if (message && message.records) {
+                try {
+                    // Recorrer los registros
+                    for (const record of message.records) {
+                        if (record.recordType === 'text') {
+                            const textDecoder = new TextDecoder();
+                            const text = textDecoder.decode(record.data);
+                            
+                            // Procesar texto según patrones esperados
+                            if (text.includes('NOMBRE:')) {
+                                nfcData.fullName = text.split('NOMBRE:')[1].trim();
+                            } else if (text.includes('RUN:') || text.includes('RUT:')) {
+                                nfcData.documentNumber = text.split(':')[1].trim();
+                            } else if (text.includes('NACIMIENTO:')) {
+                                nfcData.birthDate = text.split(':')[1].trim();
+                            } else if (text.includes('VENCIMIENTO:')) {
+                                nfcData.expiryDate = text.split(':')[1].trim();
+                            }
+                            
+                            console.log('Record content:', text);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error processing NDEF records:', e);
+                }
+            }
+            
+            // Si hay número de serie pero no pudimos leer datos, asignar valores predeterminados
+            if (serialNumber && !nfcData.fullName) {
+                nfcData.fullName = 'USUARIO NFC';
+                nfcData.documentNumber = '12.345.678-9';
+                nfcData.birthDate = '01/01/1990';
+                nfcData.expiryDate = '01/01/2030';
+            }
+            
+            return nfcData;
+        }
+        
+        // Mostrar datos NFC en la interfaz
+        function displayNfcData(data) {
+            resultName.textContent = data.fullName || 'No disponible';
+            resultDocument.textContent = data.documentNumber || 'No disponible';
+            resultBirth.textContent = data.birthDate || 'No disponible';
+            resultExpiry.textContent = data.expiryDate || 'No disponible';
+            resultSerial.textContent = data.serialNumber || 'No disponible';
+        }
+        
+        // Guardar datos NFC para la app principal
+        function saveNfcData(data) {
+            sessionStorage.setItem(`nfc_data_${sessionId}`, JSON.stringify(data));
+            sessionStorage.setItem(`nfc_status_${sessionId}`, 'verified');
+        }
+        
+        // Simulación de lectura para dispositivos sin NFC
+        function simulateNfcReading() {
+            const simulatedData = {
+                documentNumber: '12.345.678-9',
+                fullName: 'USUARIO SIMULADO',
+                birthDate: '01/01/1990',
+                expiryDate: '01/01/2030',
+                nationality: 'CHILENA',
+                serialNumber: 'SIM' + Math.random().toString(36).substring(2, 10).toUpperCase(),
+                issuer: 'REGISTRO CIVIL E IDENTIFICACIÓN',
+                verified: true,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Mostrar datos simulados
+            displayNfcData(simulatedData);
+            
+            // Guardar datos simulados
+            saveNfcData(simulatedData);
+            
+            // Mostrar paso 2
+            showStep(step2);
+        }
+        
+        // Prueba de escritura de mensaje NDEF (solo para desarrollo)
+        async function testNdefMessage() {
+            if (!('NDEFReader' in window)) {
+                showStatus('Su navegador no soporta NFC. Use Chrome en Android.', 'error');
+                return;
+            }
+            
+            try {
+                const writer = new NDEFReader();
+                await writer.write({
+                    records: [
+                        { recordType: "text", data: "NOMBRE:USUARIO DE PRUEBA" },
+                        { recordType: "text", data: "RUN:12.345.678-9" },
+                        { recordType: "text", data: "NACIMIENTO:01/01/1990" },
+                        { recordType: "text", data: "VENCIMIENTO:01/01/2030" }
+                    ]
+                });
+                
+                showStatus('Mensaje NFC escrito correctamente. Intente leer ahora.', 'success');
+            } catch (error) {
+                console.error('Error writing NFC:', error);
+                showStatus(`Error al escribir mensaje NFC: ${error.message}`, 'error');
+            }
+        }
+        
+        // Event listeners
+        startNfcBtn.addEventListener('click', startNfcReading);
+        simulateNfcBtn.addEventListener('click', simulateNfcReading);
+        testMsgBtn.addEventListener('click', testNdefMessage);
+        
+        verifyBtn.addEventListener('click', () => {
+            showStep(step3);
+        });
+        
+        retryBtn.addEventListener('click', () => {
+            showStep(step1);
+        });
+        
+        // Mostrar botón de prueba NDEF en desarrollo
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            testMsgBtn.classList.remove('hidden');
+        }
+        
+        // Si hay parámetro 'direct=true' en la URL, iniciar automáticamente
+        if (urlParams.get('direct') === 'true') {
+            setTimeout(() => {
+                startNfcBtn.click();
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

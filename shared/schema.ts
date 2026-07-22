@@ -32,7 +32,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   email: text("email").notNull().unique(),
   fullName: text("full_name").notNull(),
-  role: text("role").notNull().default("user"), // user, certifier, admin, lawyer, notary, partner
+  role: text("role").notNull().default("user"), // user, certifier, admin, lawyer, notary, partner, pos-user, operator
   platform: text("platform").default("notarypro"), // notarypro, vecinos
   businessName: text("business_name"), // For partners
   address: text("address"),
