@@ -45,32 +45,24 @@ export function generateSignatureData(userId: number, documentId: number, verifi
 /**
  * Genera un código QR en formato SVG para un código de verificación
  * @param verificationCode Código de verificación
- * @returns String con el SVG del código QR
+ * @returns Promise<string> con el SVG del código QR
  */
-export function generateQRCodeSVG(verificationCode: string): string {
+export async function generateQRCodeSVG(verificationCode: string): Promise<string> {
   try {
     // URL de verificación
     const verificationUrl = `https://www.cerfidoc.cl/verificar-documento/${verificationCode}`;
     
-    // Generar el código QR como SVG de forma sincrónica
-    // Nota: Convertimos la Promise<string> a string sincrónico para mantener compatibilidad
-    let svgContent = '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><text x="10" y="50" fill="red">Cargando QR</text></svg>';
-    
-    // Enfoque sincrónico usando la API síncrona de qrcode
-    try {
-      svgContent = qrcode.toString(verificationUrl, { 
-        type: 'svg',
-        errorCorrectionLevel: 'H', // Alta corrección de errores
-        margin: 1,
-        scale: 4,
-        color: {
-          dark: '#333333', // Color oscuro (hexadecimal)
-          light: '#ffffff' // Color claro (hexadecimal)
-        }
-      });
-    } catch (e) {
-      console.error('Error en generación síncrona de QR:', e);
-    }
+    // Generar el código QR como SVG de forma asíncrona
+    const svgContent = await qrcode.toString(verificationUrl, { 
+      type: 'svg',
+      errorCorrectionLevel: 'H', // Alta corrección de errores
+      margin: 1,
+      scale: 4,
+      color: {
+        dark: '#333333', // Color oscuro (hexadecimal)
+        light: '#ffffff' // Color claro (hexadecimal)
+      }
+    });
     
     return svgContent;
   } catch (error) {

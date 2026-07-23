@@ -110,7 +110,7 @@ export const DocumentVerificationBadge: React.FC<DocumentVerificationBadgeProps>
 
   return (
     <div className={`w-full max-w-md mx-auto ${className}`}>
-      <div ref={badgeRef} className="rounded-lg overflow-hidden border border-border bg-card text-card-foreground shadow-sm p-4 mb-4">
+      <div ref={badgeRef} className="rounded-lg overflow-hidden border border-gray-200 bg-card text-card-foreground shadow-sm p-4 mb-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-primary" />
@@ -153,7 +153,7 @@ export const DocumentVerificationBadge: React.FC<DocumentVerificationBadgeProps>
           </div>
         </div>
         
-        <div className="mt-4 pt-3 border-t border-border">
+        <div className="mt-4 pt-3 border-t border-gray-200">
           <div className="flex items-center justify-between">
             <div className="text-xs text-muted-foreground">
               Nivel {achievement.level}

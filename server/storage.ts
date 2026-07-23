@@ -25,7 +25,7 @@ import session from "express-session";
 import createMemoryStore from "memorystore";
 import connectPg from "connect-pg-simple";
 import { db, pool } from "./db";
-import { eq, and, asc, desc, sql, count, gte, lte } from "drizzle-orm";
+import { eq, and, asc, desc, sql, gte, lte, count } from "drizzle-orm";
 import { generateRandomPassword } from "@shared/utils/password-util";
 
 const PostgresSessionStore = connectPg(session);

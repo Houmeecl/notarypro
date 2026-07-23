@@ -19,9 +19,10 @@ const VerificacionIdentidadDemo: React.FC = () => {
     
     // Usar la ruta unificada de verificación NFC
     const verificationUrl = `${window.location.origin}/verificacion-nfc?session=${newSessionId}`;
-    // Generar código QR con la URL
-    const qrCode = generateQRCodeSVG(verificationUrl);
-    setVerificationQrCode(qrCode);
+    // Generar código QR con la URL de forma asíncrona
+    generateQRCodeSVG(verificationUrl).then(qrCode => {
+      setVerificationQrCode(qrCode);
+    });
   }, []);
   
   return (
