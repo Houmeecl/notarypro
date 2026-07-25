@@ -21,6 +21,7 @@ import { posManagementRouter } from "./pos-management-routes";
 import { documentSignaturesRouter } from "./routes/document-signatures";
 import { secureDocumentRouter } from "./routes/secure-document-routes";
 import { qrSignatureRouter } from "./vecinos/qr-signature-routes";
+import strategicInsightsRouter from "./strategic-insights-routes";
 
 // Middleware de autenticación
 function isAuthenticated(req: Request, res: Response, next: any) {
@@ -73,6 +74,9 @@ export function registerRoutes(app: Express): Server {
   
   // Ruta para el sistema de firma con QR
   app.use("/api/qr-signature", qrSignatureRouter);
+
+  // Estrategia automatizada
+  app.use("/api", strategicInsightsRouter);
   
   // Ruta para servir archivos estáticos (documentos y contratos)
   app.use("/docs", express.static(path.join(process.cwd(), "docs")));
