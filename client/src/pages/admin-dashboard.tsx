@@ -755,7 +755,7 @@ export default function AdminDashboard() {
                     </div>
                   </CardContent>
                   <CardFooter className="border-t pt-4">
-                    <Link href="/admin/ai-insights">
+                    <Link href="/admin/ai-strategy">
                       <Button variant="outline" className="gap-2">
                         <Brain className="h-4 w-4" />
                         <span>Ver análisis completo de IA</span>
